@@ -1,0 +1,93 @@
+<table class="table" ng-show="jobs">
+	<tr>
+		<td> ID </td>
+		<td>Description</td>
+		<td>Report Type</td>
+		<td>Script Name</td>
+		<td>Que Type</td>
+		<td>Current job status</td>
+		<td>Date submitted</td>
+		
+		<td> Comment </td>
+
+		<td>Schedule Type</td>
+		
+		
+		
+		<td>Action</td>
+		
+	</tr>
+	
+		<tr ng-repeat="job in jobs | googleSearchFilter:search">
+			<td> {[{ job.id }]} </td>
+			<td> {[{ job.report_description }]} </td>
+			<td> {[{ job.report.report_type }]} </td>
+			<td> {[{ job.script_name }]} </td>
+			<td> {[{ job.que_type }]} </td>
+			<td> {[{ job.current_job_status }]} </td>
+			<td> {[{ job.date_submitted }]} </td>
+			
+			<td> {[{ job.comment }]} </td>
+			<td> {[{ job.schedule_type }]} </td>
+			
+			<td>
+				<a href="/report/recuring/view/{[{job.id}]}/" >View</a>
+				<span ng-show="{[{ job.permission.can_change_recuringreport }]}">
+				 / 
+				<a href="/report/recuring/edit/{[{job.id}]}/" >Edit</a>
+				</span>
+
+				<span ng-show="{[{ job.permission.can_delete_recuringreport }]}">
+				 / 
+				<a href=""  data-id="{[{ job.id }]}" class="recuring-job-delete">Delete</a>
+				</span>
+				
+			</td>
+			
+		</tr>
+</table>
+
+<h2 ng-hide="jobs">There's no recuring job</h2>
+<div id="delete-job-confirm" style="display:none;" title="Do you want to delete?">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;">
+  </span>This will delete the job from your system?</p>
+</div>
+
+<script type="text/javascript">
+(function(){
+	$(document).on("click", "#recuring-report-list a.recuring-job-delete", function(e){
+		e.preventDefault();
+		job_id = $(this).data("id");
+		console.log(job_id);
+		$( "#delete-user-confirm" ).css("display:block;");
+		
+		$( "#delete-job-confirm" ).dialog({
+			resizable: false,
+			height:200,
+			modal: true,
+			buttons: {
+				"Delete Job": function() {
+									
+					$( this ).dialog( "close" );
+					$.ajax({
+						type: "POST",
+						url: "/report/recuring/delete/",
+						data: {
+							'id': job_id,
+						},
+						success: function(rdata) {
+							console.log(rdata);
+							$("a[data-id='"+ rdata + "']").closest("tr").remove();
+						}
+					})
+				},
+				Cancel: function() {
+					$( this ).dialog( "close" );
+				}
+			}
+		});
+
+	})
+})(jQuery)
+
+</script>

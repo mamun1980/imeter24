@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+<section class="row"  id="report">
+	
+
+	<div class="col-md-6 col-md-offset-3">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Edit Event</h4>
+		  	</div>
+		  	<div class="panel-body">
+			  	<form name="report-form" action="/events/edit/{{id}}/" method="POST">{% csrf_token %}
+			  		<table class="add-user-table">
+				  		{% for fl in event_form %}
+				  			<tr>
+				  				<td>{{ fl.label_tag }}</td>
+				  				<td>{{ fl.errors }}{{ fl }}</td>
+				  			</tr>
+				  		{% endfor %}
+				  		
+					<tr>
+						<td colspan="2">
+							<button type="submit" class="btn btn-primary btn-lg form-control login-btn">Update Event</button>
+						</td>
+					</tr>
+					</table>
+			  	</form>
+			</div>
+		</div>
+	</div>
+
+</section>
+</div>
+<script type="text/javascript">
+(function(){
+	$(".datepicker").datepicker();
+	$(".timepicker").timepicker({ 'timeFormat': 'H:i:s' });
+})(jQuery)
+
+</script>
+
+{% endblock content %}
+	

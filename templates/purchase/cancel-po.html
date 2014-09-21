@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block angular %}
+	<script type="text/javascript" src="/statics/js/angular.min.js"></script>
+	<script type="text/javascript" src="/statics/js/angular-route.min.js"></script>	
+
+	<script type="text/javascript" src="/statics/js/bootstrap-multiselect.js"></script>
+	<link rel="stylesheet" href="/statics/css/bootstrap-multiselect.css" type="text/css"/>
+{% endblock angular %}
+
+{% block content %}
+<style>
+#feedback { font-size: 1.4em; }
+/*#selectable .ui-selecting { background: #FECA40; }*/
+#selectable .ui-selected, #po-selectable .ui-selected  { background: #F39814; color: white; }
+#selectable, #po-selectable { list-style-type: none; margin: 0; padding: 0px 2px 0px 0px; width: 100%; }
+#selectable thead tr, #po-selectable thead tr { margin: 0px 3px; padding: 0.4em; font-size: 1.4em; height: 35px; background-color: #ed791a; }
+#selectable tbody tr, #po-selectable tbody tr { margin: 0px 3px; padding: 0.4em; font-size: 1.4em; height: 35px; border-bottom: 1px solid #EEE; }
+#selectable tbody tr:hover, #po-selectable tbody tr:hover { background-color: #FECA40; color: #000; }
+#selectable td, #selectable th, #po-selectable td, #po-selectable th {
+	padding: 3px 10px;
+}
+
+
+#supplier-container, #item-container, #po-container {
+	width: 565px;
+}
+#po-container .ui-widget-content-custom {
+	background-color: #333 !important;
+	color: #FFF;
+}
+
+#po_info p {
+	padding: 10px;
+}
+table#item-list {
+	width: 95%;
+	margin-top: 10px;
+	/*display: none;*/
+	/*border: 2px solid #333;*/
+}
+.glyphicon {
+	color: blue !important;
+	top: 10px;
+}
+</style>
+<div class="container shadow4 main-body" ng-app="premierApp">
+
+<section class="row " ng-controller="CancelPOController" >
+	{% if messages %}
+	<div class="col-md-8 col-md-offset-2">
+		<div class="row" id='message'>
+		
+		    {% for message in messages %}
+		    <li {% if message.tags %} class="{{ message.tags }}" {% endif %}><b>{{ message }}</b></li>
+		    {% endfor %}
+			
+		</div>
+	</div>
+	{% endif %}
+
+	<div class="col-md-8 col-md-offset-2">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Cancel Purchase Order</h4>
+		  	</div>
+		  	<div class="panel-body">
+			  	<form action="/purchase/po-change/" method="POST" enctype="multipart/form-data">{% csrf_token %}
+			  		<table class="table">
+			  			{% for field in po_status_form %}
+			  			
+			  				<td width="20%">{{ field.label_tag }}</td>
+			  				<td>{{ field.errors }}{{ field }}</td>
+			  			</tr>
+			  			{% endfor %}
+			  			<tr>
+			  				<td></td>
+			  				<td>
+			  					<input type='submit' class="btn btn-primary" value="Cancel Purchase Order">
+			  				</td>
+			  			</tr>
+			  			
+					</table>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div id="po-container">
+		<table id="selectable" class="ui-autocomplete ui-widget-content-custom ui-corner-all">
+			<thead>
+				<tr>
+					<th>#</th><th>PO Number</th><th>PO Status</th>
+					
+				</tr>
+			</thead>
+			<tbody>
+
+			<tr class="ui-menu-item" ng-repeat="po in purchase_orders | googleSearchFilter:search_po">
+				
+				<td class="pid"><input type="radio" name="po" value="{[{po.id}]}"></td>
+
+				<td class="po_number">{[{po.po_number}]}</td>
+				<td class="po_status">{[{po.status}]}</td>
+				
+			</tr>
+			<tr ng-show="!purchase_orders.length">
+				<td colspan='3'>No PO other then Canceled.</td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
+
+
+</section>
+
+</div>
+
+
+{% include "modals/add-modal.html" %}
+<script type="text/javascript">
+(function(){
+	$("select#id_po").hide();
+	var str1 = "<input type=text name='po_demo' id='id_po_demo' class='form-control' ng-model='search_po' autocomplete='off'>";
+	var str2 = '<div id="po_info"></div>';
+
+	$("select#id_po").closest("td").append(str1+str2);
+
+	$(document).on("click", "#selectable input[type='radio']", function(e){
+		var pid = $(this).val();
+		// $("#selectable tr").removeClass("ui-selected");
+		var po_number = $(this).closest('tr').find("td.po_number").text();
+		var po_status = $(this).closest('tr').find("td.po_status").text();
+
+		var txt = '';
+		txt += "<p class='bg-info'><b class='left-info'>PO Number</b> : "+ po_number + "</p>";
+		txt += "<p class='bg-info'><b class='left-info'>PO Status</b> : "+ po_status + "</p>";
+		
+		$("#po_info").html(txt);
+		$("#id_po_demo").val(po_number);
+		$("select#id_po").val(pid);
+
+
+		$("#selectable").hide();
+		
+		
+
+	});
+
+})(jQuery)
+</script>
+
+
+<!-- po box js -->
+<script type="text/javascript">
+premierApp.controller('CancelPOController',['$scope', '$http', function ($scope, $http) {
+	
+	$scope.init = function() {
+		$http({method: 'GET', url: "/purchase/get-purchase-orders/"}).
+            success(function(data, status, headers, config) {
+                console.log(data);
+                $scope.purchase_orders = data;
+            });
+
+        $("#selectable").hide();
+	};
+
+	$scope.init();
+
+	$scope.$watch('search_po', function (newValue, oldValue) {
+        if(newValue != undefined) {
+        	if(newValue.length > 1) {
+        		$( "#po-container" ).css('width', function(){
+        			var wid = $(this).innerWidth();
+        			console.log(wid);
+        			return wid;
+        		}).position({
+					my: "left top-1",
+					at: "left bottom",
+					of: "#id_po_demo",
+					collision: "fit"
+				});
+
+        		$("#selectable").show();
+        	} else {
+        		$("#selectable").hide();
+        	}
+        } 
+    });
+}]);
+</script>
+{% endblock content %}
+	

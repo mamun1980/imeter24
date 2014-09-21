@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+<section class="row"  id="list-deliverinternal">
+	
+
+	<div class="col-md-8 col-md-offset-2">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Deliverinternal List</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  	<table class="table">
+		  		<thead>
+		  		<tr>
+		  			<th>Deliverinternal ID</th>
+		  			<th>Department</th>
+		  			<th width="60%">Description</th>
+		  			<th>Action</th>
+		  		</tr>
+		  		</thead>
+		  		{% for deliverinternal in deliverinternals %}
+		  		<tr>
+		  			<td>{{ deliverinternal.id }}</td>
+		  			<td>{{ deliverinternal.department }}</td>
+		  			<td>{{ deliverinternal.description }}</td>
+		  			<td>
+		  				
+		  				{%if perms.inventory.change_deliverinternal %}
+
+		  				<a href="/purchase/deliverinternal/edit/{{ deliverinternal.id }}/"> Edit </a>
+
+		  				{% endif %}
+
+		  				{%if perms.inventory.delete_location %}
+
+		  				/ <a class="delete-deliverinternal" data-deliverinternal-id="{{ deliverinternal.id }}" href=""> Delete </a>
+
+		  				{% endif %}
+
+		  			</td>
+
+		  		</tr>
+		  		{% empty %}
+		  			<tr>
+		  				<td colspan="3">No deliverinternals</td>
+		  			</tr>
+		  		{% endfor %}
+		  	</table>
+			</div>
+		</div>
+	</div>
+
+</section>
+</div>
+<script type="text/javascript">
+(function(){
+	$("#list-deliverinternal a.delete-deliverinternal").on("click", function(e){
+		e.preventDefault();
+		var di_id = $(this).data("deliverinternal-id");
+		
+		$.ajax({
+			type: "POST",
+			url: "/purchase/deliverinternal/delete/",
+			data: {
+				'id': di_id,
+			},
+			success: function(rdata) {
+				
+				$("a[data-deliverinternal-id='"+rdata+"']").closest("tr").remove();
+				alert('Deliverinternal is deleted');
+			}
+		})
+	});
+
+})(jQuery)
+
+</script>
+
+{% endblock content %}
+	

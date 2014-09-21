@@ -1,0 +1,51 @@
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h4 class="modal-title" id="myModalLabel">Edit Report Type</h4>
+</div>
+<form name="report-type" action="/report/report-type/edit/{{ report_type_id }}/" method="post">{% csrf_token %}
+<div class="modal-body" style="text-align: center;">
+    
+    <input type="hidden" name="report_type_id" value="{{ report_type_id }}">
+    <table>
+        <tr>
+        {% for field in reprot_type_form %}
+            <td>
+                {{ field }}
+            </td>
+        {% endfor %}
+        
+        </tr>
+    </table>
+    
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default close-modal" data-dismiss="modal">Close</button>
+    <button type="submit" class="btn btn-primary">Save changes</button>
+</div>
+</form>
+<script type="text/javascript">
+(function(){
+    $("form[name='report-type']").on("submit", function(e){
+        e.preventDefault();
+        id = $("input[name='report_type_id']").val();
+        $("#report-type-list span."+id).remove();
+        console.log(id);
+        
+        form_data = $(this).serialize();
+        $.ajax({
+            type: "POST",
+            url: $(this).attr("action"),
+            data: form_data,
+            success: function(rdata) {
+                $( "button.close-modal" ).trigger( "click" );
+
+                $("#report-type-list").prepend(rdata);
+
+            }
+        })
+
+    })
+
+})(jQuery)
+    
+</script>

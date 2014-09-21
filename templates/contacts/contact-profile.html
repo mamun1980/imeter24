@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+
+{% block jumboblock %}
+{% endblock jumboblock %}
+
+{% block content %}
+<div class="container shadow4 main-body">
+{% if perms.contacts.view_contactphone %}
+	<div class="row" id="contact-profile">
+		
+		<div class="col-md-6 col-md-offset-3">
+			<section class="panel panel-primary">
+				<div class="panel-heading"><h4>Contact phones</h4></div>
+				<div class="panel-body">
+				{% if perms.contacts.add_contactphone %}
+					<form name="contact-phone" action="/contacts/phone/add/ajax/" method="post">{% csrf_token %}
+					<input type="hidden" name="profile_id" value="{{ pid }}">
+						<table>
+						<tr>
+						{% for ufield in cpform %}
+							<td>
+							{{ ufield.label_tag }}
+							</td>
+						{% endfor %}
+						<td></td>
+						</tr>
+						<tr>
+
+						{% for ufield in cpform %}
+							<td>
+							{{ ufield }}
+							</td>
+						{% endfor %}
+							<td>
+							
+					        	<button class="btn btn-primary" type="submit">Add</button>
+					      	
+					      	</td>
+						</tr>
+						</table>
+						
+					</form>
+				{% endif %}
+					<table class="table table-hover table-bordered">
+						<thead>
+							<tr>
+								<th>Phone Type</th>
+								<th>Phone Number</th>
+								<th>Phone Ext</th>
+								<th>Action</th>
+							</tr>
+						</thead>
+						<tbody id='contact-phone-list'>
+						{% for contact_phone in contact_phones %}
+						<tr>
+							<td>{{ contact_phone.phone_type }}</td>
+							<td>{{ contact_phone.phone }}</td>
+							<td>{{ contact_phone.phone_ext }}</td>
+							<td>
+							
+								<a class="phone-delete" href="#" data-id="{{ contact_phone.id }}">delete</a>
+							
+							</td>
+						</tr>
+						{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</section>
+		</div>
+		
+	</div>
+{% endif %}
+	<div class="row">
+		<article class="col-md-10 col-md-offset-1">
+		<section class="panel panel-primary" id="contact-profile">
+			<div class="panel-heading"><h4>Contact profile information</h4></div>
+			<div class="panel-body">
+
+			<table class="table-hover contact-profile">
+			<form role="form" action="/contacts/profile/" method="post" enctype="multipart/form-data">{% csrf_token %}
+			<input type="hidden" name="contact_id" value="{{ pid }}">
+				{% for field in profile_form %}
+					<tr>
+				
+					<th width="15%" class="profile-title">{{ field.label_tag }}</th>
+					<td width="35%" class="profile-value">{{ field }}</td>				
+					
+				{% endfor%}
+				<tr>
+					<td></td>
+					<td colspan="" align="right">
+						<button type="submit" class=" form-control btn btn-primary btn-lg">Save</button>
+					</td>
+					
+				</tr>
+			</form>
+			</table>
+			</div>
+		</section>
+		</article>
+	</div>
+
+</div>
+
+<script type="text/javascript">
+	(function() {
+		$("a.phone-delete").on("click", function(e){
+			phone_id = $(this).data("id");
+			
+			
+			$.ajax({
+				type: 'post',
+				url: "/contacts/phone/delete/",
+				data: {
+					'phone_id': phone_id,
+				},
+
+				success: function(data){
+					console.log(data);
+					$("a[data-id='"+data+"'").closest("tr").remove();
+				},
+				errors: function(data){
+					alert("Phone is not deleted.");
+				}
+			})
+
+		});
+
+
+		$("form[name='contact-phone']").on("submit", function(e){
+			e.preventDefault();
+
+			phone_type = $("select[name='phone_type']").val();
+			phone = $("input[name='phone']").val();
+			phone_ext = $("input[name='phone_ext']").val();
+			profile_id = $("input[name='profile_id']").val();
+			
+			// console.log(phone_type + " "+ phone + " "+ phone_ext);
+			$.ajax({
+				type: "post",
+				url: "/contacts/phone/add/ajax/",
+				data: {
+					'phone_type': phone_type,
+					'phone': phone,
+					'phone_ext': phone_ext,
+					'pid': profile_id,
+
+				},
+				success: function(data){
+					$("tbody#contact-phone-list").append(data)
+					console.log(data);
+				}
+			});
+		});
+
+
+		
+	})(jQuery)
+
+</script>
+{% endblock content %}

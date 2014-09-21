@@ -1,0 +1,8 @@
+<span class="label label-danger {{ report_type.id }}">
+	{{ report_type.report_type }}
+	{% if perms.report.change_reporttype %}
+		<a class="report-type-edit" href="/report/report-type/edit/{{ report_type.id }}/" 
+			data-toggle="modal" data-target="#editModal"
+			data-unit-mes-id="{{ report_type.id }}"><i class="glyphicon glyphicon-edit"></i></a>
+	{% endif %}
+</span>

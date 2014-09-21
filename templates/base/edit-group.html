@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container main-body">
+	<div class="row"  style="margin-top: 20px;">
+	    <div class="col-md-5 col-md-offset-3">
+	    	<div class="panel panel-primary">
+				<div class="panel-heading">
+			    	<h6>Edit Group</h6>
+			  	</div>
+			  	<form name="add-group" action="/group/edit/{{group.id}}/" method="POST">{% csrf_token %}
+			  	<div class="panel-body">
+			  		
+			    	<div class="input-group">
+					  	{% for field in group_form %}
+					  		{{ field }}
+					  	{% endfor %}
+					  	<div class="input-group-btn">
+							<button class="btn btn-primary" type="submit">Update Group</button>
+						</div>
+					</div>
+
+				</div>
+
+				<table class="table">
+					<tr>
+						<td>
+							<select id='group-permissions' multiple='multiple'>
+								{% for perm in all_permissions %}
+									<option data-model="{{ perm.content_type_id }}" value="{{ perm.codename }}" {% if perm in permissions %} selected {% endif %}>{{ perm.name }}</option>
+								{% endfor %}
+
+							</select>
+						</td>
+					</tr>
+						
+				</table>
+				</form>
+			</div>
+	    	
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+(function(){
+
+	$('#group-permissions').multiSelect({
+		selectableHeader: "<input type='text' class='search-input form-control' autocomplete='off' placeholder='search permission'>",
+		selectionHeader: "<input type='text' class='search-input form-control' autocomplete='off' placeholder='search permission'>",
+		
+		afterInit: function(ms){
+		var that = this,
+		    $selectableSearch = that.$selectableUl.prev(),
+		    $selectionSearch = that.$selectionUl.prev(),
+		    selectableSearchString = '#'+that.$container.attr('id')+' .ms-elem-selectable:not(.ms-selected)',
+		    selectionSearchString = '#'+that.$container.attr('id')+' .ms-elem-selection.ms-selected';
+
+		that.qs1 = $selectableSearch.quicksearch(selectableSearchString)
+		.on('keydown', function(e){
+		  if (e.which === 40){
+		    that.$selectableUl.focus();
+		    return false;
+		  }
+		});
+
+		that.qs2 = $selectionSearch.quicksearch(selectionSearchString)
+		.on('keydown', function(e){
+		  if (e.which == 40){
+		    that.$selectionUl.focus();
+		    return false;
+		  }
+		});
+		},
+		
+		afterSelect: function(){
+			this.qs1.cache();
+			this.qs2.cache();
+		},
+		
+		afterDeselect: function(){
+			this.qs1.cache();
+			this.qs2.cache();
+		}
+	});
+
+	$("form[name='add-group']").on('submit', function(e){
+		e.preventDefault();
+		options = $("select#group-permissions").val();
+		group_name = $("input[name='name']").val();
+		url = $(this).attr("action");
+
+		console.log(url)
+		my_perms = [];
+
+		if (options != null) {
+			for(i=0; i<options.length; i++) {
+				model = $("option[value='"+options[i]+"']").data("model");
+				my_perms.push(model+"-"+options[i]);			
+			}
+			console.log(my_perms);
+		}
+		
+		$.ajax({
+	    	type: "POST",
+	    	url: url,
+	    	data: {
+				'selected_permissions': my_perms,
+				'group_name': group_name,
+			},
+	    	success: function(data) {
+	    		console.log("Success");
+	    		alert("Group updated successfully");
+	    	},
+	    	error: function(errors) {
+	    		console.log("errors");
+	    	}
+	    })
+	});
+
+
+})(jQuery)
+
+
+</script>
+{% endblock content %}

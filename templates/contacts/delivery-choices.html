@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+<section class="row"  id="delivery-choice-list">
+	
+
+	<div class="col-md-6 col-md-offset-3">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Delivery Choices List</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  		<table class="table">
+			  		<tr>
+			  			<td> ID </td>
+			  			<td>Delivery Choice</td>
+			  			<td>Total Use</td>
+			  			<td>Action</td>
+			  			
+			  		</tr>
+			  		{% for delivery_choice in delivery_choices %}
+			  			<tr>
+				  			<td> {{ delivery_choice.id }} </td>
+				  			<td> {{ delivery_choice.delivery_choice }} </td>
+				  			<td> {{ delivery_choice.contactprofile_set.all.count }} </td>
+				  			<td>
+				  				<a class="delivery-choice-delete" href="#" data-dcid="{{ delivery_choice.id }}">delete</a>
+				  			</td>
+				  			
+				  		</tr>
+				  	{% empty %}
+				  	<tr>
+			  			<td colspan='4'> No delivery choices found. </td>
+			  		</tr>
+				  	{% endfor %}
+			  	</table>
+		  	
+			</div>
+		</div>
+	</div>
+
+
+</section>
+
+<script type="text/javascript">
+(function(){
+	$("#delivery-choice-list a.delivery-choice-delete").on("click", function(e){
+		e.preventDefault();
+		dcid = $(this).data("dcid");
+		console.log(dcid);
+
+		$.ajax({
+			type: "POST",
+			url: "/contacts/delivery-choice/delete/",
+			data: {
+				'dcid': dcid,
+			},
+			success: function(rdata) {
+				console.log(rdata);
+				$("a[data-dcid='"+rdata+"']").closest("tr").remove();
+			}
+		})
+	});
+
+})(jQuery)
+
+</script>
+</div>
+
+
+{% endblock content %}
+	

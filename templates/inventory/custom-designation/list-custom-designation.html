@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+<section class="row"  id="custom-designation-list">
+	
+
+	<div class="col-md-6 col-md-offset-3">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4> Custom Designation List</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  		<table class="table">
+			  		<tr>
+			  			<td> ID </td>
+			  			<td>Custom Designation </td>
+			  			<td>Total Use</td>
+			  			<td>Action</td>
+			  			
+			  		</tr>
+			  		{% for custom_designation in custom_designations %}
+			  			<tr>
+				  			<td> {{ custom_designation.id }} </td>
+				  			<td> {{ custom_designation.designation }} </td>
+				  			<td> {{ custom_designation.item_set.all.count }} </td>
+				  			<td>
+				  				<a class="custom-designation-delete" href="#" data-cus-des-id="{{ custom_designation.id }}">delete</a>
+				  			</td>
+				  			
+				  		</tr>
+				  	{% empty %}
+				  	<tr>
+			  			<td colspan='4'> No Custom Designation found. </td>
+			  		</tr>
+				  	{% endfor %}
+			  	</table>
+		  	
+			</div>
+		</div>
+	</div>
+
+
+</section>
+
+<script type="text/javascript">
+(function(){
+	$("#custom-designation-list a.custom-designation-delete").on("click", function(e){
+		e.preventDefault();
+		cusid = $(this).data("cus-des-id");
+		console.log(cusid);
+
+		$.ajax({
+			type: "POST",
+			url: "/inventory/custom-designation/delete/",
+			data: {
+				'custom_designation_id': cusid,
+			},
+			success: function(rdata) {
+				console.log(rdata);
+				$("a[data-cus-des-id='"+rdata+"']").closest("tr").remove();
+			}
+		})
+	});
+
+})(jQuery)
+
+</script>
+</div>
+
+
+{% endblock content %}
+	

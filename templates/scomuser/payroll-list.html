@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+<section class="row" id="payroll-details">
+
+	<div class="col-md-10 col-md-offset-1">
+	<div class="panel panel-primary">
+		<div class="panel-heading">
+	    	<h4>Payroll List</h4>
+	  	</div>
+	  	<div class="panel-body" id="payroll-list">
+	  	
+
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Payroll ID</th>
+					<th>First Name</th>
+					<th>Last Name</th>
+					<th>Email</th>
+					<th>Employee SIN</th>
+					<th>Department</th>
+					<th>Rate Of Pay</th>
+					<th>Rate Of Pay Type</th>
+					<th>Action</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for payroll in payrolls %}
+				<tr>
+					<td>{{ payroll.id }}</td>
+					<td>{{ payroll.user.first_name|default:"Not available" }}</td>
+					<td>{{ payroll.user.last_name|default:"Not available" }}</td>
+					<td>{{ payroll.user.email }}</td>
+					<td>{{ payroll.sin }}</td>
+					<td>{{ payroll.department }}</td>
+					<td>{{ payroll.rate_of_pay }}</td>
+					<td>{{ payroll.rate_of_pay_type }}</td>
+					<td>
+						<a href="/scomuser/payroll/{{ payroll.id }}/"> view </a> / 
+						<a href="/scomuser/payroll/edit/{{ payroll.id }}/"> Edit </a> / 
+						<a class="payroll-delete" data-payid="{{payroll.id}}" href="/scomuser/payroll/delete/"> delete </a>
+					</td>
+				</tr>
+				{% empty %}
+				<tr>
+					<td colspan=9>
+						No payroll available
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+		</div>
+	</div>
+
+</section>
+<script type="text/javascript">
+(function(){
+	$("#payroll-list a.payroll-delete").on("click", function(e){
+		e.preventDefault();
+		payroll_id = $(this).data("payid");
+
+		$.ajax({
+			type: "POST",
+			url: "/scomuser/payroll/delete/",
+			data: {
+				'payroll_id': payroll_id
+			},
+			success: function (rdata) {
+				$("#payroll-list a[data-payid='"+rdata+"']").closest("tr").remove()
+
+			}
+		})
+	})
+})(jQuery)
+
+
+
+</script>
+</div>
+
+
+
+{% endblock content %}

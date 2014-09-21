@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+<section class="row"  id="printer">
+	
+
+	<div class="col-md-10 col-md-offset-1">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>List printer que</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  		<table class="table">
+		  			<tr>
+		  				<td>Printer ID</td>
+		  				<td>Printer Location</td>
+		  				<td>Printer Type</td>
+		  				<td>Printer Status</td>
+		  				<td>Printer Capacity</td>
+		  				<td>Action</td>
+		  			</tr>
+		  			{% for printerv2 in printersv2 %}
+			  			<tr>
+			  				<td>{{ printerv2.printer_id }}</td>
+			  				<td>{{ printerv2.printer_location }}</td>
+			  				<td>{{ printerv2.printer_type }}</td>
+			  				<td>{{ printerv2.printer_status }}</td>
+			  				<td>{{ printerv2.printer_capacity }}</td>
+			  				<td>
+			  					<a href="/report/printer/view/{{printerv2.printer_id}}/">View</a> /
+			  					<a class="edit-printer" href="/report/printer/edit/{{printerv2.printer_id}}/">Edit</a> /
+			  					<a class="delete-printer" data-id="{{ printerv2.printer_id }}" href="">Delete</a>
+
+			  				</td>
+			  			</tr>
+		  			{% endfor %}
+
+		  		</table>
+			</div>
+		</div>
+	</div>
+
+</section>
+</div>
+{% include "modals/edit-modal.html" %}
+<script type="text/javascript">
+(function(){
+
+	$("a.edit-printer").on("click", function(e){
+		e.preventDefault();
+		// com_id = $(this).data("id");
+	    url = $(this).attr("href");
+		mdal = $('#editModal');
+		mdal.on("shown.bs.modal", function(){
+			$("#editModal .modal-content").load(url);
+			console.log(url);
+		}).modal();
+
+		return false;
+	});
+
+	$("a.delete-printer").on("click", function(e){
+		e.preventDefault()
+		id = $(this).data('id')
+
+		$.ajax({
+			type: "POST",
+			url: "/report/printer/delete/",
+			data: {
+				'printer_id': id,
+			},
+			success: function(rdata) {
+				$("a[data-id='"+rdata+"']").closest("tr").remove();
+			}
+
+		})
+
+	})
+})(jQuery)
+</script>
+
+{% endblock content %}
+	

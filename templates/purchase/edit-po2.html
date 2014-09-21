@@ -1,0 +1,719 @@
+{% extends "base.html" %}
+
+{% block angular %}
+	<script type="text/javascript" src="/statics/js/angular.min.js"></script>
+	
+	<script type="text/javascript" src="/statics/js/bootstrap-multiselect.js"></script>
+	<link rel="stylesheet" href="/statics/css/bootstrap-multiselect.css" type="text/css"/>
+	<script type="text/javascript" src="/statics/js/ui-bootstrap-0.9.0.min.js"></script>
+{% endblock angular %}
+
+{% block content %}
+<style type="text/css">
+#ui-datepicker-div {
+	z-index: 10 !important;
+}
+.add-po-form {
+
+}
+.panel-body {
+	padding: 0px !important;
+}
+.supplier_contact thead{
+	background-color: #E0E0E0 !important;
+}
+.supplier_contact tbody, .ship_to_contact tbody {
+	background-color: #FFF
+}
+.supplier_contact tbody tr:hover, .ship_to_contact tbody tr:hover {
+	background-color: #616183;
+}
+
+.contact_box, .item_box {
+	position: relative;
+}
+.input-group {
+	width: 90% !important;
+}
+table#supplier_contact_details, table#ship_to_contact_details {
+	margin-top: 10px;
+}
+table#supplier_contact_details th, table#ship_to_contact_details th{
+	background-color: #83AD9E;
+}
+#ship_to_contact_list, #supplier_contact_list, #items_list {
+	position: absolute;
+	top: 42px;
+	left: 8px;
+	background-color: #DDD;
+	z-index: 1000;
+	/*border: 1px solid #000;*/
+	-webkit-box-shadow: 0px 0px 10px 0px rgba(50, 50, 50, 0.75);
+	-moz-box-shadow:    0px 0px 10px 0px rgba(50, 50, 50, 0.75);
+	box-shadow:         0px 0px 10px 0px rgba(50, 50, 50, 0.75);
+}
+#items_list {
+	width: 980px;
+}
+#items_list thead {
+	background-color: #333 !important;
+	color: #FF0;
+}
+
+.glyphicon {
+	color: red;
+}
+.panel-body {
+	background-color: #FFF !important;
+
+}
+table.item {
+	margin-top: 10px;
+	background-color: #DDD !important;
+}
+table.item thead {
+	background-color: #333;
+	color: #FF0;
+}
+#calculated_total_amount {
+	background-color: #999;
+}
+#calculated_total_amount td {
+	background-color: #333;
+	color: #FF0;
+	font-size: 16px;
+}
+span.amount {
+	color: #FF0;
+	font-size: 16px;
+}
+.topmargin {
+	margin-top: 5px;
+}
+.remove-item, .add-item {
+	width: 20px;
+	display: inline;
+	padding: 2px !important;
+}
+tr.add_item {
+	border-top: 2px solid #333;
+}
+a.close {
+	text-shadow: none !important;
+	color: red !important;
+	opacity: 1 !important;
+}
+.rcv_date_label {
+	margin-left: 0px;
+}
+
+.rcv_date {
+	font-size: 10px;
+}
+.item_desc {
+	margin-top: 5px;
+	padding: 2px;
+	border: 1px solid #CCC;
+}
+span.email {
+	padding: 5px;
+	margin: 1px 5px;
+	font-weight: bold;
+}
+.tax {
+	width: 45% !important;
+	display: inline-block !important;
+}
+#add_item_list .form-control {
+	font-size: 12px;
+}
+</style>
+<div class="container-fluid" ng-app="poApp">
+
+<section class="row " ng-controller="EditPOController">
+<article class="col-md-12">
+	<div class="panel panel-primary">
+		<div class="panel-heading">
+	    	<h4>Edit Purchase Order</h4>
+	  	</div>
+		<div class="panel-body">
+
+			<form action="/purchase/edit/{{po.id}}/" method="POST" enctype="multipart/form-data">
+				<input type="hidden" name="po_id" id="po_id" value="{{po.id}}">
+				{% include "purchase/partials/edit-po-form.html" %}
+			</form>
+		</div>
+	</div>
+</article>
+</section>
+</div>
+{% include "modals/add-modal.html" %}
+<script type="text/javascript">
+(function(){
+
+$(".datepicker").datepicker();
+$(document).on("change", "input.decimal", function(e){
+	var myval = parseFloat($(this).val())
+	$(this).val(myval.toFixed(2));
+})
+$("a.close").on("click", function(){
+	$(this).closest('table').hide();
+});
+
+$( "input[name='item_job_number']" ).autocomplete({
+  source: "/schedule/list-filter/",
+  _renderItem: function( ul, item ) {
+	  return $( "<li>" )
+	    .attr( "data-value", item.value )
+	    .append( $( "<a>" ).text( item.label ) )
+	    .appendTo( ul );
+	},
+	select: function( event, ui ) {
+		console.log(ui.item.id);
+		// $(this).attr("data-id", ui.id);
+		
+		$(event.target).siblings("input.item_job_id").val(ui.item.id);
+	}
+});
+// item search
+
+$(document).on("change", "input[name='item_cost']", function(e){
+	var cost = $(this).val();
+	var cost_fl = parseFloat(cost).toFixed(4);
+	var qty = $(this).closest('tr').find('input[name="item_qty"]').val();
+	var qty_fl = parseFloat(qty).toFixed(2);
+	var sub_total = qty_fl * cost_fl;
+	$(this).val(cost_fl);
+
+	$(this).closest('tr').find("input[name='item_sub_total']").val(sub_total.toFixed(4));
+	var item_total = 0;
+
+	$("tbody#add_item_list tr input[name='item_sub_total']").each(function(index){
+			var subtotal = $(this).val();
+			item_total = item_total + parseFloat(subtotal);
+		});
+	
+	$("#calculated_total_amount span.amount").text(item_total.toFixed(4));
+	var hst_tax = $("#id_hst_taxable").val();
+	var pst_tax = $("#id_pst_taxable").val();
+	if(hst_tax == '1'){
+		var hst_tax_amount = parseFloat($("#id_hst_taxable_amount").val())
+		item_total += hst_tax_amount;
+	}
+	if(pst_tax == '1'){
+		var pst_tax_amount = parseFloat($("#id_pst_taxable_amount").val())
+		item_total += pst_tax_amount;
+	}
+
+	$("#id_total_po_amount").val(item_total.toFixed(4));
+	item_total = 0;
+});   	
+
+$(document).on("change", "input[name='item_sub_total']",function(e){
+	var item_total = 0;
+	$("tbody#add_item_list tr input[name='item_sub_total']").each(function(index){
+		var subtotal = $(this).val();
+		item_total = item_total + parseFloat(subtotal);
+		// console.log(itemtotal);
+	});
+	
+	$("#calculated_total_amount span.amount").text(item_total.toFixed(4));
+
+	var hst_tax = $("#id_hst_taxable").val();
+	var pst_tax = $("#id_pst_taxable").val();
+	if(hst_tax == '1'){
+		var hst_tax_amount = parseFloat($("#id_hst_taxable_amount").val())
+		item_total += hst_tax_amount;
+	}
+	if(pst_tax == '1'){
+		var pst_tax_amount = parseFloat($("#id_pst_taxable_amount").val())
+		item_total += pst_tax_amount;
+	}
+
+	$("#id_total_po_amount").val(item_total.toFixed(4));
+
+	item_total = 0;
+});
+
+$(document).on("change", "input[name='item_qty']", function(e){
+	var qty = parseFloat($(this).val());
+	var qty_fl = parseFloat(qty);
+	var cost = $(this).closest('tr').find('input[name="item_cost"]').val();
+	var cost_fl = parseFloat(cost);
+	
+	var sub_total = qty_fl * cost_fl;
+	$(this).closest('tr').find("input[name='item_sub_total']").val(sub_total);
+
+	var item_total = 0;
+	$("tbody#add_item_list tr input[name='item_sub_total']").each(function(index){
+		var subtotal = $(this).val();
+		item_total = item_total + parseFloat(subtotal);
+		
+	});
+	
+	$("#calculated_total_amount span.amount").text(item_total.toFixed(4));
+	var hst_tax = $("#id_hst_taxable").val();
+	var pst_tax = $("#id_pst_taxable").val();
+	console.log("hst tax "+ hst_tax);
+	if(hst_tax == '1'){
+		var hst_tax_amount = parseFloat($("#id_hst_taxable_amount").val())
+		item_total += hst_tax_amount;
+	}
+	if(pst_tax == '1'){
+		var pst_tax_amount = parseFloat($("#id_pst_taxable_amount").val())
+		item_total += pst_tax_amount;
+	}
+
+	$("#id_total_po_amount").val(item_total.toFixed(4));
+	
+	
+	var item_subtotal_qty = 0;
+	$("tbody#add_item_list tr input[name='item_qty']").each(function(index){
+		var subtotal_qty = $(this).val();
+		item_subtotal_qty = item_subtotal_qty + parseFloat(subtotal_qty);
+	});
+	$("#id_items_total").val(item_subtotal_qty.toFixed(2));
+
+	item_total = 0;
+	item_subtotal_qty = 0;
+});
+var poApp = angular.module("poApp", [], function ($interpolateProvider) {
+        $interpolateProvider.startSymbol("{[{");
+        $interpolateProvider.endSymbol("}]}");
+});
+poApp.filter('googleSearchFilter', function(){
+    return function(items, token) {
+        
+        if(token != undefined && token != "") {
+            var output=[];
+            var filter_output = [];
+            output = items;
+            // console.log(output);
+            
+            var searchArr = token.split(" ");
+
+            for(var j=0; j<searchArr.length; j++) {
+
+                for(var i=0; i<output.length; i++) {
+                    // console.log(output[i]);
+                    var search_str = output[i].search_string;
+                    // We can remove this if statement when all is updated.
+                    // console.log(search_str);
+                    if (search_str != null) {
+                        var n = search_str.search(new RegExp(searchArr[j], "i"));    
+                        // console.log('search_str is not null');
+                    }
+                    // console.log(n);
+                    if(n != -1) {
+                        filter_output.push(output[i]);
+                    }
+
+                }
+                output = filter_output;
+                filter_output = [];  
+            }
+            
+            return output;
+
+        } else {
+            return items;
+        }   
+    }
+});
+poApp.controller('EditPOController', ['$scope', '$http', '$compile', function ($scope, $http, $compile) {
+	$scope.init = function (){
+
+		var po_id = $("input#po_id").val();
+
+
+		// $scope.ship_via = ['shippingone', 'shippingtwo', 'other'];
+				
+		// intialize dateIssued value to current date
+		var now = new Date();
+		// $scope.dateIssued = now.dateFormat("m/d/Y");
+
+		// initialize po_status set set default value to 'New'
+		$scope.postatus_list = [
+			{'value':0, 'label':'New'},
+			{'value':1, 'label': 'Printed / Emailed'},
+			{'value':2, 'label':'Partial Received'},
+			{'value':3, 'label': 'Received / Completed'},
+			{'value':4, 'label': 'Accounting Confirmed'},
+			{'value':5, 'label': 'Closed'},
+			{'value':6, 'label': 'Canceled'},
+		]
+		$scope.poStatus = $scope.postatus_list[0];
+
+		// Get all contacts from the system
+
+		$http({method: 'GET', url: "/contacts/list/"}).
+            success(function(data, status, headers, config) {
+                // console.log(data);
+                $scope.contacts = data;
+                // Select deafult contacts
+                $("#id_supplier").val($scope.contacts[0].id);
+        });
+
+        // Get items
+        $http({method: 'GET', url: "/inventory/items/"}).
+        	success(function(data, status, headers, config){
+        	$scope.items = data;
+        });
+
+        $http({method: 'GET', url: "/purchase/get-po-by-id/"+po_id+"/"}).
+        	success(function(data, status, headers, config){
+        	// $scope.po = data;
+
+        	$scope.supplier_contact = data.supplier;
+        	$("#id_supplier").val(data.supplier.id);
+        	$scope.ship_to_contact = data.ship_to;
+        	$("#id_ship_to").val(data.ship_to.id);
+        	$scope.shipVia = data.ship_via.id;
+        	$scope.poStatus = data.po_status.id;
+        	$scope.fob = data.fob;
+        	$scope.shipping_inst = data.shipping_inst;
+        	$scope.department = data.deliver_internal.id;
+        	$scope.blanket_po = data.blanket_po;
+        	$scope.terms = data.terms.id;
+        	$scope.purchasing_agent = data.purchasing_agent.id;
+        	$scope.return_type = data.return_type.id;
+        	
+        	$scope.item_total_qty = data.items_total;
+        	console.log(data.items_total);
+        	$scope.pst_tax = data.pst_taxable;
+			$scope.hst_tax = data.hst_taxable;
+			$scope.total_amount = data.total_po_amount;
+			$scope.hst_tax_amount = data.hst_taxable_amount;
+			$scope.pst_tax_amount = data.pst_taxable_amount;
+
+			$scope.po_que = data.po_que.id;
+			$scope.po_overwridden_by = data.po_overwridden_by.id
+
+			$scope.first_currency_id = data.currency.id;
+			console.log(data.supplier);
+        });
+		
+
+		// Supplier
+		$("#supplier_contact_list").hide();
+		if($scope.supplier_contact === null){
+			console.log("hello");
+			$("#supplier_contact_details").hide();
+		}
+		
+		// ship to
+		$("#ship_to_contact_list").hide();
+		if($scope.ship_to_contact === null){
+			$("#ship_to_contact_details").hide();
+		} 
+		
+		// Items
+		$("#items_list").hide();
+
+		var item_total = 0;
+		$("#add_item_list input[name='item_sub_total']").each(function(index){
+			var subtotal = $(this).val();
+			item_total = item_total + parseFloat(subtotal);
+		});
+		$("#calculated_total_amount span.amount").text(item_total.toFixed(4));
+		
+	}
+
+	$scope.init();
+
+	// suppplier google search and select
+
+	$scope.$watch('search_supplier', function (newValue, oldValue) {
+        if(newValue != undefined) {
+        	if(newValue.length > 1) {
+        		$("#supplier_contact_list").show();
+        		console.log(newValue);
+        	} else {
+        		$("#supplier_contact_list").hide();
+        	}
+        } 
+    });
+
+	$scope.setSupplier = function(con){
+		$("#supplier_contact_list").hide();
+		$scope.supplier_contact = con;
+		// $scope.supplier = con;
+		$("#id_supplier").val(con.id);
+		$("#supplier_contact_details").show();
+		$scope.search_supplier = '';
+		
+		// autoselect ship_to
+		$scope.ship_to_contact = con;
+		$("#id_ship_to").val(con.id);
+		$("#ship_to_contact_details").show();
+
+		// autoselect ship via
+		$("#id_ship_via").val(con.shipvia_id)
+
+		// autoselect terms
+		$("#id_terms").val(con.term_id);
+
+		// autoselect FOB
+		if(con.fob){
+			$("#id_fob").val(con.fob);	
+		}
+		
+	};
+
+	// ship to google seach and select
+	$scope.$watch('search_ship_to', function (newValue, oldValue) {
+        if(newValue != undefined) {
+        	if(newValue.length > 1) {
+        		$("#ship_to_contact_list").show();
+        		console.log(newValue);
+        	} else {
+        		$("#ship_to_contact_list").hide();
+        	}
+        } 
+    });
+
+	$scope.selectShipTo = function(con) {
+		$("#ship_to_contact_list").hide();
+		$scope.search_ship_to = ""
+		$scope.ship_to_contact = con;
+		$("#id_ship_to").val(con.id);
+		$("#ship_to_contact_details").show();
+
+
+	};
+
+	// item google seach and select
+	// $scope.$watch('search_item', function (newValue, oldValue) {
+ //        if(newValue != undefined) {
+ //        	if(newValue.length > 1) {
+ //        		$("#items_list").show();
+ //        		console.log(newValue);
+ //        	} else {
+ //        		$("#items_list").hide();
+ //        	}
+ //        } 
+ //    });
+	$scope.searchItem = function(q) {
+		if(q.length > 1) {
+			console.log(q);
+			$http({method: 'GET', url: "/inventory/items/"}).
+	        	success(function(data, status, headers, config){
+	        	$scope.items = data;
+	        });
+			$("#items_list").show();
+		} else {
+			$("#items_list").hide();
+		}
+		
+	}
+    $scope.selectItem = function(item) {
+    	$scope.search_item = '';
+
+    	$("#items_list").hide();
+    	var myitem = $("tbody#add_item_list tr.add_item");
+    	var item_number = item.item_number;
+    	var item_description = item.description;
+    	var item_id = item.id;
+    	var currency_id = item.currency_id;
+    	var item_unit_measure = item.item_unit_measure;
+    	var item_qty_received = 0.00;
+    	// console.log(item_qty_received);
+    	var last_received_date = null;
+    	// console.log(item.qty_received_date);
+    	var wholesale_cost = item.wholesale_cost;
+
+    	if($scope.first_currency_id === undefined){
+    		$scope.first_currency_id = currency_id;
+    		$("#id_po_currency").val(currency_id);
+    	}
+    	if($scope.first_currency_id != currency_id){
+    		alert("Currency not matched!");
+    		return;
+    	}
+    	
+
+    	var item_count = myitem.length;
+
+    	if(item_number == undefined) {
+    		alert("Please choose an item first.");
+    		return;
+    	}
+
+    	if(item_count > 0) {
+    		try{
+	    		myitem.each(function(index){
+	    			var myval = $(this).find("input[name='added_item_number']").val();
+	    			if(myval == item_number){
+	    				alert("This item already added.");
+	    				throw 'duplicate';
+	    			}
+	    			
+	    		});
+	    	} catch(e) {
+	    		console.log(e);
+	    		return;
+
+	    	}
+			
+    	}
+    	
+    	var str = "<tr class='add_item'>";
+    	str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+item_number+"' readonly></td>";
+    	str += "<td><p class='bg-info item_desc'>"+item_description+"</p></td>";
+    	
+    	str += "<td><select class='form-control'>";
+    	str += "<option ng-repeat='um in item_unit_measures' value='{[{um.id}]}'>{[{um.unit_name}]}</option>";
+    	str += "</select></td>";
+    	
+    	str += "<td><input type='currency' class='form-control' step='0.0001' name='item_cost' value='"+wholesale_cost+"'></td>";
+    	str += "<td><input type='number' class='form-control decimal' step='0.01' name='item_qty' value='0'></td>";
+    	str += "<td><input type='currency' step='0.0001' name='item_sub_total' class='form-control' value='0.0' readonly></td>";
+    	str += "<td><input type='text' class='form-control item-job-number' name='item_job_number' placeholder='Start typing to search job'><input type='hidden' name='item_job_id' class='item_job_id'></td>";
+    	str += "<td><textarea rows='4' class='form-control' name='item_comment' placeholder='Put your comments here'></textarea></td>";
+    	str += "<td><input type='number' step='0.01' name='qty_received' class='form-control' value='"+item_qty_received+"' readonly></td>";
+    	str += "<td><input type='text' name='last_received_date' class='form-control' value='"+last_received_date+"' readonly></td>";
+
+
+    	str += "<td><a class='remove-item btn' ng-click='removeField($event)'><span class='glyphicon glyphicon-remove'></span></a></td>";
+    	str += "</tr>";
+    	
+    	var element = $compile(str)($scope);
+
+    	// if(item_count == 0){
+    	// 	$("tbody#add_item_list").html(element);
+    	// } else {
+    	// 	$("tbody#add_item_list").append(element);
+    	// }
+    	$("tbody#add_item_list").prepend(element);
+
+		$( "input[name='item_job_number']" ).autocomplete({
+	      source: "/schedule/list-filter/",
+	      _renderItem: function( ul, item ) {
+			  return $( "<li>" )
+			    .attr( "data-value", item.value )
+			    .append( $( "<a>" ).text( item.label ) )
+			    .appendTo( ul );
+			},
+			select: function( event, ui ) {
+				console.log(ui.item.id);
+				// $(this).attr("data-id", ui.id);
+				
+				$(event.target).siblings("input.item_job_id").val(ui.item.id);
+			}
+	    });
+	    
+    }
+
+    $scope.removeField = function (event) {
+        var myitem = $("tbody#add_item_list tr.add_item");
+        var items_length = myitem.length;
+
+		$(event.target).closest('tr').remove();
+		var item_total = 0;
+		$("tbody#add_item_list tr input[name='item_sub_total']").each(function(index){
+			var subtotal = $(this).val();
+			item_total = item_total + parseFloat(subtotal);
+		});
+		
+		$("#calculated_total_amount span.amount").text(item_total.toFixed(4));
+		var hst_tax = $("#id_hst_taxable").val();
+		var pst_tax = $("#id_pst_taxable").val();
+
+		if(hst_tax == '1'){
+			var hst_tax_amount = parseFloat($("#id_hst_taxable_amount").val())
+			item_total += hst_tax_amount;
+		}
+		if(pst_tax == '1'){
+			var pst_tax_amount = parseFloat($("#id_pst_taxable_amount").val())
+			item_total += pst_tax_amount;
+		}
+		
+		$("#id_total_po_amount").val(item_total.toFixed(4));
+		// recalculate total amount
+		var item_subtotal_qty = 0;
+		$("tbody#add_item_list tr input[name='item_qty']").each(function(index){
+			var subtotal_qty = $(this).val();
+			item_subtotal_qty = item_subtotal_qty + parseFloat(subtotal_qty);
+		});
+		$("#id_items_total").val(item_subtotal_qty.toFixed(2));
+		item_total = 0;
+		item_subtotal_qty = 0;
+
+		if(items_length == 1) {
+			// window.location.reload();
+			$scope.first_currency_id = undefined;
+		}
+	
+    };
+
+    $scope.addExtraContact = function() {
+		console.log("testing..");
+		mdal = $('#addModal');
+		url = "/purchase/add-po-contact/p1004/",
+		mdal.on("shown.bs.modal", function(){
+			$("#addModal .modal-content").load(url);
+			
+			// console.log(url);
+		}).modal();
+		return false;
+    };
+
+    $scope.addHstAmount = function(e){
+    	if($scope.hst_tax) {
+    		var hst_tax_amount = parseFloat($scope.hst_tax_amount);
+    		// console.log(hst_tax_amount);
+    		var item_total = 0;
+			$("tbody#add_item_list tr input[name='item_sub_total']").each(function(index){
+				var subtotal = $(this).val();
+				item_total = item_total + parseFloat(subtotal);
+			});
+			item_total += hst_tax_amount + parseFloat($scope.pst_tax_amount);
+			$("#id_total_po_amount").val(item_total.toFixed(4));
+    	}
+    };
+    $scope.addPstAmount = function(e){
+    	if($scope.pst_tax) {
+    		var pst_tax_amount = parseFloat($scope.pst_tax_amount);
+    		console.log(pst_tax_amount);
+    		var item_total = 0;
+			$("tbody#add_item_list tr input[name='item_sub_total']").each(function(index){
+				var subtotal = $(this).val();
+				item_total = item_total + parseFloat(subtotal);
+			});
+			item_total += pst_tax_amount + parseFloat($scope.hst_tax_amount);
+			$("#id_total_po_amount").val(item_total.toFixed(4));
+
+    	}
+    }
+
+	
+}])
+
+$(document).on("click", "a.delete-extra-contact", function(e){
+	e.preventDefault();
+	var poecid = $(this).data("pecid");
+	// var url = "/purchase/delete-po-contact/";
+	$.ajax({
+		type: "POST",
+		url: "/purchase/delete-po-contact/",
+		
+		data: {
+			'poecid': poecid,
+		},
+		success: function(rdata) {
+			
+			$("a[data-pecid='"+rdata+"']").closest("tr").remove();
+
+        }
+	});
+})
+
+$(document).on("change", "input.demo_box", function(e){
+	e.preventDefault();
+	alert("Please select item first.");
+	$(this).val("");
+});
+
+})(jQuery);
+</script>
+{% endblock content %}

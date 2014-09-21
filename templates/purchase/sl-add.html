@@ -1,0 +1,652 @@
+{% extends "base.html" %}
+
+{% block angular %}
+	<script type="text/javascript" src="/statics/js/angular.min.js"></script>
+	<script type="text/javascript" src="/statics/js/angular-route.min.js"></script>	
+
+	<script type="text/javascript" src="/statics/js/bootstrap-multiselect.js"></script>
+	<link rel="stylesheet" href="/statics/css/bootstrap-multiselect.css" type="text/css"/>
+{% endblock angular %}
+
+{% block content %}
+<style>
+
+.google-search-container thead {
+	background-color: #ed791a;
+}
+.google-search-container tbody tr{ margin: 5px 3px; padding: 0.4em; font-size: 1.4em; height: 35px; border-bottom: 1px solid #EEE; }
+.google-search-container tbody tr:hover { background-color: #FECA40; color: #000; }
+
+.google-search-container {
+	width: 480px;
+	position: relative;
+}
+.google-search-container .ui-widget-content-custom {
+	background-color: #333 !important;
+	color: #FFF;
+	padding: 10px;
+}
+#selectable {
+	position: absolute;
+	width: 460px;
+
+}
+#item-selectable {
+	width: 550px;
+}
+.clear {
+	clear: both;
+}
+.glyphicon {
+	color: #000 !important;
+}
+#item-list {
+	position: fixed;
+	width: 648px;
+	font-size: 10px;
+	margin-top: 20px;
+}
+.half-widget {
+	width: 54%;
+}
+.show-value {
+	color: #000;
+	font-size: 16px;
+}
+.contact_info {
+	
+	color: #000;
+	border-radius: 2px;
+	margin: 5px auto;
+}
+.sold_to_contact_info, .ship_to_contact_info {
+	padding: 5px 10px 2px;
+	background-color: #CCC;
+	display: none;
+}
+.sold_to_contact_info p, .ship_to_contact_info p {
+	margin: 2px 0px;
+	margin-bottom: 0px !important;
+
+}
+#item-list hr {
+	margin: 0px !important;
+}
+#item-list input {
+	font-size: 10px;
+	padding: 5px;
+}
+#item-list td {
+	padding: 5px;
+}
+</style>
+<div class="container shadow4 main-body" ng-app="premierApp">
+
+<section class="row " ng-controller="AddSLController">
+	
+	<form action="/purchase/add-sl/" method="POST" enctype="multipart/form-data">{% csrf_token %}
+	<div class="col-md-5">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Add Shipping List</h4>
+		  	</div>
+		  	<div class="panel-body">
+			  	
+			  		<table class="table">
+			  			{% for field in sl_form %}
+			  			
+			  			<tr>
+			  			
+			  				<td width="20%" >{{ field.label_tag }}</td>
+			  				<td >{{ field.errors }}{{ field }}</td>
+			  			
+			  			</tr>			  			
+
+			  			{% endfor %}
+			  			<tr>
+			  				<td>
+			  					<label for="id_invoiced_on">Items:</label>
+			  				</td>
+			  				<td>
+			  					<input type=text name='item_demo' id='id_item_demo' class='form-control' ng-model='search_item' autocomplete='off' placeholder='Start typing to search inventory'>
+			  				</td>
+			  			</tr>
+
+			  			
+			  			<tr>
+			  				<td></td>
+			  				<td>
+			  					<input type='submit' class="btn btn-primary" value="Add Shipping List">
+			  				</td>
+			  			</tr>
+			  			
+					</table>
+				
+			</div>
+		</div>
+	</div>
+	<div class="col-md-7">
+		<table class="table table-bordered table-striped" id="item-list">
+  			<thead>
+  				<tr class='info'>
+  					<td>Item #/ Description</td>
+  					
+  					<td width="90">Ordered</td>
+  					<td width="90">Shipped</td>
+  					<td width="90">Required</td>
+  					<td width='90'>Filled</td>
+  					
+  					<td width='10'>X</td>
+  				</tr>
+  			</thead>
+  			<tbody>
+  				<tr>
+  					<td colspan=6>No Items Added</td>
+  				</tr>
+  			</tbody>
+		</table>
+	</div>
+
+	
+
+	</form>
+
+
+	<div id="sold-to-container" class="google-search-container">
+		<table id="selectable" class="table ui-autocomplete ui-widget-content-custom ui-corner-all">
+			<thead>
+				<tr>
+					<th>#</th><th>ID</th><th>Contact Name</th><th>Address 1</th><th> City <span ng-show="{[{ contact.permission.can_change_contact }]}">Action</span> <a href="" class="close">x</a></th>
+				</tr>
+			</thead>
+			<tbody>
+			<tr class="ui-menu-item" ng-repeat="contact in contacts | googleSearchFilter:search_sold_to">
+				<td>
+					<input type="radio" name="contact" value="{[{contact.id}]}" data-contact-name="{[{contact.contact_name}]}" data-sold-city="{[{contact.city}]}" data-sold-country="{[{contact.country}]}" data-sold-province="{[{contact.province}]}" data-sold-shipviaid="{[{contact.shipvia_id}]}">
+					
+					
+				</td>
+				<td class="sid">{[{contact.id}]}</td>
+				<td class="contact_name">{[{contact.contact_name}]}</td>
+				<td class="address_1">{[{contact.address_1}]}</td>
+				<td class="city">
+				{[{contact.city}]}
+				
+				</td>
+				
+			</tr>
+			</tbody>
+		</table>
+		
+	</div>
+
+	<div id="ship-to-container" class="google-search-container">
+		<table id="ship-selectable" class="table ui-autocomplete ui-widget-content-custom ui-corner-all">
+			<thead>
+				<tr>
+					<th>#</th><th>ID</th><th>Contact Name</th><th>Address 1</th><th> City <span ng-show="{[{ contact.permission.can_change_contact }]}">Action</span> <a href="" class="close">x</a></th>
+				</tr>
+			</thead>
+			<tbody>
+			<tr class="ui-menu-item" ng-repeat="contact in contacts | googleSearchFilter:search_ship_to">
+				<td>
+					<input type="radio" name="contact" value="{[{contact.id}]}">
+					<input type="hidden" name="contact_name" data-contact-name="{[{contact.contact_name}]}">
+					<input type="hidden" name="ship_to_city" data-ship-city="{[{contact.city}]}">
+					<input type="hidden" name="ship_to_country" data-ship-country="{[{contact.country}]}">
+					<input type="hidden" name="ship_to_province" data-ship-province="{[{contact.province}]}">
+					
+					
+				</td>
+				<td class="sid">{[{contact.id}]}</td>
+				<td class="contact_name">{[{contact.contact_name}]}</td>
+				<td class="address_1">{[{contact.address_1}]}</td>
+				<td class="city">
+				{[{contact.city}]}
+				
+				</td>
+				
+			</tr>
+			</tbody>
+		</table>
+		
+	</div>
+
+
+
+	<div id="job-number-container" class="google-search-container">
+		<table id="job-number-selectable" class="table ui-autocomplete ui-widget-content-custom ui-corner-all">
+			<thead>
+				<tr>
+					<th>#</th><th>Job Number</th><th>description</th><th>job_name <span ng-show="{[{ contact.permission.can_change_contact }]}">Action</span> <a href="" class="close">x</a></th>
+				</tr>
+			</thead>
+			<tbody>
+			<tr class="ui-menu-item" ng-repeat="job in jobs | googleSearchFilter:search_job_number">
+				<td>
+					<input type="radio" name="contact" value="{[{job.id}]}">
+					<input type="hidden" name="job_number" data-job-number="{[{job.job_number}]}">
+				</td>
+				<td class="sid">{[{job.job_number}]}</td>
+				<td class="contact_name">{[{job.description}]}</td>
+				<td class="address_1">{[{job.job_name}]}</td>
+			</tr>
+			</tbody>
+		</table>
+		
+	</div>
+
+
+	<div id="po-container" class="google-search-container">
+		<table id="po-selectable" class="table ui-autocomplete ui-widget-content-custom ui-corner-all">
+			<thead>
+				<tr>
+					<th>#</th><th>PO Number</th><th>po status</th><th>Supplier <a href="" class="close">x</a></th>
+				</tr>
+			</thead>
+			<tbody>
+			<tr class="ui-menu-item" ng-repeat="po in pos | googleSearchFilter:search_po_number">
+				<td>
+					<input type="radio" name="po" value="{[{po.id}]}">
+					<input type="hidden" name="po_number" data-po-number="{[{po.po_number}]}">
+				</td>
+				<td class="sid">{[{po.po_number}]}</td>
+				<td class="contact_name">{[{po.po_status}]}</td>
+				<td class="address_1">{[{po.supplier}]}</td>
+			</tr>
+			</tbody>
+		</table>
+		
+	</div>
+
+
+	<div id="item-container" class="google-search-container">
+		<table id="item-selectable" class="table ui-autocomplete ui-widget-content-custom ui-corner-all">
+			<thead>
+				<tr>
+					<th>#</th><th>Item Number</th><th>description</th><th>Currency</th><th>qty on hand</th><th> Supplier <a href="" class="close">x</a></th>
+					
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="ui-menu-item" ng-repeat="item in items | googleSearchFilter:search_item">
+					
+					<td class="select-item">
+						<input type='checkbox' name='items' value="{[{item.item_number}]}" >
+					</td>
+					<td class="item_number">{[{item.item_number}]}</td>
+					<td class="item-description">{[{item.description}]}</td>
+					<td class="qonh">{[{item.currency}]}</td>
+					<td class="qonh">{[{item.quantity_on_hand}]}</td>
+					<td class="supplier">{[{item.primary_supplier}]}</td>
+					
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+</section>
+
+</div>
+<!-- SL Number -->
+<script type="text/javascript">
+	(function(){
+		$(".datepicker").datepicker();
+
+		var elementPosition = $('#item-list').offset();
+		// console.log(elementPosition.top);
+		$(window).scroll(function(){
+	        if($(window).scrollTop() > elementPosition.top){
+	              $('#item-list').css('position','fixed').css('top','0');
+	        } else {
+	            $('#item-list').css('position','static');
+	        }    
+		});
+
+		$(document).on("change", "input.add-item", function(e){
+			var item_value = parseFloat($(this).val()).toFixed(2);
+			console.log(item_value);
+			$(this).val(item_value);
+		});
+
+	})(jQuery)
+</script>
+<!-- Sold to -->
+<script type="text/javascript">
+(function(){
+	
+
+	// ========= Sold to ===========
+	$("select#id_sold_to").hide();
+	var str1 = "<input type=text name='sold_to_demo' placeholder='Start typing to search start to' id='id_sold_to_demo' class='form-control' ng-model='search_sold_to' autocomplete='off'>";
+	var str2 = '<p class="sold_to_contact_info contact_info"></p>';
+	$("select#id_sold_to").closest("td").append(str1+str2);
+
+	$(document).on("click", "#sold-to-container input[type='radio']", function(e){
+		var sold_to_radio = $(this);
+		var sold_to_contact_name = sold_to_radio.data('contact-name');
+		var sold_city = sold_to_radio.data('sold-city');
+		var sold_country = sold_to_radio.data('sold-country');
+		var sold_province = sold_to_radio.data('sold-province');
+		var sold_shipviaid = sold_to_radio.data('sold-shipviaid');
+		var sold_contact_id = $(this).val();
+
+		$("select#id_sold_to").val(sold_contact_id);
+		$("#id_sold_to_demo").val(sold_to_contact_name);
+
+		var s_contact = "<p><b>"+sold_to_contact_name+"</b></p><p>"+sold_city+"</p><p>"+sold_country+"</p><p>"+sold_province+"</p>";
+		$(".sold_to_contact_info").html(s_contact);
+		$('.sold_to_contact_info').css('display','block');
+
+		$("select#id_ship_to").val(sold_contact_id);
+		$(".ship_to_contact_info").html(s_contact);
+		$('.ship_to_contact_info').css('display','block');
+
+		$("#id_ship_via").val(sold_shipviaid);
+
+		$("#selectable").hide();
+	})
+
+	
+	$("a.close").on("click", function(){
+		$(this).closest('table').hide();
+	});
+})(jQuery)
+</script>
+
+<!-- Ship to -->
+<script type="text/javascript">
+(function(){
+	
+	
+	$("select#id_ship_to").hide();
+	var str1 = "<input type=text name='ship_to_demo' id='id_ship_to_demo' class='form-control' ng-model='search_ship_to' placeholder='start typing to search ship to' autocomplete='off'>";
+	var str2 = '<p class="ship_to_contact_info contact_info"></p>';
+	$("select#id_ship_to").closest("td").append(str1+str2);
+
+	$(document).on("click", "#ship-to-container input[type='radio']", function(e){
+		var contact_name = $(this).closest('td').find("input[name=contact_name]").data('contact-name');
+		var ship_city = $(this).closest('td').find("input[name=ship_to_city]").data('ship-city');
+		var ship_country = $(this).closest('td').find("input[name=ship_to_country]").data('ship-country');
+		var ship_province = $(this).closest('td').find("input[name=ship_to_province]").data('ship-province');
+		var ship_contact_id = $(this).val();
+
+		$("select#id_ship_to").val(ship_contact_id);
+		$("#id_ship_to_demo").val(contact_name);
+		var ship_contact = "<p><b>"+contact_name+"</b></p><p>"+ship_city+"</p><p>"+ship_country+"</p><p>"+ship_province+"</p>";
+		$(".ship_to_contact_info").html(ship_contact);
+		$('.ship_to_contact_info').css('display','block');
+		console.log(contact_name);
+		$("#ship-selectable").hide();
+	})
+
+	
+	$("a.close").on("click", function(){
+		$(this).closest('table').hide();
+	});
+})(jQuery)
+</script>
+
+
+
+<!-- Job Number -->
+<script type="text/javascript">
+(function(){
+	
+	
+	$("select#id_job_number").hide();
+	var str1 = "<input type=text name='job_number_demo' id='id_job_number_demo' class='form-control' ng-model='search_job_number' placeholder='start typing to search job' autocomplete='off'>";
+	$("select#id_job_number").closest("td").append(str1);
+
+	$(document).on("click", "#job-number-container input[type='radio']", function(e){
+		var job_number = $(this).closest('td').find("input[name=job_number]").data('job-number');
+		var job_id = $(this).val();
+
+		$("#id_job_number_demo").val(job_number);
+		$("#id_job_number").val(job_id);
+
+		$("#job-number-selectable").hide();
+
+
+	})
+
+	
+	$("a.close").on("click", function(){
+		$(this).closest('table').hide();
+	});
+})(jQuery)
+</script>
+
+
+<!-- Purchase Order -->
+<script type="text/javascript">
+(function(){
+
+	// ========= Sold to ===========
+	$("select#id_purchase_order").hide();
+	var str1 = "<input type=text name='purchase_order_demo' id='id_purchase_order_demo' class='form-control' ng-model='search_purchase_order' placeholder='Start typing to search po' autocomplete='off'>";
+	$("select#id_purchase_order").closest("td").append(str1);
+
+	$(document).on("click", "#po-container input[type='radio']", function(e){
+		var po_number = $(this).closest('td').find("input[name=po_number]").data('po-number');
+		var po_id = $(this).val();
+		console.log(po_number);
+
+		$("#id_purchase_order_demo").val(po_number);
+		$("select#id_purchase_order").val(po_id);
+
+		$("#po-selectable").hide();
+
+	})
+
+	
+	$("a.close").on("click", function(){
+		$(this).closest('table').hide();
+	});
+})(jQuery)
+</script>
+
+<!-- Item container -->
+
+<script type="text/javascript">
+(function(){
+
+	firstitem = false
+	item_count = 0
+	$(document).on("change", "#item-selectable input[type='checkbox']", function(e){
+		
+		var item_number = $(this).closest('tr').find("td.item_number").text();
+		var item_desc = $(this).closest('tr').find("td.item-description").text();
+
+		if($(this).is(':checked')) {
+
+			if(item_number != '') {
+				
+				var itemstr = "<tr><td><p class='item-number'><b>Item #</b>: "+item_number+"</p><hr><p class='item-desc'><b>"+item_desc+"</b></p><input type='hidden' name='item_item' value='"+item_number+"'></td>";
+				var ordered = "<td><input type='text' class='form-control add-item' name='item_ordered'></td>";
+				var required = "<td><input type='text' class='form-control add-item' name='item_required'></td>";
+				var shipped = "<td><input type='text' class='form-control add-item' name='item_shipped'></td>";
+				var filled = "<td><input type='text' class='form-control item-recv add-item' name='item_filled'></td>";
+				var remove = "<td><a href='#' class='remove-item'><span class='glyphicon glyphicon-remove'></span></a></td></tr>";
+				
+				if(firstitem == false && item_count == 0) {
+					$("table#item-list tbody").html(itemstr+ordered+shipped+required+filled+remove);
+					
+					item_count++;
+					
+					firstitem = true;	
+				} else {
+					$("table#item-list tbody").append(itemstr+ordered+shipped+required+filled+remove);
+					item_count++;
+				}
+				
+			}
+		} else {
+			$("table#item-list input[value='"+item_number+"']").closest('tr')[0].remove();
+			item_count--;
+		}
+		
+	});
+
+	$(document).on("click", "a.remove-item", function(e){
+		e.preventDefault();
+		$(this).closest('tr').remove();
+		item_count--;
+	})
+
+
+
+})(jQuery)
+</script>
+
+
+<script type="text/javascript">
+premierApp.controller('AddSLController',['$scope', '$http', function ($scope, $http) {
+	
+	$scope.init = function() {
+
+
+		$http({method: 'GET', url: "/inventory/items/"}).
+            success(function(data, status, headers, config) {
+                // console.log(data);
+                $scope.items = data;
+            });
+
+        $http({method: 'GET', url: "/contacts/list/"}).
+            success(function(data, status, headers, config) {
+                // console.log(data);
+                $scope.contacts = data;
+            });
+
+        $http({method: 'GET', url: "/schedule/all-jobs/"}).
+            success(function(data, status, headers, config) {
+                // console.log(data);
+                $scope.jobs = data;
+            });
+
+        $http({method: 'GET', url: "/purchase/list/"}).
+            success(function(data, status, headers, config) {
+                // console.log(data);
+                $scope.pos = data;
+            });
+
+        $("#item-selectable").hide();
+        $("#selectable").hide();
+        $("#ship-selectable").hide();
+        $("#ship-by-selectable").hide();
+        $("#job-number-selectable").hide();
+        $("#po-selectable").hide();
+        // $("#ship-to-container").hide();
+	};
+
+	$scope.init();
+
+	$scope.$watch('search_sold_to', function (newValue, oldValue) {
+        if(newValue != undefined) {
+        	if(newValue.length > 1) {
+        		$( "#sold-to-container" ).css('width', function(){
+        			var wid = $(this).innerWidth();
+        			console.log(wid);
+        			return wid;
+        		}).position({
+					my: "left top-1",
+					at: "left bottom",
+					of: "#id_sold_to_demo",
+					collision: "fit"
+				});
+
+        		$("#selectable").show();
+        	} else {
+        		$("#selectable").hide();
+        	}
+        } 
+    });
+
+    $scope.$watch('search_ship_to', function (newValue, oldValue) {
+        if(newValue != undefined) {
+        	if(newValue.length > 1) {
+        		$( "#ship-to-container" ).css('width', function(){
+        			var wid = $(this).innerWidth();
+        			console.log(wid);
+        			return wid;
+        		}).position({
+					my: "left top-1",
+					at: "left bottom",
+					of: "#id_ship_to_demo",
+					collision: "fit"
+				});
+
+        		$("#ship-selectable").show();
+        	} else {
+        		$("#ship-selectable").hide();
+        	}
+        } 
+    });
+
+    $scope.$watch('search_job_number', function (newValue, oldValue) {
+        if(newValue != undefined) {
+        	if(newValue.length > 1) {
+        		$( "#job-number-container" ).css('width', function(){
+        			var wid = $(this).innerWidth();
+        			console.log(wid);
+        			return wid;
+        		}).position({
+					my: "left top-1",
+					at: "left bottom",
+					of: "#id_job_number_demo",
+					collision: "fit"
+				});
+
+        		$("#job-number-selectable").show();
+        	} else {
+        		$("#job-number-selectable").hide();
+        	}
+        } 
+    });
+
+    $scope.$watch('search_purchase_order', function (newValue, oldValue) {
+        if(newValue != undefined) {
+        	if(newValue.length > 1) {
+        		$( "#po-container" ).css('width', function(){
+        			var wid = $(this).innerWidth();
+        			console.log(wid);
+        			return wid;
+        		}).position({
+					my: "left top-1",
+					at: "left bottom",
+					of: "#id_purchase_order_demo",
+					collision: "fit"
+				});
+
+        		$("#po-selectable").show();
+        	} else {
+        		$("#po-selectable").hide();
+        	}
+        } 
+    });
+
+    $scope.$watch('search_item', function (newValue, oldValue) {
+        if(newValue != undefined) {
+        	if(newValue.length > 1) {
+        		$( "#item-container" ).css('width', function(){
+        			var wid = $(this).innerWidth();
+        			// console.log(wid);
+        			return wid;
+        		}).position({
+					my: "left top-1",
+					at: "left bottom",
+					of: "#id_item_demo",
+					collision: "fit"
+				});
+
+        		$("#item-selectable").show();
+        	} else {
+        		$("#item-selectable").hide();
+        	}
+        } 
+    });
+
+}]);
+</script>
+{% endblock content %}
+	

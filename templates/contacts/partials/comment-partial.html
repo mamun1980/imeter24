@@ -1,0 +1,77 @@
+<section class="panel panel-info comment">
+	<div class="panel-body">
+		{{ comment.comment }}
+		<p>
+		{% if perms.contacts.change_comment %}
+			<span><a class="comment-edit" href="/contacts/comment/edit/{{ comment.id }}/" 
+							data-toggle="modal" data-target="#editModal"
+							data-id="{{ comment.id }}"><i class="glyphicon glyphicon-edit"></i></a></span>
+		{% endif %}
+
+		{% if perms.contacts.delete_comment %}
+			 / <span><a class="comment-delete" href="/contacts/comment/delete/" data-id="{{ comment.id }}">
+			 <i class="glyphicon glyphicon-remove"></i></a></span>
+		{% endif %}
+		</p>
+
+	</div>
+
+	<script type="text/javascript">
+	(function(){
+		$("div.message").hide();
+
+		$("a.comment-edit").on("click", function(e){
+			e.preventDefault();
+			
+		    url = $(this).attr("href");
+			mdal = $('#editModal');
+			mdal.on("shown.bs.modal", function(){
+				$("#editModal .modal-content").load(url);
+				console.log(url);
+			}).modal();
+
+			return false;
+		});
+
+		$("a.comment-delete").on("click", function(e){
+			e.preventDefault();
+			com_id = $(this).data("id")
+
+			$( "#delete-comment-confirm" ).dialog({
+				resizable: false,
+				height:200,
+				modal: true,
+				buttons: {
+					"Delete Comment": function() {
+										
+						$( this ).dialog( "close" );
+						$.ajax({
+							type: "POST",
+							url: "/contacts/comment/delete/",
+							data: {
+								'com_id': com_id
+							},
+							success: function(rdata) {
+								console.log(rdata);
+								$("a[data-id='"+rdata+"']").closest("section").remove();
+							}
+						})
+					},
+					Cancel: function() {
+						$( this ).dialog( "close" );
+					}
+				}
+			});
+		});
+
+	})(jQuery)
+
+	</script>
+
+
+
+<div id="delete-comment-confirm" title="Do you want to delete?">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;">
+  </span>This will delete the comment from your system?</p>
+</div>
+</section>

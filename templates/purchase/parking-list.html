@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block angular %}
+	<script type="text/javascript" src="/statics/js/angular.min.js"></script>
+	<script type="text/javascript" src="/statics/js/angular-route.min.js"></script>	
+{% endblock angular %}
+
+{% block content %}
+<style type="text/css">
+#supplier-contact {
+	width: 400px;
+	border: 2px solid black;
+	background-color: #FFF;
+	height: auto;
+}
+.list {
+	margin-top: 10px;
+}
+
+</style>
+<div class="container shadow4 main-body" ng-app="premierApp" ng-controller='PLListController'>
+<section class="row">
+	<div class="col-md-6">
+		<input type='text' class="form-control" ng-model="search" placeholder="Filter PO">
+	</div>
+</section>
+<section class="row list" >
+	<div class="col-md-12">
+		
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Packing List</h4>
+		  	</div>
+		  	<div class="panel-body">
+				<table class='table table-bordered table-striped'>
+					<thead>
+						<tr class='info'>
+							<th>PL Number</th>
+							<th>Date Issued</th>
+							<th>Date Shipped</th>
+							<th>Sold To</th>
+							<th>Shipped To</th>
+							<th>Cus PO Numeber</th>
+							<th width='130'>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						
+						<tr ng-repeat="pl in packing_list | googleSearchFilter:search">
+							<td>{[{ pl.pl_number }]}</td>
+							<td>{[{ pl.date_issued }]}</td>
+							<td>{[{ pl.date_shipped }]}</td>
+							<td>{[{ pl.sold_to }]}</td>
+							<td>{[{ pl.ship_to }]}</td>
+							<td>{[{ pl.customer_po_number }]}</td>
+							
+							<td width="100">
+								<a href="/purchase/view-pl/{[{pl.id}]}/">View</a> 
+								/ <a href="/purchase/edit-pl/{[{pl.id}]}/">Edit</a>
+								/ <a class="pl-delete" data-pid="{[{pl.id}]}" href="">Delete</a>
+							</td>
+						</tr>
+						<tr ng-show="!packing_list.length">
+							<td colspan="7">No Items</td>
+						</tr>
+						
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+
+</section>
+
+<div id="delete-job-confirm" style="display:none;" title="Do you want to delete?">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;">
+  </span>This will delete the job from your system?</p>
+</div>
+
+</div>
+
+<div id='supplier-contact' class="bg-info">
+	
+	
+</div>
+
+{% include "modals/add-modal.html" %}
+
+<script type="text/javascript">
+
+(function(){
+	
+	$("#supplier-contact").hide();
+
+
+
+	$(document).on("click","a.pl-delete", function(e){
+		e.preventDefault();
+		plid = $(this).data("pid");
+		console.log(plid);
+
+		$( "#delete-job-confirm" ).dialog({
+			resizable: false,
+			height:200,
+			modal: true,
+			buttons: {
+				"Delete User": function() {
+									
+					$( this ).dialog( "close" );
+					$.ajax({
+						type: "POST",
+						url: "/purchase/pl-delete/",
+						data: {
+							'pl_id': plid,
+						},
+						success: function(rdata) {
+							console.log(rdata);
+							$("a[data-pid='"+rdata+"']").closest("tr").remove();
+						}
+					})
+				},
+				Cancel: function() {
+					$( this ).dialog( "close" );
+				}
+			}
+		});
+
+	});
+
+})(jQuery)
+
+</script>
+
+<script type="text/javascript">
+	premierApp.controller('PLListController',['$scope', '$http', function ($scope, $http) {
+	
+		$scope.init = function() {
+			$http({method: 'GET', url: "/purchase/pl-list/"}).
+	            success(function(data, status, headers, config) {
+	                console.log(data);
+	                $scope.packing_list = data;
+	            });
+
+		};
+
+		$scope.init();
+	}]);
+</script>
+{% endblock content %}

@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+<section class="row"  id="report-list">
+	
+
+	<div class="col-md-10 col-md-offset-1">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4> Report List</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  		<table class="table">
+			  		<tr>
+			  			<td> ID </td>
+			  			<td> Report Type </td>
+			  			
+			  			<td> Comments </td>
+			  			<td>Python Script</td>
+			  			
+			  			<td> Total Use </td>
+			  			<td> Action </td>
+			  			
+			  		</tr>
+			  		{% for report in reports %}
+			  			<tr>
+				  			<td> {{ report.id }} </td>
+				  			<td> {{ report.report_type }} </td>
+				  			
+				  			<td> {{ report.comments }} </td>
+
+				  			<td>{{report.python_script}}</td>
+				  			
+				  			<td> {{ report.recuringreport_set.all.count }} </td>
+				  			<td>
+				  				{% if perms.report.change_report %}
+				  				<a class="report-edit" href="/report/edit/{{report.id}}/" data-id="{{ report.id }}">Edit</a>
+				  				{% endif %}
+				  				
+
+				  				{% if perms.report.delete_report %}
+				  				/ <a class="report-delete" href="#" data-id="{{ report.id }}">delete</a>
+				  				{% endif %}
+
+				  			</td>
+				  			
+				  		</tr>
+				  	{% empty %}
+				  	<tr>
+			  			<td colspan='4'> No Report found. </td>
+			  		</tr>
+				  	{% endfor %}
+			  	</table>
+		  	
+			</div>
+		</div>
+	</div>
+
+
+</section>
+
+<div id="delete-job-confirm" style="display:none;" title="Do you want to delete?">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;">
+  </span>This will delete the job from your system?</p>
+</div>
+
+<script type="text/javascript">
+(function(){
+	$("#report-list a.report-delete").on("click", function(e){
+		e.preventDefault();
+		id = $(this).data("id");
+		console.log(id);
+
+		$( "#delete-job-confirm" ).dialog({
+			resizable: false,
+			height:200,
+			modal: true,
+			buttons: {
+				"Delete User": function() {
+									
+					$( this ).dialog( "close" );
+					$.ajax({
+						type: "POST",
+						url: "/report/delete/",
+						data: {
+							'report_id': id,
+						},
+						success: function(rdata) {
+							console.log(rdata);
+							$("a[data-id='"+rdata+"']").closest("tr").remove();
+						}
+					})
+				},
+				Cancel: function() {
+					$( this ).dialog( "close" );
+				}
+			}
+		});
+
+	});
+
+})(jQuery)
+
+</script>
+</div>
+
+
+{% endblock content %}
+	

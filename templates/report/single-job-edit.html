@@ -1,0 +1,334 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body" ng-app="demoApp">
+
+<section class="row"  id="report" ng-controller="EditSingleJobController">
+	
+
+	<div class="col-md-6">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Edit Single Report Job:</h4>
+		  	</div>
+		  	<div class="panel-body" >
+			  	<form name="report-form" action="{[{action}]}"  method="POST">{% csrf_token %}
+			  		
+			  		<table class="add-user-table">
+			  			
+			  				<tbody><tr>
+			  				<td><label for="id_report">Report:</label></td>
+				  				<td>
+				  					<select class="form-control" id="id_report" name="report" ng-model="report_type" ng-change="getReport(report_type)" ng-select="{[{report_type}]}">
+										<option value="-1" selected="selected">---------</option>
+										<option ng-repeat="report in reports" value="{[{report.id}]}">{[{report.report_type}]}</option>
+										
+									</select>
+								</td>
+			  				</tr>
+			  			
+			  				<tr>
+			  				<td><label for="id_report_description">Report description:</label></td>
+			  				<td><textarea class="form-control" cols="40" id="id_report_description" name="report_description" placeholder="Report Description" required="False" rows="2" readonly>{[{ report_description }]}</textarea></td>
+			  				</tr>
+			  			
+			  				<tr>
+			  				<td><label for="id_script_name">Script name:</label></td>
+			  				<td><input class="form-control" id="id_script_name" maxlength="200" name="script_name" placeholder="Report Description" type="text" value="{[{ script_name }]}" readonly></td>
+			  				</tr>
+			  			
+			  				<tr>
+			  				<td><label for="id_que_type">Que Type:</label></td>
+			  					<td>
+			  						<select class="form-control" id="id_que_type" name="que_type" placeholder="Report Description" ng-model="que_type" ng-selected="{[{que_type}]}">
+										<option value="email">Email</option>
+										<option value="printer">Printer</option>
+										<option value="fax">Fax</option>
+										
+									</select>
+								</td>
+			  				</tr>
+			  			
+			  				<tr ng-if="que_type=='email'">
+			  				<td><label for="id_email">Email:</label></td>
+			  				<td><input class="form-control" id="id_email" maxlength="500" value="{[{email}]}" name="email" placeholder="Email address" type="email" required></td>
+			  				</tr>
+			  			
+			  				<tr ng-if="que_type=='printer'">
+			  				<td><label for="id_printer">Printer:</label></td>
+			  					<td>
+			  						<input type='hidden' name="printer" value="{[{printer}]}">
+			  						<select class="form-control" id="id_printer" ng-model="printer" >
+										
+										<option ng-repeat="report in printers" value="{[{report.printer_id}]}" ng-selected="{[{printer}]}">{[{report.printer_id}]}</option>
+										
+									</select>
+								</td>
+			  				</tr>
+			  			
+			  				<tr ng-if="que_type=='fax'">
+			  				<td><label for="id_fax">Fax:</label></td>
+			  				<td><input class="form-control" id="id_fax" maxlength="500" value="{[{fax}]}" name="fax" placeholder="Fax Number" type="text" required></td>
+			  				</tr>
+			  			
+			  				<tr>
+			  				<td><label for="id_current_job_status">Current job status:</label></td>
+			  					<td>
+			  						<select class="form-control" id="id_current_job_status" name="current_job_status" ng-model="current_job_status" ng-selected="{[{current_job_status}]}">
+				  						<option value="new">New</option>
+				  						<option value="inprogress">In Progress</option>
+				  						<option value="error">Error</option>
+				  						<option value="completed">Completed</option>
+				  					</select>
+			  					</td>
+			  				</tr>
+
+
+			  				<tr>
+			  				<td><label for="id_search_start_date">Search Start Date:</label></td>
+			  				<td>
+			  					<input class="form-control" id="id_search_start_date" value="{[{search_start_date}]}" name="search_start_date" placeholder="Search Start Date" type="text" ng-model="search_start_date" jqdatepicker></td>
+			  				</tr>
+
+			  				<tr>
+			  				<td><label for="id_search_end_date">Search End Date:</label></td>
+			  				<td>
+			  					<input class="form-control" id="id_search_end_date" value="{[{search_end_date}]}" name="search_end_date" placeholder="Search End Date" type="text" ng-model="search_end_date" jqdatepicker></td>
+			  				</tr>
+
+
+			  				<tr>
+			  				<td><label for="id_date_submitted">Date Submitted:</label></td>
+			  				<td>
+			  					<input class="form-control" id="id_date_submitted" value="{[{date_submitted}]}" name="date_submitted" placeholder="Report Description" type="text" ng-model="date_submitted" jqdatepicker></td>
+			  				</tr>
+			  			
+			  				<tr>
+			  				<td><label for="id_time_submitted">Time Submitted:</label></td>
+			  				<td><input class="form-control timepicker ui-timepicker-input" value="{[{time_submitted}]}" ng-model="time_submitted" id="id_time_submitted" name="time_submitted" placeholder="00:00:00" type="text" autocomplete="off"></td>
+			  				</tr>
+			  			
+			  				<tr>
+			  				<td><label for="id_date_finished">Date finished:</label></td>
+			  				<td><input class="form-control" id="id_date_finished" value="{[{date_finished}]}" name="date_finished" placeholder="Report Description" type="text" ng-model="date_finished" jqdatepicker></td>
+			  				</tr>
+			  			
+			  				<tr>
+			  				<td><label for="id_time_finished">Time finished:</label></td>
+			  				<td><input class="form-control timepicker ui-timepicker-input" value="{[{time_finished}]}" id="id_time_finished" name="time_finished" placeholder="00:00:00" type="text"></td>
+			  				</tr>
+			  			
+			  				<tr>
+			  				<td><label for="id_search_string">Search String</label></td>
+			  				<td><input class="form-control" id="id_search_string" value="{[{search_string}]}" maxlength="200" name="search_string" placeholder="Search String" type="text"></td>
+			  				</tr>
+			  			
+			  				<tr>
+			  				<td><label for="id_schedule_type">Search Status type:</label></td>
+			  				<td>
+			  					<select class="form-control ng-pristine ng-valid" id="id_search_status_type" name="search_status_type" ng-model="search_status_type">
+			  						
+									<option value="new">New</option>
+									<option value="inprogress">In Progress</option>
+									<option value="completed">Completed</option>
+									</select>
+								</td>
+			  				</tr>
+			  			
+			  				
+			  			
+			  			<tr>
+							<td colspan="2">
+								<button type="submit" class="btn btn-primary btn-lg form-control login-btn">Update Single Report Job</button>
+							</td>
+						</tr>
+			  		</tbody></table>
+
+			  	</form>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-md-6" >
+		<div class="panel panel-primary" ng-show="show_report">
+			<div class="panel-heading">
+		    	<h4>Report Details</h4>
+		  	</div>
+		  	<div class="panel-body" >
+		  		<table class="table">
+		  			<tr>
+		  				<td>Report ID</td>
+		  				<td>{[{ report_type }]}</td>
+		  			</tr>
+		  			
+		  			<tr>
+		  				<td>Comments</td>
+		  				<td>{[{ report_description }]}</td>
+		  			</tr>
+		  			<tr>
+		  				<td>Python script</td>
+		  				<td>{[{ script_name }]}</td>
+		  			</tr>
+		  			
+
+		  		</table>
+		  	</div>
+		 </div>
+
+	</div>
+
+</section>
+</div>
+<script type="text/javascript">
+var demoApp = angular.module("demoApp", [], function ($interpolateProvider) {
+        $interpolateProvider.startSymbol("{[{");
+        $interpolateProvider.endSymbol("}]}");
+});
+demoApp.directive('jqdatepicker', function() {
+    return {
+        restrict: 'A',
+        require: 'ngModel',
+        link: function(scope, element, attrs, ngModelCtrl) {
+            $(element).datepicker({
+                dateFormat: 'yy-mm-dd',
+
+                onSelect: function(date) {
+                    var ngModelName = this.attributes['ng-model'].value;
+                    scope[ngModelName] = date;
+                    scope.$apply();
+                }
+
+            });
+        }
+    };
+});
+
+// demoApp.directive('jqtimepicker', function() {
+//     return {
+//         restrict: 'A',
+//         require: 'ngModel',
+//         link: function(scope, element, attrs, ngModelCtrl) {
+//             $(element).timepicker({
+//                 // dateFormat: 'yy-mm-dd',
+
+//                 onSelect: function(date) {
+//                     var ngModelName = this.attributes['ng-model'].value;
+//                     scope[ngModelName] = date;
+//                     scope.$apply();
+//                 }
+
+//             });
+//         }
+//     };
+// });
+
+demoApp.controller("EditSingleJobController", ['$scope', '$http', function ($scope, $http){
+
+	$scope.init = function(){
+		$http.get("/report/list/api/").success(function(data){
+   			     
+          	$scope.reports = data;
+        });
+
+		$http.get("/report/printer/list/api/").success(function(data){
+        	$scope.printers = data;
+        });
+
+		var path = window.location.pathname;
+		var segments = path.split("/");
+		var jobid = segments[(segments.length-2)];
+		
+		var url = "/report/singlejob/api/"+jobid+"/";
+		$scope.action = "/report/singlejob/edit/"+jobid+"/";
+		
+        $http.get(url).success(function(data){
+   			console.log(data);
+          	$scope.job = data;
+          	$scope.report_type = data.report.id;
+          	$scope.script_name = data.script_name;
+          	$scope.report_description = data.report_description;
+          	$scope.que_type = data.que_type;
+          	if(data.que_type == 'email') {
+          		$scope.email = data.email;
+          		$scope.fax = '';
+          		$scope.printer = null;	
+          	} else if(data.que_type == 'fax') {
+          		$scope.fax = data.fax;	
+          		$scope.printer = null;
+          		$scope.email = '';
+          	} else if (data.que_type = 'printer') {
+          		$scope.printer = data.printer;	
+          		$scope.fax = '';
+          		$scope.email = '';
+          	}
+          	
+          	
+          	
+          	$scope.current_job_status = data.current_job_status;
+          	$scope.time_submitted = data.time_submitted;
+          	$scope.date_finished = data.date_finished;
+          	$scope.time_finished = data.time_finished;
+
+          	$scope.search_start_date = data.search_start_date;
+          	$scope.search_end_date = data.search_end_date;
+          	$scope.search_string = data.search_string;
+          	$scope.search_status_type = data.search_status_type;
+
+
+
+        });
+        $scope.keyExist = function(key,arr) {
+        	console.log(key);
+        	var a = arr.indexOf(key,0);
+        	if (a != -1) {
+        		return true;
+        	} else {
+        		return false;
+        	}
+        };
+
+        $scope.getReport = function (report_id) {
+	    	if (report_id != -1) {
+	    		var url = "/report/view/api/"+report_id+"/";
+
+		    	$http.get(url).success(function(data){
+		   			console.log(data);
+		   			$scope.report_type = data.id
+		          	$scope.script_name = data.python_script;
+		          	$scope.report_description = data.comments
+		          	$scope.show_report = true;
+		          	
+		        });
+	    	} else {
+	    		$scope.show_report = false;
+
+	    	}
+	    	
+	    	
+	    }
+        
+
+        $scope.week_days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    }
+
+    $scope.init();
+    
+
+
+}]);
+
+</script>
+
+
+<script type="text/javascript">
+(function(){
+	// $(".datetimepicker").datepicker();
+	$(".timepicker").timepicker();
+
+	});
+
+})(jQuery);
+</script>
+{% endblock content %}
+	

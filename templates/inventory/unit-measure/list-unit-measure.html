@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+<section class="row"  id="unit-measure-list">
+	
+
+	<div class="col-md-6 col-md-offset-3">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4> Unit Measure List</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  		<table class="table">
+			  		<tr>
+			  			<td> ID </td>
+			  			<td>Unit Measure </td>
+			  			<td>Total Use</td>
+			  			<td>Action</td>
+			  			
+			  		</tr>
+			  		{% for unit_measure in unit_measures %}
+			  			<tr>
+				  			<td> {{ unit_measure.id }} </td>
+				  			<td> {{ unit_measure.unit_name }} </td>
+				  			<td> {{ unit_measure.item_set.all.count }} </td>
+				  			<td>
+				  				<a class="unit-measure-delete" href="#" data-iumid="{{ unit_measure.id }}">delete</a>
+				  			</td>
+				  			
+				  		</tr>
+				  	{% empty %}
+				  	<tr>
+			  			<td colspan='4'> No Item Unit Measure found. </td>
+			  		</tr>
+				  	{% endfor %}
+			  	</table>
+		  	
+			</div>
+		</div>
+	</div>
+
+
+</section>
+
+<script type="text/javascript">
+(function(){
+	$("#unit-measure-list a.unit-measure-delete").on("click", function(e){
+		e.preventDefault();
+		iumid = $(this).data("iumid");
+		console.log(iumid);
+
+		$.ajax({
+			type: "POST",
+			url: "/inventory/unit-measure/delete/",
+			data: {
+				'unit_measure_id': iumid,
+			},
+			success: function(rdata) {
+				console.log(rdata);
+				$("a[data-iumid='"+rdata+"']").closest("tr").remove();
+			}
+		})
+	});
+
+})(jQuery)
+
+</script>
+</div>
+
+
+{% endblock content %}
+	

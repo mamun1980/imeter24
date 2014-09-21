@@ -1,0 +1,22 @@
+<table class="table table-bordered table-striped">
+<tr>
+	<th width="40%">Contact Name</th><td>{{ contact.contact_name}}</td>
+</tr>
+<tr>
+	<th width="40%">Address 1</th><td>{{ contact.address_1}}</td>
+</tr>
+<tr>
+	<th width="40%">City</th><td>{{ contact.city}}</td>
+</tr>
+<tr>
+	<th width="40%">Contact Numbers</th>
+	<td>
+		{% for number in contact.contact_numbers %}
+			<li>{{ number.type}} - {{ number.number}} (EXT- {{ number.phone_ext}})</li>
+		{% empty %}
+			No Numbers
+		{% endfor %}
+	</td>
+</tr>
+
+</table>

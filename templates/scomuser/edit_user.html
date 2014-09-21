@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container shadow4 main-body">
+
+
+
+<section class="row ">
+	
+	<div class="col-md-6">
+		{% if request.user == user_obj or perms.auth.change_user %}
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>EDIT USER</h4>
+		  	</div>
+		  	<div class="panel-body">
+			  	<form action="/scomuser/edituser/{{ user_obj.id }}/" method="POST" enctype="multipart/form-data">{% csrf_token %}
+			  	<table class="add-user-table">
+			  		{% for fl in usereditform %}
+			  			<tr>
+			  				<td>{{ fl.label_tag }}</td>
+			  				<td>{{ fl.errors }}{{ fl }}</td>
+			  			</tr>
+			  		{% endfor %}
+			  		{% for field in supform %}
+			  			<tr>
+			  				<td>{{ field.label_tag }}</td>
+			  				<td>{{ field.errors }}{{ field }}</td>
+			  			</tr>
+			  		{% endfor %}
+
+			  		{%if perms.scomuser.add_payroll %}
+				  		{% for fl in payroll_form %}
+							<tr>
+								<td>{{ fl.label_tag }}</td>
+								<td>{{ fl.errors }}{{ fl }}</td>
+							</tr>
+						{% endfor %}
+					{% endif %}
+				<tr>
+					<td colspan="2">
+						<button type="submit" class="btn btn-primary btn-lg form-control login-btn">Update User</button>
+					</td>
+				</tr>
+				</table>
+				</form>
+			</div>
+		</div>
+		{% else %}
+		<div class="panel panel-danger">
+			<div class="panel-heading">
+		    	<h4>Opps! No permission</h4>
+		    	{{ request.user.id }}, {{ user_obj }}, {{perms.auth.change_user}}
+		  	</div>
+		</div>
+		{% endif %}
+
+	</div>
+
+{% include "modals/add-modal.html" %}
+
+
+	<div class="col-md-6">
+		{%if perms.auth.add_permission %}		
+			{% include "scomuser/edit-permissions.html" %}
+		{% endif %}
+
+		{%if perms.auth.change_group %}
+			{% include "scomuser/edit-group.html" %}
+		{% endif %}
+		
+	</div>
+
+
+
+</section>
+</div>
+{% endblock content %}
+	

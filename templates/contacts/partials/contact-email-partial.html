@@ -1,0 +1,159 @@
+
+
+<div class="col-md-12">
+	<section class="panel panel-primary">
+		<div class="panel-heading"><h4>Contact Email</h4></div>
+		<div class="panel-body">
+		{% if perms.contacts.add_contactemailaddress %}
+			<form name='contact-email' method="POST">{% csrf_token %}
+				<input type="hidden" name="cid" value="{{ cid }}">
+				<table>
+					<tr>
+						{% for efield in ceform %}
+							<td>
+							{{ efield.label_tag }}
+							</td>
+						{% endfor %}
+							<td></td>
+					</tr>
+					<tr>
+						
+						{% for efield in ceform %}
+						<td>
+							
+							
+							{{ efield }}
+						</td>		
+						{% endfor %}
+						<td>
+							<div class="input-group-btn">
+								<button class="btn btn-primary" type="submit">Add</button>
+							</div>
+						</td>
+					</tr>
+					
+				</table>
+
+
+			</form>
+		{% endif %}
+
+			
+			<table class="table table-hover table-bordered email-list">
+				<thead>
+					<tr class="danger">
+						<th>Email Type</th>
+						<th>Email Address</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody id='contact-email-list'>
+					{% for contact_email in contact_emails %}
+					<tr class="{{ contact_email.id }}">
+						<td>{{ contact_email.email_address_type }}</td>
+						<td>{{ contact_email.email_address }}</td>
+						
+						<td>
+							<a class="email-edit" href="/contacts/email/edit/{{ contact_email.id }}/" 
+							data-toggle="modal" data-target="#editModal"
+							data-id="{{ contact_email.id }}">edit</a> / 
+						
+							<a class="email-delete" href="#" data-id="{{ contact_email.id }}">delete</a>
+						
+						</td>
+					</tr>
+					{% empty %}
+						<tr class="warning">
+							<td colspan="4"> No email address availabe
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+			
+		</div>
+	</section>				
+
+{% include "modals/edit-modal.html" %}
+
+
+<script type="text/javascript">
+	(function(){
+
+		$("a.email-edit").on("click", function(e){
+		
+			e.preventDefault();
+			pid = $(this).data("id");
+		    url = $(this).attr("href");
+			mdal = $('#editModal');
+			mdal.on("shown.bs.modal", function(){
+				$("#editModal .modal-content").load(url);
+				console.log(url);
+			}).modal();
+
+			return false;
+		})
+
+		$("form[name='contact-email']").on("submit", function(e){
+			e.preventDefault();
+
+			form_data = $(this).serialize()
+			
+			// console.log(phone_type + " "+ phone + " "+ phone_ext);
+			$.ajax({
+				type: "post",
+				url: "/contacts/email/add/",
+				data: form_data,
+				success: function(data){
+					$("tbody#contact-email-list tr.warning").remove()
+					$("tbody#contact-email-list").append(data)
+					console.log(data);
+				}
+			});
+		});
+
+		$("a.email-delete").on("click", function(e){
+			e.preventDefault();
+			email_id = $(this).data("id");
+
+			$( "#delete-email-confirm" ).dialog({
+				resizable: false,
+				height:200,
+				modal: true,
+				buttons: {
+					"Delete Email": function() {
+										
+						$( this ).dialog( "close" );
+						$.ajax({
+							type: 'post',
+							url: "/contacts/email/delete/",
+							data: {
+								'email_id': email_id,
+							},
+
+							success: function(data){
+								console.log(data);
+								$("a[data-id='"+data+"'").closest("tr").remove();
+							},
+							errors: function(data){
+								alert("Phone is not deleted.");
+							}
+						})
+					},
+					Cancel: function() {
+						$( this ).dialog( "close" );
+					}
+				}
+			});
+
+		});
+
+	})(jQuery)
+</script>
+
+
+<div id="delete-email-confirm" title="Do you want to delete?">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;">
+  </span>This will delete the contact email from your system?</p>
+</div>
+</div>

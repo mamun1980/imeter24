@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body" ng-app="demoApp">
+
+
+<section class="row"  id="report-edit" ng-controller="EditReportController">
+	
+
+	<div class="col-md-6 col-md-offset-3">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Update Report</h4>
+		  	</div>
+		  	<div class="panel-body">
+			  	<form name="report-form" action="/report/edit/{{report_id}}/" method="POST">{% csrf_token %}
+			  		<table class="add-user-table">
+				  		<tbody><tr>
+				  				<td><label for="id_report_type">Report type:</label></td>
+				  				<td><input class="form-control" id="id_report_type" maxlength="100" name="report_type" placeholder="Report Type" type="text" value="{[{report_type}]}"></td>
+				  			</tr>
+				  		
+				  		
+				  			<tr>
+				  				<td><label for="id_comments">Comments:</label></td>
+				  				<td><textarea class="form-control" cols="40" id="id_comments" name="comments" placeholder="Comments" rows="2">{[{comments}]}</textarea></td>
+				  			</tr>
+				  		
+				  			<tr>
+				  				<td><label for="id_python_script">Python script:</label></td>
+				  				<td><input class="form-control" id="id_python_script" maxlength="200" name="python_script" placeholder="Python script" type="text" value="{[{python_script}]}"></td>
+				  			</tr>
+				  		
+				  		
+					<tr>
+						<td colspan="2">
+							<button type="submit" class="btn btn-primary btn-lg form-control login-btn">Update Report Job</button>
+						</td>
+					</tr>
+					</tbody>
+				  	
+					</table>
+			  	</form>
+			</div>
+		</div>
+	</div>
+
+</section>
+</div>
+
+
+<script type="text/javascript">
+
+var demoApp = angular.module("demoApp", [], function ($interpolateProvider) {
+        $interpolateProvider.startSymbol("{[{");
+        $interpolateProvider.endSymbol("}]}");
+});
+
+
+demoApp.controller("EditReportController", ['$scope', '$http', function ($scope, $http){
+	$scope.init = function() {
+		var path = window.location.pathname;
+		var segments = path.split("/");
+		var rid = segments[(segments.length-2)];
+		console.log(rid);
+		var url = "/report/view/api/"+rid+"/";
+
+		$http.get(url).success(function(data){
+   			console.log(data);
+          	$scope.report_type = data.report_type;
+          	$scope.destination_type = data.destination_type;
+          	$scope.comments = data.comments;
+          	$scope.python_script = data.python_script;
+          	$scope.printer = data.printer;
+          	
+
+
+        });
+	}
+	$scope.init();
+}]);
+</script>
+
+{% endblock content %}
+	

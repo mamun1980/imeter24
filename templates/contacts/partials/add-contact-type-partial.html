@@ -1,0 +1,8 @@
+<span class="label label-danger {{ contact_type.id }}">
+	{{ contact_type.contact_type }}
+	{% if perms.contacts.change_contacttype %}
+		<a class="contact-type-edit" href="/contacts/contact-type/edit/{{ contact_type.id }}/" 
+			data-toggle="modal" data-target="#editModal"
+			data-id="{{ contact_type.id }}"><i class="glyphicon glyphicon-edit"></i></a>
+	{% endif %}
+</span>

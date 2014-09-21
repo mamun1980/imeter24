@@ -1,0 +1,104 @@
+<section class="container-fluid logo">
+	<div class="row">
+		<div class="col-md-3">
+			<img src="/statics/images/logo_header.jpg" style="margin-left: -15px;">
+		</div>
+		
+		<div class="col-md-9">
+			{% if user.is_authenticated %}
+			<ul class="nav navbar-nav navbar-right">
+				{% if user.scomuser.avatar %}
+				<li>
+					<img src="/media/{{ user.contactprofile.avatar }}" width='40' height='50'>
+				</li>
+			{% else %}
+				<li class="active"><span><img src="/statics/images/avatar/avatar.jpg" width='40' height='50' /></span></li>
+			{% endif %}
+			
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+					{% if user.first_name and user.last_name %}
+						{{ user.first_name }} {{ user.last_name }}
+					{% else %}
+						{{ user.username }}
+					{% endif %}
+					<b class="caret"></b>
+					</a>
+					<ul class="dropdown-menu">
+						<li><a href="/scomuser/profile/{{ user.id }}">Profile</a></li>
+						<li><a href="/scomuser/logout/">Logout</a></li>
+					
+
+					{% if user.is_staff and perms.scomuser.view_paytype %}
+						<li class="divider"></li>
+						{% if perms.scomuser.add_paytype %}
+							<li><a href="/scomuser/pay-type/add/">Add Pay Type</a></li>
+						{% endif %}
+						
+							<li><a href="/scomuser/pay-types/">Paytype List</a></li>
+						
+					{% endif %}
+
+					{% if user.is_staff and perms.scomuser.view_department %}
+						<li class="divider"></li>
+						{% if perms.scomuser.add_department %}
+							<li><a href="/scomuser/department/add/">Add Department</a></li>
+						{% endif %}
+
+							<li><a href="/scomuser/departments/">Department List</a></li>
+						
+					{% endif %}
+
+					{% if user.is_staff and perms.auth.view_group %}
+						
+							<li class="divider"></li>
+							{% if perms.auth.add_group %}
+							<li><a href="/group/add/">Add Group</a></li>
+							{% endif %}
+						
+							<li><a href="/group/list/">Group List</a></li>
+						
+					{% endif %}
+
+					{% if user.is_staff and perms.auth.view_user %}
+						<li class="divider"></li>
+						{% if perms.auth.add_user %}
+							<li><a href="/scomuser/adduser/">Add User</a></li>
+						{% endif %}
+
+							<li><a href="/scomuser/list/#/userlist">User List</a></li>
+						
+					{% endif %}
+						<li><a class="change-password" href="#">Change Password</a></li>
+
+					</ul>
+				</li>
+				
+			</ul>
+		{% else %}
+			<ul class="nav navbar-nav navbar-right">
+				<li><a href="/scomuser/login/">Sign In</a></li>
+				<li class="active"><a href="">Scom</a></li>
+			</ul>
+		{% endif %}
+		</div>
+
+	</div>
+</section>
+{% include "modals/edit-modal.html" %}
+<script type="text/javascript">
+(function(){
+	$("a.change-password").on("click", function(e){
+			e.preventDefault();
+			// com_id = $(this).data("id");
+		    url = "/scomuser/change-password/"
+			mdal = $('#editModal');
+			mdal.on("shown.bs.modal", function(){
+				$("#editModal .modal-content").load(url);
+				console.log(url);
+			}).modal();
+
+			return false;
+		});
+})(jQuery)
+</script>

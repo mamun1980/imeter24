@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style type="text/css">
+#supplier-contact {
+	width: 400px;
+	border: 2px solid black;
+	background-color: #FFF;
+	height: auto;
+}
+.list {
+	margin-top: 10px;
+}
+.pr-view, .dropdown {
+	display: inline-block;
+}
+</style>
+<div class="container-fluid shadow4 main-body">
+
+<section class="row list" >
+	<div class="col-md-12">
+		
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Purchase Request List</h4>
+		  	</div>
+		  	<div class="panel-body">
+				<table class='table table-bordered table-striped'>
+					<thead>
+						<tr class='info'>
+							<th>PR ID</th>
+							<th>Requested User</th>
+							<th>Item Details</th>
+							<th>Description</th>
+							<th>Expected At</th>
+							<th>Requested At</th>
+							<th>Ordered (Approved)</th>
+							
+							<th>Status</th>
+							
+							<th width='150'>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for pr in pr_list %}
+						<tr {% if pr.status == '1' %} class="success" {% endif %}>
+							<td>{{ pr.id }}</td>
+							<td>{{ pr.user_requested }}</td>
+							<td>{{ pr.item }}</td>
+							<td>{{ pr.description }}</td>
+							<td>{{ pr.item_require_before }}</td>
+							<td>{{ pr.requeste_created_at }}</td>
+							<td>{{ pr.order_qty }} ({{ pr.approved_qty }})</td>
+							
+							<td>{{ pr.status_verbose }}</td>
+							
+							<td>
+								<a class="pr-view btn btn-primary btn-sm" href="/purchase/view-pr/{{pr.id}}/">View</a> 
+								{% if pr.status != '1' %}
+								<div class="dropdown">
+								  	<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu_{{pr.id}}" data-toggle="dropdown">
+								    Status
+								    <span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu_{{pr.id}}">
+								    	<li role="presentation">
+								    	{%if perms.purchase.approve_purchase_request %}
+											<a role="menuitem" class="pr-approve" data-id="{{pr.id}}" href="">Approve</a>
+										{% endif %}
+										</li>
+										{% if not pr.status == '3' %}
+								    	<li role="presentation">
+								    		<a role="menuitem" class="pr-decline" data-id="{{pr.id}}" href="">Decline</a>
+								    	</li>
+								    	{% endif %}
+
+								    	{% if not pr.status == '4' %}
+								    	<li role="presentation">
+								    		<a role="menuitem" class="pr-on-hold" data-id="{{pr.id}}" href="">On Hold</a>
+								    	</li>
+								    	{% endif %}
+								  	</ul>
+								</div>
+								{% endif %}
+							</td>
+
+
+						</tr>
+						{% empty %}
+							<tr>
+								<td colspan="8">No PR</td>
+							</tr>
+						{% endfor %}
+						
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+
+</section>
+
+{% include "modals/add-modal.html" %}
+
+<script type="text/javascript">
+(function(){
+$(document).on("change", "input.decimal", function(e){
+	var myval = parseFloat($(this).val())
+	$(this).val(myval.toFixed(2));
+})
+	$(document).on("click", "a.pr-approve", function(e){
+		e.preventDefault();
+		var pr_id = $(this).data("id");
+
+		e.preventDefault();
+		url = "/purchase/approve-pr/" + pr_id + "/",
+		mdal = $('#addModal');
+		mdal.on("shown.bs.modal", function(){
+			$("#addModal .modal-content").load(url);
+			// console.log(url);
+		}).modal();
+		return false;
+	
+	});
+
+
+	$(document).on("click", "a.pr-decline", function(e){
+		e.preventDefault();
+		var pr_id = $(this).data("id");
+
+		$.ajax({
+			type: "POST",
+			url: "/purchase/declien-pr/",
+			data: {
+				'pr_id': pr_id
+			},
+			success: function(rdata){
+				alert('PR Decliened');
+				window.location.reload(true);
+			}
+		})
+	
+	});
+
+	$(document).on("click", "a.pr-on-hold", function(e){
+		e.preventDefault();
+		var pr_id = $(this).data("id");
+
+		$.ajax({
+			type: "POST",
+			url: "/purchase/onhold-pr/",
+			data: {
+				'pr_id': pr_id
+			},
+			success: function(rdata){
+				alert('PR On Hold');
+				window.location.reload(true);
+			}
+		})
+	
+	})
+})(jQuery)
+
+</script>
+
+<script type="text/javascript">
+
+</script>
+{% endblock content %}

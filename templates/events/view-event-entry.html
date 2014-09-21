@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+<section class="row"  id="report">
+	
+
+	<div class="col-md-6 col-md-offset-1">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Event</h4>
+		  	</div>
+		  	<div class="panel-body">
+			  	
+		  		<table class="add-user-table table details">
+			  			<tr>
+			  				<th>Entry ID</th>
+			  				<td>{{ entry.entryid }}</td>
+			  			</tr>
+			  			<tr>
+			  				<th>Event Date</th>
+			  				<td>{{ entry.date_of_transaction }}</td>
+			  			</tr>
+			  			<tr>
+			  				<th>Event Time</th>
+			  				<td>{{ entry.time_of_transaction }}</td>
+			  			</tr>
+			  			<tr>
+			  				<th>Event Name</th>
+			  				<td>{{ entry.transaction_username }}</td>
+			  			</tr>
+		
+
+			  		
+				</table>
+			  	
+			</div>
+		</div>
+	</div>
+
+</section>
+</div>
+<script type="text/javascript">
+(function(){
+	
+})(jQuery)
+
+</script>
+
+{% endblock content %}
+	

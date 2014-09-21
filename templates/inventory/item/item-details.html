@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+<section class="row"  id="add-inventory-item">
+	
+
+	<div class="col-md-6">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Item Details {%if perms.inventory.change_item %} <a href="/inventory/item/edit/{{ item.item_number }}/"> <i class="glyphicon glyphicon-edit"></i></a>{% endif %}</h4>
+
+		  	</div>
+		  	<div class="panel-body">
+		  		<table class="table item-details">
+		  			<tr>
+		  				<th width="15%">Item Number</th>
+		  				<td width="35%">{{ item.item_number }}</td>
+		  				<th width="15%">Description</th>
+		  				<td width="35%">{{ item.description }}</td>
+		  			</tr>
+		  			<tr>
+		  				<th width="15%">Quantity on hand</th>
+		  				<td width="35%">{{ item.quantity_on_hand }}</td>
+		  				<th width="15%">Quantity on order</th>
+		  				<td width="35%">{{ item.quantity_on_order }}</td>
+		  			</tr>
+		  			<tr>
+		  				<th width="15%">Date Modified</th>
+		  				<td width="35%">{{ item.date_modified }}</td>
+		  				<th width="15%">Department</th>
+		  				<td width="35%">{{ item.department }}</td>
+		  			</tr>
+		  			<tr>
+		  				<th width="15%">Primary Supplier</th>
+		  				<td width="35%">
+		  					<p class='bg-info'><b class='left-info'>NAME : 
+		  						<a href="/contacts/{{item.primary_supplier.id}}/">	{{item.primary_supplier.contact_name}}</a>
+		  					</b></p>
+		  					<p class='bg-info'><b class=''>ADDRESS : </b>{{item.primary_supplier.address_1}} </p>
+		  					<p class='bg-info'><b class=''>CITY : </b>{{item.primary_supplier.city}} </p>
+		  					<p class='bg-info'><b class=''>CONTACT NUMBER : </b> 
+		  						{% for phon in item.primary_supplier.contactphone_set.all %}
+		  						<li> {{phon.phone_type }} - {{phon.phone}} (ext - {{phon.phone_ext}}) </li>
+		  						{% endfor %}
+		  						
+		  					</p>
+		  				</td>
+		  				<th width="15%">Duty Percentage</th>
+		  				<td width="35%">{{ item.duty_percentage }}</td>
+		  			</tr>
+
+		  			<tr>
+		  				<th width="15%">Item unit measure</th>
+		  				<td width="35%">{{ item.item_unit_measure }}</td>
+		  				<th width="15%">stock status type</th>
+		  				<td width="35%">{{ item.stock_status_type }}</td>
+		  			</tr>
+		  			<tr>
+		  				<th width="15%">Currency</th>
+		  				<td width="35%">{{ item.currency }}</td>
+		  				<th width="15%">Location</th>
+		  				<td width="35%">{{ item.location }}</td>
+		  			</tr>
+		  			<tr>
+		  				<th width="15%">Quantity on request</th>
+		  				<td width="35%">{{ item.qty_on_request }}</td>
+		  				<th width="15%">Minimum Quantity</th>
+		  				<td width="35%">{{ item.minimum_qty }}</td>
+		  			</tr>
+		  			<tr>
+		  				<th width="15%">Maximum order quantity</th>
+		  				<td width="35%">{{ item.max_order_qty }}</td>
+		  				<th width="15%">Max single oder qty</th>
+		  				<td width="35%">{{ item.max_single_order_qty }}</td>
+		  			</tr>
+		  			<tr>
+		  				<th width="15%">Retail price</th>
+		  				<td width="35%">{{ item.retail_price }}</td>
+		  				<th width="15%">wholesale sale</th>
+		  				<td width="35%">{{ item.wholesale_cost }}</td>
+		  			</tr>
+		  			<tr>
+		  				<th width="15%">Estimated whole sale cost</th>
+		  				<td width="35%">{{ item.estimated_wholesale_cost }}</td>
+		  				<th width="15%">Production type</th>
+		  				<td width="35%">{{ item.production_type }}</td>
+		  			</tr>
+		  			<tr>
+		  				<th width="15%">PO Status</th>
+		  				<td width="35%">{{ item.PO_status }}</td>
+		  				<th width="15%">Catalog Number</th>
+		  				<td width="35%">{{ item.catalog_number }}</td>
+		  			</tr>
+		  			<tr>
+		  				<th width="15%">Country of origin</th>
+		  				<td width="35%">{{ item.country_of_origin }}</td>
+		  				<th width="15%">Lead Time</th>
+		  				<td width="35%">{{ item.lead_time }}</td>
+		  			</tr>
+		  			<tr>
+		  				<th width="15%">Customs Designation</th>
+		  				<td width="35%">{{ item.customs_designation }}</td>
+		  				<th width="15%">Customer Tariff Number</th>
+		  				<td width="35%">{{ item.customer_tariff_number }}</td>
+		  			</tr>
+		  			<tr>
+		  				<th width="15%">Preferance Criteria</th>
+		  				<td width="35%">{{ item.preference_criteria }}</td>
+		  				<th width="15%">Producer of item</th>
+		  				<td width="35%">{{ item.producer_of_item }}</td>
+		  			</tr>
+		  			<tr>
+		  				<th width="15%">Shipping Weight</th>
+		  				<td width="35%">{{ item.shipping_weight }}</td>
+		  				<th width="15%">Minimum Qty On Hand</th>
+		  				<td width="35%">{{ item.minimum_qty_on_hand }}</td>
+		  			</tr>
+		  			<tr>
+		  				<th width="15%">Item Webite</th>
+		  				<td width="35%">{{ item.website }}</td>
+		  				<th width="15%">Item Image</th>
+		  				<td width="35%">
+		  				{% if item.item_image %}
+		  					<img src="/media/{{ item.item_image }}" width="100" height="100">
+		  				{% else %}
+		  					<p>No Image</p>
+		  				{% endif %}
+		  				</td>
+		  				
+		  			</tr>
+
+		  			
+		  		</table>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="col-md-6">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Purchase orders for this Item</h4>
+		  	</div>
+		  	<div class="panel-body">	
+		  	<table class="table">
+			  	<thead>
+			  		<tr>
+			  			<th>PO Number</th>
+			  			<th>Supplier</th>
+			  			<th>Date Issued</th>
+			  			<th>PO Status</th>
+			  			<th>Agent</th>
+			  		</tr>	
+			  	</thead>
+			  	<tbody>
+			  	{% for po in purchase_orders %}
+			  		<tr>
+			  			<td>{{ po.po_number }}</td>
+			  			<td>{{ po.supplier }}</td>
+			  			<td>{{ po.date_issued }}</td>
+			  			<td>{{ po.status_verbose }}</td>
+			  			<td>{{ po.purchasing_agent }}</td>
+			  		</tr>
+			  	{% empty %}
+			  	<tr>
+			  		<td colspan="5">No PO for this Item</td>
+			  	</tr>
+			  	{% endfor%}
+			  	</tbody>
+		  	</table>
+		  	</div>
+		</div>
+
+	</div>
+	<div class="col-md-6">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Add Comments</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  	<form action="/inventory/item/comment/add/" name="item-comment" method="POST">{% csrf_token %}
+		  	<input type="hidden" name="item_id" value="{{ item.item_number }}">
+		  		{{ item_comment_form.as_p }}
+		  		<button class="btn btn-primary btn-lg" type="submit">Add Comment</button>
+		  	</form>
+			</div>
+			<table class="table" id="item-comments">
+			<thead>
+			<tr>
+				<th>Comment #</th><th width="200">Comment</th><th>Comment By</th><th>Comment Date</th>
+			</tr>
+			</thead>
+			<tbody>
+			{% for comment in item_comments %}
+				<tr>
+					<td>{{  comment.id }}</td>
+					<td>{{  comment.comment }}</td>
+					<td>{{  comment.comment_by }}</td>
+					<td>{{  comment.comment_date }}</td>
+				</tr>
+			{% empty %}
+			
+				<tr>
+					<td colspan="4">No comments</td>
+				</tr>
+			{% endfor %}
+			</tbody>	
+			</table>
+		</div>
+	</div>
+
+</section>
+</div>
+
+<script type="text/javascript">
+(function(){
+	$("form[name='item-comment']").on("submit", function(e){
+		e.preventDefault();
+		form_data = $(this).serialize();
+		console.log($(this).attr('action'));
+		$.ajax({
+			type: "POST",
+			url: $(this).attr('action'),
+			data: form_data,
+			success: function(rdata) {
+				console.log(rdata);
+                $( "button.close-modal" ).trigger( "click" );
+                $("table#item-comments tbody").prepend(rdata);
+                
+                // window.location.reload(false);
+                // win = window.open("",'_blank');
+                // win.location.href = "/contacts/edit/" + rdata + "/";
+
+            }
+		});
+
+	})
+})(jQuery)
+</script>
+{% endblock content %}
+	

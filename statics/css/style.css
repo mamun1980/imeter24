@@ -1,0 +1,468 @@
+@font-face {
+	font-family: championFace;
+	src: url('/statics/font/Glegoo-Regular.ttf')
+}
+/* ============ */
+#editModal, #addModal,#changePasswordModal {
+	z-index: 9999999;
+}
+.modal-content {
+	position: relative;
+	margin-top: 50px;
+}
+#changePasswordModal .modal-content {
+	position: relative;
+	margin-top: 120px;
+}
+body {
+	background-color: #CCC;
+	font-size: 11px;
+	background-image: url("/statics/images/scom-bg.jpg");
+
+}
+.logo {
+	background: #4d5866;
+}
+ul.dropdown-menu {
+	z-index: 9999999;
+}
+.topmargin {
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+.filter {
+	margin-top: 10px;
+	margin-bottom: 20px;
+}
+.shadow4 {
+	/*-moz-box-shadow: 0 0 5px 2px #888;
+	-webkit-box-shadow: 0 0 5px 2px#888;
+	box-shadow: 0 0 5px 2px #888;*/
+	padding: 20px 10px 10px;
+}
+table {
+	background-color: #FFF;
+}
+#comment-form table {
+	background-color: transparent;
+}
+.shadow-bottom {
+	-webkit-box-shadow: 0 8px 6px -6px black;
+	-moz-box-shadow: 0 8px 6px -6px black;
+	box-shadow: 0 8px 6px -6px black;
+}
+#login-jumbo {
+	padding-bottom: 50px;
+	margin-top: 20px;
+}
+.widget2 {
+	padding: 10px;
+	margin: 10px;
+}
+.widget-section {
+	margin: 20px auto;
+}
+.widget {
+	margin: 10px auto;
+	height: 250px;
+	-moz-box-shadow: 0px 0px 15px #000000;
+	-webkit-box-shadow: 0px 0px 15px #000000;
+	box-shadow: 0px 0px 15px #777;
+
+/*	background: #f6e6b4;
+	background: -moz-linear-gradient(top, #f6e6b4 0%, #ed9017 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f6e6b4), color-stop(100%,#ed9017));
+	background: -webkit-linear-gradient(top, #f6e6b4 0%,#ed9017 100%);
+	background: -o-linear-gradient(top, #f6e6b4 0%,#ed9017 100%);
+	background: -ms-linear-gradient(top, #f6e6b4 0%,#ed9017 100%);
+	background: linear-gradient(to bottom, #f6e6b4 0%,#ed9017 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f6e6b4', endColorstr='#ed9017',GradientType=0 );
+*/
+
+}
+.dashboard a {
+	text-decoration: none;
+}
+.widget-title {
+	/*text-shadow: 2px 2px 5px #000;*/
+}
+.widget-title h4 {
+	font-stretch: expanded;
+	background-color: #565656;
+  	color: transparent;
+  	text-shadow: 0px 2px 3px rgba(255,255,255,0.5);
+  	-webkit-background-clip: text;
+    -moz-background-clip: text;
+    background-clip: text;
+}
+.widget-body {
+	
+	background-color: #FFF;
+	
+}
+.glyphicon {
+	color: #FFF;
+}
+#comment .glyphicon {
+	color: #428BCA !important;
+}
+.widget:hover {
+	/*IE 7 AND 8 DO NOT SUPPORT BORDER RADIUS*/
+	-moz-box-shadow: 0px 0px 15px #000000;
+	-webkit-box-shadow: 0px 0px 15px #000000;
+	box-shadow: 0px 0px 15px #000;
+
+}
+#message {
+	margin: 10px auto;
+	padding: 10px;
+	
+}
+#message li {
+	list-style: none;
+	padding: 10px 50px;
+}
+li.error {
+	background-color: red;
+}
+li.success {
+	background-color: green;
+}
+li.warning {
+	background-color: #fd0;
+}
+.errorlist li {
+	list-style: none;
+	padding: 5px;
+	color: #000;
+	background: red;
+	font-size: 12px;
+	font-weight: 900;
+}
+.bg-danger {
+	background: red;
+}
+/*=================== Top-navigation bar ==============*/
+.scom {
+	font-size: 22px;
+	padding-left: 0px !important;
+	padding-top: 15px !important;
+	text-shadow: 0px 0px 5px rgba(150, 50, 50, 1);
+}
+.navbar-brand {
+	padding-bottom: 0px !important;
+	padding-top: 15px !important;
+}
+.navbar {
+	position: relative;
+	border-bottom: 3px solid red;
+	z-index: 999999;
+}
+
+/*=========== Main Body===============*/
+tr.table-head {
+	background-color: #777;
+	color: #FFF;
+	font-size: 16px;
+}
+.home {
+	text-align: center;
+}
+.main-body {
+	min-height: 600px;
+	margin-top: 20px;
+	margin-bottom: 50px;
+	/*background-color: #FFF;*/
+}
+.login-btn, .update-btn {
+	height: 50px !important;
+	padding: 5px 16px !important;	
+	margin-top: 20px;
+}
+.mybutton {
+	height: 50px !important;
+	padding: 10px 16px !important;	
+	margin-top: 10px;
+	margin-bottom: 10px;
+
+}
+.update-btn {
+	margin-bottom: 20px;
+	margin-top: 10px;
+
+}
+#delete-phone-confirm, #delete-email-confirm, #delete-user-confirm, #delete-contact-confirm,
+#delete-comment-confirm, #delete-contact-distribution-method-confirm, #delete-contact-contact-type-confirm {
+	display: none;
+}
+/*=========== scomuser app ==================*/
+.search-input {
+	margin-bottom: 5px;
+}
+table.add-user-table {
+	margin: 10px auto;
+	width: 100%;
+}
+#report-details table.add-user-table  th, table.job  th, table.job-status th{
+	background-color: #ccc;
+}
+table.add-user-table  th{
+	padding-left: 10px;
+}
+table.add-user-table  td{
+	padding-left: 10px;
+}
+
+.details-table {
+	border: 3px solid #CCC;
+	margin-top: 10px;
+	background-color: #EEE;
+}
+.user-details-table th {
+	
+	
+
+}
+table.add-user-table tr {
+	padding: 5px;
+	
+	line-height: 3;
+}
+#user-list, #contact-list, #inventory-list, #schedule-job-list, #report-list, #recuring-report-list, #event-list, #controller-list, .group-list {
+	margin-top: 20px !important;
+	font-size: 11px;
+}
+.permission {
+	
+	padding: 10px 5px 20px;
+	background-color: #FFF;
+	-moz-box-shadow: 0 0 5px 2px #888;
+	-webkit-box-shadow: 0 0 5px 2px#888;
+	box-shadow: 0 0 5px 2px #888;
+	
+}
+
+h3.permission-title {
+	width: 100%;
+	text-align: center;
+	background-color: #E2C1BD;
+	color: #000;
+	padding: 10px;
+	margin-top: 0px;
+}
+
+/*========== Footer ==================*/
+
+.footer-main {
+	min-height: 200px;
+	background-color: #FFF;
+	text-align: center;
+}
+
+/*=============== CONTACT ===============*/
+table.contact-profile {
+	border-collapse: separate;
+	border-spacing: 0 1em;
+}
+table.contact-profile tr {
+	/*border-spacing:5em;*/
+}
+.message {
+	margin: 5px auto;
+	padding: 10px 20px;
+	color: #FFF;
+	text-align: center;
+	background-color: #911;
+}
+form[name='contact-phone'] {
+	margin: 10px auto 20px;
+}
+input.comment {
+	padding-top:14px !important;
+	padding-bottom:14px !important;
+	margin-top: 20px;
+}
+table.email-list {
+	margin-top: 20px;
+}
+#payment-term .label-danger, #email-type .label-danger, #delivery-choice-list .label-danger, #contact-type-list .label-danger,
+#currency-list .label-danger, #phone-type-list .label-danger, #distribution-method .label-danger, #pay-type-list .label-danger,
+#department-list .label-danger, #unit-measure-list .label-danger, #production-type-list .label-danger, #report-type-list .label-danger,
+#printer-list .label-danger, 
+#custom-designation-list .label-danger {
+	font-size: 150% !important;
+	display: inline-block;
+	margin-top:5px;
+}
+#comment .panel-body {
+	padding: 5px 10px 5px !important;
+	position: relative;
+}
+#comment .panel-body p {
+	position: absolute;
+	right: 10px;
+	top: 2px;
+
+}
+.payment-term-edit {
+	margin-left: 10px;
+}
+.items {
+	margin: 2px 5px;
+	padding: 5px;
+	border: 1px solid #DDD;
+	background: #EEE;
+}
+/*==================== Bootstrap 3 multilebel menu =====================*/
+.dropdown-submenu{
+    position:relative;
+}
+ 
+.dropdown-submenu > .dropdown-menu
+{
+    top:0;
+    left:100%;
+    margin-top:-6px;
+    margin-left:-1px;
+    -webkit-border-radius:0 6px 6px 6px;
+    -moz-border-radius:0 6px 6px 6px;
+    border-radius:0 6px 6px 6px;
+}
+ 
+.dropdown-submenu:hover > .dropdown-menu{
+    display:block;
+}
+ 
+.dropdown-submenu > a:after{
+    display:block;
+    content:" ";
+    float:right;
+    width:0;
+    height:0;
+    border-color:transparent;
+    border-style:solid;
+    border-width:5px 0 5px 5px;
+    border-left-color:#cccccc;
+    margin-top:5px;
+    margin-right:-10px;
+}
+ 
+.dropdown-submenu:hover > a:after{
+    border-left-color:#ffffff;
+}
+ 
+.dropdown-submenu .pull-left{
+    float:none;
+}
+ 
+.dropdown-submenu.pull-left > .dropdown-menu{
+    left:-100%;
+    margin-left:10px;
+    -webkit-border-radius:6px 0 6px 6px;
+    -moz-border-radius:6px 0 6px 6px;
+    border-radius:6px 0 6px 6px;
+}
+
+/*================== schedule app ====================*/
+.job {
+	position: relative;
+	z-index: 99999;
+}
+.job-status {
+	position: relative;
+	z-index: 9999;
+}
+p.inform-left {
+	display: inline-block;
+	float: left;
+	margin-left: 10px;
+}
+p.inform-right {
+	display: inline-block;
+	float: right;
+}
+tr.job-status-yellow {
+	background-color: #edf268;
+}
+
+tr.job-status-red {
+	background-color: #ef4545;
+}
+
+tr.job-status-green {
+	background-color: #0bc66f;
+	color: #000;
+}
+tr.job-status-purple {
+	background-color: #cc35dd;
+	color: #000;
+}
+
+.no-valid-job {
+	background: red;
+	padding: 5px 10px;
+	margin: 5px auto 10px;
+	text-align: center;
+}
+.no-resize-leftpane {
+	max-width: 196px;
+}
+/*============= Inventory ================*/
+.item-details th {
+	background: #DDD;
+}
+.custom-form-control {
+	width: 93% !important;
+	display: inline-block !important;
+}
+
+.primary_supplier {
+	width: 95%;
+	display: inline-block;
+}
+
+#contact_info {
+	margin-top: 10px;
+}
+#contact_info p {
+	padding: 10px;
+}
+b.left-info {
+	width: 115px;
+	display: inline-block;
+}
+ul.phone-list-ul {
+	width: 60%;
+	display: inline-block;
+}
+/*============ Report =====================*/
+#report-details a {
+	color: #FFF;
+}
+
+#report-search {
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.details th {
+	background-color: #DDD;
+}
+
+
+
+/*=========== Utility ==============*/
+#massmail .table-head {
+	background-color: #333;
+}
+#massmail .pending {
+	background-color: #eae362;
+}
+
+#massmail .delivered {
+	background-color: #0bc66f;
+}
+
+#massmail .failed {
+	background-color: #e83e3e;
+}

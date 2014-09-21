@@ -1,0 +1,371 @@
+{% extends "base.html" %}
+
+{% block angular %}
+	<script type="text/javascript" src="/statics/js/angular.min.js"></script>
+	<script type="text/javascript" src="/statics/js/angular-route.min.js"></script>	
+{% endblock angular %}
+
+{% block content %}
+<style>
+#feedback { font-size: 1.4em; }
+/*#selectable .ui-selecting { background: #FECA40; }*/
+#selectable .ui-selected { background: #F39814; color: white; }
+#selectable { list-style-type: none; margin: 0; padding: 0px 2px 0px 0px; width: 100%; }
+#selectable thead tr { margin: 0px 3px; padding: 0.4em; font-size: 1.4em; height: 35px; background-color: #ed791a; }
+#selectable tbody tr { margin: 0px 3px; padding: 0.4em; font-size: 1.4em; height: 35px; border-bottom: 1px solid #EEE; }
+#selectable tbody tr:hover { background-color: #FECA40; color: #000; }
+#selectable td, #selectable th {
+	padding: 3px 10px;
+}
+
+#contact-list {
+	/*border: 2px solid #333;*/
+}
+#container {
+	width: 450px;
+}
+#container .ui-widget-content-custom {
+	background-color: #333 !important;
+	color: #FFF;
+}
+</style>
+
+<div class="container shadow4 main-body" ng-app="premierApp">
+
+<section class="row"  id="add-inventory-item" ng-controller="EditItemController">
+	
+
+	<div class="col-md-6">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Edit Inventory Item</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  	<form action="/inventory/item/edit/{{itemid}}/" enctype="multipart/form-data" name="inventory-item-form" method="POST">{% csrf_token %}
+		  		<input type="hidden" name="contact_id" value="{{contact_id}}">
+		  		{% for field in item_form %}
+		        
+		            <div class="col-md-5 topmargin">
+		            {{ field.label_tag }}
+		            </div>
+		            <div class="col-md-7 topmargin">
+		                {{ field }}
+		            </div>
+		        
+		        {% endfor %}
+					
+					  	<div class="btn btn-lg">
+							<button class="btn btn-primary btn-lg" type="submit">Update Inventory Item</button>
+						</div>
+					
+		  	</form>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-md-6">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Add Comments</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  	<form action="/inventory/item/comment/add/" name="item-comment" method="POST">{% csrf_token %}
+		  	<input type="hidden" name="item_id" value="{{itemid}}">
+		  		{{ item_comment_form.as_p }}
+		  		<button class="btn btn-primary btn-lg" type="submit">Add Comment</button>
+		  	</form>
+			</div>
+			<table class="table" id="item-comments">
+			<thead>
+			<tr>
+				<th>Comment #</th><th width="150">Comment</th><th>Comment By</th><th>Comment Date</th>
+			</tr>
+			</thead>
+			<tbody>
+			{% for comment in item_comments %}
+				<tr>
+					<td>{{  comment.id }}</td>
+					<td>{{  comment.comment }}</td>
+					<td>{{  comment.comment_by }}</td>
+					<td>{{  comment.comment_date }}</td>
+				</tr>
+			{% empty %}
+			
+				<tr>
+					<td colspan="4">No comments</td>
+				</tr>
+			{% endfor %}
+			</tbody>	
+			</table>
+		</div>
+	</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<div id="container" style="z-index: 999999;">
+		<table id="selectable" class="ui-autocomplete ui-widget-content-custom ui-corner-all">
+			<thead>
+				<tr>
+					<th>#</th><th>ID</th><th>Contact Name</th><th>Address 1</th><th> City </th>
+					<th><span ng-show="{[{ contact.permission.can_change_contact }]}">Action</span> <a href="" class="close">x</a></th>
+				</tr>
+			</thead>
+			<tbody>
+			<tr class="ui-menu-item" ng-repeat="contact in contacts | googleSearchFilter:search">
+				<td>
+					<input type="radio" name="contact" value="{[{contact.id}]}">
+					<div class='phone' ng-repeat="phon in contact.phones">
+					<input type="hidden" data-phone-number="{[{phon.number}]}" data-ext="{[{phon.phone_ext}]}" data-phone-type="{[{phon.type}]}">
+					</div>
+				</td>
+				<td class="sid">{[{contact.id}]}</td>
+				<td class="contact_name">{[{contact.contact_name}]}</td>
+				<td class="address_1">{[{contact.address_1}]}</td>
+				<td class="city">{[{contact.city}]}</td>
+				
+				<td>
+					<span ng-show="{[{ contact.permission.can_change_contact }]}">
+						<a class="edit-contact" data-id="{[{contact.id}]}" href="#">Edit</a>
+					</span>
+				</td>
+				
+			</tr>
+			</tbody>
+		</table>
+
+	</div>
+</section>
+</div>
+
+
+
+{% include "modals/add-modal.html" %}
+<script type="text/javascript">
+(function(){
+	$("form[name='item-comment']").on("submit", function(e){
+		e.preventDefault();
+		form_data = $(this).serialize();
+		console.log($(this).attr('action'));
+		$.ajax({
+			type: "POST",
+			url: $(this).attr('action'),
+			data: form_data,
+			success: function(rdata) {
+				console.log(rdata);
+                $( "button.close-modal" ).trigger( "click" );
+                $("table#item-comments tbody").prepend(rdata);
+                
+                // window.location.reload(false);
+                // win = window.open("",'_blank');
+                // win.location.href = "/contacts/edit/" + rdata + "/";
+
+            }
+		});
+
+	})
+})(jQuery)
+</script>
+
+
+<script type="text/javascript">
+(function(){
+	$(document).on("change", "input.decimal", function(e){
+		var myval = parseFloat($(this).val())
+		$(this).val(myval.toFixed(2));
+	});
+	
+	$("select#id_primary_supplier").hide();
+	// var pr_sup = $("select#id_primary_supplier option[selected='selected']").text();
+	// console.log("PR: "+pr_sup);
+
+	var str1 = "<input type=text name='primary_supplier_demo' id='id_primary_supplier_demo' class='form-control custom-form-control' ng-model='search' placeholder='Start typing to search supplier'>";
+	var str2 = '<a href="/admin/contacts/contact/add/" class="add-another" id="add_id_primary_supplier" onclick="return showAddAnotherPopup(this);"> <img src="/statics/admin/img/icon_addlink.gif" width="10" height="10" alt="Add Another"></a><div id="contact_info"></div>'
+	$("select#id_primary_supplier").closest("div").append(str1+str2);
+	
+	// $("input#id_primary_supplier_demo").val(pr_sup);
+	
+
+
+	$("a#add_id_primary_supplier").on("click", function(e){
+		e.preventDefault();
+		url = "/contacts/add/rel/",
+		mdal = $('#addModal');
+		mdal.on("shown.bs.modal", function(){
+			$("#addModal .modal-content").load(url);
+			// console.log(url);
+		}).modal();
+		return false;
+	});
+	$("#selectable a.close").on("click", function(){
+		$("#selectable").hide();
+	});
+
+	$(document).on("click", "#selectable input[type='radio']", function(e){
+		// e.preventDefault();
+		var id = $(this).val();
+		// console.log(id);
+		// $("#selectable tr").removeClass("ui-selected");
+		var c_n = $(this).closest('tr').find("td.contact_name").text();
+		var a_1 = $(this).closest('tr').find("td.address_1").text();
+		var city = $(this).closest('tr').find("td.city").text();
+		
+		var phone_str = '<ul class="phone-list-ul">';
+
+		$(this).closest('tr').find("div.phone input").each(function( index ){
+			var phtype = $(this).data('phone-type');
+			var number = $(this).data('phone-number');
+			var ext = $(this).data('ext');
+			
+			phone_str += '<li>' + phtype + ' - ' + number + ' ( ext- ' + ext + ' ) ' + '</li>';
+
+		});
+		phone_str += "</ul></span>";
+		
+
+		var str = ''
+		if(c_n != '') {
+			str += c_n;
+		}
+
+		// console.log(str);
+
+		$("select#id_primary_supplier option[value='"+ id.trim()+"']").prop("selected", true);
+		$("#id_primary_supplier_demo").val(str);
+
+
+		var txt = '';
+		txt += "<p class='bg-info'><b class='left-info'>CONTACT NAME</b> : "+ c_n + "</p>";
+		txt += "<p class='bg-info'><b class='left-info'>ADDRESS</b> : "+ a_1 + "</p>";
+		txt += "<p class='bg-info'><b class='left-info'>CITY</b> : " + city + "</p>";
+		txt += "<p class='bg-info' id='aaaaa'><b class='left-info'>CONTACT NUMBER</b> :  </p>";
+		
+
+		$("#contact_info").html(txt);
+		$("#aaaaa").append(phone_str);
+
+
+		// console.log(id);
+		$("#selectable").hide();
+
+	});
+
+	$(document).on("click", "#selectable a.edit-contact", function(e){
+		e.preventDefault();
+		var cid = $(this).data("id");
+
+		e.preventDefault();
+		url = "/contacts/edit/basic/" + cid + "/",
+		mdal = $('#addModal');
+		mdal.on("shown.bs.modal", function(){
+			$("#addModal .modal-content").load(url);
+			// console.log(url);
+		}).modal();
+		return false;
+	
+	})
+
+
+})(jQuery)
+
+</script>
+
+<script type="text/javascript">
+premierApp.controller('EditItemController',['$scope', '$http', function ($scope, $http) {
+	
+	$scope.init = function() {
+		$http({method: 'GET', url: "/contacts/list/"}).
+            success(function(data, status, headers, config) {
+                // console.log(data);
+                $scope.contacts = data;
+            });
+        // var pr_sup = $("select#id_primary_supplier option[selected='selected']").text();
+        // console.log("PR: "+pr_sup);
+        // $scope.search = pr_sup;
+        // $scope.editpage = true;
+        var cid = $("input[name='contact_id']").val();
+        console.log("Contact ID: "+cid);
+        $http({ method: 'GET', url: "/contacts/get-contact/"+cid+"/"}).
+        	success(function(data, status, headers, config){
+	        	$scope.contact = data;
+	        	console.log($scope.contact.contact_numbers.length);
+	        	var phone_str2 = '<ul class="phone-list-ul">';
+	        	for (var i=0; i<$scope.contact.contact_numbers.length; i++) {
+	        		console.log($scope.contact.contact_numbers[i]);
+	        		phtype = $scope.contact.contact_numbers[i]['type'];
+	        		number = $scope.contact.contact_numbers[i]['number'];
+	        		ext = $scope.contact.contact_numbers[i]['phone_ext'];
+
+	        		phone_str2 += '<li>' + phtype + ' - ' + number + ' ( ext- ' + ext + ' ) ' + '</li>';
+
+	        	}
+
+	        	var txt = '';
+				txt += "<p class='bg-info'><b class='left-info'>CONTACT NAME</b> : "+ $scope.contact.contact_name + "</p>";
+				txt += "<p class='bg-info'><b class='left-info'>ADDRESS</b> : "+ $scope.contact.address_1 + "</p>";
+				txt += "<p class='bg-info'><b class='left-info'>CITY</b> : " + $scope.contact.city + "</p>";
+				txt += "<p class='bg-info' id='aaaaa'><b class='left-info'>CONTACT NUMBER</b></p>";
+				
+
+				
+
+				$("#contact_info").append(txt);
+				$("#aaaaa").append(phone_str2);
+        	});
+
+        $("#selectable").hide();
+	};
+
+	$scope.init();
+
+	$scope.showContacts = function(search) {
+		// console.log('hello');
+		console.log(search);
+	};
+	$scope.$watch('search', function (newValue, oldValue) {
+		// console.log(oldValue);
+		// console.log(newValue);
+        if(newValue != undefined) {
+        	if(newValue.length > 1) {
+        		$( "#container" ).css('width', function(){
+        			var wid = $(this).innerWidth();
+        			console.log(wid);
+        			return wid;
+        		}).position({
+					my: "left-40 top-1",
+					at: "left bottom",
+					of: "#id_primary_supplier_demo",
+					collision: "fit"
+				});
+        		
+        			$("#selectable").show();	
+        	
+        		
+        	} else {
+        		$("#selectable").hide();
+        	}
+        } 
+    });
+
+}]);
+</script>
+
+{% endblock content %}
+	

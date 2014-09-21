@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style type="text/css">
+
+</style>
+
+<div class="container shadow4 main-body" ng-app="premierApp">
+
+<section class="row">
+	<div class="col-md-6">
+		<input type='text' class="form-control" ng-model="search" placeholder="Filter By Name">
+	</div>
+	
+	
+</section>
+
+	<section class="row" id="user-list">
+		
+		<div class="col-md-11">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>USER LIST</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  		<div ng-view></div>
+			</div>
+		</div>
+
+	</section>
+<div id="delete-user-confirm" title="Do you want to delete?">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;">
+  </span>This will delete the user from your system?</p>
+</div>
+
+{% include "modals/change-password-modal.html" %}
+
+<script type="text/javascript">
+premierApp.controller('UserController',['$scope', '$http', 'UserService', 'users', function ($scope, $http, UserService, users) {
+    console.log(users);
+    $scope.users = users;
+}]);
+
+</script>
+
+</div>
+
+{% endblock content %}

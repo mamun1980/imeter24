@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container shadow4 main-body">
+
+<section class="row">
+	
+
+	<div class="col-md-12">
+		<form action="/schedule/job-status/add/{{jsid}}/" method="POST" enctype="multipart/form-data">{% csrf_token %}
+			<input type="hidden" name="jobid" value="{{jobid}}">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Add Job status for job id={{job.id}}</h4>
+		  	</div>
+		  	<div class="panel-body">
+			  	<article class="row">
+			  		
+					<section class="col-md-12">
+						<section class="row">
+
+					  		{% for field in job_status_form %}
+					  		<article class="col-md-4" style="margin-bottom: 10px;">
+
+					  			{{ field.label_tag }}
+					  			{{ field.errors }}
+					  			{{ field }}
+					  		</article>
+					  		{% endfor %}
+					  		
+						</section>
+					</section>
+				
+				</article>
+
+				<article class="row">
+					<section class="col-md-6">
+					  	<table class="add-user-table">
+					  		<tr>
+								<td colspan="2">
+									<button type="submit" class="btn btn-primary btn-lg form-control login-btn">Add Job Status</button>
+								</td>
+							</tr>
+						</table>
+					</section>
+				</article>
+				
+			</div>
+		</div>
+		</form>
+	</div>
+</section>
+</div>
+<script type="text/javascript">
+(function(){
+	$(".datetimepicker").datepicker();
+})(jQuery)
+
+</script>
+{% endblock content %}

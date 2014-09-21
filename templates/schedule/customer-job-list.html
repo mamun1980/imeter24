@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container shadow4 main-body">
+
+<section class="row">
+	
+</section>
+
+
+
+	<section class="row" id="schedule-list">
+		
+		<div class="col-md-12">
+			<div class="panel panel-primary">
+				<div class="panel-heading">
+			    	<h4>Scheduled Job list</h4>
+			  	</div>
+			  	<div class="panel-body">
+			  		<table class="table">
+			  			<tr>
+							<td>Job Number</td>
+							<td>Cab Designation</td>
+							<td>Date Opened</td>
+							<td>Date Required</td>
+							<td>Status</td>
+							<td>Customer</td>
+							<td>Job Name</td>
+							<td># of Cabs</td>
+							<td>Description</td>
+							
+						</tr>
+						{% for job in jobs %}
+						<tr>
+							<td>{{ job.job_number }}</td>
+							<td>{{ job.cab_designation }}</td>
+							<td>{{ job.date_opened }}</td>
+							<td>{{ job.date_required }}</td>
+							<td>{{ job.status }}</td>
+							<td>{{ job.customer }}</td>
+							<td>{{ job.job_name }}</td>
+							<td>{{ job.number_of_cabs }}</td>
+							<td>{{ job.description }}</td>
+							<td>
+								<a href="/schedule/job/view/{{job.id}}/"> View </a>
+							</td>
+						</tr>
+			  		{% endfor %}
+
+			  		</table>
+			  	</div>
+			</div>
+			
+		</div>
+	</section>
+</div>
+<script type="text/javascript">
+
+</script>
+{% endblock content %}

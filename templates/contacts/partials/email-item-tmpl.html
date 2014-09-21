@@ -1,0 +1,10 @@
+<tr class="{{ contact_email.id }}">
+	<td>{{ contact_email.email_address_type }}</td>
+	<td>{{ contact_email.email_address }}</td>
+	
+	<td>
+		<a class='email-delete' href='#' data-id="{{ contact_email.id }}">delete</a> /
+		<a class="email-edit" href="/contacts/email/edit/{{ contact_email.id }}/" 
+		data-id="{{ contact_email.id }}" data-toggle="modal" data-target="#editModal" >edit</a>
+	</td>
+</tr>

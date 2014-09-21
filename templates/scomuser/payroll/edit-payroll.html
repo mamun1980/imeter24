@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+<section class="row" id="add-payroll">
+
+	<div class="col-md-6 col-md-offset-3">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Edit Payroll</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  		<form action="/scomuser/payroll/edit/{{payroll_id}}/" method="POST">
+		  			<table class="add-user-table">
+				  		{% for field in payroll_form %}
+				  			<tr>
+				  				<td>{{ field.label_tag }}</td>
+				  				<td>{{ field.errors }}{{ field }}</td>
+				  			</tr>
+				  		{% endfor %}
+				  		
+					<tr>
+						<td colspan="2">
+							<button type="submit" class="btn btn-primary btn-lg form-control login-btn">Update Payroll</button>
+						</td>
+					</tr>
+					</table>
+		  		</form>
+			</div>
+		</div>
+	</div>
+
+
+</section>
+</div>
+{% endblock content %}

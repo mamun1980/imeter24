@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+<section class="row"  id="report-details">
+	
+
+	<div class="col-md-6 col-md-offset-1">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>
+		    		Report Details {%if perms.report.change_report %}<a href="/report/edit/{{ report.id }}/"><i class="glyphicon glyphicon-edit"></i></a> {% endif %}
+			</h4>
+		  	</div>
+		  	<div class="panel-body">
+			  	
+			  		<table class="add-user-table">
+					  	<tr>
+					  		<th>Report Id</th>
+					  		<td>{{ report.id }}</td>
+						</tr>
+						<tr>
+					  		<th>Report Type</th>
+					  		<td>{{ report.report_type }}</td>
+						</tr>
+						
+						<tr>
+					  		<th>Report Status</th>
+					  		<td>{{ report.status }}</td>
+						</tr>
+						<tr>
+					  		<th>Comments</th>
+					  		<td>{{ report.comments }}</td>
+						</tr>
+						
+
+					</table>
+			  	
+			</div>
+		</div>
+	</div>
+
+</section>
+</div>
+
+
+{% endblock content %}
+	

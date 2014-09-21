@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+<section class="row"  id="report">
+	
+
+	<div class="col-md-6 col-md-offset-3">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Event</h4>
+		  	</div>
+		  	<div class="panel-body">
+			  	
+		  		<table class="add-user-table table details">
+			  			<tr>
+			  				<th>Event ID</th>
+			  				<td>{{ event.eventid }}</td>
+			  			</tr>
+			  			<tr>
+			  				<th>Event Date</th>
+			  				<td>{{ event.eventdate }}</td>
+			  			</tr>
+			  			<tr>
+			  				<th>Event Time</th>
+			  				<td>{{ event.eventtime }}</td>
+			  			</tr>
+			  			<tr>
+			  				<th>Event Name</th>
+			  				<td>{{ event.name }}</td>
+			  			</tr>
+			  			<tr>
+			  				<th>Event Category</th>
+			  				<td>{{ event.category }}</td>
+			  			</tr>
+			  			<tr>
+			  				<th>Door Name</th>
+			  				<td>{{ event.doorname }}</td>
+			  			</tr>
+			  			<tr>
+			  				<th>Card Number</th>
+			  				<td>{{ event.cardnumber }}</td>
+			  			</tr>
+			  			<tr>
+			  				<th>Event</th>
+			  				<td>{{ event.event }}</td>
+			  			</tr>
+			  			<tr>
+			  				<th>Event Action</th>
+			  				<td>{{ event.action }}</td>
+			  			</tr>
+
+			  		
+				</table>
+			  	
+			</div>
+		</div>
+	</div>
+
+</section>
+</div>
+<script type="text/javascript">
+(function(){
+	
+})(jQuery)
+
+</script>
+
+{% endblock content %}
+	

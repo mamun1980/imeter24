@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Premier Online : {% block page_title %}{{page_title}}{% endblock page_title %} - ({% block title %}{{site_name}}{% endblock title %})</title>
+	
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width">
+	<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+	<link rel="shortcut icon" href="/statics/images/favicon.ico" type="image/x-icon">
+	<link rel="icon" href="/statics/images/favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="/statics/css/jquery.datetimepicker.css" />
+	<link rel="stylesheet" href="/statics/css/jquery.timepicker.css" />
+
+	{% block jquery-ui %}
+		<link rel="stylesheet" href="/statics/jquery-ui/css/luv/jquery-ui-1.10.4.min.css" />
+		<script src="/statics/jquery/jquery-2.0.2.min.js"></script>
+		<script src="/statics/jquery-ui/jquery-ui-1.10.4.min.js"></script>
+		<script type="text/javascript" src="/statics/jquery/jquery.multi-select.js"></script>
+		<script type="text/javascript" src="/statics/js/jquery.quicksearch.js"></script>
+		<script type="text/javascript" src="/statics/js/jquery.datetimepicker.js"></script>
+		
+		<script type="text/javascript" src="/statics/js/jquery.timepicker.min.js"></script>
+	{% endblock jquery-ui %}
+
+	{% block angular %}
+		<script type="text/javascript" src="/statics/js/angular.min.js"></script>
+		<script type="text/javascript" src="/statics/js/angular-route.min.js"></script>	
+	{% endblock angular %}
+
+	<link rel="stylesheet" href="/statics/bootstrap/css/bootstrap.min.css" />
+	
+	<script src="/statics/bootstrap/js/bootstrap.min.js"></script>
+	
+	<link rel="stylesheet" href="/statics/css/multi-select.css">
+	<link rel="stylesheet" href="/statics/css/style.css" />
+	<script src="/statics/js/script.js"></script>
+
+</head>
+<body>
+{% block logo %}
+	{% include "logo.html" %}
+{% endblock logo %}
+{% block top-navigation %}
+	{% include "base/top-nav.html" %}
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid main-body">
+
+	<div class="row">
+	    <div class="col-md-12">
+	      <p>12 columns</p>
+	    </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+
+{% block footer %}
+
+{% endblock footer %}
+</body>
+</html>
+<script type="text/javascript">
+(function(e){
+    setTimeout(function() {
+      $('#message').fadeOut();
+    }, 3000);
+
+})(jQuery)
+
+</script>

@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+<section class="row" id="add-payroll">
+
+	<div class="col-md-8 col-md-offset-2">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Payroll Details for {{ user.username }}</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  		<table class="table details-table">
+		  			<thead>
+		  				<tr>
+		  					<th colspan=2>
+		  						User Login Info 
+		  						{% if perms.auth.change_user %}
+		  						<a href="/scomuser/edituser/{{user.id}}/"> <i class="glyphicon glyphicon-edit"></i> </a>
+		  						{% endif %}
+		  					</th>
+
+		  				</tr>
+		  			</thead>
+		  			<tr>
+		  				<th>User Name</th>
+		  				<td>{{user.username}}</td>
+		  			</tr>
+		  			<tr>
+		  				<td>First Name</td>
+		  				<td>{{user.first_name}}</td>
+		  			</tr>
+		  			<tr>
+		  				<td>Last Name</td>
+		  				<td>{{user.last_name}}</td>
+		  			</tr>
+		  			<tr>
+		  				<td>Email Address</td>
+		  				<td>{{user.email}}</td>
+		  			</tr>
+		  		
+		  			<tr>
+		  				<td>Address 1</td>
+		  				<td>{{userprofile.address_1}}</td>
+		  			</tr>
+		  			<tr>
+		  				<td>Address 2</td>
+		  				<td>{{userprofile.address_2}}</td>
+		  			</tr>
+		  			<tr>
+		  				<td>Address 3</td>
+		  				<td>{{userprofile.address_3}}</td>
+		  			</tr>
+		  			<tr>
+		  				<td>City</td>
+		  				<td>{{userprofile.city}}</td>
+		  			</tr>
+		  			<tr>
+		  				<td>Province</td>
+		  				<td>{{userprofile.province}}</td>
+		  			</tr>
+		  			<tr>
+		  				<td>Postal</td>
+		  				<td>{{userprofile.postal}}</td>
+		  			</tr>
+		  			<tr>
+		  				<td>Home Phone</td>
+		  				<td>{{userprofile.home_phone}}</td>
+		  			</tr>
+		  			<tr>
+		  				<td>Cell Phone</td>
+		  				<td>{{userprofile.cell_phone}}</td>
+		  			</tr>
+		  			<tr>
+		  				<td>Other Phone</td>
+		  				<td>{{userprofile.other_phone}}</td>
+		  			</tr>
+		  			<tr>
+		  				<td>Emargency Contact 1</td>
+		  				<td>{{userprofile.em_contact_1}}</td>
+		  			</tr>
+		  			<tr>
+		  				<td>Emargency Contact 2</td>
+		  				<td>{{userprofile.em_contact_2}}</td>
+		  			</tr>
+		  		</table>
+		  		<table class="table details-table">
+		  			<thead>
+		  				<tr>
+		  					<th colspan=2>User Payroll Info
+		  						{% if perms.auth.change_user %}
+		  						<a href="/scomuser/payroll/edit/{{payroll.id}}/"> <i class="glyphicon glyphicon-edit"></i> </a>
+		  						{% endif %}
+		  					</th>
+
+		  				</tr>
+		  			</thead>
+
+		  			<tr>
+		  				<td>Sin</td>
+		  				<td>{{payroll.sin}}</td>
+		  			</tr>
+		  			<tr>
+		  				<td>Initial</td>
+		  				<td>{{payroll.initial}}</td>
+		  			</tr>
+		  			<tr>
+		  				<td>Department</td>
+		  				<td>{{payroll.department}}</td>
+		  			</tr>
+		  			<tr>
+		  				<td>Rate of Pay</td>
+		  				<td>{{payroll.rate_of_pay}}</td>
+		  			</tr>
+		  			<tr>
+		  				<td>Rate of Pay Type</td>
+		  				<td>{{payroll.rate_of_pay_type}}</td>
+		  			</tr>
+		  			<tr>
+		  				<td>Emargency Contact 2</td>
+		  				<td>{{payroll.sin}}</td>
+		  			</tr>
+
+		  		</table>
+			</div>
+		</div>
+	</div>
+
+
+</section>
+</div>
+{% endblock content %}

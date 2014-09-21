@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style type="text/css">
+#supplier-contact {
+	width: 400px;
+	border: 2px solid black;
+	background-color: #FFF;
+	height: auto;
+}
+.list {
+	margin-top: 10px;
+}
+
+</style>
+<div class="container shadow4 main-body" ng-app="premierApp" ng-controller='SLListController'>
+<section class="row">
+	<div class="col-md-6">
+		<input type='text' class="form-control" ng-model="search" placeholder="Filter SL">
+	</div>
+</section>
+<section class="row list" >
+	<div class="col-md-12">
+		
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Shipping List</h4>
+		  	</div>
+		  	<div class="panel-body">
+				<table class='table table-bordered table-striped'>
+					<thead>
+						<tr class='info'>
+							<th>SL Number</th>
+							<th>Sold To</th>
+							<th>Ship To</th>
+							<th>Ordered Date</th>
+							<th>Job Number</th>
+							<th>Customer PO Number</th>
+							<th>Customer Job Number</th>
+							
+							<th width='110'>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="sl in shipping_list | googleSearchFilter:search | filter:status">
+							<td>{[{ sl.sl_number }]}</td>
+							<td>{[{ sl.sold_to }]}</td>
+							<td>{[{ sl.ship_to }]}</td>
+							<td>{[{ sl.ordered_date }]}</td>
+							<td>{[{ sl.job_number }]}</td>
+							<td>{[{ sl.customer_po_number }]}</td>
+							<td>{[{ sl.customer_job_number }]}</td>
+							
+							<td>
+								<a href="/purchase/view-sl/{[{sl.id}]}/">View</a> 
+								<span ng-show="{[{sl.can_edit}]}">
+								/ <a href="/purchase/edit-sl/{[{sl.id}]}/">Edit</a>
+								</span>
+
+								<span ng-show="{[{sl.can_edit}]}">
+								/ <a class="sl-delete" data-slid="{[{sl.id}]}" href="">Delete</a>
+								</span>
+							</td>
+						</tr>
+						<tr ng-show="!shipping_list.length">
+							<td colspan="8">No Items</td>
+						</tr>
+						
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+
+</section>
+
+<div id="delete-job-confirm" style="display:none;" title="Do you want to delete?">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;">
+  </span>This will delete the job from your system?</p>
+</div>
+
+{% include "modals/add-modal.html" %}
+
+
+<script type="text/javascript">
+(function(){
+	$(document).on("click","a.sl-delete", function(e){
+		e.preventDefault();
+		id = $(this).data("slid");
+		console.log(id);
+
+		$( "#delete-job-confirm" ).dialog({
+			resizable: false,
+			height:200,
+			modal: true,
+			buttons: {
+				"Delete User": function() {
+									
+					$( this ).dialog( "close" );
+					$.ajax({
+						type: "POST",
+						url: "/purchase/sl-delete/",
+						data: {
+							'sl_id': id,
+						},
+						success: function(rdata) {
+							console.log(rdata);
+							$("a[data-slid='"+rdata+"']").closest("tr").remove();
+						}
+					})
+				},
+				Cancel: function() {
+					$( this ).dialog( "close" );
+				}
+			}
+		});
+
+	});
+})(jQuery)
+</script>
+<script type="text/javascript">
+	premierApp.controller('SLListController',['$scope', '$http', function ($scope, $http) {
+	
+		$scope.init = function() {
+			$http({method: 'GET', url: "/purchase/sl-list-json/"}).
+	            success(function(data, status, headers, config) {
+	                // console.log(data);
+	                $scope.shipping_list = data;
+	            });
+
+		};
+
+		$scope.init();
+	}]);
+</script>
+{% endblock content %}

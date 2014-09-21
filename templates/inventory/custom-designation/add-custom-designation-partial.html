@@ -1,0 +1,8 @@
+<span class="label label-danger {{ custom_designation.id }}">
+	{{ custom_designation.designation }}
+	{% if perms.inventory.change_customdesignation %}
+		<a class="custom-designation-edit" href="/inventory/custom-designation/edit/{{ custom_designation.id }}/" 
+			data-toggle="modal" data-target="#editModal"
+			data-cus-des-id="{{ custom_designation.id }}"><i class="glyphicon glyphicon-edit"></i></a>
+	{% endif %}
+</span>

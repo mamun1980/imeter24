@@ -1,0 +1,631 @@
+
+<div class="navbar navbar-default navbar-static-top shadow-bottom" role="navigation">
+	<div class="container">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand scom" href="/">PREMIER ONLINE</a>
+		</div>
+		<div class="navbar-collapse collapse">
+			<ul class="nav navbar-nav">
+				<li class="active"><a href="/">Home</a></li>
+
+				{% if user.is_authenticated %}
+					{% if perms.contacts.view_contact %}
+						<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Contact <b class="caret"></b></a>
+						<ul class="dropdown-menu">
+							{% if perms.contacts.add_contact %}
+								<li><a href="/contacts/add/">Add Contact</a></li>
+							{% endif %}						
+							<li><a href="/contacts/#/contacts">Contact List</a></li>
+
+							{% if perms.contacts.view_contacttype %}
+								<li class="divider"></li>
+								<li class="dropdown-submenu">
+								<a href="/contacts/contact-type/">Contact Type</a>
+									<ul class="dropdown-menu">
+										{% if perms.contacts.add_contacttype %}
+										<li>
+											<a href="/contacts/contact-type/add/">
+												Add Contact Type
+											</a>
+										</li>
+										{% endif %}
+										<li>
+											<a href="/contacts/contact-type/">
+												Contact Type List
+											</a>
+										</li>
+										
+									</ul>
+								</li>
+							{% endif %}
+
+							{% if perms.contacts.view_paymentterm %}
+								<li class="divider"></li>
+								<li class="dropdown-submenu">
+								<a href="/contacts/terms/">Payment Terms</a>
+									<ul class="dropdown-menu">
+										{% if perms.contacts.add_paymentterm %}
+										<li><a href="/contacts/term/add/">Add Terms</a></li>
+										{% endif %}
+										<li><a href="/contacts/terms/">Term List</a></li>
+										
+									</ul>
+								</li>
+							{% endif %}
+
+							{% if perms.contacts.view_emailtype %}
+								<li class="divider"></li>
+								<li class="dropdown-submenu">
+								<a href="/contacts/email-type/">Email Types</a>
+									<ul class="dropdown-menu">
+										{% if perms.contacts.add_emailtype %}
+										<li><a href="/contacts/email-type/add/">Add Email Type</a></li>
+										{% endif %}
+										<li><a href="/contacts/email-type/">Email Type List</a></li>
+										
+									</ul>
+								</li>
+							{% endif %}
+
+							{% if perms.contacts.view_deliverychoice %}
+								<li class="divider"></li>
+								<li class="dropdown-submenu">
+								<a href="/contacts/delivery-choice/">Shippling Method</a>
+									<ul class="dropdown-menu">
+										{% if perms.contacts.add_deliverychoice %}
+										<li><a href="/contacts/delivery-choice/add/">Add Shippling Method</a></li>
+										{% endif %}
+										<li><a href="/contacts/delivery-choice/">Shippling Method List</a></li>
+										
+									</ul>
+								</li>
+							{% endif %}
+
+							{% if perms.contacts.view_distributionmethod %}
+								<li class="divider"></li>
+								<li class="dropdown-submenu">
+								<a href="/contacts/distribution-method/">Distribution Method</a>
+									<ul class="dropdown-menu">
+										{% if perms.contacts.add_distributionmethod %}
+										<li>
+											<a href="/contacts/distribution-method/add/">
+												Add Distribution Method
+											</a>
+										</li>
+										{% endif %}
+										<li>
+											<a href="/contacts/distribution-method/">
+												Distribution Method List
+											</a>
+										</li>
+										
+									</ul>
+								</li>
+							{% endif %}
+
+
+							{% if perms.contacts.view_currency %}
+								<li class="divider"></li>
+								<li class="dropdown-submenu">
+								<a href="/contacts/currency/">Currency</a>
+									<ul class="dropdown-menu">
+										{% if perms.contacts.add_currency %}
+										<li><a href="/contacts/currency/add/">Add Currency</a></li>
+										{% endif %}
+										<li><a href="/contacts/currency/">Currency List</a></li>
+										
+									</ul>
+								</li>
+							{% endif %}
+
+							{% if perms.contacts.view_phonetype %}
+								<li class="divider"></li>
+								<li class="dropdown-submenu">
+								<a href="/contacts/phone-type/">Phone Type</a>
+									<ul class="dropdown-menu">
+										{% if perms.contacts.add_currency %}
+										<li><a href="/contacts/phone-type/add/">Add Phone Type</a></li>
+										{% endif %}
+										<li><a href="/contacts/phone-type/">Phone Type List</a></li>
+										
+									</ul>
+								</li>
+							{% endif %}
+							
+						</ul>
+						</li>
+					{% endif %}
+
+					{% if perms.inventory.view_item %}
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown">Inventory <b class="caret"></b></a>
+							<ul class="dropdown-menu">
+								{% if perms.inventory.add_item %}
+								<li>
+									<a href="/inventory/item/add/">
+										Add Inventory Item
+									</a>
+								</li>
+								{% endif %}
+								<li>
+									<a href="/inventory/list/#/inventory/items">
+										Inventory Item List
+									</a>
+								</li>
+								
+								{% if perms.inventory.view_itemunitmeasure %}
+								<li class="divider"></li>
+
+								<li class="dropdown-submenu">
+									<a href="/inventory/unit-measure-list/">Item Unit Mesure</a>
+									<ul class="dropdown-menu">
+										{% if perms.inventory.add_itemunitmeasure %}
+										<li><a href="/inventory/unit-measure/add/">Add Unit Measure</a></li>
+										{% endif %}
+										<li><a href="/inventory/unit-measure-list/">Unit Measure List</a></li>
+										
+									</ul>
+								</li>
+								{% endif %}
+
+								{% if perms.inventory.view_productiontype %}
+								<li class="divider"></li>
+
+								<li class="dropdown-submenu">
+									<a href="/inventory/production-type-list/">Production Type</a>
+									<ul class="dropdown-menu">
+										{% if perms.inventory.add_productiontype %}
+										<li><a href="/inventory/production-type/add/">Add Production Type</a></li>
+										{% endif %}
+										<li><a href="/inventory/production-type-list/">Production Type List</a></li>
+										
+									</ul>
+								</li>
+								{% endif %}
+
+								{% if perms.inventory.view_customsdesignation %}
+								<li class="divider"></li>
+
+								<li class="dropdown-submenu">
+									<a href="/inventory/custom-designation-list/">Custom Designation</a>
+									<ul class="dropdown-menu">
+										{% if perms.inventory.add_customsdesignation %}
+										<li><a href="/inventory/custom-designation/add/">Add Custom Designation</a></li>
+										{% endif %}
+										<li><a href="/inventory/custom-designation-list/">Custom Designation List</a></li>
+										
+									</ul>
+								</li>
+								{% endif %}
+								{% if perms.inventory.view_location %}
+								<li class="divider"></li>
+
+								<li class="dropdown-submenu">
+									<a href="/inventory/location-list/">Location</a>
+									<ul class="dropdown-menu">
+										{% if perms.inventory.add_location %}
+										<li><a href="/inventory/location/add/">Add Location</a></li>
+										{% endif %}
+										<li><a href="/inventory/location-list/">Location List</a></li>
+										
+									</ul>
+								</li>
+								{% endif %}
+
+								
+							</ul>
+						</li>
+					{% endif %}
+
+					<!--  Start of Purchase menu -->
+					{% if perms.purchase.view_purchase_order %}
+						<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">PO's <b class="caret"></b></a>
+							<ul class="dropdown-menu">
+								
+								{% if perms.purchase.view_purchase_order %}
+								<li class="dropdown-submenu">
+									<a href="">Purchase Order (PO)</a>
+									<ul class="dropdown-menu">
+										{% if perms.purchase.add_purchaseorder %}
+										<li>
+											<a href="/purchase/add-po/">
+												Add PO
+											</a>
+
+										</li>
+										{% endif %}
+										
+										
+										<li>
+											<a href="/purchase/list-purchase-orders/">PO List</a>
+										</li>
+										
+
+										{% if perms.purchase.cancel_purchase_order %}
+										
+										<li>
+											<a href="/purchase/po-change/">Change PO Status</a>
+										</li>
+										{% endif %}
+										
+									</ul>
+								</li>
+								{% endif %}
+
+								{% if perms.purchase.view_purchase_request %}
+								<li class="divider"></li>
+								<li class="dropdown-submenu">
+									<a href="">Purchase Request (PR)</a>
+									<ul class="dropdown-menu">
+										{% if perms.purchase.add_purchaserequest %}
+										<li>
+											<a href="/purchase/add-pr/">
+												Add PR
+											</a>
+
+										</li>
+										{% endif %}
+										
+										
+										<li>
+											<a href="/purchase/list-purchase-requests/">PR List</a>
+										</li>
+										<li>
+											<a href="/purchase/list-approved-pr/">Approved PR List</a>
+										</li>
+										
+										
+									</ul>
+								</li>
+								{% endif %}
+
+								{% if perms.purchase.view_purchase_request %}
+								<li class="divider"></li>
+								<li class="dropdown-submenu">
+									<a href="">Purchased Items</a>
+									<ul class="dropdown-menu">
+										{% if perms.purchase.add_purchaserequest %}
+										<li>
+											<a href="/purchase/pending-list/">
+												Pending List
+											</a>
+
+										</li>
+										{% endif %}
+										
+										
+										<li>
+											<a href="/purchase/received-list/">
+												Received List
+											</a>
+										</li>
+
+
+										
+										
+									</ul>
+								</li>
+								{% endif %}
+
+								{% if perms.purchase.view_deliverinternal %}
+								<li class="divider"></li>
+
+								<li class="dropdown-submenu">
+									<a href="/purchase/deliverinternal-list/">Deliver Internal</a>
+									<ul class="dropdown-menu">
+										{% if perms.inventory.add_location %}
+										<li><a href="/purchase/deliverinternal/add/">Add Deliver Internal</a></li>
+										{% endif %}
+										<li><a href="/purchase/deliverinternal-list/">Deliver Internal List</a></li>
+										
+									</ul>
+								</li>
+								{% endif %}
+								
+								
+								
+							</ul>
+						</li>
+					{% endif %}
+
+					<!--  Start of Utility menu -->
+					{% if perms.purchase.view_shipping_list %}
+						<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Shipping<b class="caret"></b></a>
+							<ul class="dropdown-menu">
+								{% if perms.purchase.view_shipping_list %}
+								
+								
+									<li>
+										<a href="/purchase/add-sl/">
+											Add Shipping List
+										</a>
+									</li>
+									<li>
+										<a href="/purchase/shipping-list/">
+											View Shipping List 
+										</a>
+									</li>
+								
+								{% endif %}
+
+								{% if perms.purchase.view_packing_list %}
+								<li class="divider"></li>
+								<li class="dropdown-submenu">
+									<a href="/purchase/packing-list/">PL</a>
+									<ul class="dropdown-menu">
+										<li>
+											<a href="/purchase/add-pl/">
+												Add Packing List
+											</a>
+										</li>
+										<li>
+											<a href="/purchase/packing-list/">
+												View Packing List 
+											</a>
+										</li>
+									</ul>
+								</li>
+								{% endif %}
+
+								
+								
+								
+							</ul>
+						</li>
+
+					{% endif %}
+					
+
+					{% if perms.schedule.view_job or perms.schedule.view_customer_job %}
+						<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Schedule <b class="caret"></b></a>
+						<ul class="dropdown-menu">
+							{% if perms.schedule.add_job %}
+								<li>
+									<a href="/schedule/job/add/">
+										Add Job
+									</a>
+								</li>
+							{% endif %}
+							<li class="dropdown-submenu">
+							<a href="/schedule/jobs/">Jobs</a>
+								<ul class="dropdown-menu">
+									{% if perms.schedule.view_job %}
+									<li>
+										<a href="/schedule/jobs/#/schedule/all-jobs">
+											All Jobs
+										</a>
+									</li>
+
+									<li>
+										<a href="/schedule/jobs/#/schedule/current-jobs">
+											Current Jobs
+										</a>
+									</li>
+									{% endif %}
+									
+									<li>
+										<a href="/schedule/jobs/#/schedule/my-jobs">
+											My Jobs
+										</a>
+									</li>
+								</ul>
+							</li>
+						</ul>
+						</li>
+					{% endif %}
+
+					{% if perms.report.view_recuringreport or perms.report.view_singlereport or perms.report.view_report %}
+						<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Report Que<b class="caret"></b></a>
+						<ul class="dropdown-menu">
+							
+							{% if perms.report.view_singlereport %}
+							<li>
+								<a href="/report/lists/#/report/single-job-list">
+									Current Jobs
+								</a>
+							</li>
+							{% endif %}
+							{% if perms.report.add_singlereport %}
+							<li>
+								<a href="/report/singlejob/add/">
+									Add Single Report job
+								</a>
+							</li>
+							{% endif %}
+							
+							{% if perms.report.add_recuringreport or perms.report.add_singlereport %}
+							<li class="divider"></li>
+							<li class="dropdown-submenu">
+								<a href="/report/report-types/">Recurring Jobs</a>
+								<ul class="dropdown-menu">
+									<li>
+										<a href="/report/lists/#/report/recuring-job-list">
+											List Recurring Jobs
+										</a>
+									</li>
+										{% if perms.report.add_recuringreport %}
+							
+										<li>
+											<a href="/report/recuring/add/">
+												Add Recuring Report job
+											</a>
+										</li>
+										{% endif %}
+										
+									
+								</ul>
+							</li>
+							{% endif %}
+							
+							{% if perms.report.view_report %}
+							<li class="divider"></li>
+							<li class="dropdown-submenu">
+								<a href="/report/report-types/">Reports</a>
+								<ul class="dropdown-menu">
+									
+									{% if perms.report.add_report %}
+									<li>
+										<a href="/report/add/">
+											Add Report
+										</a>
+									</li>
+									{% endif %}
+									<li>
+										<a href="/report/list/">
+											Report List
+										</a>
+									</li>
+								</ul>
+							</li>
+							{% endif %}
+
+							{% if perms.report.view_printer %}
+							<li class="divider"></li>
+							<li class="dropdown-submenu">
+								<a href="/report/printer/">Printer setup</a>
+								<ul class="dropdown-menu">
+									{% if perms.report.add_printer %}
+									<li>
+										<a href="/report/printer/add/">
+											Add printer
+										</a>
+									</li>
+									{% endif %}
+									<li>
+										<a href="/report/printer/list/">
+											printer List
+										</a>
+									</li>
+									
+								</ul>
+							</li>
+							{% endif %}
+
+						</ul>
+					</li>
+					{% endif %}
+
+					<!-- Start of Events menu -->
+
+					{% if perms.events.view_events or perms.events.view_controllers %}
+						<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Events <b class="caret"></b></a>
+						<ul class="dropdown-menu">
+							{% if perms.events.view_events %}
+							<li>
+								<a href="/events/#/events/list/">
+									Current Events
+								</a>
+							</li>
+							{% endif %}
+							{% if perms.events.view_controllers %}
+							<li class="divider"></li>
+							<li class="dropdown-submenu">
+								<a href="/events/controllers/">Controllers</a>
+								<ul class="dropdown-menu">
+									{% if perms.events.add_controllers %}
+									<li>
+										<a href="/events/controllers/add/">
+											Add Controller
+										</a>
+									</li>
+									{% endif %}
+									<li>
+										<a href="/events/controllers/#/events/controller-list">
+											Controllers List
+										</a>
+									</li>
+									
+								</ul>
+							</li>
+							{% endif %}
+
+							{% if perms.events.view_evententry %}
+							<li class="divider"></li>
+							<li class="dropdown-submenu">
+								<a href="/events/controllers/">Payroll Event </a>
+								<ul class="dropdown-menu">
+									{% if perms.events.add_evententry %}
+									<li>
+										<a href="/events/evententry/add/">
+											Add Event Entry
+										</a>
+									</li>
+									{% endif %}
+									<li>
+										<a href="/events/entry/list/#/events/event-entry-list">
+											Event Entry List
+										</a>
+									</li>
+									<li class="divider"></li>
+
+									{% if perms.events.add_evententry %}
+									<li>
+										<a href="/events/eventpayroll/add/">
+											Add Event Payroll
+										</a>
+									</li>
+									{% endif %}
+									<li>
+										<a href="/events/payroll/list/">
+											List Event Payroll
+										</a>
+									</li>
+									
+								</ul>
+							</li>
+							{% endif %}
+
+
+						</ul>
+					</li>
+					{% endif %}
+					<!-- End of Events menu -->
+
+					<!--  Start of Utility menu -->
+					{% if perms.auth.view_utility %}
+						<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Utility <b class="caret"></b></a>
+							<ul class="dropdown-menu">
+								{% if perms.scomuser.send_massmail %}
+								<li>
+									<a href="/send-mass-mail/">
+										Send mass email
+									</a>
+								</li>
+								{% endif %}
+
+								{% if perms.scomuser.view_massmail %}
+
+								<li>
+									<a href="/mass-mail-status/#/get-mass-mails">
+										Mass email status
+									</a>
+								</li>
+								{% endif %}
+								
+							</ul>
+						</li>
+					{% endif %}
+
+
+					
+
+				{% endif %}
+
+			</ul>
+
+		</div><!--/.nav-collapse -->
+	</div>
+</div>

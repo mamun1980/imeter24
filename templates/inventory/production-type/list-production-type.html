@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+<section class="row"  id="production-type-list">
+	
+
+	<div class="col-md-6 col-md-offset-3">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4> Unit Measure List</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  		<table class="table">
+			  		<tr>
+			  			<td> ID </td>
+			  			<td>Production Type </td>
+			  			<td>Total Use</td>
+			  			<td>Action</td>
+			  			
+			  		</tr>
+			  		{% for production_type in production_types %}
+			  			<tr>
+				  			<td> {{ production_type.id }} </td>
+				  			<td> {{ production_type.production_type_name }} </td>
+				  			<td> {{ production_type.item_set.all.count }} </td>
+				  			<td>
+				  				<a class="production-type-delete" href="#" data-prod-type-id="{{ production_type.id }}">delete</a>
+				  			</td>
+				  			
+				  		</tr>
+				  	{% empty %}
+				  	<tr>
+			  			<td colspan='4'> No Production Type found. </td>
+			  		</tr>
+				  	{% endfor %}
+			  	</table>
+		  	
+			</div>
+		</div>
+	</div>
+
+
+</section>
+
+<script type="text/javascript">
+(function(){
+	$("#production-type-list a.production-type-delete").on("click", function(e){
+		e.preventDefault();
+		prodid = $(this).data("prod-type-id");
+		console.log(prodid);
+
+		$.ajax({
+			type: "POST",
+			url: "/inventory/production-type/delete/",
+			data: {
+				'production_type_id': prodid,
+			},
+			success: function(rdata) {
+				console.log(rdata);
+				$("a[data-prod-type-id='"+rdata+"']").closest("tr").remove();
+			}
+		})
+	});
+
+})(jQuery)
+
+</script>
+</div>
+
+
+{% endblock content %}
+	

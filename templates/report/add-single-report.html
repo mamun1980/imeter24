@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<div class="container shadow4 main-body" ng-app="demoApp">
+
+<section class="row"  id="report" ng-controller="AddRecuringReportController">
+	
+
+	<div class="col-md-7">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Add Single Report Job</h4>
+		  	</div>
+		  	<div class="panel-body" >
+			  	<form name="report-form" action="/report/singlejob/add/" method="POST">{% csrf_token %}
+			  		
+			  		<table class="add-user-table">
+			  			
+			  				<tbody><tr>
+			  				<td><label for="id_report">Report:</label></td>
+				  				<td>
+				  					<select class="form-control" id="id_report" name="report" ng-model="recuring_job" ng-change="getReport(recuring_job)">
+										<option ng-repeat="report in reports" value="{[{report.id}]}" ng-selected="$index==0">{[{report.report_type}]}</option>
+										
+									</select>
+								</td>
+			  				</tr>
+			  			
+			  				<tr>
+			  				<td><label for="id_report_description">Report description:</label></td>
+			  				<td><textarea class="form-control" cols="40" id="id_report_description" name="report_description" placeholder="Report Description" required="False" rows="2" readonly>{[{ report.comments }]}</textarea></td>
+			  				</tr>
+			  			
+			  				<tr>
+			  				<td><label for="id_script_name">Script name:</label></td>
+			  				<td><input class="form-control" id="id_script_name" maxlength="200" name="script_name" placeholder="Report Description" type="text" value="{[{ report.python_script }]}" readonly></td>
+			  				</tr>
+			  			
+			  				<tr>
+			  				<td><label for="id_que_type">Que Type:</label></td>
+			  					<td>
+			  						<select class="form-control" id="id_que_type" name="que_type" ng-model="que_type">
+			  							
+										<option value="email" >Email</option>
+										<option value="printer">Printer</option>
+										<option value="fax">Fax</option>
+										
+									</select>
+								</td>
+			  				</tr>
+			  			
+			  				<tr ng-if="que_type=='email'">
+			  				<td><label for="id_email">Email:</label></td>
+			  				<td>
+			  					<input class="form-control" id="id_email" maxlength="500" name="email" placeholder="Email Address" type="email" required>
+			  					<span class="error" ng-show="myForm.input.$error.email">Not valid email!</span>
+			  				</td>
+			  				</tr>
+			  			
+			  				<tr ng-if="que_type=='printer'">
+			  				<td><label for="id_printer">Printer:</label></td>
+			  					<td>
+			  						<select class="form-control" id="id_printer" name="printer">
+										
+										<option ng-repeat="report in printers" value="{[{report.printer_id}]}">{[{report.printer_id}]}</option>
+
+									</select>
+								</td>
+			  				</tr>
+			  			
+			  				<tr ng-if="que_type=='fax'">
+			  				<td><label for="id_fax">Fax:</label></td>
+			  				<td><input class="form-control" id="id_fax" maxlength="500" name="fax" placeholder="Fax Number" type="text"required></td>
+			  				</tr>
+			  				
+			  				<tr>
+				  				<td><label for="id_search_string">Search String</label></td>
+				  				<td><input class="form-control" id="id_search_string" maxlength="200" name="search_string" placeholder="Search String" type="text"></td>
+			  				</tr>
+			  			
+			  				<tr>
+			  				<td><label for="id_schedule_type">Search Status type:</label></td>
+			  				<td>
+			  					<select class="form-control ng-pristine ng-valid" id="id_search_status_type" name="search_status_type" ng-model="search_status_type" ng-selected="{[{search_status_type}]}">
+			  						
+									<option value="new">New</option>
+									<option value="inprogress">In Progress</option>
+									<option value="completed">Completed</option>
+									</select>
+								</td>
+			  				</tr>
+			  				<tr>
+			  					<td colspan="2"><hr></td>
+			  				</tr>
+			  				<tr>
+			  				<td><label for="id_current_job_status">Current job status:</label></td>
+			  					<td>
+			  						<select class="form-control" id="id_current_job_status" name="current_job_status" ng-model="current_job_status" ng-selected="{[{current_job_status}]}">
+
+				  						<option value="new">New</option>
+				  						<option value="inprogress">In Progress</option>
+				  						<option value="error">Error</option>
+				  						<option value="completed">Completed</option>
+				  					</select>
+			  					</td>
+			  				</tr>
+
+
+			  				<tr>
+			  				<td><label for="id_search_start_date">Search Start Date:</label></td>
+			  				<td>
+			  					<input class="form-control" id="id_search_start_date" name="search_start_date" placeholder="Search Start Date" type="text" ng-model="search_start_date" jqdatepicker></td>
+			  				</tr>
+
+			  				<tr>
+			  				<td><label for="id_search_end_date">Search End Date:</label></td>
+			  				<td>
+			  					<input class="form-control" id="id_search_end_date" name="search_end_date" placeholder="Search End Date" type="text" ng-model="search_end_date" jqdatepicker></td>
+			  				</tr>
+
+
+			  				
+			  			
+			  			<tr>
+							<td colspan="2">
+								<button type="submit" class="btn btn-primary btn-lg form-control login-btn">Add Single Report Job</button>
+							</td>
+						</tr>
+			  		</tbody></table>
+
+			  	</form>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-md-5" >
+		<div class="panel panel-primary" ng-show="show_report">
+			<div class="panel-heading">
+		    	<h4>Report Details</h4>
+		  	</div>
+		  	<div class="panel-body" >
+		  		<table class="table">
+		  			<tr>
+		  				<td>Report ID</td>
+		  				<td>{[{ report.id }]}</td>
+		  			</tr>
+		  			
+		  			<tr>
+		  				<td>Comments</td>
+		  				<td>{[{ report.comments }]}</td>
+		  			</tr>
+		  			<tr>
+		  				<td>Python script</td>
+		  				<td>{[{ report.python_script }]}</td>
+		  			</tr>
+		  			
+
+		  		</table>
+		  	</div>
+		 </div>
+
+	</div>
+
+</section>
+</div>
+
+<script type="text/javascript">
+(function(){
+	// $(".datetimepicker").datepicker();
+	$(".timepicker").timepicker();
+
+})(jQuery)
+</script>
+
+
+<script type="text/javascript">
+var demoApp = angular.module("demoApp", [], function ($interpolateProvider) {
+        $interpolateProvider.startSymbol("{[{");
+        $interpolateProvider.endSymbol("}]}");
+});
+
+demoApp.factory("AddRReportService", function($http, $q){
+    var factory = {};
+
+    factory.getReportDetails = function(report_id) {
+        var defer = $q.defer();
+
+        $http({method: 'GET', url: "/report/"+report_id+"/details"}).
+            success(function(data, status, headers, config) {
+                console.log(data);
+                defer.resolve(data);
+            }).
+            error(function(data, status, headers, config) {
+
+            });
+
+        return defer.promise;
+    };
+
+    return factory;
+});
+
+demoApp.directive('jqdatepicker', function() {
+    return {
+        restrict: 'A',
+        require: 'ngModel',
+        link: function(scope, element, attrs, ngModelCtrl) {
+            $(element).datepicker({
+                dateFormat: 'yy-mm-dd',
+                defaultDate: "-1w",
+
+                onSelect: function(date) {
+                    var ngModelName = this.attributes['ng-model'].value;
+                    scope[ngModelName] = date;
+                    scope.$apply();
+                }
+
+            });
+        }
+    };
+});
+
+demoApp.controller("AddRecuringReportController", ['$scope', '$http', 'AddRReportService', function ($scope, $http, AddRReportService){
+
+	$scope.init = function(){
+        $http.get("/report/list/api/").success(function(data){
+   			console.log(data);
+          	$scope.reports = data;
+        });
+        $http.get("/report/printer/list/api/").success(function(data){
+        	$scope.printers = data;
+        });
+
+        $scope.current_job_status = 'new';
+        $scope.que_type = 'email';
+        $scope.search_status_type = 'new';
+        $scope.fax = true;
+               
+        
+        
+    }
+    $scope.init();
+    
+
+    $scope.getReport = function (report_id) {
+    	if (report_id != -1) {
+    		var url = "/report/view/api/"+report_id+"/";
+
+	    	$http.get(url).success(function(data){
+	   			 
+	          	$scope.report = data;
+	          	$scope.show_report = true;
+	          	
+	        });
+    	} else {
+    		$scope.show_report = false;
+
+    	}
+    	
+    	
+    }
+
+
+}]);
+
+</script>
+
+
+{% endblock content %}
+	

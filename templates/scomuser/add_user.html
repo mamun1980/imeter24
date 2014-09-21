@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container shadow4 main-body">
+
+<section class="row ">
+	
+
+	<div class="col-md-10">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>ADD USER</h4>
+		  	</div>
+		  	<div class="panel-body">
+			  	<form action="/scomuser/adduser/" method="POST" enctype="multipart/form-data">{% csrf_token %}
+			  		<table class="table">
+			  			<tr>
+			  				<td width="50%">
+							  	<table class="add-user-table">
+							  		{% for fl in useraddform %}
+							  			<tr>
+							  				<td>{{ fl.label_tag }}</td>
+							  				<td>{{ fl.errors }}{{ fl }}</td>
+							  			</tr>
+							  		{% endfor %}
+							  		{% for field in supform %}
+							  			<tr>
+							  				<td>{{ field.label_tag }}</td>
+							  				<td>{{ field.errors }}{{ field }}</td>
+							  			</tr>
+							  		{% endfor %}
+									<tr>
+										<td colspan="2">
+											<button type="submit" class="btn btn-primary btn-lg form-control login-btn">Add User</button>
+										</td>
+									</tr>
+								</table>
+							</td>
+							<td width="50%">
+								<select id='add-group' multiple='multiple' name="selected-groups">
+									{% for group in groups %}
+										<option data-model="{{ group.id }}" value="{{ group.name }}" {% if group in user.groups %} selected {% endif %}>{{ group.name }}</option>
+									{% endfor %}
+
+								</select>
+
+							</td>	
+						</tr>
+					</table>
+				</form>
+			</div>
+		</div>
+	</div>
+</section>
+
+<script type="text/javascript">
+(function(){
+
+	$('#add-group').multiSelect({
+		selectableHeader: "<input type='text' class='search-input form-control' autocomplete='off' placeholder='search group'>",
+		selectionHeader: "<input type='text' class='search-input form-control' autocomplete='off' placeholder='search group'>",
+		afterInit: function(ms){
+		var that = this,
+		    $selectableSearch = that.$selectableUl.prev(),
+		    $selectionSearch = that.$selectionUl.prev(),
+		    selectableSearchString = '#'+that.$container.attr('id')+' .ms-elem-selectable:not(.ms-selected)',
+		    selectionSearchString = '#'+that.$container.attr('id')+' .ms-elem-selection.ms-selected';
+
+		that.qs1 = $selectableSearch.quicksearch(selectableSearchString)
+		.on('keydown', function(e){
+		  if (e.which === 40){
+		    that.$selectableUl.focus();
+		    return false;
+		  }
+		});
+
+		that.qs2 = $selectionSearch.quicksearch(selectionSearchString)
+		.on('keydown', function(e){
+		  if (e.which == 40){
+		    that.$selectionUl.focus();
+		    return false;
+		  }
+		});
+		},
+		afterSelect: function(){
+		this.qs1.cache();
+		this.qs2.cache();
+		},
+		afterDeselect: function(){
+		this.qs1.cache();
+		this.qs2.cache();
+		}
+	});
+
+})(jQuery)
+
+</script>
+</div>
+{% endblock content %}
+	

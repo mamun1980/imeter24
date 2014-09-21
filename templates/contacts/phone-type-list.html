@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+<section class="row"  id="phone-type-list">
+	
+
+	<div class="col-md-6 col-md-offset-3">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Phone Type List</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  	<table class="table">
+		  		<tr>
+		  			<td> ID </td>
+		  			<td>Phone Type</td>
+		  			<td>Total Use</td>
+		  			<td>Action</td>
+		  			
+		  		</tr>
+		  		{% for phone_type in phone_types %}
+		  			<tr>
+			  			<td> {{ phone_type.id }} </td>
+			  			<td> {{ phone_type.phone_type }} </td>
+			  			<td> {{ phone_type.contactprofile_set.all.count }} </td>
+			  			<td>
+			  				<a class="phone-type-delete" href="#" data-phtid="{{ phone_type.id }}">delete</a>
+			  			</td>
+			  			
+			  		</tr>
+			  	{% empty %}
+				  	<tr>
+				  		<td colspan="4" align="center"><b> No phone type found </b></td>
+				  	</tr>
+
+			  	{% endfor %}
+		  	</table>
+			</div>
+		</div>
+	</div>
+
+</section>
+
+<script type="text/javascript">
+(function(){
+	$("#phone-type-list a.phone-type-delete").on("click", function(e){
+		e.preventDefault();
+		phtid = $(this).data("phtid");
+		console.log(phtid);
+
+		$.ajax({
+			type: "POST",
+			url: "/contacts/phone-type/delete/",
+			data: {
+				'phtid': phtid,
+			},
+			success: function(rdata) {
+				console.log(rdata);
+				$("a[data-phtid='"+rdata+"']").closest("tr").remove();
+			}
+		})
+	});
+
+})(jQuery)
+
+</script>
+</div>
+
+
+{% endblock content %}
+	

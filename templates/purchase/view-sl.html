@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style type="text/css">
+.sold-contact span {
+	padding: 5px;
+	background-color: #DDD;
+}
+.sold-contact p {
+	padding: 5px;
+	background-color: #CCC;
+}
+tr.Pending {
+	background-color: #BE9797;
+}
+tr.OnShipping {
+	background-color: #5388CA
+}
+tr.Done {
+	background-color: #DDD;
+}
+tr.thead {
+	background-color: #494949;
+	color: #FFF;
+}
+
+</style>
+<div class="container shadow4 main-body">
+<section class="row ">
+	
+	<div class="col-md-10 col-md-offset-1">
+		
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Shipping List Details</h4>
+		  	</div>
+		  	<div class="panel-body">
+				<table class='table table-bordered table-striped'>
+					
+					<tbody>
+						<tr>
+							<th width="25%">SL Number</th>
+							<td>{{sl.sl_number}}</td>
+						</tr>
+						<tr>
+							<th width="25%">Sold To</th>
+							<td>
+								{% if sl.ship_to %}
+								<div class="sold-contact">
+									<p><b>{{sl.sold_to}}</b> </p>
+									<span>{{sl.sold_to.city}}</span>
+									<span>{{sl.sold_to.country}}</span>
+									<span>{{sl.sold_to.province}}</span>
+								</div>
+								{% else %}
+									No contact
+								{% endif %}
+							</td>
+						</tr>
+						<tr>
+							<th width="25%">Ship To</th>
+							<td>
+							{% if sl.ship_to %}
+								<div class="sold-contact">
+									<p><b>{{sl.ship_to}}</b> </p>
+									<span>{{sl.ship_to.city}}</span>
+									<span>{{sl.ship_to.country}}</span>
+									<span>{{sl.ship_to.province}}</span>
+								</div>
+							{% else %}
+								No contact
+							{% endif %}
+							</td>
+						</tr>
+						<tr>
+							<th width="25%">Date Ordered</th>
+							<td>{{sl.ordered_date}}</td>
+						</tr>
+						
+						<tr>
+							<th width="25%">Date Required</th>
+							<td>{{sl.date_required}}</td>
+						</tr>
+						<tr>
+							<th width="25%">Ship Via</th>
+							<td>{{sl.ship_via}}</td>
+						</tr>
+						<tr>
+							<th width="25%">Job Number</th>
+							<td>{{sl.job_number}}</td>
+						</tr>
+						<tr>
+							<th width="25%">Customer PO Number</th>
+							<td>{{sl.customer_po_number}}</td>
+						</tr>
+						<tr>
+							<th width="25%">Customer Job Number</th>
+							<td>{{sl.customer_job_number}}</td>
+						</tr>
+						<tr>
+							<th> Items for this Shipping List</th>
+							<td>
+								<table class="table sl-items">
+									<thead>
+										<tr class="thead">
+											<th>Item Number</th>
+											<th>Item Description</th>
+											<th>Ordered</th>
+											<th>Shipped</th>
+											<th>Required</th>
+											<th>Filled</th>
+											<th>Status</th>
+										</tr>
+									</thead>
+									<tbody>
+									{% for item in sl_items %}
+										
+									<tr class="{{item.item_ship_status_verbose}}">
+										<td>{{item.item.item_number}}</td>
+										<td>{{item.item.description}}</td>
+										<td>{{item.ordered}}</td>
+										<td>{{item.shipped}}</td>
+										<td>{{item.required}}</td>
+										<td>{{item.filled}}</td>
+										<td>{{item.item_ship_status_verbose}}</td>
+										
+									</tr>
+												
+											
+									{% empty %}
+										<tr><td colspan="7">No Item</td></tr>
+									{% endfor %}
+									</tbody>
+								</table>
+							</td>
+						</tr>
+						
+					</tbody>
+
+				</table>
+				
+			</div>
+		</div>
+		
+	</div>
+
+</section>
+</div>
+
+<script type="text/javascript">
+(function(){
+	$(document).on("click", "a.delete-extra-contact", function(e){
+			e.preventDefault();
+			var poecid = $(this).data("pecid");
+			// var url = "/purchase/delete-po-contact/";
+			$.ajax({
+				type: "POST",
+				url: "/purchase/delete-po-contact/",
+				
+				data: {
+					'poecid': poecid,
+				},
+				success: function(rdata) {
+					console.log(rdata);
+					$("a[data-pecid='"+rdata+"']").closest("tr").remove();
+	                
+	                // window.location.reload(false);
+	                // win = window.open("",'_blank');
+	                // win.location.href = "/contacts/edit/" + rdata + "/";
+
+	            }
+			});
+		})
+})(jQuery)
+
+</script>
+{% endblock content %}
+	

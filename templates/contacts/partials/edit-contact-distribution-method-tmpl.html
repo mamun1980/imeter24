@@ -1,0 +1,56 @@
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h4 class="modal-title" id="myModalLabel">Edit Contact Distribution Method</h4>
+</div>
+<form name="contact-distribution-method" action="/contacts/contact-distribution-method/edit/{{ cdmid }}/" method="post">{% csrf_token %}
+<div class="modal-body" style="text-align: center;">
+    
+    <input type="hidden" name="cdmid" value="{{ cdmid }}">
+    <table>
+        <tr>
+        {% for field in cmdform %}
+            <td>
+                {{ field }}
+            </td>
+        {% endfor %}
+        
+        </tr>
+    </table>
+    
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default close-modal" data-dismiss="modal">Close</button>
+    <button type="submit" class="btn btn-primary">Save changes</button>
+</div>
+</form>
+<script type="text/javascript">
+(function(){
+    $("form[name='contact-distribution-method']").on("submit", function(e){
+        e.preventDefault();
+        cdmid = $("input[name='cdmid']").val();
+        $("#contact-distribution-method-list tr."+cdmid).remove();
+        console.log(cdmid);
+        
+        form_data = $(this).serialize();
+        $.ajax({
+            type: "POST",
+            url: $(this).attr("action"),
+            data: form_data,
+            success: function(rdata) {
+                $( "button.close-modal" ).trigger( "click" );
+
+                $("#contact-distribution-method-list").prepend(rdata);
+
+            }
+        })
+
+    })
+
+    // $("button.close-modal").on("click", function(){
+    //     pid = $("input[name='pid']").val();
+    //     
+    // })
+
+})(jQuery)
+    
+</script>

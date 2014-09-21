@@ -1,0 +1,50 @@
+<form name="ReceiveItem" action="/purchase/receive-item/{{item_id}}/" method="POST" enctype="multipart/form-data">{% csrf_token %}
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h4 class="modal-title" id="myModalLabel">Receive Item</h4>
+</div>
+
+
+<div class="modal-body">
+	<input type="hidden" name="item_po" value="{{item_po}}">
+	<input type="hidden" name="purchase_item" value="{{purchase_item}}">
+	<table class="add-user-table">
+	{% for fl in item_rcv_form %}
+		<tr>
+			<td>{{ fl.label_tag }}</td>
+			<td>{{ fl.errors }}{{ fl }}</td>
+		</tr>
+	{% endfor %}
+	</table>
+</div>
+
+
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-default close-modal" data-dismiss="modal">Close</button>
+    <button type="submit" class="btn btn-primary">Add Item</button>
+</div>
+</form>
+<script type="text/javascript">
+(function(){
+	$("form[name='ReceiveItem']").on("submit", function(e){
+		e.preventDefault();
+		form_data = $(this).serialize();
+		console.log(form_data);
+		$.ajax({
+			type: "POST",
+			url: $(this).attr('action'),
+			data: form_data,
+			success: function(rdata) {
+                $( "button.close-modal" ).trigger( "click" );
+                window.location.reload(false);
+                // win = window.open("",'_blank');
+                // win.location.href = "/contacts/edit/" + rdata + "/";
+
+            }
+		});
+
+	})
+})(jQuery)
+</script>
+    

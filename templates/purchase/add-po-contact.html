@@ -1,0 +1,66 @@
+<form name="pocontact" action="/purchase/add-po-contact/{{po_number}}/" method="POST" enctype="multipart/form-data">{% csrf_token %}
+	<input type="hidden" name="purchase_order" value="{{po_number}}">
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h4 class="modal-title" id="myModalLabel">Add Extra Contact</h4>
+</div>
+
+
+<div class="modal-body">
+	<table class="add-user-table">
+	{% for fl in po_contact_form %}
+		<tr>
+			<td>{{ fl.label_tag }}</td>
+			<td>{{ fl.errors }}{{ fl }}</td>
+		</tr>
+	{% endfor %}
+	</table>
+</div>
+
+
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-default close-modal" data-dismiss="modal">Close</button>
+    <button type="submit" class="btn btn-primary">Add Contact</button>
+</div>
+</form>
+<script type="text/javascript">
+	(function(){
+		$("form[name='pocontact']").on("submit", function(e){
+			e.preventDefault();
+			form_data = $(this).serialize();
+			// console.log($(this).attr('action'));
+			$.ajax({
+				type: "POST",
+				url: $(this).attr('action'),
+				data: form_data,
+				success: function(rdata) {
+					console.log(rdata);
+	                $( "button.close-modal" ).trigger( "click" );
+	                // var em = "<li> mamun@gmali.com</li>";
+	                var extraContactPlaceHolder = $("table#supplier_contact_details tfoot.extra-contact");
+	                var contacts = extraContactPlaceHolder.find("tr");
+	                
+	                
+	                if (contacts.length > 0) {
+	                	extraContactPlaceHolder.append(rdata);
+					} else {
+						extraContactPlaceHolder.html(rdata);
+					}
+	                
+	                // window.location.reload(false);
+	                // win = window.open("",'_blank');
+	                // win.location.href = "/contacts/edit/" + rdata + "/";
+
+	            }
+			});
+
+		});
+
+		var c_name = $("#id_primary_supplier_demo").val();
+		// console.log('contact name :'+c_name);
+		$("#id_contact_name").val(c_name);
+
+	})(jQuery)
+
+</script>

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block angular %}
+	<script type="text/javascript" src="/statics/js/angular.min.js"></script>
+	<script type="text/javascript" src="/statics/js/angular-route.min.js"></script>
+	
+	
+{% endblock angular %}
+
+{% block content %}
+
+<div class="container shadow4 main-body" ng-app="premierApp">
+
+<section class="row">
+	<div class="col-md-6">
+		<input type='text' class="form-control" ng-model="search" placeholder="Filter By Name">
+	</div>
+	
+	
+</section>
+
+<section class="row"  id="contact-list">
+	
+
+	<div class="col-md-12">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>CONTACT LIST</h4>
+		  	</div>
+		  	<div class="panel-body" >
+			  	<div ng-view></div>
+			  	
+			</div>
+		</div>
+	</div>
+</section>
+</div>
+
+<script type="text/javascript">
+premierApp.controller('ContactController',['$scope', '$http', function ($scope, $http) {
+    $scope.customers = [
+      {name: 'Mamun', age: 33},
+      {name: 'Martin', age: 3},
+    ]
+    $scope.init = function(){
+        $http.get("/contacts/list/").success(function(data){
+   			console.log(data);       
+          	$scope.contacts = data;
+        })
+    }
+    $scope.init();
+}]);
+
+</script>
+
+
+
+
+{% endblock content %}
+	

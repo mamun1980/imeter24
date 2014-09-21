@@ -1,0 +1,8 @@
+<span class="label label-danger {{ email_type.id }}">
+	{{ email_type.email_type }}
+	{% if perms.contacts.change_emailaddresstype %}
+		<a class="email-type-edit" href="/contacts/email-type/edit/{{ email_type.id }}/" 
+			data-toggle="modal" data-target="#editModal"
+			data-id="{{ email_type.id }}"><i class="glyphicon glyphicon-edit"></i></a>
+	{% endif %}
+</span>

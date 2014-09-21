@@ -1,0 +1,51 @@
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h4 class="modal-title" id="myModalLabel">Edit Delivery Choice</h4>
+</div>
+<form name="distribution-method-form" action="/contacts/distribution-method/edit/{{ dmid }}/" method="post">{% csrf_token %}
+<div class="modal-body">
+    
+    <input type="hidden" name="dmid" value="{{ dmid }}">
+    <table>
+        <tr>
+        {% for field in dmform %}
+            <td>
+                {{ field }}
+            </td>
+        {% endfor %}
+        
+        </tr>
+    </table>
+    
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default close-modal" data-dismiss="modal">Close</button>
+    <button type="submit" class="btn btn-primary">Save changes</button>
+</div>
+</form>
+<script type="text/javascript">
+(function(){
+    $("form[name='distribution-method-form']").on("submit", function(e){
+        e.preventDefault();
+        dmid = $("input[name='dmid']").val();
+        $("#distribution-method span."+dmid).remove();
+        console.log($(this).attr("action"));
+        
+        form_data = $(this).serialize();
+        $.ajax({
+            type: "POST",
+            url: $(this).attr("action"),
+            data: form_data,
+            success: function(rdata) {
+                $( "button.close-modal" ).trigger( "click" );
+
+                $("#distribution-method").prepend(rdata);
+
+            }
+        })
+
+    })
+
+})(jQuery)
+    
+</script>

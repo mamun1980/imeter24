@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+<section class="row"  id="report">
+	
+
+	<div class="col-md-10 col-md-offset-1">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Controller Details</h4>
+		  	</div>
+		  	<div class="panel-body">
+			  	
+		  		<table class="add-user-table table details">
+			  			<tr>
+			  				<th style="width:120px;">Controller Name</th>
+			  				<td>{{ controller.controller_name }}</td>
+			  			
+			  				<th style="width:120px;">Controller ID</th>
+			  				<td>{{ controller.controllerid }}</td>
+			  			
+			  				<th style="width:120px;">IP Address</th>
+			  				<td>{{ controller.ipaddress }}</td>
+			  			</tr>
+			  			<tr>
+			  				<th>Serial Number</th>
+			  				<td>{{ controller.serial_number }}</td>
+			  			
+			  				<th>Door Current Status</th>
+			  				<td>{{ controller.doorcurrentstatus }}</td>
+			  			
+			  				<th>Door Last Oppened Date</th>
+			  				<td>{{ controller.doorlastopeneddate }}</td>
+			  			</tr>
+			  			<tr>
+			  				<th>Door Last Opened Time</th>
+			  				<td>{{ controller.doorlastopenedtime }}</td>
+			  			
+			  				<th>Door Last Closed Date</th>
+			  				<td>{{ controller.doorlastcloseddate }}</td>
+			  			
+			  				<th>Door Last Closed Time</th>
+			  				<td>{{ controller.doorlastclosedtime }}</td>
+			  			</tr>
+			  			<tr>
+			  				<th>Card 1 Name </th>
+			  				<td>{{ controller.card_1_name }}</td>
+			  			
+			  				<th>Card 1 Type</th>
+			  				<td>{{ controller.card_1_type }}</td>
+			  			
+			  				<th>Card 1 Last Date</th>
+			  				<td>{{ controller.card_1_lastdate }}</td>
+			  			</tr>
+			  			<tr>
+			  				<th>Card 1 Last Time</th>
+			  				<td>{{ controller.card_1_lasttime }}</td>
+			  			
+			  				<th>Card 1 Last User</th>
+			  				<td>{{ controller.card_1_lastuser }}</td>
+			  			
+			  				<th>Card 1 Last Card</th>
+			  				<td>{{ controller.card_2_lastcard }}</td>
+			  			</tr>
+			  			<tr>
+			  				<th>Card 2 Name </th>
+			  				<td>{{ controller.card_2_name }}</td>
+			  			
+			  				<th>Card 2 Type</th>
+			  				<td>{{ controller.card_2_type }}</td>
+			  			
+			  				<th>Card 2 Last Date</th>
+			  				<td>{{ controller.card_2_lastdate }}</td>
+			  			</tr>
+			  			<tr>
+			  				<th>Card 2 Last Time</th>
+			  				<td>{{ controller.card_2_lasttime }}</td>
+			  			
+			  				<th>Card 2 Last User</th>
+			  				<td>{{ controller.card_2_lastuser }}</td>
+			  			
+			  				<th>Card 2 Last Card</th>
+			  				<td>{{ controller.card_2_lastcard }}</td>
+			  			</tr>
+			  			<tr>
+			  				<th>Input 1 Name</th>
+			  				<td>{{ controller.input_1_name }}</td>
+			  			
+			  				<th>Input 1 Type</th>
+			  				<td>{{ controller.input_1_type }}</td>
+			  			
+			  				<th>Input 1 Status</th>
+			  				<td>{{ controller.input_1_status }}</td>
+			  			</tr>
+			  			<tr>
+			  				<th>Input 1 last date</th>
+			  				<td>{{ controller.input_1_lastdate }}</td>
+			  			
+			  				<th>Input 1 last status</th>
+			  				<td>{{ controller.input_1_lasttime }}</td>
+			  			
+			  				<th>Input last state</th>
+			  				<td>{{ controller.input_1_laststate }}</td>
+			  			</tr>
+			  			<tr>
+			  				<th>Input 2 Name</th>
+			  				<td>{{ controller.input_2_name }}</td>
+			  			
+			  				<th>Input 2 Type</th>
+			  				<td>{{ controller.input_2_type }}</td>
+			  			
+			  				<th>Input 2 Status</th>
+			  				<td>{{ controller.input_2_status }}</td>
+			  			</tr>
+			  			<tr>
+			  				<th>Input 2 last date</th>
+			  				<td>{{ controller.input_2_lastdate }}</td>
+			  			
+			  				<th>Input 2 last status</th>
+			  				<td>{{ controller.input_2_lasttime }}</td>
+			  			
+			  				<th>Input last state</th>
+			  				<td>{{ controller.input_2_laststate }}</td>
+			  			</tr>
+			  			<tr>
+			  				<th>Input 3 Name</th>
+			  				<td>{{ controller.input_3_name }}</td>
+			  			
+			  				<th>Input 3 Type</th>
+			  				<td>{{ controller.input_3_type }}</td>
+			  			
+			  				<th>Input 3 Status</th>
+			  				<td>{{ controller.input_3_status }}</td>
+			  			</tr>
+			  			<tr>
+			  				<th>Input 3 last date</th>
+			  				<td>{{ controller.input_3_lastdate }}</td>
+			  			
+			  				<th>Input 3 last status</th>
+			  				<td>{{ controller.input_3_lasttime }}</td>
+			  			
+			  				<th>Input last state</th>
+			  				<td>{{ controller.input_3_laststate }}</td>
+			  			</tr>
+			  			<tr>
+			  				<th>Input 4 Name</th>
+			  				<td>{{ controller.input_4_name }}</td>
+			  			
+			  				<th>Input 4 Type</th>
+			  				<td>{{ controller.input_4_type }}</td>
+			  			
+			  				<th>Input 4 Status</th>
+			  				<td>{{ controller.input_4_status }}</td>
+			  			</tr>
+			  			<tr>
+			  				<th>Input 4 last date</th>
+			  				<td>{{ controller.input_4_lastdate }}</td>
+			  			
+			  				<th>Input 4 last status</th>
+			  				<td>{{ controller.input_4_lasttime }}</td>
+			  			
+			  				<th>Input last state</th>
+			  				<td>{{ controller.input_4_laststate }}</td>
+			  			</tr>
+			  			<tr>
+			  				<th>Alerm Last state</th>
+			  				<td>{{ controller.controller_alarm_laststate }}</td>
+			  			
+			  				<th>Alerm Last Date</th>
+			  				<td>{{ controller.controller_alarm_lastdate }}</td>
+			  			
+			  				<th>Alerm Last Time</th>
+			  				<td>{{ controller.controller_alarm_lasttime }}</td>
+			  			</tr>
+
+
+			  			
+				</table>
+			  	
+			</div>
+		</div>
+	</div>
+
+</section>
+</div>
+<script type="text/javascript">
+(function(){
+	
+})(jQuery)
+
+</script>
+
+{% endblock content %}
+	

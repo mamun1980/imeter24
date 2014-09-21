@@ -1,0 +1,8 @@
+<span class="label label-danger {{ department.id }}">
+	{{ department.name }}
+	{% if perms.scomuser.change_department %}
+		<a class="department-edit" href="/scomuser/department/edit/{{ department.id }}/" 
+			data-toggle="modal" data-target="#editModal"
+			data-id="{{ department.id }}"><i class="glyphicon glyphicon-edit"></i></a>
+	{% endif %}
+</span>

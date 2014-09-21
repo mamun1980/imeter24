@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block angular %}
+	<script type="text/javascript" src="/statics/js/angular.min.js"></script>
+	<script type="text/javascript" src="/statics/js/angular-route.min.js"></script>	
+{% endblock angular %}
+
+{% block content %}
+
+<div class="container shadow4 main-body" ng-app="premierApp">
+<section class="row">
+	<div class="col-md-6">
+		<input type='text' class="form-control" ng-model="search" placeholder="Filter By Item Number">
+	</div>
+</section>
+
+<section class="row"  id="inventory-list">
+	
+
+	<div class="col-md-12">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Inventory Item List</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  		<div ng-view></div>
+			</div>
+		</div>
+	</div>
+
+</section>
+</div>
+
+<script type="text/javascript">
+premierApp.controller('InventoryController',['$scope', '$http', 'InventoryService', 'items', function ($scope, $http, InventoryService, items) {
+	console.log(items);
+	$scope.items = items;
+}]);
+
+</script>
+
+{% endblock content %}
+	

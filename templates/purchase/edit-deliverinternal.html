@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<style>
+#feedback { font-size: 1.4em; }
+/*#selectable .ui-selecting { background: #FECA40; }*/
+#selectable .ui-selected, #selectable-producer .ui-selected { background: #F39814; color: white; }
+#selectable,#selectable-producer { list-style-type: none; margin: 0; padding: 0px 2px 0px 0px; width: 100%; }
+#selectable thead tr, #selectable-producer thead tr { margin: 0px 3px; padding: 0.4em; font-size: 1.4em; height: 35px; background-color: #ed791a; }
+#selectable tbody tr, #selectable-producer tbody tr { margin: 0px 3px; padding: 0.4em; font-size: 1.4em; height: 35px; border-bottom: 1px solid #EEE; }
+#selectable tbody tr:hover, #selectable-producer tbody tr:hover { background-color: #FECA40; color: #000; }
+#selectable td, #selectable th, #selectable-producer td, #selectable-producer th {
+	padding: 3px 10px;
+}
+
+#contact-list {
+	/*border: 2px solid #333;*/
+}
+#container,#container-producer {
+	width: 520px;
+}
+#container .ui-widget-content-custom, #container-producer .ui-widget-content-custom {
+	background-color: #333 !important;
+	color: #FFF;
+}
+</style>
+
+<div class="container shadow4 main-body">
+
+<section class="row"  id="edit-deliverinternal">
+	
+
+	<div class="col-md-8 col-md-offset-2">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Edit Deliver Internal</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  	<form action="/purchase/deliverinternal/edit/{{id}}/" enctype="multipart/form-data" name="purchase-di-form" method="POST">{% csrf_token %}
+		  		
+		  		{% for field in deliverinternal_frm %}
+		  		
+		            <div class="col-md-4 topmargin">
+		            {{ field.label_tag }} 
+		            </div>
+		            <div class="col-sm-8 topmargin">
+		            	{{ field.errors }}
+		                {{ field }}
+		            </div>
+		        
+
+		        {% endfor %}
+	    		  	<div class="btn btn-lg">
+						<button class="btn btn-primary btn-lg" type="submit">Update Department</button>
+					</div>
+					
+		  	</form>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-8 col-md-offset-2">
+		
+	</div>
+
+	
+
+</section>
+</div>
+
+{% endblock content %}

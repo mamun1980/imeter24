@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container shadow4 main-body" ng-app="scheduleApp">
+
+<section class="row" >
+	
+
+	<div class="col-md-8 col-md-offset-2" ng-controller="AddScheduleController">
+		<form action="/schedule/job/add/" method="POST" enctype="multipart/form-data">{% csrf_token %}
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>ADD Job</h4>
+		  	</div>
+		  	<div class="panel-body">
+			  	<article class="row">
+			  		<section class="col-md-10 col-md-offset-1">
+			  			
+			  				
+			  				{{ jobform.non_field_errors }}
+			  				
+			  			
+					  	<table class="add-user-table">
+					  		{% for field in jobform %}
+					  			<tr>
+					  				<td>{{ field.label_tag }} {{field.error}}</td>
+					  				<td>{{ field.errors }}{{ field }}</td>
+					  			</tr>
+					  		{% endfor %}
+					  		
+						
+						</table>
+					</section>
+				
+				</article>
+
+				<article class="row">
+					<section class="col-md-8 col-md-offset-2">
+					  	<table class="add-user-table">
+					  		<tr>
+					  			
+								<td colspan="2">
+									<button type="submit" class="btn btn-primary btn-lg form-control login-btn">Add Job </button>
+								</td>
+							</tr>
+						</table>
+					</section>
+				</article>
+				
+			</div>
+		</div>
+		</form>
+	</div>
+</section>
+</div>
+
+<script type="text/javascript">
+'use strict';
+
+var scheduleApp = angular.module("scheduleApp", ['ngRoute'], function ($interpolateProvider) {
+        $interpolateProvider.startSymbol("{[{");
+        $interpolateProvider.endSymbol("}]}");
+});
+
+scheduleApp.controller("AddScheduleController", ['$scope', '$http', function($scope, $http){
+	
+}]);
+
+
+
+(function(){
+	$(".datetimepicker").datepicker();
+})(jQuery)
+
+</script>
+{% endblock content %}

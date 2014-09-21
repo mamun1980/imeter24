@@ -1,0 +1,40 @@
+<table class="table" ng-show="jobs">
+	<tr>
+		<td>Job Number</td>
+		<td>Cab Designation</td>
+		<td>Date Opened</td>
+		<td>Date Required</td>
+		<td>Status</td>
+		<td>Customer</td>
+		<td>Job Name</td>
+		<td># of Cabs</td>
+		<td>Description</td>
+		<td>Action</td>
+
+	</tr>
+	<tr ng-repeat="job in jobs | googleSearchFilter:search">
+		<td>{[{ job.job_number }]}</td>
+		<td>{[{ job.cab_designation }]}</td>
+		<td>{[{ job.date_opened }]}</td>
+		<td>{[{ job.date_required }]}</td>
+		<td>{[{ job.status }]}</td>
+		<td>{[{ job.customer }]}</td>
+		<td>{[{ job.job_name }]}</td>
+		<td>{[{ job.number_of_cabs }]}</td>
+		<td>{[{ job.description }]}</td>
+		<td>
+			<a href="/schedule/job/view/{[{job.id}]}/"> View </a>
+			
+			/ <a href="/schedule/job/edit/{[{job.id}]}/"> Edit </a>
+			
+			/ 
+			<a href="#" data-job-id="{[{job.id}]}" class="job-delete"> Delete </a>
+			
+			
+		</td>
+	</tr>
+	
+
+</table>
+
+<h2 ng-hide="jobs">There is no jobs</h2>

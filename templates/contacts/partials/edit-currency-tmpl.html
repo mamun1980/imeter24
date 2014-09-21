@@ -1,0 +1,52 @@
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h4 class="modal-title" id="myModalLabel">Edit Currency Type</h4>
+</div>
+<form name="contact-currency-edit" action="/contacts/currency/edit/{{ curid }}/" method="post">{% csrf_token %}
+<div class="modal-body">
+    
+    <input type="hidden" name="curid" value="{{ curid }}">
+    <table class="table currency-edit">
+        {% for fl in currency_form %}
+            <tr>
+                <td>{{ fl.label_tag }}</td>
+                <td>{{ fl.errors }}{{ fl }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default close-modal" data-dismiss="modal">Close</button>
+    <button type="submit" class="btn btn-primary">Save changes</button>
+</div>
+</form>
+<script type="text/javascript">
+(function(){
+    $("form[name='contact-currency-edit']").on("submit", function(e){
+        e.preventDefault();
+        curid = $("input[name='curid']").val();
+                
+        form_data = $(this).serialize();
+        console.log(form_data);
+        $.ajax({
+            type: "POST",
+            url: $(this).attr("action"),
+            data: form_data,
+            success: function(rdata) {
+                $( "button.close-modal" ).trigger( "click" );
+                window.location.reload(true);              
+
+            }
+        })
+
+    })
+
+    // $("button.close-modal").on("click", function(){
+    //     pid = $("input[name='pid']").val();
+    //     
+    // })
+
+})(jQuery)
+    
+</script>

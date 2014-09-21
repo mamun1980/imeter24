@@ -1,0 +1,45 @@
+<div id="comment-form" style="padding-top: 20px; padding-bottom: 20px;">
+	<form id="contactComment">
+		<table width="100%">
+			<tr>
+				<td>
+					<input type="hidden" name="cid" value="{{ cid }}">
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<textarea class="form-control" name="comment" placeholder="Comments here" rows="5"></textarea>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<input type="submit" class="btn btn-danger btn-lg comment" value="Submit Comment">
+				</td>
+			</tr>
+	
+	    </table>
+	</form>
+</div>
+<script type="text/javascript">
+(function(){
+	$("form#contactComment").on("submit", function(e){
+		e.preventDefault();
+		form_data = $(this).serialize();
+		console.log(form_data);
+
+		$.ajax({
+			type: "POST",
+			url: "/contacts/comment/add/",
+			data: form_data,
+			success: function(rdata) {
+				$("#comment").append(rdata);
+
+			},
+			errors: function() {
+
+			}
+		})
+
+	});
+})();
+</script>

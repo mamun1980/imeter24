@@ -1,0 +1,353 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body" ng-app="demoApp">
+
+<section class="row"  id="report" ng-controller="EditRecuringJobController">
+	
+
+	<div class="col-md-6">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Edit Recuring Job</h4>
+		  	</div>
+		  	<div class="panel-body" >
+			  	<form name="report-form" action="{[{action}]}" method="POST">{% csrf_token %}
+			  		<table class="add-user-table">
+				  		<tr>
+			  				<td><label for="id_report">Report:</label></td>
+			  				<td>
+			  					<select class="form-control" ng-model="report_type" id="id_report" name="report" ng-selected="{[{report_type}]}" ng-change="getReport(report_type)">
+									<option value="0">---------</option>
+									<option ng-repeat="report in reports"  value="{[{report.id}]}" data-id="{[{job.report.id}]}"
+									>{[{report.report_type}]}</option>
+									
+								</select>
+							</td>
+				  		</tr>
+				  		<tr>
+			  				<td><label for="id_report_description">Report description:</label></td>
+			  				<td><textarea class="form-control" cols="40" id="id_report_description" name="report_description" placeholder="Report Description" required="False" rows="2" readonly>{[{ comments }]}</textarea></td>
+			  			</tr>
+			  			<tr>
+			  				<td><label for="id_script_name">Script name:</label></td>
+			  				<td><input class="form-control" id="id_script_name" maxlength="200" name="script_name" placeholder="Report Description" type="text" value="{[{ python_script }]}" readonly></td>
+			  			</tr>
+
+			  			<tr>
+			  				<td><label for="id_que_type">Que Type:</label></td>
+		  					<td>
+		  						<select class="form-control" id="id_que_type" name="que_type" ng-model="que_type" ng-selected="{[{que_type}]}">
+									<option value="email">Email</option>
+									<option value="printer">Printer</option>
+									<option value="fax">Fax</option>
+									
+								</select>
+							</td>
+			  			</tr>
+
+			  			<tr ng-show="que_type=='email'">
+			  				<td><label for="id_email">Email:</label></td>
+			  				<td>
+			  					<input class="form-control" id="id_email" value="{[{que_type_email}]}" maxlength="500" name="email" placeholder="Email" type="text">
+			  				</td>
+			  			</tr>
+
+			  			<tr ng-show="que_type=='printer'">
+			  				<td><label for="id_printer">Printer:</label></td>
+			  					<td>
+			  						<select class="form-control" id="id_printer" name="printer" ng-model="que_type_printer" >
+										
+										<option ng-repeat="report in printers" value="{[{report.printer_id}]}" ng-selected="{[{que_type_printer}]}">{[{report.printer_id}]}</option>
+										
+									</select>
+								</td>
+			  			</tr>
+
+			  			<tr ng-show="que_type=='fax'">
+			  				<td><label for="id_fax">Fax:</label></td>
+			  				<td><input class="form-control" id="id_fax" maxlength="500" value="{[{que_type_fax}]}" name="fax" placeholder="Fax number" type="text"></td>
+			  			</tr>
+
+			  			<tr>
+			  				<td><label for="id_current_job_status">Current job status:</label></td>
+			  					<td>
+			  						<select class="form-control" id="id_current_job_status" name="current_job_status" ng-model="current_job_status" ng-selected="{[{current_job_status}]}">
+				  						<option value="new">New</option>
+				  						<option value="inprogress">In Progress</option>
+				  						<option value="error">Error</option>
+				  						<option value="completed">Completed</option>
+				  					</select>
+			  					</td>
+			  			</tr>
+
+			  			<tr>
+			  				<td><label for="id_date_submitted">Date Submitted:</label></td>
+			  				<td>
+			  					<input class="form-control" id="id_date_submitted" value="{[{date_submitted}]}" name="date_submitted" placeholder="Date submitted" type="text" ng-model="date_submitted" jqdatepicker></td>
+		  				</tr>
+		  			
+		  				<tr>
+		  					<td><label for="id_time_submitted">Time Submitted:</label></td>
+		  					<td><input class="form-control timepicker ui-timepicker-input" id="id_time_submitted" name="time_submitted" placeholder="time submitted" type="text" value="{[{time_submitted}]}" autocomplete="off"></td>
+		  				</tr>
+		  			
+		  				<tr>
+		  					<td><label for="id_date_finished">Date finished:</label></td>
+		  					<td><input class="form-control" id="id_date_finished" value="{[{date_finished}]}" name="date_finished" placeholder="Date Finished" type="text" ng-model="date_finished" jqdatepicker></td>
+		  				</tr>
+		  			
+		  				<tr>
+		  					<td><label for="id_time_finished">Time finished:</label></td>
+		  					<td><input class="form-control timepicker ui-timepicker-input" id="id_time_finished" name="time_finished" placeholder="time finished" type="text" value="{[{time_finished}]}" autocomplete="off"></td>
+		  				</tr>
+
+
+			  			<tr>
+			  				<td><label for="id_unix_que">Unix Que:</label></td>
+			  				<td><input class="form-control" value="{[{job.unix_que}]}" id="id_unix_que" maxlength="50" name="unix_que" placeholder="Unix Que" type="text"></td>
+			  			</tr>
+			  			<tr>
+			  				<td><label for="id_schedule_type">Schedule type:</label></td>
+			  				<td>
+			  					<select class="form-control" id="id_report_type" name="schedule_type" ng-model="schedule_type" ng-selected="{[{ schedule_type }]}">
+			  						<option value="">---------</option>
+			  						<option value="weekly">Weekly</option>
+			  						<option value="daily">Every Day</option>
+			  						<option value="randomdays">Random week days</option>
+			  					</select>
+			  				</td>
+			  			</tr>
+
+			  			<tr ng-show="schedule_type=='weekly'">
+			  				<td><label for="id_week_day">Choose Week day</label></td>
+			  				<td>
+			  					<select class="form-control" id="id_week_day" ng-model="week_day" name="week_day">
+			  						<option ng-repeat="day in week_days" value="{[{ day }]}">{[{ day }]}</option>
+			  					</select>
+			  				</td>
+			  			</tr>
+
+			  			<tr ng-show="schedule_type=='randomdays'">
+			  				<td><label for="id_randomdays">Choose days</label></td>
+			  				<td width="75%">
+			  					
+			  					<span ng-repeat="day in week_days" style="display:inline-block;" ng-model="test">
+			  						<input type="checkbox" value="{[{day}]}" ng-checked="choosendays.indexOf(day) > -1" class="week_days"> {[{ day }]} 
+			  					</span>
+			  					
+			  					<input type="text" name="randomdays" class="form-control" ng-model="selected_days" readonly>
+			  				</td>
+			  			</tr>
+
+			  			<tr ng-show="schedule_type=='randomdays' || week_day || daily ">
+			  				<td><label for="id_daytime">Choose your time</label></td>
+			  				<td width="75%">
+			  					<input class="form-control timepicker ui-timepicker-input" value="{[{daytime}]}" id="id_daytime" name="daytime"  type="text">
+			  				</td>
+			  			</tr>
+				  		
+						<tr>
+							<td colspan="2">
+								<button type="submit" class="btn btn-primary btn-lg form-control login-btn">Update Recuring Job</button>
+							</td>
+						</tr>
+					</table>
+			  	</form>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-md-6" >
+		<div class="panel panel-primary" ng-show="show_report">
+			<div class="panel-heading">
+		    	<h4>Report Details</h4>
+		  	</div>
+		  	<div class="panel-body" >
+		  		<table class="table">
+		  			<tr>
+		  				<td>Report ID</td>
+		  				<td>{[{ report_type_id }]}</td>
+		  			</tr>
+		  			
+		  			<tr>
+		  				<td>Comments</td>
+		  				<td>{[{ comments }]}</td>
+		  			</tr>
+		  			<tr>
+		  				<td>Python script</td>
+		  				<td>{[{ python_script }]}</td>
+		  			</tr>
+		  			
+
+		  		</table>
+		  	</div>
+		 </div>
+
+	</div>
+
+</section>
+</div>
+<script type="text/javascript">
+var demoApp = angular.module("demoApp", [], function ($interpolateProvider) {
+        $interpolateProvider.startSymbol("{[{");
+        $interpolateProvider.endSymbol("}]}");
+});
+
+demoApp.directive('jqdatepicker', function() {
+    return {
+        restrict: 'A',
+        require: 'ngModel',
+        link: function(scope, element, attrs, ngModelCtrl) {
+            $(element).datepicker({
+                dateFormat: 'yy-mm-dd',
+
+                onSelect: function(date) {
+                    var ngModelName = this.attributes['ng-model'].value;
+                    scope[ngModelName] = date;
+                    scope.$apply();
+                }
+
+            });
+        }
+    };
+});
+demoApp.controller("EditRecuringJobController", ['$scope', '$http', function ($scope, $http){
+
+	$scope.init = function(){
+		$http.get("/report/list/api/").success(function(data){
+          	$scope.reports = data;
+        });
+
+        $http.get("/report/printer/list/api/").success(function(data){
+        	$scope.printers = data;
+        });
+
+		var path = window.location.pathname;
+		var segments = path.split("/");
+		var jobid = segments[(segments.length-2)];
+		
+		var url = "/report/recuring/job/api/"+jobid+"/";
+		$scope.action = "/report/recuring/edit/"+jobid+"/";
+		
+        $http.get(url).success(function(data){
+   			
+          	$scope.job = data;
+          	$scope.report_type = data.report.id;
+          	$scope.destination_type = data.report.destination_type;
+          	$scope.comments = data.report.comments;
+          	$scope.python_script = data.report.python_script;
+          	
+          	
+          	$scope.report_description = data.report_description;
+          	$scope.script_name = data.script_name;
+          	$scope.que_type = data.que_type;
+
+          	if(data.que_type == 'email') {
+          		$scope.que_type_email = data.email;
+	          	$scope.que_type_printer = "";
+	          	$scope.que_type_fax = "" ;	
+          	} else if (data.que_type == 'printer') {
+          		$scope.que_type_email = "";
+	          	$scope.que_type_printer = data.printer;
+	          	$scope.que_type_fax = "";
+	          } else if (data.que_type == 'fax') {
+	          	$scope.que_type_email = "";
+	          	$scope.que_type_printer = "";
+	          	$scope.que_type_fax = data.fax;
+	          }
+          	
+          	$scope.current_job_status = data.current_job_status;
+          	$scope.date_submitted = data.date_submitted;
+          	$scope.time_submitted = data.time_submitted;
+          	$scope.date_finished = data.date_finished;
+          	$scope.time_finished = data.time_finished;
+
+          	$scope.unix_que = data.unix_que;
+
+          	$scope.schedule_type = data.schedule_type;
+          	$scope.week_day = data.week_day;
+          	$scope.selected_days = data.randomdays;
+          	var randomdays = data.randomdays.split(",");
+          	$scope.choosendays = randomdays;
+          	$scope.daytime = data.daytime;
+          	
+
+
+        });
+        $scope.keyExist = function(key,arr) {
+        	console.log(key);
+        	var a = arr.indexOf(key,0);
+        	if (a != -1) {
+        		return true;
+        	} else {
+        		return false;
+        	}
+        };
+
+        $scope.getReport = function (report_id) {
+	    	if (report_id != -1) {
+	    		var url = "/report/view/api/"+report_id+"/";
+
+		    	$http.get(url).success(function(data){
+		   			 console.log(data);
+		   			$scope.report_type_id = data.id;
+		          	$scope.comments = data.comments;
+		          	$scope.python_script = data.python_script;
+		          	$scope.show_report = true;
+		          	
+		        });
+	    	} else {
+	    		$scope.show_report = false;
+
+	    	}
+	    	
+	    	
+	    }
+        
+
+        $scope.week_days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    }
+
+    $scope.init();
+    
+
+
+}]);
+
+</script>
+
+
+<script type="text/javascript">
+(function(){
+	$(".datetimepicker").datepicker();
+	$(".timepicker").timepicker();
+
+	$(document).on("click", ".week_days", function(e){
+		var day = $(this).val();
+		var check = this.checked;
+		var str = $("input[name='randomdays']").val();
+
+		if (check) {
+			if(str == ""){
+				str = day	
+			} else {
+				str += "," + day
+			}
+			$("input[name='randomdays']").val(str);
+		} else {
+			var strarray = str.split(",");
+			console.log(strarray);
+			arr2 = strarray.splice( strarray.indexOf( day ), 1 );
+			var newstr = strarray.join(",");
+			$("input[name='randomdays']").val(newstr);
+		}
+		
+
+	});
+
+})(jQuery)
+</script>
+{% endblock content %}
+	

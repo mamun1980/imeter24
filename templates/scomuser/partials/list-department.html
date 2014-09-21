@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+<section class="row"  id="department">
+	
+
+	<div class="col-md-6 col-md-offset-3">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Department List</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  	<form name="department-form">
+		  		<div class="input-group">
+				  	{% for field in department_form %}
+				  		{{ field }}
+				  	{% endfor %}
+				  	<div class="input-group-btn">
+						<button class="btn btn-primary" type="submit">Add Department</button>
+					</div>
+				</div>
+		  	</form>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-md-6 col-md-offset-3">
+		<div class="panel panel-primary">
+			<div class="panel-body">
+				<div id="department-list">
+				{% for department in departments %}
+					{% include "scomuser/partials/add-department-partial.html" %}
+				{% endfor %}
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+{% include "modals/edit-modal.html" %}
+
+
+<script type="text/javascript">
+	(function(){
+
+		$("a.department-edit").on("click", function(e){
+			e.preventDefault();
+			// com_id = $(this).data("id");
+		    url = $(this).attr("href");
+			mdal = $('#editModal');
+			mdal.on("shown.bs.modal", function(){
+				$("#editModal .modal-content").load(url);
+				console.log(url);
+			}).modal();
+
+			return false;
+		});
+
+		$("form[name='department-form']").on("submit", function(e){
+			e.preventDefault();
+			form_data = $(this).serialize();
+
+			$.ajax({
+				type: "POST",
+				url: "/scomuser/department/add/",
+				data: form_data,
+				success: function(rdata) {
+					$("#department-list").append(rdata);
+					console.log(rdata);
+				},
+				errors: function() {
+
+				}
+			})
+
+		})
+
+	})(jQuery)
+
+
+</script>
+
+
+
+</section>
+</div>
+
+
+{% endblock content %}
+	

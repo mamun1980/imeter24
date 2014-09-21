@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+
+<section class="row"  id="recuring-job">
+	
+
+	<div class="col-md-8 col-md-offset-2">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>
+		    		Recuring job details
+		    		{% if perms.report.change_recuringreport %}
+			  			<a href="/report/recuring/edit/{{ job.id }}/"> <i class="glyphicon glyphicon-edit"></i></a>
+			  		{% endif %}
+		    	</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  		<table class="table">
+		  			<tr>
+		  				<td width="25%">Job Id</td>
+		  				<td>{{ job.id }}</td>
+		  			</tr>
+		  			<tr>
+		  				<td width="25%">Job Description</td>
+		  				<td>{{ job.report_description }}</td>
+		  			</tr>
+		  			<tr>
+		  				<td width="25%">Script Name</td>
+		  				<td>{{ job.script_name }}</td>
+		  			</tr>
+		  			<tr>
+		  				<td width="25%">Que type</td>
+		  				<td>{{ job.que_type }}</td>
+		  			</tr>
+		  			{% if job.que_type == 'email' %}
+		  			<tr>
+		  				<td width="25%">Email</td>
+		  				<td>{{ job.email }}</td>
+		  			</tr>
+		  			{% elif job.que_type == 'printer' %}
+		  			<tr>
+		  				<td width="25%">Printer Id</td>
+		  				<td>{{ job.printer }}</td>
+		  			</tr>
+		  			{% elif job.que_type == 'fax' %}
+		  			<tr>
+		  				<td width="25%">Fax number</td>
+		  				<td>{{ job.fax }}</td>
+		  			</tr>
+		  			{% endif %}
+		  			<tr>
+		  				<td width="25%">Date submitted</td>
+		  				<td>{{ job.date_submitted }}</td>
+		  			</tr>
+		  			<tr>
+		  				<td width="25%">Time submitted</td>
+		  				<td>{{ job.time_submitted }}</td>
+		  			</tr>
+		  			<tr>
+		  				<td width="25%">Date finished</td>
+		  				<td>{{ job.date_finished }}</td>
+		  			</tr>
+		  			<tr>
+		  				<td width="25%">Time finished</td>
+		  				<td>{{ job.time_finished }}</td>
+		  			</tr>
+		  			<tr>
+		  				<td width="25%">Unix Que</td>
+		  				<td>{{ job.unix_que }}</td>
+		  			</tr>
+		  			<tr>
+		  				<td width="25%">Schedule Type</td>
+		  				{% if job.schedule_type %}
+		  				<td>{{ job.schedule_type }}</td>
+		  				{% else %}
+		  				<td>Not Scheduled Yet!</td>
+		  				{% endif %}
+		  			</tr>
+		  			{% if job.week_day %}
+		  			<tr>
+		  				<td width="25%">Schedule Day</td>
+		  				<td>{{ job.week_day }}</td>
+		  			</tr>
+		  			{% endif %}
+
+		  			{% if job.randomdays %}
+		  			<tr>
+		  				<td width="25%">Schedule Days</td>
+		  				<td>{{ job.randomdays }}</td>
+		  			</tr>
+		  			{% endif %}
+
+		  			{% if job.daytime %}
+		  			<tr>
+		  				<td width="25%">Schedule Time</td>
+		  				<td>{{ job.daytime }}</td>
+		  			</tr>
+		  			{% endif %}
+		  			<tr>
+		  				<td width="25%">Report Type</td>
+		  				<td>{{ job.report.report_type }}</td>
+		  			</tr>
+		  			
+		  			<tr>
+		  				<td width="25%">Python script</td>
+		  				<td>{{ job.report.python_script }}</td>
+		  			</tr>
+		  			
+
+
+		  		</table>
+			  	
+			</div>
+		</div>
+	</div>
+
+</section>
+</div>
+
+
+{% endblock content %}
+	

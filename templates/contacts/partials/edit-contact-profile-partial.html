@@ -1,0 +1,75 @@
+<div class="panel panel-primary">
+	<div class="panel-heading">
+    	<h4 class="panel-title"><a data-toggle="collapse" data-parent="#accordion" href="#CONTACTPROFILE">CONTACT PROFILE (click for update)</a></h4>
+  	</div>
+
+  	<div id="CONTACTPROFILE" class="panel-collapse collapse in">
+	  	<div class="panel-body">
+	  	<div class="message"></div>
+		  	<form name="contact-profile-form" method="POST" enctype="multipart/form-data">{% csrf_token %}
+		  	<input type="hidden" name="cpid" value="{{ cpid }}">
+		  	<table class="add-user-table">
+		  	<tr>
+				<td colspan="2" class="submit">
+					<button type="submit" class="btn btn-primary btn-lg form-control update-btn">
+						UPDATE
+					</button>
+				</td>
+			</tr>
+		  		{% for fl in cpform %}
+		  			<tr>
+		  				<td>{{ fl.label_tag }}</td>
+		  				<td>{{ fl.errors }}{{ fl }}</td>
+		  			</tr>
+		  		{% endfor %}
+		  		
+			<tr>
+				<td colspan="2" class="submit">
+					<button type="submit" class="btn btn-primary btn-lg form-control login-btn">
+						UPDATE
+					</button>
+				</td>
+			</tr>
+			</table>
+			</form>
+		</div>
+	</div>
+<script type="text/javascript">
+	(function(){
+		$("form[name='contact-profile-form']").on("submit", function(e){
+			e.preventDefault()
+			$("#CONTACTPROFILE button[type='submit']").hide();
+			console.log( $( this ).serialize() );
+			form_data = $( this ).serialize();
+
+			$.ajax({
+				type: "POST",
+				url: "/contacts/profile/update/",
+				data: form_data,
+				success: function(return_data) {
+					console.log(return_data);
+					if(return_data == 'success') {
+
+						$("#CONTACTPROFILE div.message").html("Contact Updated successfully").show();
+						$("#CONTACTPROFILE button[type='submit']").show();
+						setTimeout(function() {
+					      $('#CONTACT div.message').fadeOut();
+					    }, 2000);
+
+					} else if(return_data == 'error') {
+
+						$("#CONTACTPROFILE div.message").html("Error occured").show();
+						setTimeout(function() {
+					      $('#CONTACTPROFILE div.message').fadeOut();
+					    }, 2000);
+
+					}
+				},
+				errors: function(errors) {
+		    		console.log("errors");
+		    	}
+			})
+		});
+	})(jQuery)
+</script>
+</div>

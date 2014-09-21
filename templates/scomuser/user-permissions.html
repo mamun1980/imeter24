@@ -1,0 +1,70 @@
+<div class="panel-group" id="accordion">
+	{% if permissions %}
+
+	{% for model_name, perms in permissions.items %}
+	<div class="panel panel-primary">
+		<div class="panel-heading">
+			<h4 class="panel-title">
+				<a data-toggle="collapse" data-parent="#accordion" href="#{{ model_name }}">
+					{{ model_name|upper }} <i class="glyphicon glyphicon-arrow-down"></i>
+				</a>
+			</h4>
+		</div>
+		<div id="{{ model_name }}" class="panel-collapse collapse">
+			<div class="panel-body">
+				{% for perm in perms %}
+					<li class="list-group-item">
+						{{ perm }} <i class="glyphicon glyphicon-remove pull-right"></i>
+					</li>
+				{% endfor %}
+			</div>
+		</div>
+	</div>
+	{% endfor %}
+
+	{% else %}
+
+	<div class="panel panel-warning">
+		<div class="panel-heading">
+			<h4 class="panel-title">
+				No Permissions
+			</h4>
+		</div>
+		
+			<div class="panel-body">
+				<p>User have no permissions assigned.</p>	
+			</div>
+			
+	</div>
+
+	{% endif %}
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  	
+
+  	

@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block angular %}
+	<script type="text/javascript" src="/statics/js/angular.min.js"></script>
+	<script type="text/javascript" src="/statics/js/angular-route.min.js"></script>	
+{% endblock angular %}
+
+{% block content %}
+<div class="container shadow4 main-body" ng-app="premierApp">
+
+<section class="row">
+	<div class="col-md-6">
+		<input type='text' class="form-control" ng-model="search" placeholder="Filter By job number, cab designaiton, job name and customers">
+	</div>
+	
+	
+</section>
+
+
+
+<section class="row" id="schedule-job-list">
+	
+	<div class="col-md-12">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Scheduled Job list</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  		
+		  		<div ng-view></div>
+		  		
+		  	</div>
+		</div>
+	</div>
+	
+</section>
+</div>
+<script type="text/javascript">
+
+
+premierApp.controller('ScheduleController',['$scope', '$http', 'JobService', 'jobs', function ($scope, $http, JobService, jobs) {
+	$scope.jobs = jobs;
+	$scope.getJobStatus = function(job) {
+		return job.job_current_state;
+	};
+	$scope.getJobStatusValue = function(job_status) {
+		var status = ""
+		switch(job_status) {
+			case "new":
+			status = 'New';
+			break;
+			case "issuetoeng":
+			status = 'Issued to Eng';
+			break;
+			case "drawingsent":
+			status = 'Drawings Sent to Customer';
+			break;
+			case "drawingapproved":
+			status = 'Drawings Approved';
+			break;
+			case "issuetoproduction":
+			status = 'Issued to Production';
+			break;
+			case "issuetoshipping":
+			status = 'Issued to Shipping';
+			break;
+			case "shipped":
+			status = 'Shipped';
+			break;
+			case "issuetoinstallers":
+			status = 'Issued to Installers';
+			break;
+			case "installed":
+			status = 'Installation Completed';
+			break;
+			case "completed":
+			status = 'Completed (Awaiting Invoice)';
+			break;
+			case "invoiced":
+			status = 'Invoiced';
+			break;
+			case "closed":
+			status = 'Closed';
+			break;
+			case "cancel":
+			status = 'Cancelled';
+			break;
+			case "onhold":
+			status = 'On Hold';
+			break;
+		}
+		return status;
+	}
+    // $scope.init = function(){
+    //     $http.get("/schedule/all-jobs/").success(function(data){
+   	// 		console.log(data);       
+    //       	$scope.jobs = data;
+    //     })
+    // }
+    // $scope.init();
+
+}]);
+
+</script>
+{% endblock content %}

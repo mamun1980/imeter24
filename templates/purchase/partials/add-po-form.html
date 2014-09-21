@@ -1,0 +1,467 @@
+<table class="table add-po-form">
+<tr class="bg-success">
+	<th width="150">
+		<label for="id_po_number">PO Number:</label>
+	</th>
+	<td>
+		<input class="form-control" id="id_po_number" name="po_number" placeholder="PO Number" type="text" value="{{po_number}}" readonly="readonly">
+	</td>
+	<th width="150">
+		<label for="id_next_number">Next Number:</label>
+	</th>
+	<td>
+		<input class="form-control" id="id_next_number" name="next_number" placeholder="Next Number" type="text" value="{{next_number}}" readonly="readonly">
+	</td>
+</tr>
+<tr class="bg-info">
+	<th width="150">
+		<label for="id_date_issued">Date issued:</label>
+	</th>
+	<td>
+		<input ng-model="dateIssued" class="form-control datepicker" id="id_date_issued" name="date_issued" value="{[{dateIssued}]}" placeholder="date issued" type="text" >
+	</td>
+	<th width="150">
+		<label for="id_date_expected">Date expected:</label>
+	</th>
+	<td>
+
+
+		<input class="form-control datepicker" id="id_date_expected" name="date_expected" placeholder="date expected" type="text">
+	</td>
+	
+</tr>
+
+<tr class="bg-success">
+	<th width="150">
+		<label for="id_supplier">Supplier:</label>
+	</th>
+	<td colspan="3">
+	<div class="contact_box">
+		<input type="text" ng-model="search_supplier" placeholder="start typing to search supplier" class="form-control">
+
+		<table class="table" id="supplier_contact_details">
+			<tr>
+				<th width="150">Contact Name</th>
+				<td colspan="2">{[{ supplier_contact.contact_name }]}</td>
+			</tr>
+			<tr>
+				<th>City</th>
+				<td colspan="2">{[{ supplier_contact.city }]}</td>
+			</tr>
+			<tr>
+				<th>Province</th>
+				<td colspan="2">{[{ supplier_contact.province }]}</td>
+			</tr>
+			<tr>
+				<th>Country</th>
+				<td colspan="2">{[{ supplier_contact.country }]}</td>
+			</tr>
+			<tr>
+				<th>Emails</th>
+				<td colspan="2"><span class='bg-info email' ng-repeat="em in supplier_contact.emails">{[{ em.email_address}]}</span></td>
+			</tr>
+			<tr>
+				<th colspan="3">
+					<a class="btn btn-info" ng-click="addExtraContact()">
+						Add Extra Contact
+					</a>
+				</th>
+			</tr>
+			<tfoot class="extra-contact">
+					
+			</tfoot>
+			
+			
+		</table>
+
+		<table class="table supplier_contact" id="supplier_contact_list">
+			<thead>
+				<tr>
+					<th>ID</th><th>Contact Name</th><th>Address 1</th><th> City <a href="" class="close">x</a></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="con in contacts | googleSearchFilter:search_supplier" ng-click="setSupplier(con)">
+					<td>{[{con.id}]}</td>
+					<td>{[{con.contact_name}]}</td>
+					<td>{[{con.address_1}]}</td>
+					<td>{[{con.city}]}</td>
+				</tr>
+				<tr ng-show="!contacts.length">
+					<td colspan="4">No contacts</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<select ng-model="supplier" class="form-control" id="id_supplier" name="supplier" style="display:none;">
+			<option ng-repeat="contact in contacts" value="{[{contact.id}]}">{[{ contact.contact_name }]}</option>
+		</select>
+	</div>
+
+
+	</td>
+</tr>
+<tr class="bg-info">
+	<th width="150">
+		<label for="id_ship_to">Ship to:</label>
+	</th>
+	<td colspan="3">
+	<div class="contact_box">
+		
+	
+		<input type="text" ng-model="search_ship_to" placeholder="start typing to search ship to contact" class="form-control">
+		<table class="table" id="ship_to_contact_details">
+			<tr>
+				<th width="150">Contact Name</th>
+				<td>{[{ ship_to_contact.contact_name }]}</td>
+			</tr>
+			<tr>
+				<th>Phone</th>
+				<td>{[{ ship_to_contact.phone }]}</td>
+			</tr>
+			<tr>
+				<th>Email</th>
+				<td><span class='bg-info email' ng-repeat="em in ship_to_contact.emails">{[{ em.email_address}]}</span></td>
+			</tr>
+		</table>
+		<table class="table ship_to_contact" id="ship_to_contact_list">
+			<thead>
+				<tr>
+					<th>Contact Name</th><th> City <a href="" class="close">x</a></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="con in contacts | googleSearchFilter:search_ship_to" ng-click="selectShipTo(con)">
+					
+					<td>{[{con.contact_name}]}</td>
+					<td>{[{con.city}]}</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<select ng-model="ship_to" class="form-control" id="id_ship_to" name="ship_to" style="display:none;">
+			<option ng-repeat="contact in contacts" value="{[{contact.id}]}">{[{ contact.contact_name }]}</option>
+		</select>
+	</div>
+
+</td>
+</tr>
+<tr class="bg-success">	
+	<th width="150">
+		<label for="id_ship_via">Ship via:</label>
+	</th>
+	<td>
+		<select class="form-control" id="id_ship_via" name="ship_via"
+		ng-model="shipVia">
+		{% for dc in delivery_choices %}
+			<option value="{{dc.id}}">{{dc.delivery_choice}}</option>
+		{% endfor %}
+		</select>
+	</td>
+
+	<th width="150">
+		<label for="id_po_status">Po status:</label>
+	</th>
+	<td>
+		<select ng-model="poStatus" ng-options="postatus.label for postatus in postatus_list" class="form-control" id="id_po_status" name="po_status">
+		
+		</select>
+	</td>
+</tr>
+<tr class="bg-info">
+	<th width="150">
+		<label for="id_fob">Fob:</label>
+	</th>
+	<td colspan="3">
+		<input class="form-control" id="id_fob" maxlength="200" name="fob" placeholder="FOB" type="text" value="1400 Phillip Murray Avenue, Oshawa, Ontario - L1J7E8">
+	</td>
+</tr>
+
+<tr class="bg-success">
+	<th width="150">
+		<label for="id_shipping_inst">Shipping inst:</label>
+	</th>
+	<td colspan="3">
+		<textarea class="form-control" cols="40" id="id_shipping_inst" name="shipping_inst" placeholder="Shipping Inst" rows="3"></textarea>
+	</td>
+</tr>
+<tr class="bg-info">
+	<th width="150">
+		<label for="id_deliver_internal">Department deliver internal:</label>
+	</th>
+	<td>
+		<select class="form-control" id="id_deliver_internal" name="deliver_internal">
+			{% for di in deliver_internals %}
+			<option value="{{di.id}}">
+				{{di.department}}
+			</option>
+			{% endfor %}
+		</select>
+	</td>
+	<th width="150">
+		<label for="id_date_confirmed">Date confirmed:</label>
+	</th>
+	<td>
+		<input class="form-control datepicker" id="id_date_confirmed" name="date_confirmed" placeholder="Date Confirmed" type="text">
+	</td>
+</tr>
+<tr class="bg-success">
+	<th width="150">
+		<label for="id_blanket_po">Blanket po:</label>
+	</th>
+	<td>
+		<select class="form-control" id="id_blanket_po" name="blanket_po" placeholder="Blanket PO">
+		<option value="0">NO</option>
+		<option value="1">YES</option>
+		</select>
+	</td>
+
+	<th>
+		<label for="id_terms">Terms:</label>
+	</th>
+	<td colspan="3">
+		<select class="form-control" id="id_terms" name="terms">
+			{% for pt in terms %}
+				<option value="{{pt.id}}">{{pt.term}}</option>
+			{% endfor %}
+		</select>
+	</td>
+</tr>
+<tr class="bg-info">
+	<th width="150">
+		<label for="id_purchasing_agent">Purchasing agent:</label>
+	</th>
+	<td>
+		<select class="form-control" id="id_purchasing_agent" name="purchasing_agent">
+		{% for user in users %}
+			<option value="{{user.id}}" {% if user.id == request.user.id %}selected='selected' {% endif %}>
+				{{ user.first_name }} {{ user.last_name }}
+			</option>
+		{% endfor %}
+		</select>
+	</td>
+
+	<th width="150">
+		<label for="id_returned_type">Type:</label>
+	</th>
+	<td>
+		<select class="form-control" id="id_returned_type" name="returned_type">
+		<option value="0">Purchase Order</option>
+		<option value="1">Return For Credit</option>
+		<option value="2">Returned damaged Goods</option>
+		<option value="3">Return For Repair</option>
+		<option value="4">Return For Replacement</option>
+		<option value="5">Return For RE-WORK</option>
+		<option value="6">Returned Excessive Qty</option>
+		<option value="7">Returned Wrong Material</option>
+		</select>
+	</td>
+</tr>
+<tr class="bg-success">
+	<th width="150">
+		<label for="id_items_total">Items:</label>
+	</th>
+	<td colspan="3">
+		<a href="/inventory/item/add/" class="btn btn-primary" target="_blank">Add New Item To Inventory</a>
+	</td>
+</tr>
+<tr class="bg-success">
+	<td colspan="4">
+		<div class="item_box">
+						
+			<table class="table item">
+			<thead>
+				<tr>
+					<th width="120">Item Number</th>
+					<th width="180">Description</th>
+					<th width="120">Unit Measure</th>
+					<th width="">Current Cost</th>
+					<th width="100">Order Qty</th>
+					<th width="150">Subtotal</th>
+					<th width="">Job Number</th>
+					<th width="180">Comments</th>
+					<th width="100">Qty Recv To Date</th>
+					<th width="100">Date Last Received</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody id="add_item_list">
+				<tr style="border-top: 2px dotted red;">
+				<td style="position: relative;">
+					<input type="text" class="form-control added_item_number" name="" value="" ng-model="search_item" ng-change="searchItem(search_item)" placeholder="search for item" autocomplete="off">
+
+					<table class="table supplier_contact" id="items_list">
+						<thead>
+							<tr>
+								<th width="110">Item Number</th>
+								<th width="160">Description</th>
+								<th>Unit Measure</th>
+								<th>Wholesale Cost</th>
+								<th>Currency</th>
+								<th>Primary Supplier</th>
+								<th>QTY on hand</th>
+								<th>Qty on Order</th>
+								<th>Last Ordered</th>
+								<th><a href="" class="close">x</a></th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="item in items | googleSearchFilter:search_item" ng-click="selectItem(item)">
+								<td>{[{item.item_number}]}</td>
+								<td>{[{item.description}]}</td>
+								<td>{[{item.item_unit_measure}]}</td>
+								<td>{[{item.wholesale_cost}]}</td>
+								<td>{[{item.currency}]}</td>
+								<td>{[{item.primary_supplier}]}</td>
+								<td>{[{item.quantity_on_hand}]}</td>
+								<td>{[{item.quantity_on_order}]}</td>
+								<td>{[{item.last_ordered}]}</td>
+								<td></td>
+								
+								
+							</tr>
+
+							<tr ng-show="!items.length">
+								<td colspan="10">No Items</td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+				<td>
+					<textarea rows="4" class="form-control demo_box" readonly=""></textarea>
+				</td>
+				<td>
+					<select class="form-control">
+					{% for unit_measue in item_unit_measures %}
+						<option value="{{unit_measue.id}}">{{unit_measue.unit_name}}</option>
+					{% endfor %}
+					</select>
+				</td>
+				<td>
+					<input type="currency" class="form-control demo_box" placeholder="Cost">
+				</td>
+				<td>
+					<input type="number" class="form-control demo_box" placeholder="Qty">
+				</td>
+				<td>
+					<input type="currency" step="0.0001" class="form-control demo_box" placeholder="Subtotal" readonly="readonly">
+				</td>
+				<td>
+					
+					<input type="text" class="form-control demo_box" placeholder="job number" autocomplete="off">
+				</td>
+				<td>
+					<textarea rows="4" class="form-control demo_box" placeholder="Put your comments here"></textarea>
+				</td>
+				<td>
+					<input type="number" step="0.01" class="form-control" placeholder="Qty Received" readonly="readonly">
+				</td>
+				<td>
+					<input type="text" class="form-control" placeholder="Last Recv Date" readonly="readonly">
+				</td>
+				<td></td>
+				</tr>				
+			</tbody>
+			<tr id='calculated_total_amount'>
+				<td colspan='5'>Total Amount</td>
+				<td width="120">{{ currency.get_currency_icon }}<span class="amount">0</span></td>
+				<td width="10" colspan="5"></td>
+			</tr>
+				
+			</table>
+				
+		</div>
+	</td>	
+
+</tr>
+
+<tr class="bg-info">
+	<th width="150">
+		<label for="id_items_total">Items Total Qty:</label>
+	</th>
+	<td colspan="3">
+		<input class="form-control" id="id_items_total" name="items_total" value="0" placeholder="Items Total" readonly="readonly" step="0.0001" type="number">
+	</td>
+</tr>
+<tr class="bg-success">
+	<th width="150">
+		<label for="id_hst_taxable">Hst taxable:</label>
+	</th>
+	<td>
+		<select class="form-control tax" ng-model="hst_tax" id="id_hst_taxable" name="hst_taxable" placeholder="Blanket PO">
+		<option value="0">NO</option>
+		<option value="1">YES</option>
+		</select>
+		
+		<input class="form-control decimal tax" ng-if="hst_tax" ng-model="hst_tax_amount" ng-blur="addHstAmount($event)" id="id_hst_taxable_amount" name="hst_taxable_amount" placeholder="HST Taxable Amount" value="0.0" step="0.0001" type="currency">
+	</td>
+	<th width="150">
+		<label for="id_pst_taxable">Pst taxable:</label>
+	</th>
+	<td>
+		<select class="form-control tax" ng-model="pst_tax" id="id_pst_taxable" name="pst_taxable" placeholder="Blanket PO">
+		<option value="0">NO</option>
+		<option value="1">YES</option>
+		</select>
+		<input class="form-control decimal tax" ng-if="pst_tax" ng-model="pst_tax_amount" id="id_pst_taxable_amount" name="pst_taxable_amount" ng-blur="addPstAmount($event)" placeholder="PST Taxable Amount" value="0.0" step="0.0001" type="currency">
+	</td>
+</tr>
+
+<tr class="bg-info">
+	<th width="150">
+		<label for="id_po_currency">Po currency:</label>
+	</th>
+	<td>
+		<select class="form-control" id="id_po_currency" name="po_currency">
+		{% for currency in currencies %}
+		<option data-currency-icon="{{ currency.get_currency_icon }}" value="{{currency.id}}">
+				{{ currency.currency }} ({{ currency.get_currency_icon }})
+			</option>
+		{% endfor %}
+		</select>
+	</td>
+	<th width="150">
+		<label for="id_total_po_amount">Total po amount:</label>
+	</th>
+	<td>
+		<input class="form-control" ng-model="total_amount" id="id_total_po_amount" name="total_po_amount" value="0.0" readonly="readonly" step="0.0001" type="currency">
+	</td>
+</tr>
+<tr class="bg-success">
+	<th width="150">
+		<label for="id_po_que">Po action:</label>
+	</th>
+	<td>
+		<select class="form-control" id="id_po_que" name="po_que">
+		<option value="0">None</option>
+		<option value="1">Print</option>
+		<option value="2">Fax</option>
+		<option value="3">Email</option>
+		<option value="4">Print &amp; Fax</option>
+		<option value="5">Print &amp; Email</option>
+		<option value="6">Print, Fax &amp; Email</option>
+		</select>
+	</td>
+	<th>
+		<label for="id_po_overwridden_by">Po overwridden by:</label>
+	</th>
+	<td>
+		<select class="form-control" id="id_po_overwridden_by" name="po_overwridden_by">
+		{% for user in adminusers %}
+			<option value="{{user.id}}">
+				{{ user.first_name }} {{ user.last_name }}
+			</option>
+		{% endfor %}
+		</select>
+	</td>
+</tr>
+
+<tr>
+	<td colspan="3">
+		
+	</td>
+	<td>
+		<button type="submit" class="btn btn-primary form-control">Add PO</button>
+	</td>
+</tr>
+</table>

@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container shadow4 main-body">
+<section class="row ">
+	
+	<div class="col-md-10 col-md-offset-1">
+		
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Purchase Order Details</h4>
+		  	</div>
+		  	<div class="panel-body">
+				<table class='table table-bordered table-striped'>
+					
+					<tbody>
+						<tr>
+							<th width="25%">PO Number</th>
+							<td>{{po.po_number}}</td>
+						</tr>
+						<tr>
+							<th width="25%">Next Number</th>
+							<td>{{po.next_number}}</td>
+						</tr>
+						<tr>
+							<th width="25%">Date Issued</th>
+							<td>{{po.date_issued}}</td>
+						</tr>
+						<tr>
+							<th width="25%">Date Expected</th>
+							<td>{{po.date_expected}}</td>
+						</tr>
+						
+						<tr>
+							<th width="25%">Supplier</th>
+							<td>
+								<p class='bg-info'><b class='left-info'>Contact Name</b> : {{po.supplier}} </p>
+								<p class='bg-info'><b class='left-info'>Address</b> : {{po.supplier.address_1}} </p>
+								<p class='bg-info'><b class='left-info'>City</b> : {{po.supplier.city}} </p>
+								<p class='bg-info'><b class='left-info'>Supplier Contact</b> : {{po.supplier.contact.mail_list}} </p>
+								<table class='table'>
+									<tr>
+										<th>Extra Contact Type</th>
+										<th>Contact</th>
+										<th>Action</th>
+									</tr>
+								{% for con in extra_contacts %}
+									<tr>
+										<td>{{con.contact_type}}</td>
+										<td>{{con.contact}}</td>
+										<td><a href='' data-pecid="{{con.id}}" class='delete-extra-contact'>Delete</a></td>
+									</tr>
+								{% empty %}
+									<tr><td colspan='3'></td></tr>
+								{% endfor  %}
+								</table>
+							</td>
+						</tr>
+						
+						<tr>
+							<th width="25%">Ship To</th>
+							<td>{{po.ship_to}}</td>
+						</tr>
+						<tr>
+							<th width="25%">Ship Via</th>
+							<td>{{po.ship_via}}</td>
+						</tr>
+						<tr>
+							<th width="25%">Terms</th>
+							<td>{{po.terms}}</td>
+						</tr>
+						<tr>
+							<th width="25%">FOB</th>
+							<td>{{po.fob}}</td>
+						</tr>
+						<tr>
+							<th width="25%">Shipping Inst</th>
+							<td>{{po.shipping_inst}}</td>
+						</tr>
+						
+						<tr>
+							<th width="25%">PST Taxable</th>
+							<td>{{po.pst_taxable}}</td>
+						</tr>
+						<tr>
+							<th width="25%">Blanket PO</th>
+							<td>{{po.blanket_po}}</td>
+						</tr>
+						<tr>
+							<th width="25%">Deliver Internal</th>
+							<td>{{po.deliver_internal}}</td>
+						</tr>
+						<tr>
+							<th width="25%">Purchasing Agent</th>
+							<td>{{po.purchasing_agent}}</td>
+						</tr>
+						<tr>
+							<th width="25%">Date Confirmed</th>
+							<td>{{po.date_confirmed}}</td>
+						</tr>
+						<tr>
+							<th width="25%">Returned Type</th>
+							<td>{{po.returned_type}}</td>
+						</tr>
+						<tr>
+							<th width="25%">Items</th>
+							<td>
+								<table class="table table-bordered table-striped">
+									<tr class="danger">
+										<th width="100">Item Number</th>
+										<th>Description</th>
+										<th>Job Number</th>
+										<th>Qty</th>
+										<th>Cost</th>
+										<th>Subtotal</th>
+									</tr>
+									{% for item in purchase_items %}
+										<tr class="info">
+											<td>{{item.item.item_number}}</td>
+											<td>{{item.item.description}}</td>
+											<td>{{item.job_number.job_number}}</td>
+											<td>{{item.qty}}</td>
+											<td>{{item.cost}}</td>
+											<td>{{item.sub_total}}</td>
+
+										</tr>
+									{% empty %}
+										<tr>
+											<th colspan='5'>No Items</th>
+										</tr>
+									{% endfor %}
+								</table>
+								
+							</td>
+						</tr>
+						<tr>
+							<th width="25%">Items Total</th>
+							<td>{{po.items_total}}</td>
+						</tr>
+						<tr>
+							<th width="25%">HST Taxable</th>
+							<td>{{po.hst_taxable}}</td>
+						</tr>
+						<tr>
+							<th width="25%">PST Taxable</th>
+							<td>{{po.pst_taxable}}</td>
+						</tr>
+						<tr>
+							<th width="25%">Items PO Amount</th>
+							<td>{{po.total_po_amount}} {{po.po_currency}}</td>
+						</tr>
+						<tr>
+							<th width="25%">PO Currency</th>
+							<td>{{po.po_currency}}</td>
+						</tr>
+
+						<tr>
+							<th width="25%">PO Overwritten By</th>
+							<td>{{po.po_overwridden_by}}</td>
+						</tr>
+						<tr>
+							<th width="25%">Date Time</th>
+							<td>{{po.datetime}}</td>
+						</tr>
+						<tr>
+							<th width="25%"> Status</th>
+							<td>{{po.status_verbose}}</td>
+						</tr>
+						<tr>
+							<th width="25%"> PO Que</th>
+							<td>{{po.que_verbose}}</td>
+						</tr>
+
+
+
+						
+					</tbody>
+				</table>
+				{% if status_comments %}
+				<table class="table">
+					<thead>
+						<tr class="bg-info">
+							<th>Status Changed By</th>
+							<th>Status Changed To</th>
+							<th>Date Time</th>
+							<th>Statu Comments</th>
+							
+						</tr>
+					</thead>
+					{% for comment in status_comments %}
+					<tr>
+						<td>{{ comment.status_by }}</td>
+						<td>{{ comment.status_verbose }}</td>
+						<td>{{ comment.datetime }}</td>
+						<td width=50%>{{ comment.status_comment }}</td>
+					</tr>
+					{% endfor %}
+
+				</table>
+				{% endif %}
+			</div>
+		</div>
+		
+	</div>
+
+</section>
+</div>
+
+<script type="text/javascript">
+(function(){
+	$(document).on("click", "a.delete-extra-contact", function(e){
+			e.preventDefault();
+			var poecid = $(this).data("pecid");
+			// var url = "/purchase/delete-po-contact/";
+			$.ajax({
+				type: "POST",
+				url: "/purchase/delete-po-contact/",
+				
+				data: {
+					'poecid': poecid,
+				},
+				success: function(rdata) {
+					console.log(rdata);
+					$("a[data-pecid='"+rdata+"']").closest("tr").remove();
+	                
+	                // window.location.reload(false);
+	                // win = window.open("",'_blank');
+	                // win.location.href = "/contacts/edit/" + rdata + "/";
+
+	            }
+			});
+		})
+})(jQuery)
+
+</script>
+{% endblock content %}
+	

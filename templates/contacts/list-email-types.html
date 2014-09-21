@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+<section class="row"  id="email-type-list">
+	
+
+	<div class="col-md-6 col-md-offset-3">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Email Address Type List</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  		<table class="table">
+			  		<tr>
+			  			<td> ID </td>
+			  			<td>Email Address Type</td>
+			  			<td>Total Use</td>
+			  			<td>Action</td>
+			  			
+			  		</tr>
+			  		{% for email_type in email_types %}
+			  			<tr>
+				  			<td> {{ email_type.id }} </td>
+				  			<td> {{ email_type.email_type }} </td>
+				  			<td> {{ email_type.contactemailaddress_set.all.count }} </td>
+				  			<td>
+				  				<a class="email-type-delete" href="#" data-etid="{{ email_type.id }}">delete</a>
+				  			</td>
+				  			
+				  		</tr>
+				  	{% empty %}
+				  	<tr>
+			  			<td colspan='4'> No email type found. </td>
+			  		</tr>
+				  	{% endfor %}
+			  	</table>
+		  	
+			</div>
+		</div>
+	</div>
+
+
+</section>
+
+<script type="text/javascript">
+(function(){
+	$("#email-type-list a.email-type-delete").on("click", function(e){
+		e.preventDefault();
+		etid = $(this).data("etid");
+		console.log(etid);
+
+		$.ajax({
+			type: "POST",
+			url: "/contacts/email-type/delete/",
+			data: {
+				'etid': etid,
+			},
+			success: function(rdata) {
+				console.log(rdata);
+				$("a[data-etid='"+rdata+"']").closest("tr").remove();
+			}
+		})
+	});
+
+})(jQuery)
+
+</script>
+</div>
+
+
+{% endblock content %}
+	

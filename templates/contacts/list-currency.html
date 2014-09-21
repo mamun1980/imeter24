@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+<section class="row"  id="contact-list">
+	
+
+	<div class="col-md-6 col-md-offset-3">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Currency List</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  	<table class="table">
+		  	<thead>
+		  		<tr>
+		  			<td>ID</td>
+		  			<td>Currency</td>
+		  			<td>Icon</td>
+		  			<td>Action</td>
+		  		</tr>
+		  	</thead>
+		  	{% for currency in currencies %}
+		  		<tr >
+		  			<td>{{currency.id}}</td>
+		  			<td>{{currency.currency}}</td>
+		  			<td>{{currency.get_currency_icon}}</td>
+		  			<td>
+		  				<a href="/contacts/currency/edit/{{currency.id}}/" class="currency-edit"> Edit </a>
+		  				<a href="/contacts/currency/delete/" class="currency-delete" data-cid="{{currency.id}}"> / Delete </a>
+		  			</td>
+		  		</tr>
+		  	{% endfor %}
+		  	</table>
+			</div>
+		</div>
+	</div>
+
+<div id="delete-job-confirm" style="display:none;" title="Do you want to delete?">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;">
+  </span>This will delete the currency from your system?</p>
+</div>
+{% include "modals/edit-modal.html" %}
+
+
+<script type="text/javascript">
+	(function(){
+
+		$("a.currency-edit").on("click", function(e){
+			e.preventDefault();
+			// com_id = $(this).data("id");
+		    url = $(this).attr("href");
+			mdal = $('#editModal');
+			mdal.on("shown.bs.modal", function(){
+				$("#editModal .modal-content").load(url);
+				console.log(url);
+			}).modal();
+
+			return false;
+		});
+
+	$(document).on("click", "a.currency-delete", function(e){
+		e.preventDefault();
+		currency_id = $(this).data("cid");
+		
+		$( "#delete-currency-confirm" ).css("display:block;");
+		
+		$( "#delete-job-confirm" ).dialog({
+			resizable: false,
+			height:200,
+			modal: true,
+			buttons: {
+				"Delete Currency": function() {
+									
+					$( this ).dialog( "close" );
+					$.ajax({
+						type: "POST",
+						url: "/contacts/currency/delete/",
+						data: {
+							'currency_id': currency_id,
+						},
+						success: function(rdata) {
+							console.log(rdata);
+							$("a[data-cid='"+ rdata + "']").closest("tr").remove();
+						}
+					})
+				},
+				Cancel: function() {
+					$( this ).dialog( "close" );
+				}
+			}
+		});
+
+	})
+	})(jQuery)
+
+
+</script>
+
+
+
+</section>
+</div>
+
+
+{% endblock content %}
+	

@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container shadow4 main-body">
+
+<section class="row ">
+	
+	<div class="col-md-6">
+		{% if userobj and userprofileobj %}
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h3 class="panel-title">Details of <b><i>{{ userobj.get_full_name }}</i></b></h3>
+		  	</div>
+		  	<div class="panel-body">
+		  	<p>
+		  	{% if userprofileobj.avatar %}
+		  		<img src="{{ userprofileobj.avatar.url }}" class="img-rounded" height="80">
+		  	{% else %}
+		  		<img src="/statics/images/avatar/avatar.jpg" class="img-rounded" height="80">
+		  	{% endif %}
+		  	</p>
+		  	<p>
+		  	<b>{% if userobj.get_full_name %}{{ userobj.get_full_name }}{% else %}{{userobj.username }}{% endif %}
+		  	{% if perms.auth.change_user or request.user == userobj %}
+		  		<a href="/scomuser/edituser/{{ userobj.id }}/"> <i class="glyphicon glyphicon-edit"></i></a>
+		  	{% endif %}
+		  	</b>
+		  	</p>
+		  	<table class="table user-details-table">
+		  	<tbody>
+		  		
+		  		<tr>
+		  			<th>First Name</th>
+		  			<td>{{ userobj.first_name }}</td>
+		  		</tr>
+		  		<tr>
+		  			<th>Last Name</th>
+		  			<td>{{ userobj.last_name }}</td>
+		  		</tr>
+		  		<tr>
+		  			<th>Email</th>
+		  			<td>{{ userobj.email }}</td>
+		  		</tr>
+		  		<tr>
+		  			<th>Is Staff</th>
+		  			<td>{{ userobj.is_staff }}</td>
+		  		</tr>
+		  		<tr>
+		  			<th>Is Superuser</th>
+		  			<td>{{ userobj.is_superuser }}</td>
+		  		</tr>
+		  		<tr>
+		  			<th>Last Login</th>
+		  			<td>{{ userobj.last_login }}</td>
+		  		</tr>
+		  		<tr>
+		  			<th>Address 1</th>
+		  			<td>{{ userprofileobj.address_1 }}</td>
+		  		</tr>
+		  		<tr>
+		  			<th>Address 2</th>
+		  			<td>{{ userprofileobj.address_2 }}</td>
+		  		</tr>
+		  		<tr>
+		  			<th>Address 3</th>
+		  			<td>{{ userprofileobj.address_3 }}</td>
+		  		</tr>
+		  		<tr>
+		  			<th>City</th>
+		  			<td>{{ userprofileobj.city }}</td>
+		  		</tr>
+		  		<tr>
+		  			<th>Province</th>
+		  			<td>{{ userprofileobj.province }}</td>
+		  		</tr>
+		  		<tr>
+		  			<th>Postal</th>
+		  			<td>{{ userprofileobj.postal }}</td>
+		  		</tr>
+		  		<tr>
+		  			<th>Home Phone</th>
+		  			<td>{{ userprofileobj.home_phone }}</td>
+		  		</tr>
+		  		<tr>
+		  			<th>Cell Phone</th>
+		  			<td>{{ userprofileobj.cell_phone }}</td>
+		  		</tr>
+		  		<tr>
+		  			<th>Other Phone</th>
+		  			<td>{{ userprofileobj.other_phone }}</td>
+		  		</tr>
+		  		<tr>
+		  			<th>Internal Extension</th>
+		  			<td>{{ userprofileobj.internal_extension }}</td>
+		  		</tr>
+		  		<tr>
+		  			<th>Emargency Contact 1</th>
+		  			<td>{{ userprofileobj.em_contact_1 }}</td>
+		  		</tr>
+		  		<tr>
+		  			<th>Emargency Contact 2</th>
+		  			<td>{{ userprofileobj.em_contact_2 }}</td>
+		  		</tr>
+
+		  		{%if perms.scomuser.view_payroll %}
+		  			{% include "scomuser/payroll/payroll-details.html" %}
+		  		{% endif %}
+
+
+		  	</tbody>
+		  	</table>
+			  	
+			</div>
+		</div>
+		{% else %}
+			<div class="panel panel-danger">
+				<div class="panel-heading">
+			    	<h2 class="panel-title">User Profile Does not Exist</h2>
+			  	</div>
+			</div>
+		{% endif %}
+	</div>
+
+	<div class="col-md-4">
+		<article class="permission">
+			<h3 class="permission-title">User Permissions</h3>
+			{% include "scomuser/user-permissions.html" %}		
+		</article>
+	</div>
+
+</section>
+</div>
+{% endblock content %}
