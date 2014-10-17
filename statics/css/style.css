@@ -116,11 +116,12 @@ table {
 #message {
 	margin: 10px auto;
 	padding: 10px;
+	text-align: center;
 	
 }
 #message li {
 	list-style: none;
-	padding: 10px 50px;
+	padding: 10px;
 }
 li.error {
 	background-color: red;
@@ -128,8 +129,9 @@ li.error {
 li.success {
 	background-color: green;
 }
-li.warning {
-	background-color: #fd0;
+#message li.warning {
+	background-color: #EE7272 !important;
+	font-size: 14px;
 }
 .errorlist li {
 	list-style: none;

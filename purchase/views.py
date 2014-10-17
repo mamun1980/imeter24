@@ -3,6 +3,7 @@ from django.http import HttpRequest, HttpResponseRedirect, HttpResponse
 from django.contrib import messages
 from purchase.forms import *
 from purchase.models import *
+from premierelevator.models import SystemVariable
 # Create your views here.
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.contrib.auth.decorators import login_required
@@ -297,8 +298,6 @@ def add_purchase_order(request):
         user_id = request.user.pk
 
         form_init = {
-            'po_number' : po_number,
-            'next_number': next_number,
             'date_issued': now.strftime('%Y-%m-%d'),
             'datetime': now,
             'po_status': 'New',
@@ -316,40 +315,24 @@ def add_purchase_order(request):
             po_form.fields['po_overwridden_by'].widget.attrs['readonly'] = True
         return render(request, "purchase/add-po2.html", 
             {'poform': po_form, 'po_contact_form': po_contact_form, 
-            'po_number': po_number, 'po_contacts': po_contacts})
+            'po_number': po_number, 'po_contacts': po_contacts, 'next_number': sv.next_po_number})
 
 @csrf_exempt
 def add_po(request):
+    try:
+        sv = SystemVariable.objects.get(id=1)
+        next_number = sv.next_po_number
+        if not next_number:
+            messages.warning(request, "System varible is not set for PO. Please ask your admin to update System variable.")
+            return HttpResponseRedirect("/")
+    except Exception, e:
+        messages.warning(request, "System varible is not set for PO. Please ask your admin to update System variable.")
+        return HttpResponseRedirect("/")
+        pass
     if request.method == 'POST':
-        try:
-            mutable = request.POST._mutable
-            request.POST._mutable = True
-
-            po = PurchaseOrder.objects.latest('id')
-            next_number = 'P' + po.next_number
-            new_po_number = request.POST.get("po_number")
-            if next_number != new_po_number:
-                new_po_number = next_number
-                new_next_number = int(po.next_number) + 1
-                request.POST['po_number'] = "P" + str(new_po_number)
-                request.POST['next_number'] = str(new_next_number)
-
-            request.POST._mutable = mutable
-
-        except PurchaseOrder.DoesNotExist:
-            po_number = 'P' + '1000'
-            next_number = '1001'
-
         po_form = POForm(request.POST)
-        
-
         if po_form.is_valid():
-            
-            try:
-                po = po_form.save()
-            except Exception, e:
-                raise e
-            
+            po = po_form.save()
             po.po_created_by = request.user
             po.datetime = datetime.datetime.now()
             po.save_final_draft = 0
@@ -406,14 +389,6 @@ def add_po(request):
             
             return HttpResponseRedirect("/purchase/add-po/")
     else:
-        try:
-            po = PurchaseOrder.objects.latest('id')
-            po_number = 'P' + po.next_number
-            next_number = int(po.next_number) + 1
-        except PurchaseOrder.DoesNotExist:
-            po_number = 'P' + '1000'
-            next_number = '1001'
-
         currencies = Currency.objects.all()
         delivery_choices = DeliveryChoice.objects.all()
         terms = PaymentTerm.objects.all()
@@ -422,11 +397,11 @@ def add_po(request):
         users = User.objects.all().exclude(id__in=[-1]).order_by("username")
         adminusers = User.objects.filter(is_superuser=1)
 
-        POContact.objects.filter(purchase_order=po_number).delete()
+        # POContact.objects.filter(purchase_order=po_number).delete()
         po_contact_form = POContactForm()
 
         return render(request, "purchase/add-po2.html", 
-            {"po_number":po_number , 'next_number': next_number,
+            {"po_number":'NEW' , 'next_number': next_number,
             'po_contact_form': po_contact_form, 'currencies': currencies,
             'delivery_choices': delivery_choices, 'terms': terms,
             'deliver_internals': deliver_internals, 'users': users, 'item_unit_measures':item_unit_measures,
@@ -605,9 +580,11 @@ def get_po_by_id(request,pk):
         po_dict['returned_type'] = None
     po_dict['items_total'] = po.items_total.to_eng_string()
     po_dict['hst_taxable'] = po.hst_taxable
-    po_dict['hst_taxable_amount'] = po.hst_taxable_amount.to_eng_string()
+    if po.hst_taxable_amount:
+        po_dict['hst_taxable_amount'] = po.hst_taxable_amount.to_eng_string()
     po_dict['pst_taxable'] = po.pst_taxable
-    po_dict['pst_taxable_amount'] = po.pst_taxable_amount.to_eng_string()
+    if po.pst_taxable_amount:
+        po_dict['pst_taxable_amount'] = po.pst_taxable_amount.to_eng_string()
     if po.po_currency:
         currency = {}
         currency['id'] = str(po.po_currency.id)
@@ -791,7 +768,11 @@ def change_po(request):
 # @permission_required("purchase.change_purchaseorder")
 @csrf_exempt
 def edit_purchase_order(request, pk):
-    
+    try:
+        sv = SystemVariable.objects.get(id=1)
+        next_number = sv.next_po_number
+    except Exception, e:
+        pass
     po = PurchaseOrder.objects.get(id=pk)
     if po.supplier:
         contact_id = po.supplier.pk
@@ -822,13 +803,16 @@ def edit_purchase_order(request, pk):
                     job_id = request.POST.getlist('item_job_id')[count]
                     cost = float(request.POST.getlist('item_cost')[count])
                     sub_total = float(request.POST.getlist('item_sub_total')[count])
-                    try:
-                        job = Job.objects.get(id=job_id)
-                        po.search_string += job.job_number + " "
+                    if(job_id):
+                        try:
+                            job = Job.objects.get(id=job_id)
+                            po.search_string += job.job_number + " "
 
-                    except Job.DoesNotExist:
+                        except Job.DoesNotExist:
+                            job = None
+                            pass
+                    else:
                         job = None
-
                     try:
                         pi_id = request.POST.getlist('pi_id')[count]
                         pi = PurchaseItem.objects.get(id=pi_id)
@@ -858,6 +842,7 @@ def edit_purchase_order(request, pk):
         delivery_choices = DeliveryChoice.objects.all()
         terms = PaymentTerm.objects.all()
         deliver_internals = DeliverInternal.objects.all()
+        item_unit_measures = ItemUnitMeasure.objects.filter(is_active=True)
         users = User.objects.all().exclude(id__in=[-1]).order_by("username")
         adminusers = User.objects.filter(is_superuser=1)
         contacts = Contact.objects.all()
@@ -865,8 +850,8 @@ def edit_purchase_order(request, pk):
 
         return render(request, "purchase/edit-po2.html", 
             {'po_id': pk, 'po_items': po_items, 'status_comments':status_comments,
-            'po_contact_form': po_contact_form, 'currencies': currencies,
-            'delivery_choices': delivery_choices, 'terms': terms,
+            'po_contact_form': po_contact_form, 'currencies': currencies, 'item_unit_measures': item_unit_measures,
+            'delivery_choices': delivery_choices, 'terms': terms, 'next_number': next_number,
             'deliver_internals': deliver_internals, 'users': users, 'contacts': contacts,
             'adminusers': adminusers, 'po': po})
 
@@ -1076,9 +1061,10 @@ def receive_item(request, item_id):
 
 def add_packing_list(request):
     cuser =request.user
+    users = User.objects.all().exclude(id__in=[-1]).order_by("username")
+    dcs = DeliveryChoice.objects.all()
     if request.method == 'POST':
-        # import pdb; pdb.set_trace()
-        # return HttpResponse("hello")
+        return HttpResponse("under construction..")
         pl_form = PackingListForm(request.POST)
         item_unit = request.POST.getlist('item_unit')
         item_qtybo = request.POST.getlist('item_qtybo')
@@ -1126,10 +1112,8 @@ def add_packing_list(request):
             'generated_by': cuser
         }
         pl_form = PackingListForm(initial=form_init)
-
-        pl_form.fields['generated_by'].widget.attrs['readonly'] = True
-
-        return render(request, "purchase/add-pl.html", {'pl_form': pl_form})
+        return render(request, "purchase/add-pl.html", 
+            {'pl_form': pl_form, 'users': users, 'cuser': cuser, 'dcs': dcs})
 
 
 def pl_list(request):
@@ -1306,31 +1290,51 @@ def packing_list(request):
 @csrf_exempt
 def add_shipping_list(request):
     if request.method == 'POST':
-        # import pdb; pdb.set_trace()       
+        # import pdb; pdb.set_trace()  
+        user = request.user 
         sl_form = ShippingListForm(request.POST)
-        item_filled = request.POST.getlist('item_filled')
+
         item_ordered = request.POST.getlist('item_ordered')
-        item_required = request.POST.getlist('item_required')
         item_shipped = request.POST.getlist('item_shipped')
-        items = request.POST.getlist('item_item')
+        item_backordered = request.POST.getlist('item_backordered')
+        shipped_total_to_date = request.POST.getlist('shipped_total_to_date')
+        
+        items = request.POST.getlist('added_item_number')
 
         if sl_form.is_valid():
+            # import pdb; pdb.set_trace()
             try:
                 sl = sl_form.save()
+                try:
+                    sv = SystemVariable.objects.get(id=1)
+                    if(sv.next_sl_number):
+                        sl.sl_number = 'SL'+str(sv.next_sl_number)
+                        sl.save()
+                        sv.next_sl_number = sv.next_sl_number + 1
+                        sv.save()
+                    else:
+                        import random
+                        sl.sl_number = random.randint(100, 10000)
+                        sl.save()
+                except Exception, e:
+                    pass
+
                 for i, item in enumerate(items):
                     item_obj = Item.objects.get(item_number=item)
-                    shipping_item = ShippingItem(item=item_obj, description=item_obj.description)
+                    shipping_item = ShippingItem(item=item_obj, description=item_obj.description, shipping_list=sl)
                     if item_ordered[i] != '':
                         shipping_item.ordered = item_ordered[i]
                     if item_shipped[i] !='':
                         shipping_item.shipped = item_shipped[i]
-                    if item_required[i] != '':
-                        shipping_item.required = item_required[i]
-                    if item_filled[i] != '':
-                        shipping_item.filled = item_filled[i]
+                    if shipped_total_to_date[i] != '':
+                        shipping_item.shipped_total_to_date = shipped_total_to_date[i]
+                    if item_backordered[i] != '':
+                        shipping_item.backordered = item_backordered[i]
+                    
+
                     shipping_item.item_ship_status = 0
-                    shipping_item.shipping_list = sl
-                    shipping_item.search_string = item + " " + sl.sl_number
+                    shipping_item.shipped_by = user
+                    shipping_item.search_string = item + " " + sl.sl_number + " "
                     shipping_item.save()
                     # sl.items.add(shipping_item)
                 sl.search_string = sl.sl_number + " " + sl.customer_po_number + sl.customer_job_number
@@ -1349,10 +1353,12 @@ def add_shipping_list(request):
         else:
             return HttpResponse("Not valid form")
     else:
+        ship_vias = DeliveryChoice.objects.filter(is_active=True)
         sl_form = ShippingListForm()
-        return render(request, "purchase/sl-add.html", {'sl_form': sl_form})
+        return render(request, "purchase/sl-add.html", {'sl_form': sl_form, 'ship_vias': ship_vias})
 
 def get_sl_json(request):
+    # import pdb; pdb.set_trace()
     cuser = request.user
     all_sl = ShippingList.objects.filter(sl_status__lt=2)
     sl_list = []
@@ -1371,19 +1377,71 @@ def get_sl_json(request):
         sl_dict['id'] = sl.id
         sl_dict['sl_number'] = sl.sl_number
         if sl.sold_to:
-            sl_dict['sold_to'] = sl.sold_to.contact_name
-            sl_dict['sold_to_id'] = sl.sold_to.id
+            sl_dict['sold_to'] = {}
+            sl_dict['sold_to']['contact_name'] = sl.sold_to.contact_name
+            phone_list = sl.sold_to.contactphone_set.all()
+            if phone_list:
+                sl_dict['sold_to']['phones'] = []
+                for ph in phone_list:                    
+                    phone = {}
+                    phone['phone_type'] = ph.phone_type.phone_type
+                    phone['phone'] = ph.phone
+                    phone['phone_ext'] = ph.phone_ext
+                    sl_dict['sold_to']['phones'].append(phone)
+            else:
+                sl_dict['sold_to']['phones'] = None
+            
+            email_list = sl.sold_to.contactemailaddress_set.all()
+            if email_list:
+                sl_dict['sold_to']['emails'] = []
+                for em in emails:
+                    email = {}
+                    email['email_address_type'] = em.email_address_type.email_type
+                    email['email_address'] = em.email_address
+                    sl_dict['sold_to']['emails'].append(email)
+            else:
+                sl_dict['sold_to']['emails'] = None
+            
+            sl_dict['sold_to']['id'] = sl.sold_to.id
         else:
             sl_dict['sold_to'] = None
+
         if sl.ship_to:
-            sl_dict['ship_to'] = sl.ship_to.contact_name
-            sl_dict['ship_to_id'] = sl.ship_to.id
+            sl_dict['ship_to'] = {}
+            sl_dict['ship_to']['contact_name'] = sl.ship_to.contact_name
+            phone_list = sl.ship_to.contactphone_set.all()
+            if phone_list:
+                sl_dict['ship_to']['phones'] = []
+                for ph in phone_list:                    
+                    phone = {}
+                    phone['phone_type'] = ph.phone_type.phone_type
+                    phone['phone'] = ph.phone
+                    phone['phone_ext'] = ph.phone_ext
+                    sl_dict['ship_to']['phones'].append(phone)
+            else:
+                sl_dict['ship_to']['phones'] = None
+            
+            email_list = sl.ship_to.contactemailaddress_set.all()
+            if email_list:
+                sl_dict['ship_to']['emails'] = []
+                for em in emails:
+                    email = {}
+                    email['email_address_type'] = em.email_address_type.email_type
+                    email['email_address'] = em.email_address
+                    sl_dict['ship_to']['emails'].append(email)
+
+            else:
+                sl_dict['ship_to']['emails'] = None
+            
+            sl_dict['ship_to']['id'] = sl.ship_to.id
         else:
             sl_dict['ship_to'] = None
+        
         if sl.ordered_date:
             sl_dict['ordered_date'] = sl.ordered_date.isoformat()
         else:
             sl_dict['ordered_date'] = None
+        
         if sl.date_required:
             sl_dict['date_required'] = sl.date_required.isoformat()
         else:
@@ -1396,15 +1454,57 @@ def get_sl_json(request):
             sl_dict['job_number'] = None
         sl_dict['customer_po_number'] = sl.customer_po_number
         sl_dict['customer_job_number'] = sl.customer_job_number
+        
         if sl.ship_via:
             sl_dict['ship_via'] = sl.ship_via.delivery_choice
             sl_dict['ship_via_id'] = sl.ship_via.id
         else:
             sl_dict['ship_via'] = None
+        
         sl_dict['search_string'] = sl.search_string
         sl_list.append(sl_dict)
     json_posts = json.dumps(sl_list)
     return HttpResponse(json_posts, mimetype='application/json')
+
+def get_sl_json_by_id(request, sl_id):
+    sl = ShippingList.objects.get(id=sl_id)
+    sl_dict = {}
+    sl_dict['id'] = sl.id
+    sl_dict['sl_number'] = sl.sl_number
+    if sl.sold_to:
+        sl_dict['sold_to'] = {}
+        sl_dict['sold_to']['id'] = sl.sold_to.id
+        sl_dict['sold_to']['contact_name'] = sl.sold_to.contact_name
+        sl_dict['sold_to']['city'] = sl.sold_to.city
+    else:
+        sl_dict['sold_to'] = None
+
+    if sl.ship_to:
+        sl_dict['ship_to'] = {}
+        sl_dict['ship_to']['id'] = sl.ship_to.id
+        sl_dict['ship_to']['contact_name'] = sl.ship_to.contact_name
+        sl_dict['ship_to']['city'] = sl.ship_to.city
+    else:
+        sl_dict['ship_to'] = None
+
+    sl_dict['ordered_date'] = sl.ordered_date.isoformat()
+    sl_dict['date_required'] = sl.date_required.isoformat()
+    if sl.job_number:
+        sl_dict['job_number'] = sl.job_number.job_number
+    sl_dict['customer_po_number'] = sl.customer_po_number
+    sl_dict['customer_job_number'] = sl.customer_job_number
+    if sl.ship_via:
+        sl_dict['ship_via'] = sl.ship_via.delivery_choice
+    else:
+        sl_dict['ship_via'] = None
+    sl_dict['sl_status'] = sl.sl_status
+    sl_dict['search_string'] = sl.search_string
+
+    sl_json = json.dumps(sl_dict)
+
+    return HttpResponse(sl_json, mimetype="application/json")
+
+
 
 def get_sl_item_json(request, sl_id=None):
     if sl_id:
@@ -1422,8 +1522,6 @@ def get_sl_item_json(request, sl_id=None):
             sl_item_dict['ordered'] = float(sl_item.ordered)
         if sl_item.shipped:
             sl_item_dict['shipped'] = float(sl_item.shipped)
-        if sl_item.required:
-            sl_item_dict['required'] = float(sl_item.required)
         if sl_item.filled:
             sl_item_dict['filled'] = float(sl_item.filled)
         sl_item_dict['shipping_list'] = sl_item.shipping_list.sl_number
@@ -1451,6 +1549,7 @@ def view_shipping_list(request, sl_id):
 def edit_shipping_list(request, sl_id):
     slobj = ShippingList.objects.get(id=sl_id)
     sl_items = ShippingItem.objects.filter(shipping_list=slobj)
+    ship_vias = DeliveryChoice.objects.filter(is_active=True)
     if request.method == 'POST':
         sl_form = ShippingListForm(request.POST, instance=slobj)
         item_filled = request.POST.getlist('item_filled')
@@ -1515,11 +1614,8 @@ def edit_shipping_list(request, sl_id):
             return HttpResponse("Not valid form")
     else:
         sl_form = ShippingListForm(instance=slobj)
-
-    sl_form.fields['sl_number'].widget.attrs['readonly'] = True
-    
-    return render(request, "purchase/sl-edit.html", 
-        {'sl_form': sl_form, 'sl_items': sl_items, 'sl_id': sl_id})
+        return render(request, "purchase/sl-edit.html", 
+        {'sl_items': sl_items, 'sl': slobj, 'ship_vias': ship_vias})
 
 
 def shipping_list(request):
@@ -1592,3 +1688,38 @@ def list_deliverinternal_json(request):
 
     json_posts = json.dumps(di_list)
     return HttpResponse(json_posts, mimetype='application/json')
+
+@csrf_exempt
+@login_required
+def po_reindex(request):
+    # import pdb; pdb.set_trace()
+    pos = PurchaseOrder.objects.all()
+    for po in pos:
+        po.search_string = po.po_number + " "
+        if po.supplier:
+            po.search_string += po.supplier.contact_name + " "
+        pis = PurchaseItem.objects.filter(po=po)
+        for pi in pis:
+            po.search_string += pi.item.item_number + " "
+            if pi.job_number:
+                po.search_string += pi.job_number.job_number + " "
+        po.save()
+
+    return HttpResponseRedirect("/")
+
+@csrf_exempt
+@login_required
+def sl_reindex(request):
+    # import pdb; pdb.set_trace()
+    shipping_list = ShippingList.objects.all()
+    for sl in shipping_list:
+        sl.search_string = sl.sl_number + " " + sl.customer_po_number + sl.customer_job_number
+        if sl.job_number:
+            sl.search_string += sl.job_number.job_number
+        if sl.sold_to:
+            sl.search_string += sl.sold_to.contact_name
+        if sl.ship_via:
+            sl.search_string += sl.ship_via.delivery_choice
+        sl.save()
+
+    return HttpResponseRedirect("/")

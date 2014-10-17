@@ -6,6 +6,9 @@ admin.autodiscover()
 urlpatterns = patterns('',
     # Examples:
     url(r'^$', 'premierelevator.views.home', name='home'),
+
+    url(r'^system-variable/$', 'premierelevator.views.sys_variable', name='sys-variable'),
+    
     url(r'^dashboard/$', 'premierelevator.views.dashboard', name='user-dashboard'),
 
     url(r'^send-mass-mail/$', 'premierelevator.views.send_mass_mail', name='send-mass-mail'),

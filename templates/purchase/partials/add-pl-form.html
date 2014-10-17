@@ -1,0 +1,309 @@
+<table class="table">
+<tr>
+	<td class="bg-info">
+		<table class="table table-bordered">
+			<tr>
+				<th width="150">
+					<label for="id_pl_number">PL Number:</label>
+				</th>
+				<td>
+					<input class="form-control" id="id_pl_number" name="pl_number" value="NEW" type="text" readonly="">
+				</td>		
+			</tr>
+			<tr>
+				<td width="">
+					<label for="id_sold_to">Sold to:</label>
+				</td>
+				<td>
+					<div class="contact_box">						
+					
+						<input type="text" ng-model="search_sold_to" placeholder="start typing to search sold to contact" class="form-control">
+						<table class="table table-bordered" id="sold_to_contact_details">
+							<tr>
+								<th width="150">Contact Name</th>
+								<td>{[{ sold_to_contact.contact_name }]}</td>
+							</tr>
+							<tr>
+								<th>Phone</th>
+								<td>
+									<li ng-repeat="ph in sold_to_contact.phones">
+										({[{ ph.type }]}): {[{ ph.number }]}-{[{ ph.phone_ext }]}
+									</li>
+								</td>
+							</tr>
+							<tr>
+								<th>Email</th>
+								<td><span class='bg-info email' ng-repeat="em in sold_to_contact.emails">{[{ em.email_address}]}</span></td>
+							</tr>
+						</table>
+						<table class="table sold_to_contact" id="sold_to_contact_list">
+							<thead>
+								<tr>
+									<th>Contact Name</th><th> City <a href="" class="close">x</a></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="con in contacts | googleSearchFilter:search_sold_to" ng-click="selectSoldTo(con)">
+									
+									<td>{[{con.contact_name}]}</td>
+									<td>{[{con.city}]}</td>
+								</tr>
+							</tbody>
+						</table>
+
+						<input type="hidden" id="id_sold_to" name="sold_to">
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<th width="150">
+					<label for="id_date_issued">Date Issued:</label>
+				</th>
+				<td>
+					<input class="form-control datepicker" id="id_date_issued" name="date_issued" placeholder="date issued" type="text" autocomplate="off">
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label for="id_job_number">Job number:</label>
+				</td>
+				<td>
+				<div class="job_box">
+					<input type='text' ng-model="search_job" class='form-control item-job-number' name='item_job_number' placeholder='Start typing to search job'>
+					<table class="table table-bordered" id="job-details">
+					<tr>
+						<th class="bg-info">job number</th>
+						<th class="bg-info">job name</th>
+						<th class="bg-info">Customer Contact</th>
+					</tr>
+					<tr>
+						<td >{[{schedule_job.job_number}]}</td>
+						<td >{[{schedule_job.job_name}]}</td>
+						<td >{[{schedule_job.customer_contact_name}]}</td>
+
+					</tr>
+						
+					</table>
+					<table class="table" id="job_list">
+					<thead>
+					<tr>
+						<td>ID</td><td>Job number</td><td>job name</td><td>customer_contact <a href="" class="close">x</a></td>
+					</tr>
+					</thead>
+					<tr ng-repeat="job in schedule_jobs | googleSearchFilter:search_job" ng-click="selectJob(job)">
+						<td>{[{ job.id }]}</td>
+						<td>{[{ job.job_number }]}</td>
+						<td>{[{ job.job_name }]}</td>
+						<td>{[{ job.customer_contact_name }]}</td>
+					</tr>
+						
+					</table>
+					<input type='hidden' name='job_number' id='id_job_number' value="0">
+				</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label for="id_order_type">Order Type:</label>
+				</td>
+				<td>
+					<select class="form-control" name="order_type" id="id_order_type">
+						<option value="0">Engineering Parts Order</option>
+						<option value="1">Standared Parts Order</option>
+						<option value="2">F.O.B Order</option>
+						<option value="3">Mod Parts Order Std</option>
+						<option value="4">Mod Parts Order Eng</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label for="id_hold_at_dept_for_pickup">Hold at for pickup:</label>
+				</td>
+				<td>
+					<select class="form-control" name="hold_at_dept_for_pickup" id="id_hold_at_dept_for_pickup">
+						<option value="1">Yes</option>
+						<option value="0">No</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td width="">
+					<label for="id_ship_to">Customer Broker:</label>
+				</td>
+				<td>
+					<div class="contact_box">
+						<input type="text" ng-model="search_customer_broker" placeholder="start typing to search customer broker contact" class="form-control">
+						<table class="table table-bordered" id="customer_broker_contact_details">
+							<tr>
+								<th width="150">Contact Name</th>
+								<td>{[{ customer_broker_contact.contact_name }]}</td>
+							</tr>
+							<tr>
+								<th>Phone</th>
+								<td>
+									<li ng-repeat="ph in customer_broker_contact.phones">
+										({[{ ph.type }]}): {[{ ph.number }]}-{[{ ph.phone_ext }]}
+									</li>
+								</td>
+							</tr>
+							<tr>
+								<th>Email</th>
+								<td><span class='bg-info email' ng-repeat="em in customer_broker_contact.emails">{[{ em.email_address}]}</span></td>
+							</tr>
+						</table>
+						<table class="table customer_broker_contact" id="customer_broker_contact_list">
+							<thead>
+								<tr>
+									<th>Contact Name</th><th> City <a href="" class="close">x</a></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="con in contacts | googleSearchFilter:search_customer_broker" ng-click="selectCustomerBroker(con)">
+									
+									<td>{[{con.contact_name}]}</td>
+									<td>{[{con.city}]}</td>
+								</tr>
+							</tbody>
+						</table>
+
+						<select ng-model="customer_broker" class="form-control" id="id_customer_broker" name="customer_broker" style="display:none;">
+							<option ng-repeat="contact in contacts" value="{[{contact.id}]}">{[{ contact.contact_name }]}</option>
+						</select>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label for="id_freight_charges">Freight charges:</label>
+				</td>
+				<td>
+					<input class="form-control" id="id_freight_charges" maxlength="20" name="freight_charges" placeholder="freight charges" type="number">
+				</td>
+			</tr>
+		</table>
+	</td>
+	<td class="bg-info">
+		<table class="table table-bordered">
+			<tr>
+				<th width="150">
+					<label for="id_sl_number">SL Number:</label>
+				</th>
+				<td>
+					<input class="form-control" id="id_sl_number" name="sl_number" placeholder="Start typing to search SL" type="text">
+				</td>		
+			</tr>
+			<tr>
+				<td width="">
+					<label for="id_ship_to">Ship to:</label>
+				</td>
+				<td>
+					<div class="contact_box">
+						<input type="text" ng-model="search_ship_to" placeholder="start typing to search ship to contact" class="form-control">
+						<table class="table table-bordered" id="ship_to_contact_details">
+							<tr>
+								<th width="150">Contact Name</th>
+								<td>{[{ ship_to_contact.contact_name }]}</td>
+							</tr>
+							<tr>
+								<th>Phone</th>
+								<td>
+									<li ng-repeat="ph in ship_to_contact.phones">
+										({[{ ph.type }]}): {[{ ph.number }]}-{[{ ph.phone_ext }]}
+									</li>
+								</td>
+							</tr>
+							<tr>
+								<th>Email</th>
+								<td><span class='bg-info email' ng-repeat="em in ship_to_contact.emails">{[{ em.email_address}]}</span></td>
+							</tr>
+						</table>
+						<table class="table ship_to_contact" id="ship_to_contact_list">
+							<thead>
+								<tr>
+									<th>Contact Name</th><th> City <a href="" class="close">x</a></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="con in contacts | googleSearchFilter:search_ship_to" ng-click="selectShipTo(con)">
+									
+									<td>{[{con.contact_name}]}</td>
+									<td>{[{con.city}]}</td>
+								</tr>
+							</tbody>
+						</table>
+
+						<input type="hidden" id="id_ship_to" name="ship_to">
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<th width="150">
+					<label for="id_date_shipped">Date Shipped:</label>
+				</th>
+				<td>
+					<input class="form-control datepicker" id="id_date_shipped" name="date_shipped" placeholder="date shipped" type="text" autocomplate="off">
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label for="id_generated_by">Generated By:</label>
+				</td>
+				<td>
+					<select class="form-control" name="generated_by" id="id_generated_by" 
+					{% if cuser.is_superuser == 0 %} disabled {% endif %}>
+					{% for us in users %}
+						<option value="{{us.id}}" {% if us.id == cuser.id %} selected {% endif %}>{{us.username}}</option>
+					{% endfor %}
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label for="id_ship_via">Ship Via:</label>
+				</td>
+				<td>
+					<select class="form-control" name="ship_via" id="id_ship_via">
+					{% for dc in dcs %}
+						<option value="{{dc.id}}">{{dc.delivery_choice}}</option>					
+					{% endfor %}
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label for="id_nel_packing_slip">Nel packing slip:</label>
+				</td>
+				<td>
+					<select class="form-control" name="nel_packing_slip" id="id_nel_packing_slip">
+						<option value="1">Yes</option>
+						<option value="0">No</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label for="id_customer_po_number">Customer po number:</label>
+				</td>
+				<td>
+					<input class="form-control" id="id_customer_po_number" maxlength="20" name="customer_po_number" placeholder="Customer PO Number" type="text">
+				</td>
+			</tr>
+			<tr>
+				<th width="150">
+					<label for="id_invoiced_on">Invoiced On:</label>
+				</th>
+				<td>
+					<input class="form-control datepicker" id="id_invoiced_on" name="invoiced_on" placeholder="date issued" type="text" autocomplate="off">
+				</td>
+			</tr>
+		</table>
+	</td>
+</tr>
+<tr>
+<td></td>
+	<td>
+		<input type="submit" class="form-control btn btn-primary" value="Add PL">
+	</td>
+</tr>
+</table>

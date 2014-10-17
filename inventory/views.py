@@ -2,17 +2,25 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from inventory.forms import *
 # Create your views here.
+from scomuser.models import *
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import permission_required
 import json
 
+from contacts.models import *
+
 @login_required
 @permission_required("inventory.add_item")
 @csrf_exempt
 def add_item(request):
+    currencies = Currency.objects.all()
+    departments = Department.objects.all()
+    unit_measures = ItemUnitMeasure.objects.all()
+    locations = Location.objects.all()
+    production_types = ProductionType.objects.all()
+    terms = PaymentTerm.objects.all()
     if request.method == "POST":
-        # import pdb; pdb.set_trace();
         item_form = ItemForm(request.POST, request.FILES)
         if item_form.is_valid():
             item = item_form.save()
@@ -24,7 +32,10 @@ def add_item(request):
 
     # return render(request, "inventory/item/test.html", {'item_form': item_form, 'page_title': 'Add Item'})
     
-    return render(request, "inventory/item/add-item.html", {'item_form': item_form, 'page_title': 'Add Item'})
+    return render(request, "inventory/item/add-item.html", 
+        {'item_form': item_form, 'page_title': 'Add Item', 'currencies': currencies, 
+        'departments': departments, 'unit_measures': unit_measures, 'locations': locations,
+        'production_types': production_types, 'terms': terms})
 
 @login_required
 @permission_required("inventory.add_item")
@@ -183,6 +194,12 @@ def list_item(request):
             item_dict['item_unit_measure_id'] = item.item_unit_measure.id
         else:
             item_dict['item_unit_measure'] = 'Unit not configured'
+
+        if item.terms:
+            item_dict['terms'] = item.terms.term
+            item_dict['terms_id'] = item.terms.id
+        else:
+            item_dict['terms'] = None
 
         if item.warehouse_location:
             item_dict['warehouse_location'] = item.warehouse_location.warehouse_location
@@ -489,3 +506,14 @@ def delete_custom_designation(request):
         return HttpResponse(custom_designation_id)
     else:
         return HttpResponse("Hello World!")
+
+@csrf_exempt
+@login_required
+def item_reindex(request):
+    items = Item.objects.all()
+    for item in items:
+        item.search_string = item.item_number + " " + item.description
+        if item.primary_supplier:
+            item.search_string += " " + item.primary_supplier.contact_name
+        item.save()
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])

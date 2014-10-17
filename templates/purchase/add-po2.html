@@ -131,6 +131,13 @@ span.email {
 }
 </style>
 <div class="container-fluid" ng-app="poApp">
+{% if messages %}
+<section id="message">
+	{% for message in messages %}
+    	<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</section>
+{% endif %}
 
 <section class="row " ng-controller="AddPOController">
 <article class="col-md-12">
@@ -140,7 +147,8 @@ span.email {
 	  	</div>
 		<div class="panel-body">
 
-			<form action="/purchase/add-po/" method="POST" enctype="multipart/form-data">	{% include "purchase/partials/add-po-form.html" %}
+			<form action="/purchase/add-po/" method="POST" enctype="multipart/form-data">	
+			{% include "purchase/partials/add-po-form.html" %}
 			</form>
 		</div>
 	</div>
@@ -241,10 +249,11 @@ $(document).on("change", "input[name='item_qty']", function(e){
 	var qty = parseFloat($(this).val());
 	var qty_fl = parseFloat(qty);
 	var cost = $(this).closest('tr').find('input[name="item_cost"]').val();
-	var cost_fl = parseFloat(cost);
+	var cost_fl = parseFloat(cost).toFixed(4);
 	
 	var sub_total = qty_fl * cost_fl;
-	$(this).closest('tr').find("input[name='item_sub_total']").val(sub_total);
+	
+	$(this).closest('tr').find("input[name='item_sub_total']").val(sub_total.toFixed(4));
 
 	var item_total = 0;
 	$("tbody#add_item_list tr input[name='item_sub_total']").each(function(index){
@@ -275,6 +284,7 @@ $(document).on("change", "input[name='item_qty']", function(e){
 		item_subtotal_qty = item_subtotal_qty + parseFloat(subtotal_qty);
 	});
 	$("#id_items_total").val(item_subtotal_qty.toFixed(2));
+	$("span#items_total_qty").html(item_subtotal_qty.toFixed(2));
 
 	item_total = 0;
 	item_subtotal_qty = 0;
@@ -409,10 +419,15 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 		$("#ship_to_contact_details").show();
 
 		// autoselect ship via
-		$("#id_ship_via").val(con.shipvia_id)
-
+		if(con.shipvia_id){
+			$("#id_ship_via").val(con.shipvia_id);	
+		}
+		
 		// autoselect terms
-		$("#id_terms").val(con.term_id);
+		if(con.term_id){
+			$("#id_terms").val(con.term_id);	
+		}
+		
 
 		// autoselect FOB
 		if(con.fob){
@@ -469,15 +484,16 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 	}
     $scope.selectItem = function(item) {
     	$scope.search_item = '';
-
+    	$scope.mixed_currency == false;
     	$("#items_list").hide();
     	var myitem = $("tbody#add_item_list tr.add_item");
     	var item_number = item.item_number;
+    	var item_term = item.terms_id;
     	var item_description = item.description;
     	var item_id = item.id;
     	var currency_id = item.currency_id;
     	var unit_measure_id = item.item_unit_measure;
-    	console.log(unit_measure_id);
+    	// console.log(unit_measure_id);
     	// var item_qty_received = parseFloat(item.qty_received).toFixed(4);
     	// var last_received_date = item.qty_received_date;
 
@@ -490,9 +506,9 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
     		$scope.first_currency_id = currency_id;
     		$("#id_po_currency").val(currency_id);
     	}
-    	if($scope.first_currency_id != currency_id){
+    	if($scope.first_currency_id != currency_id && $scope.mixed_currency == false){
     		alert("Currency not matched!");
-    		return;
+    		$scope.mixed_currency = true;
     	}
     	
 
@@ -519,6 +535,12 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 
 	    	}
 			
+    	} else {
+    		
+    		if($scope.supplier_contact == undefined) {
+				$("#id_terms").val(item_term);
+				console.log(item_term);
+    		}
     	}
     	
     	var str = "<tr class='add_item'>";
@@ -533,7 +555,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
     	str += "<td><input type='number' class='form-control decimal' step='0.01' name='item_qty' value='0'></td>";
     	str += "<td><input type='currency' step='0.0001' name='item_sub_total' class='form-control' value='0.0' readonly></td>";
     	str += "<td><input type='text' class='form-control item-job-number' name='item_job_number' placeholder='Start typing to search job'><input type='hidden' name='item_job_id' class='item_job_id'></td>";
-    	str += "<td><textarea rows='4' class='form-control' name='item_comment' placeholder='Put your comments here'></textarea></td>";
+    	str += "<td><textarea rows='1' class='form-control' name='item_comment' placeholder='Put your comments here'></textarea></td>";
     	str += "<td><input type='number' step='0.01' name='qty_received' class='form-control' value='"+item_qty_received+"' readonly></td>";
     	str += "<td><input type='text' name='last_received_date' class='form-control' value='"+last_received_date+"' readonly></td>";
 
@@ -627,31 +649,46 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 
     $scope.addHstAmount = function(e){
     	if($scope.hst_tax) {
-    		var hst_tax_amount = parseFloat($scope.hst_tax_amount);
+    		// console.log(e);
+    		// var hst_tax_amount = parseFloat($scope.hst_tax_amount);
+    		var hst_tax_amount = parseFloat(e.currentTarget.value);
+    		var pst_tax_amount = parseFloat($("#id_pst_taxable_amount").val());
+    		// console.log(pst_tax_amount);
+    		var item_total = 0;
+			$("tbody#add_item_list tr input[name='item_sub_total']").each(function(index){
+				var subtotal = $(this).val();
+				item_total = item_total + parseFloat(subtotal);
+			});
+			if (pst_tax_amount){
+				item_total += hst_tax_amount + pst_tax_amount;	
+			} else {
+				item_total += hst_tax_amount;
+			}
+			
+			$("#id_total_po_amount").val(item_total.toFixed(4));
+    	}
+    };
+    $scope.addPstAmount = function(e){
+    	if($scope.pst_tax) {
+    		// var pst_tax_amount = parseFloat($scope.pst_tax_amount);
+    		var pst_tax_amount = parseFloat(e.currentTarget.value);
+    		var hst_tax_amount = parseFloat($("#id_hst_taxable_amount").val());
     		// console.log(hst_tax_amount);
     		var item_total = 0;
 			$("tbody#add_item_list tr input[name='item_sub_total']").each(function(index){
 				var subtotal = $(this).val();
 				item_total = item_total + parseFloat(subtotal);
 			});
-			item_total += hst_tax_amount + parseFloat($scope.pst_tax_amount);
-			$("#id_total_po_amount").val(item_total.toFixed(4));
-    	}
-    };
-    $scope.addPstAmount = function(e){
-    	if($scope.pst_tax) {
-    		var pst_tax_amount = parseFloat($scope.pst_tax_amount);
-    		console.log(pst_tax_amount);
-    		var item_total = 0;
-			$("tbody#add_item_list tr input[name='item_sub_total']").each(function(index){
-				var subtotal = $(this).val();
-				item_total = item_total + parseFloat(subtotal);
-			});
-			item_total += pst_tax_amount + parseFloat($scope.hst_tax_amount);
+			if (hst_tax_amount){
+				item_total += pst_tax_amount + hst_tax_amount;
+			} else {
+				item_total += pst_tax_amount;
+			}
+			
 			$("#id_total_po_amount").val(item_total.toFixed(4));
 
     	}
-    }
+    };
 
 	
 }])

@@ -134,6 +134,7 @@ class Item(models.Model):
 	item_image = models.ImageField(upload_to='item_image', blank=True, null=True)
 	date_added = models.DateTimeField('date added', auto_now_add=True)
 	date_modified = models.DateTimeField('date modified', auto_now=True)
+	terms = models.ForeignKey(PaymentTerm, blank=True, null=True, related_name='item_payment_terms')
 	search_string 	  = models.TextField(null=True, blank=True, verbose_name='Search String')
 
 	def __unicode__(self):

@@ -90,4 +90,6 @@ urlpatterns = patterns('',
 
     
     url(r'make-call/$', 'contacts.views.make_call'),
+
+    url(r'^contact/reindex/$', 'contacts.views.contact_reindex', name='contact-reindex'),
 )

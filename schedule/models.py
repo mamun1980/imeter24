@@ -1,6 +1,8 @@
 from django.db import models
 from schedule.choices import *
 from datetime import datetime
+from contacts.models import Contact
+from django.contrib.auth.models import User
 # Create your models here.
 
 
@@ -153,6 +155,57 @@ class JobStatus(models.Model):
 		permissions = (
     		('view_jobstatus', 'Can View Job Status'),
     	)
+
+class ElevetorType(models.Model):
+	elevetor_type = models.CharField(max_length=50, null=True, blank=True)
+	description = models.TextField(max_length=200, blank=True, null=True)
+
+	def __unicode__(self):
+		return self.id
+
+	class Meta:
+		verbose_name = "Elevetor type"
+		verbose_name_plural = "Elevetor types"
+
+		permissions = (
+			('view_elevetor_type', 'Can view elevetor type'),
+		)
+
+
+
+class JobControl(models.Model):
+	job_number = models.CharField(max_length=20, null=True, blank=True)
+	# next_job_number = models.CharField(max_length=20, null=True, blank=True)
+	sold_to = models.ForeignKey(Contact, null=True, blank=True, related_name='job-control-sold_to')
+	ship_to = models.ForeignKey(Contact, null=True, blank=True, related_name='job-control-ship_to')
+	elevetor_type = models.ForeignKey(ElevetorType, null=True, blank=True, related_name='job-con-elevetor-type')
+	number_of_floors = models.IntegerField(null=True, blank=True)
+	front = models.CharField(max_length=20, null=True, blank=True)
+	rear = models.CharField(max_length=20, null=True, blank=True)
+	rgw = models.CharField(max_length=20, null=True, blank=True)
+	capacity = models.IntegerField(null=True, blank=True)
+	customer_po_number = models.CharField(max_length=30, null=True, blank=True)
+	delivery_date = models.DateField(blank=True, null=True)
+	start_date = models.DateField(blank=True, null=True)
+	installed_by = models.ForeignKey(Contact, null=True, blank=True)
+	job_name = models.CharField(max_length=20, null=True, blank=True)
+	estimated_price_for_job = models.DecimalField(max_digits=10, decimal_places=4, null=True, blank=True)
+	search_string = models.TextField(max_length=1000, blank=True, null=True)
+
+	def __unicode__(self):
+		return self.id
+
+	class Meta:
+		verbose_name = "Job control"
+		verbose_name_plural = "Job controls"
+
+		permissions = (
+			('view_job_control', 'Can view job control'),
+		)
+
+
+
+
 
 
 

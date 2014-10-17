@@ -4,7 +4,7 @@
 		<label for="id_po_number">PO Number:</label>
 	</th>
 	<td>
-		<input class="form-control" id="id_po_number" name="po_number" placeholder="PO Number" type="text" value="{{po_number}}" readonly="readonly">
+		<input class="form-control" id="id_po_number" name="po_number" placeholder="PO Number" type="text" value="NEW" readonly="readonly">
 	</td>
 	<th width="150">
 		<label for="id_next_number">Next Number:</label>
@@ -151,8 +151,7 @@
 		<label for="id_ship_via">Ship via:</label>
 	</th>
 	<td>
-		<select class="form-control" id="id_ship_via" name="ship_via"
-		ng-model="shipVia">
+		<select class="form-control" id="id_ship_via" name="ship_via">
 		{% for dc in delivery_choices %}
 			<option value="{{dc.id}}">{{dc.delivery_choice}}</option>
 		{% endfor %}
@@ -265,7 +264,7 @@
 		<a href="/inventory/item/add/" class="btn btn-primary" target="_blank">Add New Item To Inventory</a>
 	</td>
 </tr>
-<tr class="bg-success">
+<tr class="bg-info">
 	<td colspan="4">
 		<div class="item_box">
 						
@@ -328,7 +327,7 @@
 					</table>
 				</td>
 				<td>
-					<textarea rows="4" class="form-control demo_box" readonly=""></textarea>
+					<textarea rows="1" class="form-control demo_box" readonly=""></textarea>
 				</td>
 				<td>
 					<select class="form-control">
@@ -351,7 +350,7 @@
 					<input type="text" class="form-control demo_box" placeholder="job number" autocomplete="off">
 				</td>
 				<td>
-					<textarea rows="4" class="form-control demo_box" placeholder="Put your comments here"></textarea>
+					<textarea rows="1" class="form-control demo_box" placeholder="Put your comments here"></textarea>
 				</td>
 				<td>
 					<input type="number" step="0.01" class="form-control" placeholder="Qty Received" readonly="readonly">
@@ -363,7 +362,14 @@
 				</tr>				
 			</tbody>
 			<tr id='calculated_total_amount'>
-				<td colspan='5'>Total Amount</td>
+				<td width="150">
+					Items Total Qty:
+				</td>
+				<td colspan="3">
+					<span id='items_total_qty'>0.0</span>
+					<input class="form-control" id="id_items_total" name="items_total" type="hidden">
+				</td>
+				<td>Total Amount</td>
 				<td width="120">{{ currency.get_currency_icon }}<span class="amount">0</span></td>
 				<td width="10" colspan="5"></td>
 			</tr>
@@ -375,14 +381,6 @@
 
 </tr>
 
-<tr class="bg-info">
-	<th width="150">
-		<label for="id_items_total">Items Total Qty:</label>
-	</th>
-	<td colspan="3">
-		<input class="form-control" id="id_items_total" name="items_total" value="0" placeholder="Items Total" readonly="readonly" step="0.0001" type="number">
-	</td>
-</tr>
 <tr class="bg-success">
 	<th width="150">
 		<label for="id_hst_taxable">Hst taxable:</label>

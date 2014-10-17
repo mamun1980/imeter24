@@ -38,5 +38,7 @@ urlpatterns = patterns('',
     url(r'^location/add/$', 'inventory.views.add_location', name='add-inventory-location'),
     url(r'^location/edit/(?P<loc_id>\d+)/$', 'inventory.views.edit_location', name='edit-inventory-location'),
     url(r'^location/delete/$', 'inventory.views.delete_location', name='delete-inventory-location'),
+
+    url(r'^item/reindex/$', 'inventory.views.item_reindex', name='item-reindex'),
     
 )

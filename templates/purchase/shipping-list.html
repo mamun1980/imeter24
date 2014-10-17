@@ -44,8 +44,34 @@
 					<tbody>
 						<tr ng-repeat="sl in shipping_list | googleSearchFilter:search | filter:status">
 							<td>{[{ sl.sl_number }]}</td>
-							<td>{[{ sl.sold_to }]}</td>
-							<td>{[{ sl.ship_to }]}</td>
+							<td>
+								<p><b>{[{ sl.sold_to.contact_name }]}</b></p>
+								<div class="bg-info">
+									<p ng-repeat="ph in sl.sold_to.phones">
+
+										({[{ ph.phone_type }]}): {[{ ph.phone }]}-{[{ ph.phone_ext }]}
+									</p>
+								</div>
+								<div class="bg-warning">
+									<p ng-repeat="em in sl.sold_to.emails">
+										{[{ em.email_address_type }]}: {[{ em.email_address }]}
+									</p>
+								</div>
+							</td>
+							<td>
+								<p><b>{[{ sl.ship_to.contact_name }]}</b></p>
+								<div class="bg-info">
+									<p ng-repeat="ph in sl.ship_to.phones">
+
+										({[{ ph.phone_type }]}): {[{ ph.phone }]}-{[{ ph.phone_ext }]}
+									</p>
+								</div>
+								<div class="bg-warning">
+									<p ng-repeat="em in sl.ship_to.emails">
+										{[{ em.email_address_type }]}: {[{ em.email_address }]}
+									</p>
+								</div>
+							</td>
 							<td>{[{ sl.ordered_date }]}</td>
 							<td>{[{ sl.job_number }]}</td>
 							<td>{[{ sl.customer_po_number }]}</td>
@@ -125,7 +151,7 @@
 		$scope.init = function() {
 			$http({method: 'GET', url: "/purchase/sl-list-json/"}).
 	            success(function(data, status, headers, config) {
-	                // console.log(data);
+	                console.log(data);
 	                $scope.shipping_list = data;
 	            });
 

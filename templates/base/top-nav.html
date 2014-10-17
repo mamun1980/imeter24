@@ -336,25 +336,63 @@
 						</li>
 					{% endif %}
 
-					<!--  Start of Utility menu -->
+
+						<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Job control <b class="caret"></b></a>
+						<ul class="dropdown-menu">
+							<li>
+								<a href="/schedule/job-control/add/">
+									Add Job Control
+								</a>
+							</li>
+							<li>
+								<a href="/schedule/job-control/list/">
+									List Job Control
+								</a>
+							</li>
+							<li class="divider"></li>
+							<li class="dropdown-submenu">
+								<a href="/schedule/elevetor-type-list/">Elevetor type</a>
+								<ul class="dropdown-menu">
+									<li>
+										<a href="/schedule/elevetor-type/add/">
+											Add Elevetor type
+										</a>
+									</li>
+									<li>
+										<a href="/schedule/elevetor-type/list/">
+											View Elevetor type List 
+										</a>
+									</li>
+								</ul>
+							</li>
+
+							
+						</ul>
+						</li>
+
+
+					<!--  Start of Order Control menu -->
 					{% if perms.purchase.view_shipping_list %}
 						<li class="dropdown">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Shipping<b class="caret"></b></a>
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Order Control<b class="caret"></b></a>
 							<ul class="dropdown-menu">
 								{% if perms.purchase.view_shipping_list %}
-								
-								
-									<li>
-										<a href="/purchase/add-sl/">
-											Add Shipping List
-										</a>
-									</li>
-									<li>
-										<a href="/purchase/shipping-list/">
-											View Shipping List 
-										</a>
-									</li>
-								
+								<li class="dropdown-submenu">
+									<a href="/purchase/shipping-list/">SL</a>
+									<ul class="dropdown-menu">
+										<li>
+											<a href="/purchase/add-sl/">
+												Add Shipping List
+											</a>
+										</li>
+										<li>
+											<a href="/purchase/shipping-list/">
+												View Shipping List 
+											</a>
+										</li>
+									</ul>
+								</li>
 								{% endif %}
 
 								{% if perms.purchase.view_packing_list %}
@@ -376,9 +414,6 @@
 								</li>
 								{% endif %}
 
-								
-								
-								
 							</ul>
 						</li>
 
@@ -614,13 +649,48 @@
 									</a>
 								</li>
 								{% endif %}
-								
+								<li class="divider"></li>
+								<li>
+									<a href="/system-variable/">
+										System variables
+									</a>
+								</li>
+								<li class="divider"></li>
+								<li class="dropdown-submenu">
+								<a href="/events/controllers/">Reindex Database</a>
+									<ul  class="dropdown-menu">
+										<li>
+											<a href="/contacts/contact/reindex/">
+												Contact reindex
+											</a>
+										</li>
+										<li>
+											<a href="/inventory/item/reindex/">
+												Inventory Iten reindex
+											</a>
+										</li>
+										<li>
+											<a href="/purchase/po/reindex/">
+												PO reindex
+											</a>
+										</li>
+										<li>
+											<a href="/purchase/sl/reindex/">
+												SL reindex
+											</a>
+										</li>
+										
+										<li>
+											<a href="/schedule/sjob/reindex/">
+												Schedule job reindex
+											</a>
+										</li>	
+									</ul>
+								</li>
+
 							</ul>
 						</li>
 					{% endif %}
-
-
-					
 
 				{% endif %}
 

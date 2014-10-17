@@ -1160,6 +1160,12 @@ def make_call(request):
 
 
 
-
-
+@csrf_exempt
+@login_required
+def contact_reindex(request):
+    contacts = Contact.objects.all()
+    for contact in contacts:
+        contact.search_string = contact.contact_name + " " + contact.city + " " + contact.province + " " + contact.attention_to
+        contact.save()
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
 

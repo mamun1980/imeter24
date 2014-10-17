@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style type="text/css">
+
+#sold_to_contact_details, #ship_to_contact_list, #sold_to_contact_list, #ship_to_contact_list {
+	display: none;
+}
+</style>
+<div class="container shadow4 main-body">
+
+<section class="row" >
+	
+
+	<div class="col-md-8 col-md-offset-2">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Add Elevetor type</h4>
+		  	</div>
+			<div class="panel-body">
+				<form action="/schedule/elevetor-type/add/" method="POST" enctype="multipart/form-data">{% csrf_token %}
+					{{ form.as_p }}
+					<input type="submit" class="btn btn-primary" value="Add Elevetor Type">
+				</form>
+			</div>
+		</div>
+	</div>
+</section>
+</div>
+
+<script type="text/javascript">
+
+(function(){
+	$(".datepicker").datepicker();
+})(jQuery)
+
+</script>
+{% endblock content %}

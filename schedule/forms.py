@@ -3,13 +3,14 @@ from schedule.models import *
 from schedule.choices import *
 from schedule.lookups import JobLookup
 import selectable
+from premierelevator.models import SystemVariable
 # from schedule.custom_field import MultiEmailField
 from django.core.validators import validate_email
 from datetime import datetime
 
 class JobForm(forms.ModelForm):
     job_number = forms.CharField( max_length=20,
-        widget=forms.TextInput(attrs={"class": "form-control", 'required': 'True', 'placeholder':"Job Number"}))
+        widget=forms.TextInput(attrs={"class": "form-control", "value": "NEW", "readonly": 'readonly'}))
     cab_designation = forms.CharField( max_length=50, required=False,
         widget=forms.TextInput(attrs={"class": "form-control", 'placeholder':"Cab Designation"}))
     date_opened = forms.DateField(required=False, widget=forms.DateInput(
@@ -83,6 +84,11 @@ class JobForm(forms.ModelForm):
 
     def save(self, commit=True):
         job = super(JobForm, self).save(commit=False)
+        sv = SystemVariable.objects.get(id=1)
+        job.job_number = str(sv.next_job_number)
+        sv.next_job_number = sv.next_job_number + 1
+        sv.save()
+
         job.search_string = job.job_number + " " + job.cab_designation + " " + job.job_name + " " + job.customer + " " + job.status + " " + job.description+ " " + job.address_1 + " " + job.customer_contact_name + " " + job.customer_contact_phone_number
         id = job.save()
         job_status = JobStatus(job=job)
@@ -299,3 +305,16 @@ class JobLookupForm(forms.Form):
 
       )
 
+class JobControlForm(forms.ModelForm):
+    class Meta:
+        model = JobControl
+        exclude = ['job_number', ]
+
+class ElevetorTypeForm(forms.ModelForm):
+    elevetor_type = forms.CharField( max_length=50, required=False,
+        widget=forms.TextInput(attrs={"class": "form-control", 'placeholder':"Elevetor type"}))
+    description = forms.CharField( max_length=200, required=False,
+        widget=forms.Textarea(attrs={"class": "form-control", 'rows':2,'placeholder':"Description"}))
+    class Meta:
+        model = ElevetorType
+        exclude = ['id',]

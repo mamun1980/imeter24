@@ -31,6 +31,12 @@
 </style>
 
 <div class="container shadow4 main-body" ng-app="premierApp">
+<section class="row">
+	<div class='col-md-12'>
+
+		
+	</div>
+</section>
 
 <section class="row"  id="add-inventory-item" ng-controller="AddItemController">
 	
@@ -43,18 +49,7 @@
 		  	<div class="panel-body">
 		  	<form action="/inventory/item/add/" enctype="multipart/form-data" name="inventory-item-form" method="POST">{% csrf_token %}
 		  		
-		  		{% for field in item_form %}
-		  		
-		            <div class="col-md-4 topmargin">
-		            {{ field.label_tag }} 
-		            </div>
-		            <div class="col-sm-8 topmargin">
-		            	{{ field.errors }}
-		                {{ field }}
-		            </div>
-		        
-
-		        {% endfor %}
+		  		{% include "inventory/item/add-item-form.html" %}
 	    		  	<div class="btn btn-lg">
 						<button class="btn btn-primary btn-lg" type="submit">Add Inventory Item</button>
 					</div>
@@ -143,9 +138,9 @@
 	})
 
 	$("select#id_primary_supplier").hide();
-	var str1 = "<input type=text name='primary_supplier_demo' placeholder='Start typing to search for supplier' id='id_primary_supplier_demo' class='form-control custom-form-control' ng-model='search' autocomplete='off' >";
-	var str2 = '<a href="/admin/contacts/contact/add/" class="add-another" id="add_id_primary_supplier" onclick="return showAddAnotherPopup(this);"> <img src="/statics/admin/img/icon_addlink.gif" width="10" height="10" alt="Add Another"></a><div id="contact_info"></div>'
-	$("select#id_primary_supplier").closest("div").append(str1+str2);
+	// var str1 = "<input type=text name='primary_supplier_demo' placeholder='Start typing to search for supplier' id='id_primary_supplier_demo' class='form-control custom-form-control' ng-model='search' autocomplete='off' >";
+	// var str2 = '<a href="/admin/contacts/contact/add/" class="add-another" id="add_id_primary_supplier" onclick="return showAddAnotherPopup(this);"> <img src="/statics/admin/img/icon_addlink.gif" width="10" height="10" alt="Add Another"></a><div id="contact_info"></div>'
+	// $("select#id_primary_supplier").closest("div").append(str1+str2);
 
 	$("a#add_id_primary_supplier").on("click", function(e){
 		e.preventDefault();
@@ -232,8 +227,8 @@
 <script type="text/javascript">
 (function(){
 $("select#id_producer_of_item").hide();
-var str1 = "<input type=text name='producer_of_item_demo' placeholder='Start typing to search for supplier' id='id_producer_of_item_demo' class='form-control' ng-model='search_producer' autocomplete='off' >";
-$("select#id_producer_of_item").closest("div").append(str1);
+// var str1 = "<input type=text name='producer_of_item_demo' placeholder='Start typing to search for supplier' id='id_producer_of_item_demo' class='form-control' ng-model='search_producer' autocomplete='off' >";
+// $("select#id_producer_of_item").closest("div").append(str1);
 
 $(document).on("click", "#selectable-producer input[type='radio']", function(e){
 	var id = $(this).val();

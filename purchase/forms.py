@@ -2,6 +2,8 @@ from django import forms
 from purchase.models import *
 from purchase.choices import *
 from contacts.models import *
+from premierelevator.models import SystemVariable
+
 
 class CustomModelChoiceField(forms.ModelChoiceField):
      def label_from_instance(self, obj):
@@ -97,6 +99,15 @@ class POForm(forms.ModelForm):
         widget=forms.Select(attrs={"class": "form-control"}))
     po_que = forms.ChoiceField(required=False, choices=PO_QUE,
         widget=forms.Select(attrs={"class": "form-control"}))
+
+    def save(self, commit=True):
+        po = super(POForm, self).save(commit=False)
+        sv = SystemVariable.objects.get(id=1)
+        po.po_number = 'P'+str(sv.next_po_number)
+        sv.next_po_number = sv.next_po_number + 1
+        sv.save()
+        po.save()
+        return po
     
 
 
@@ -168,7 +179,7 @@ class ItemReeiveForm(forms.ModelForm):
 
 class PackingListForm(forms.ModelForm):
     pl_number = forms.CharField( max_length=20, required=True, label='PL Number',
-        widget=forms.TextInput(attrs={"class": "form-control", 'placeholder': "PL Number"}))
+        widget=forms.TextInput(attrs={"class": "form-control", "value": "NEW", "readonly": "readonly"}))
     sl_number = forms.ModelChoiceField(required=False,label='SL Number', queryset=ShippingList.objects.all(), 
         widget=forms.Select(attrs={"class": "form-control"}))
     sold_to = forms.ModelChoiceField(required=False, queryset=Contact.objects.all(), 

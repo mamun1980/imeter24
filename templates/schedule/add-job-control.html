@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style type="text/css">
+.supplier_contact thead{
+	background-color: #E0E0E0 !important;
+}
+.sold_to_contact tbody, .ship_to_contact tbody {
+	background-color: #FFF
+}
+.sold_to_contact tbody tr:hover, .ship_to_contact tbody tr:hover {
+	background-color: #616183;
+}
+
+.contact_box, .item_box {
+	position: relative;
+}
+.input-group {
+	width: 90% !important;
+}
+table#sold_to_contact_details, table#ship_to_contact_details {
+	margin-top: 10px;
+}
+table#sold_to_contact_details th, table#ship_to_contact_details th{
+	background-color: #83AD9E;
+}
+#ship_to_contact_list, #sold_to_contact_list, #items_list {
+	position: absolute;
+	top: 42px;
+	left: 8px;
+	background-color: #DDD;
+	z-index: 1000;
+	/*border: 1px solid #000;*/
+	-webkit-box-shadow: 0px 0px 10px 0px rgba(50, 50, 50, 0.75);
+	-moz-box-shadow:    0px 0px 10px 0px rgba(50, 50, 50, 0.75);
+	box-shadow:         0px 0px 10px 0px rgba(50, 50, 50, 0.75);
+}
+</style>
+<div class="container shadow4 main-body" ng-app="scheduleApp">
+
+<section class="row" >
+	
+
+	<div class="col-md-8 col-md-offset-2" ng-controller="AddJobControlController">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Add Job Control</h4>
+		  	</div>
+			<div class="panel-body">
+				<form action="/schedule/job-control/add/" method="POST" enctype="multipart/form-data">{% csrf_token %}
+					{% include "schedule/partial/job-control-form.html" %}
+					<input type="submit" class="btn btn-primary btn-lg" value="Add job control">
+				</form>
+			</div>
+		</div>
+	</div>
+</section>
+</div>
+
+<script type="text/javascript">
+
+(function(){
+$(".datepicker").datepicker();
+$(document).on("change", "input.decimal", function(e){
+	var myval = parseFloat($(this).val())
+	$(this).val(myval.toFixed(2));
+});
+
+var scheduleApp = angular.module("scheduleApp", [], function ($interpolateProvider) {
+        $interpolateProvider.startSymbol("{[{");
+        $interpolateProvider.endSymbol("}]}");
+});
+scheduleApp.filter('googleSearchFilter', function(){
+    return function(items, token) {
+        
+        if(token != undefined && token != "") {
+            var output=[];
+            var filter_output = [];
+            output = items;
+            // console.log(output);
+            
+            var searchArr = token.split(" ");
+
+            for(var j=0; j<searchArr.length; j++) {
+
+                for(var i=0; i<output.length; i++) {
+                    // console.log(output[i]);
+                    var search_str = output[i].search_string;
+                    // We can remove this if statement when all is updated.
+                    // console.log(search_str);
+                    if (search_str != null) {
+                        var n = search_str.search(new RegExp(searchArr[j], "i"));    
+                        // console.log('search_str is not null');
+                    }
+                    // console.log(n);
+                    if(n != -1) {
+                        filter_output.push(output[i]);
+                    }
+
+                }
+                output = filter_output;
+                filter_output = [];  
+            }
+            
+            return output;
+
+        } else {
+            return items;
+        }   
+    }
+});
+
+	scheduleApp.controller('AddJobControlController', ['$scope', '$http', '$compile', function ($scope, $http, $compile) {
+		$scope.init = function (){
+			$http({method: 'GET', url: "/contacts/list/"}).
+	            success(function(data, status, headers, config) {
+	                // console.log(data);
+	                $scope.contacts = data;
+	                // Select deafult contacts
+	                $("#id_supplier").val($scope.contacts[0].id);
+	        });
+	        
+	        $("#ship_to_contact_list").hide();
+			$("#ship_to_contact_details").hide();
+
+			$("#sold_to_contact_list").hide();
+			$("#sold_to_contact_details").hide();
+		};
+
+		$scope.init();
+
+		// ship to google seach and select
+		$scope.$watch('search_ship_to', function (newValue, oldValue) {
+	        if(newValue != undefined) {
+	        	if(newValue.length > 1) {
+	        		$("#ship_to_contact_list").show();
+	        		console.log(newValue);
+	        	} else {
+	        		$("#ship_to_contact_list").hide();
+	        	}
+	        } 
+	    });
+
+		$scope.selectShipTo = function(con) {
+			$("#ship_to_contact_list").hide();
+			$scope.search_ship_to = ""
+			$scope.ship_to_contact = con;
+			$("#id_ship_to").val(con.id);
+			$("#ship_to_contact_details").show();
+		};
+		// sold to google seach and select
+		$scope.$watch('search_sold_to', function (newValue, oldValue) {
+	        if(newValue != undefined) {
+	        	if(newValue.length > 1) {
+	        		$("#sold_to_contact_list").show();
+	        		console.log(newValue);
+	        	} else {
+	        		$("#sold_to_contact_list").hide();
+	        	}
+	        } 
+	    });
+
+		$scope.selectSoldTo = function(con) {
+			$("#sold_to_contact_list").hide();
+			$scope.search_sold_to = ""
+			$scope.sold_to_contact = con;
+			$("#id_sold_to").val(con.id);
+			$("#sold_to_contact_details").show();
+		};
+
+	}])
+})(jQuery)
+
+</script>
+{% endblock content %}

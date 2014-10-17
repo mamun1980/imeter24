@@ -1,0 +1,183 @@
+<table class="table table-bordered">
+<tr class="bg-info">
+	<th><label for="id_job_number">Job Number:</label></th>
+	<td>
+		<input class="form-control" value="New" id="id_job_number" name="job_number" type="text" readonly="readonly">
+	</td>
+</tr>
+<tr>
+	<th><label for="id_job_name">Job Name:</label></th>
+	<td>
+		<input class="form-control" id="id_job_name" name="job_name" type="text">
+	</td>
+</tr>
+<tr class="bg-info">
+	<th width="150">
+		<label for="id_sold_to">Sold to:</label>
+	</th>
+	<td colspan="3">
+	<div class="contact_box">
+		
+	
+		<input type="text" ng-model="search_sold_to" placeholder="start typing to search sold to contact" class="form-control">
+		<table class="table" id="sold_to_contact_details">
+			<tr>
+				<th width="150">Contact Name</th>
+				<td>{[{ sold_to_contact.contact_name }]}</td>
+			</tr>
+			<tr>
+				<th>Phone</th>
+				<td>{[{ sold_to_contact.phone }]}</td>
+			</tr>
+			<tr>
+				<th>Email</th>
+				<td><span class='bg-info email' ng-repeat="em in sold_to_contact.emails">{[{ em.email_address}]}</span></td>
+			</tr>
+		</table>
+		<table class="table sold_to_contact" id="sold_to_contact_list">
+			<thead>
+				<tr>
+					<th>Contact Name</th><th> City <a href="" class="close">x</a></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="con in contacts | googleSearchFilter:search_sold_to" ng-click="selectSoldTo(con)">
+					
+					<td>{[{con.contact_name}]}</td>
+					<td>{[{con.city}]}</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<select ng-model="sold_to" class="form-control" id="id_sold_to" name="sold_to" style="display:none;">
+			<option ng-repeat="contact in contacts" value="{[{contact.id}]}">{[{ contact.contact_name }]}</option>
+		</select>
+	</div>
+
+	</td>
+</tr>
+<tr>
+	<th width="150">
+		<label for="id_ship_to">Ship to:</label>
+	</th>
+	<td colspan="3">
+	<div class="contact_box">
+		
+	
+		<input type="text" ng-model="search_ship_to" placeholder="start typing to search ship to contact" class="form-control">
+		<table class="table" id="ship_to_contact_details">
+			<tr>
+				<th width="150">Contact Name</th>
+				<td>{[{ ship_to_contact.contact_name }]}</td>
+			</tr>
+			<tr>
+				<th>Phone</th>
+				<td>{[{ ship_to_contact.phone }]}</td>
+			</tr>
+			<tr>
+				<th>Email</th>
+				<td><span class='bg-info email' ng-repeat="em in ship_to_contact.emails">{[{ em.email_address}]}</span></td>
+			</tr>
+		</table>
+		<table class="table ship_to_contact" id="ship_to_contact_list">
+			<thead>
+				<tr>
+					<th>Contact Name</th><th> City <a href="" class="close">x</a></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="con in contacts | googleSearchFilter:search_ship_to" ng-click="selectShipTo(con)">
+					
+					<td>{[{con.contact_name}]}</td>
+					<td>{[{con.city}]}</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<select ng-model="ship_to" class="form-control" id="id_ship_to" name="ship_to" style="display:none;">
+			<option ng-repeat="contact in contacts" value="{[{contact.id}]}">{[{ contact.contact_name }]}</option>
+		</select>
+	</div>
+
+	</td>
+</tr>
+<tr class="bg-info">
+	<th><label for="id_installed_by">Installed By:</label></th>
+	<td>
+		<select class="form-control" id="id_installed_by" name="installed_by">
+		{% for contact in contacts %}
+			<option value="{{contact.id}}">{{contact.contact_name}}</option>
+		{% empty %}
+			<option value="0">None</option>
+		{% endfor %}
+		</select>
+	</td>
+</tr>
+<tr>
+	<th><label for="id_elevetor_type">Elevetor Type:</label></th>
+	<td>
+		<select class="form-control" id="id_elevetor_type" name="elevetor_type">
+		{% for elt in elevetor_types %}
+			<option value="{{elt.id}}">{{elt.elevetor_type}}</option>
+		{% empty %}
+			<option value="0">None</option>
+		{% endfor %}
+		</select>
+	</td>
+</tr>
+<tr class="bg-info">
+	<th><label for="id_number_of_floors">Number of floors:</label></th>
+	<td>
+		<input class="form-control" id="id_number_of_floors" name="number_of_floors" type="text">
+	</td>
+</tr>
+<tr>
+	<th><label for="id_front">Front:</label></th>
+	<td>
+		<input class="form-control" id="id_front" name="front" type="text">
+	</td>
+</tr>
+<tr class="bg-info">
+	<th><label for="id_rear">Rear:</label></th>
+	<td>
+		<input class="form-control" id="id_rear" name="rear" placeholder="Rear" type="text">
+	</td>
+</tr>
+<tr>
+	<th><label for="id_rgw">RGW:</label></th>
+	<td>
+		<input class="form-control" id="id_rgw" name="rgw" placeholder="RGW" type="text">
+	</td>
+</tr>
+<tr class="bg-info">
+	<th><label for="id_capacity">Capacity:</label></th>
+	<td>
+		<input class="form-control" id="id_capacity" name="capacity" placeholder="capacity" type="text">
+	</td>
+</tr>
+<tr>
+	<th><label for="id_customer_po_number">Customer PO Number:</label></th>
+	<td>
+		<input class="form-control" id="id_customer_po_number" name="customer_po_number" placeholder="customer_po_number" type="text">
+	</td>
+</tr>
+<tr class="bg-info">
+	<th><label for="id_delivery_date">Delivery date:</label></th>
+	<td>
+		<input class="form-control datepicker" id="id_delivery_date" name="delivery_date" type="text">
+	</td>
+</tr>
+<tr>
+	<th><label for="id_start_date">Start Date:</label></th>
+	<td>
+		<input class="form-control datepicker" id="id_start_date" name="start_date" type="text">
+	</td>
+</tr>
+
+<tr class="bg-info">
+	<th><label for="id_estimated_price_for_job">Estimated price for job:</label></th>
+	<td>
+		<input class="form-control decimal" id="id_estimated_price_for_job" name="estimated_price_for_job" type="text">
+	</td>
+</tr>
+</table>

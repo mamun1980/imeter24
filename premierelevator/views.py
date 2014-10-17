@@ -13,6 +13,7 @@ from contacts.widgets import *
 from inventory.widgets import *
 from events.widgets import *
 from schedule.widgets import *
+from report.models import Printer
 
 from premierelevator.helper_functions import *
 
@@ -22,6 +23,28 @@ def home(request):
     else:
         LoginForm = ScomUserLoginForm()
         return render_to_response("home.html", {'lform': LoginForm, 'page_title': 'Home' }, context_instance=RequestContext(request))
+
+@login_required
+@csrf_exempt
+def sys_variable(request):
+    printers = Printer.objects.all()
+    try:
+        sv = SystemVariable.objects.get(id=1)
+    except:
+        sv = None
+
+    if request.method == 'POST':
+        # import pdb; pdb.set_trace()
+        sv_form = SystemVariableForm(request.POST, instance=sv)
+        if sv_form.is_valid():
+            sv_form.save()
+            return HttpResponseRedirect("/")
+        else:
+            return render(request, "base/sys-variable.html", {'form': sv_form,'sv': sv, 'printers': printers})
+    else:
+        sv_form = SystemVariableForm(instance=sv)
+        return render_to_response("base/sys-variable.html", {'form': sv_form, 'sv': sv, 'printers': printers}, 
+            context_instance=RequestContext(request))
 
 
 def send_mass_mail(request):

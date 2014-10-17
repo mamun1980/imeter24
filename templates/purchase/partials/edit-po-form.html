@@ -10,7 +10,7 @@
 		<label for="id_next_number">Next Number:</label>
 	</th>
 	<td>
-		<input class="form-control" id="id_next_number" name="next_number" placeholder="Next Number" type="text" value="{{po.next_number}}" readonly="readonly">
+		<input class="form-control" id="id_next_number" name="next_number" placeholder="Next Number" type="text" value="{{next_number}}" readonly="readonly">
 	</td>
 </tr>
 <tr class="bg-info">
@@ -261,7 +261,7 @@
 		</select>
 	</td>
 </tr>
-<tr class="bg-success">
+<tr class="bg-info">
 	<th width="150">
 		<label for="id_items_total">Items:</label>
 	</th>
@@ -308,7 +308,7 @@
 
 					    <td><input type='text' class='form-control item-job-number' name='item_job_number' placeholder='Start typing to search job' value="{{item.job_number}}"><input type='hidden' name='item_job_id' class='item_job_id' value="{{item.job_number.id}}"></td>
 
-					    <td><textarea rows='4' class='form-control' name='item_comment' placeholder='Put your comments here'>{{item.comment}}</textarea></td>
+					    <td><textarea rows='1' class='form-control' name='item_comment' placeholder='Put your comments here'>{{item.comment}}</textarea></td>
 
 					    <td><input type='number' step='0.01' name='qty_received' class='form-control' value='{{item.item_recv}}' readonly></td>
 
@@ -360,7 +360,7 @@
 					</table>
 				</td>
 				<td>
-					<textarea rows="4" class="form-control demo_box" readonly=""></textarea>
+					<textarea rows="1" class="form-control demo_box" readonly=""></textarea>
 				</td>
 				<td>
 					<select class="form-control">
@@ -383,7 +383,7 @@
 					<input type="text" class="form-control demo_box" placeholder="job number" autocomplete="off">
 				</td>
 				<td>
-					<textarea rows="4" class="form-control demo_box" placeholder="Put your comments here"></textarea>
+					<textarea rows="1" class="form-control demo_box" placeholder="Put your comments here"></textarea>
 				</td>
 				<td>
 					<input type="number" step="0.01" class="form-control" placeholder="Qty Received" readonly="readonly">
@@ -395,7 +395,14 @@
 				</tr>				
 			</tbody>
 			<tr id='calculated_total_amount'>
-				<td colspan='4'>Total Amount</td>
+				<td width="150">
+					Items Total Qty:
+				</td>
+				<td colspan="3">
+					<span id='items_total_qty'>{{po.items_total}}</span>
+					<input class="form-control" value="{{po.items_total}}" id="id_items_total" name="items_total" type="hidden">
+				</td>
+				<td>Total Amount</td>
 				<td width="120">{{ po.po_currency.get_currency_icon }} <span class="amount">0</span></td>
 				<td width="10" colspan="5"></td>
 			</tr>
@@ -406,14 +413,6 @@
 	</td>
 </tr>
 
-<tr class="bg-info">
-	<th width="150">
-		<label for="id_items_total">Items Total Qty:</label>
-	</th>
-	<td colspan="3">
-		<input class="form-control" ng-model="item_total_qty" id="id_items_total" name="items_total" placeholder="Items Total" readonly="readonly" step="0.0001" type="text">
-	</td>
-</tr>
 <tr class="bg-success">
 	<th width="150">
 		<label for="id_hst_taxable">Hst taxable:</label>
@@ -423,7 +422,7 @@
 		<option value="0">NO</option>
 		<option value="1">YES</option>
 		</select>
-		<input class="form-control decimal" ng-if="hst_tax" ng-model="hst_tax_amount" ng-blur="addHstAmount($event)" id="id_hst_taxable_amount" name="hst_taxable_amount" placeholder="HST Taxable Amount" value="0.0" step="0.0001" type="currency">
+		<input class="form-control decimal tax" ng-if="hst_tax" ng-blur="addHstAmount($event)" id="id_hst_taxable_amount" name="hst_taxable_amount" placeholder="HST Taxable Amount" value="0.0" step="0.0001" type="currency" ng-model="hst_amount">
 	</td>
 	<th width="150">
 		<label for="id_pst_taxable">Pst taxable:</label>
@@ -434,7 +433,7 @@
 		<option value="1">YES</option>
 		</select>
 		
-		<input class="form-control decimal tax" ng-if="pst_tax" ng-model="pst_tax_amount" id="id_pst_taxable_amount" name="pst_taxable_amount" ng-blur="addPstAmount($event)" placeholder="PST Taxable Amount" value="0.0" step="0.0001" type="currency">
+		<input class="form-control decimal tax" ng-if="pst_tax" id="id_pst_taxable_amount" name="pst_taxable_amount" ng-blur="addPstAmount($event)" step="0.0001" type="currency" ng-model="pst_amount">
 	</td>
 </tr>
 
@@ -455,7 +454,7 @@
 		<label for="id_total_po_amount">Total po amount:</label>
 	</th>
 	<td>
-		<input class="form-control" ng-model="total_amount" id="id_total_po_amount" name="total_po_amount" value="0.0" readonly="readonly" step="0.0001" type="currency">
+		<input class="form-control" ng-model="total_amount" id="id_total_po_amount" name="total_po_amount" readonly="readonly" step="0.0001" type="currency" value="{{po.total_po_amount}}">
 	</td>
 </tr>
 <tr class="bg-success">

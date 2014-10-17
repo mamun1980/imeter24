@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import permission_required
 from schedule.forms import *
 from schedule.models import *
 import json, datetime
+from premierelevator.models import SystemVariable
 # Create your views here.
 def home(request):
     '''
@@ -667,10 +668,119 @@ def edit_comment(request, comid):
         return render(request, "schedule/edit-comment.html", {'comment_form': comment_form, 'comid': comid, 'job_comment': job_comment})
 
 
+@csrf_exempt
+@login_required
+def job_reindex(request):
+    # import pdb; pdb.set_trace()
+    jobs = Job.objects.all()
+    for job in jobs:
+        job.search_string = job.job_number + " " + job.cab_designation + " " + job.job_name + " " + job.customer + " " + job.status + " " + job.description+ " " + job.address_1 + " " + job.customer_contact_name + " " + job.customer_contact_phone_number
+        job.save()
+    return HttpResponseRedirect("/")
 
 
 
+def job_control_add(request):
+    elevetor_types = ElevetorType.objects.all()
+    contacts = Contact.objects.all()
+    if request.method == 'POST':
+        jc_form = JobControlForm(request.POST)
+        if jc_form.is_valid():
+            jc = jc_form.save()
+            try:
+                sv = SystemVariable.objects.get(id=1)
+                jc.job_number = str(sv.next_job_control_number)
+                jc.save()
+                sv.next_job_control_number = sv.next_job_control_number + 1
+                sv.save()
+            except Exception, e:
+                sv = None
+                pass
+            return HttpResponseRedirect("/schedule/job-control/list/")
+        else:
+            return render(request, "schedule/add-job-control.html", 
+                {'form': jc_form,'elevetor_types': elevetor_types, 'contacts': contacts})
+    else:
+        jc_form = JobControlForm()
+        return render(request, "schedule/add-job-control.html", 
+            {'form': jc_form,'elevetor_types': elevetor_types, 'contacts': contacts})
+
+def job_control_list(request):
+    return render(request, "schedule/list-job-control.html", {})
 
 
+def job_control_list_json(request):
+    job_controls = JobControl.objects.all()
+    jc_list = []
+    for jc in job_controls:
+        jc_dict = {}
+        jc_dict['id'] = jc.id
+        jc_dict['job_number'] = jc.job_number
+        if jc.sold_to:
+            jc_dict['sold_to'] = jc.sold_to.contact_name
+        else:
+            jc_dict['sold_to'] = None
+        
+        if jc.ship_to:
+            jc_dict['ship_to'] = jc.ship_to.contact_name
+        else:
+            jc_dict['ship_to'] = None
+        
+        if jc.elevetor_type:
+            jc_dict['elevetor_type'] = jc.elevetor_type.elevetor_type
+        else:
+            jc_dict['elevetor_type'] = None
+
+        jc_dict['number_of_floors'] = jc.number_of_floors
+        jc_dict['front'] = jc.front
+        jc_dict['rear'] = jc.rear
+        jc_dict['rgw'] = jc.rgw
+        jc_dict['capacity'] = jc.capacity
+        jc_dict['customer_po_number'] = jc.customer_po_number
+        if jc.delivery_date:
+            jc_dict['delivery_date'] = jc.delivery_date.isoformat()
+
+        if jc.start_date:
+            jc_dict['start_date'] = jc.start_date.isoformat()
+
+        if jc.installed_by:
+            jc_dict['installed_by'] = jc.installed_by.contact_name
+        jc_dict['job_name'] = jc.job_name
+
+        if jc.estimated_price_for_job:
+            jc_dict['estimated_price_for_job'] = float(jc.estimated_price_for_job)
+        jc_dict['search_string'] = jc.search_string
+
+        jc_list.append(jc_dict)
+
+    jc_json = json.dumps(jc_list)
+
+    return HttpResponse(jc_json, mimetype='application/json')
 
 
+def elevetor_type_add(request):
+    if request.method == 'POST':
+        # import pdb; pdb.set_trace();
+        et_form = ElevetorTypeForm(request.POST)
+        if et_form.is_valid():
+            et = et_form.save()
+            return HttpResponseRedirect("/schedule/elevetor-type/list/")
+        else:
+            return render(request, "schedule/add-elevetor-type.html", 
+                {'form': et_form})
+    else:
+        et_form = ElevetorTypeForm()
+        return render(request, "schedule/add-elevetor-type.html", 
+            {'form': et_form})
+
+
+def elevetor_type_list(request):
+    elevetor_types = ElevetorType.objects.all()
+    return render(request, "schedule/elevetor-type-list.html", {'elevetor_types': elevetor_types})
+
+@csrf_exempt
+def elevetor_type_delete(request):
+    et_id = request.POST.get("et_id")
+    et = ElevetorType.objects.get(id=et_id)
+    et.delete()
+    return HttpResponse(et_id)

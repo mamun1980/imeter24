@@ -7,8 +7,10 @@ from contacts.models import *
 import selectable
 from django.db import models
 from django.utils.safestring import mark_safe
-
+from premierelevator.models import SystemVariable
 from django.forms import Widget, TextInput
+
+
 class PremierTextInput(TextInput):
 	"""docstring for PremierTextInput"""
 	# def __init__(self, arg):
@@ -51,9 +53,11 @@ class CustomsDesignationForm(forms.ModelForm):
 
 class ItemForm(forms.ModelForm):
 	item_number = forms.CharField( max_length=25,
-        widget=forms.TextInput(attrs={"class": "form-control", 'required': 'True', 'placeholder':"Item Number"}))
+        widget=forms.TextInput(attrs={"class": "form-control", "value": 'NEW', 'readonly': 'readonly'}))
 	description = forms.CharField( max_length=250, required=False,
         widget=forms.Textarea(attrs={"class": "form-control", 'rows':2, 'required': 'False', 'placeholder':"Item Description"}))
+	currency = forms.ModelChoiceField(required=False, queryset=Currency.objects.all(),
+        widget=forms.Select(attrs={"class": "form-control"}))
 	wholesale_cost = forms.DecimalField(max_digits=10, decimal_places=2, required=False,
         widget=forms.NumberInput(attrs={"class": "form-control decimal", 'placeholder':"Wholesale cost"}))
 	quantity_on_hand = forms.DecimalField(max_digits=10, decimal_places=2, required=False,
@@ -75,8 +79,6 @@ class ItemForm(forms.ModelForm):
 
 	# stock_status_type = forms.ChoiceField(required=False, choices=STOCK_STATUS_TYPE,
  #        widget=forms.Select(attrs={"class": "form-control"}))
-	currency = forms.ModelChoiceField(required=False, queryset=Currency.objects.all(),
-        widget=forms.Select(attrs={"class": "form-control"}))
 	warehouse_location = forms.ModelChoiceField(required=False, queryset=Location.objects.all(),
         widget=forms.Select(attrs={"class": "form-control"}))
 
@@ -127,6 +129,8 @@ class ItemForm(forms.ModelForm):
         widget=forms.NumberInput(attrs={"class": "form-control decimal", 'placeholder':"Duty percentage"}))
 	# site = forms.ModelChoiceField(required=False, queryset=Contact.objects.all(),
  #        widget=forms.Select(attrs={"class": "form-control"}))
+	terms = forms.ModelChoiceField(required=False, queryset=PaymentTerm.objects.all(),
+        widget=forms.Select(attrs={"class": "form-control"}))
 	website = forms.CharField(max_length=250, required=False,
         widget=forms.URLInput(attrs={"class": "form-control", 'placeholder':"product page url"}))
 	# item_image = forms.CharField(max_length=250, required=False,
@@ -144,14 +148,18 @@ class ItemForm(forms.ModelForm):
 
 	class Meta:
 		model = Item
-		fields = ('item_number', 'description', 'wholesale_cost', 'quantity_on_hand', 'quantity_on_order', 'department', 'primary_supplier', 'item_unit_measure', 
-			'currency', 'warehouse_location', 'qty_on_request', 'minimum_qty',
+		fields = ('item_number', 'description', 'currency', 'wholesale_cost', 'quantity_on_hand', 'quantity_on_order', 'qty_on_request', 'department', 'primary_supplier', 'item_unit_measure', 
+			 'warehouse_location', 'minimum_qty',
 			'max_order_qty', 'max_single_order_qty', 'estimated_wholesale_cost', 'retail_price', 'production_type',
 			'catalog_number', 'country_of_origin', 'lead_time', 'customs_designation', 'customer_tariff_number', 'preference_criteria',
-			'producer_of_item', 'shipping_weight', 'minimum_qty_on_hand', 'duty_percentage', 'website', 'item_image')
+			'producer_of_item', 'shipping_weight', 'minimum_qty_on_hand', 'duty_percentage', 'terms', 'website', 'item_image')
 
 	def save(self, commit=True):
 		item = super(ItemForm, self).save(commit=False)
+		sv = SystemVariable.objects.get(id=1)
+		item.item_number = str(sv.next_item_number)
+		sv.next_item_number = sv.next_item_number + 1
+		sv.save()
 		item.search_string = item.item_number + " " + item.description
 		if item.primary_supplier:
 			item.search_string += " " + item.primary_supplier.contact_name
