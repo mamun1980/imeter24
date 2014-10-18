@@ -63,20 +63,7 @@
 		<input class="form-control decimal" id="id_max_single_order_qty" name="max_single_order_qty" placeholder="Maximum Single Order Quenty" step="0.01" type="number">
 	</td>
 </tr>
-<tr>
-	<th colspan="1">
-		<label for="id_department">Department:</label>
-	</th>
-	<td colspan="5">
-		{{ item_form.department.errors }}
-		<select class="form-control" id="id_department" name="department">
-		<option value="" selected="selected">---------</option>
-		{% for department in departments %}
-			<option value="{{department.id}}">{{department.name}}</option>
-		{% endfor %}
-		</select>
-	</td>
-</tr>
+
 <tr>
 	<th colspan="1">
 		<label for="id_primary_supplier">Primary supplier:</label>
@@ -114,6 +101,34 @@
 			</option>
 		{% endfor %}
 		
+		</select>
+	</td>
+</tr>
+<tr>
+	<th colspan="1">
+		<label for="id_terms">Terms:</label>
+	</th>
+	<td colspan="5">
+		{{ item_form.terms.errors }}
+		<select class="form-control" id="id_terms" name="terms">
+		<option value="" selected="selected">---------</option>
+		{% for term in terms %}
+			<option value="{{term.id}}">{{term.term}}</option>
+		{% endfor %}
+		</select>
+	</td>
+</tr>
+<tr>
+	<th colspan="1">
+		<label for="id_department">Department:</label>
+	</th>
+	<td colspan="5">
+		{{ item_form.department.errors }}
+		<select class="form-control" id="id_department" name="department">
+		<option value="" selected="selected">---------</option>
+		{% for department in departments %}
+			<option value="{{department.id}}">{{department.name}}</option>
+		{% endfor %}
 		</select>
 	</td>
 </tr>
@@ -276,20 +291,7 @@
 		<input class="form-control decimal" id="id_duty_percentage" name="duty_percentage" placeholder="Duty percentage" step="0.01" type="number">
 	</td>
 </tr>
-<tr>
-	<th colspan="1">
-		<label for="id_terms">Terms:</label>
-	</th>
-	<td colspan="5">
-		{{ item_form.terms.errors }}
-		<select class="form-control" id="id_terms" name="terms">
-		<option value="" selected="selected">---------</option>
-		{% for term in terms %}
-			<option value="{{term.id}}">{{term.term}}</option>
-		{% endfor %}
-		</select>
-	</td>
-</tr>
+
 <tr>
 	<th colspan="1">
 		<label for="id_website">Website:</label>

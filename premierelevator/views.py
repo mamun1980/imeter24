@@ -13,7 +13,7 @@ from contacts.widgets import *
 from inventory.widgets import *
 from events.widgets import *
 from schedule.widgets import *
-from report.models import Printer
+from report.models import Printer, Report
 
 from premierelevator.helper_functions import *
 
@@ -28,6 +28,7 @@ def home(request):
 @csrf_exempt
 def sys_variable(request):
     printers = Printer.objects.all()
+    reports = Report.objects.all()
     try:
         sv = SystemVariable.objects.get(id=1)
     except:
@@ -40,10 +41,12 @@ def sys_variable(request):
             sv_form.save()
             return HttpResponseRedirect("/")
         else:
-            return render(request, "base/sys-variable.html", {'form': sv_form,'sv': sv, 'printers': printers})
+            return render(request, "base/sys-variable.html", 
+                {'form': sv_form,'sv': sv, 'printers': printers, 'reports': reports})
     else:
         sv_form = SystemVariableForm(instance=sv)
-        return render_to_response("base/sys-variable.html", {'form': sv_form, 'sv': sv, 'printers': printers}, 
+        return render_to_response("base/sys-variable.html", 
+            {'form': sv_form, 'sv': sv, 'printers': printers, 'reports': reports}, 
             context_instance=RequestContext(request))
 
 

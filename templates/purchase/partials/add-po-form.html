@@ -171,8 +171,20 @@
 	<th width="150">
 		<label for="id_fob">Fob:</label>
 	</th>
-	<td colspan="3">
+	<td>
 		<input class="form-control" id="id_fob" maxlength="200" name="fob" placeholder="FOB" type="text" value="1400 Phillip Murray Avenue, Oshawa, Ontario - L1J7E8">
+	</td>
+	<th>
+		<label for="id_po_overwridden_by">Po overwridden by:</label>
+	</th>
+	<td>
+		<select class="form-control" id="id_po_overwridden_by" name="po_overwridden_by">
+		{% for user in adminusers %}
+			<option value="{{user.id}}">
+				{{ user.first_name }} {{ user.last_name }}
+			</option>
+		{% endfor %}
+		</select>
 	</td>
 </tr>
 
@@ -423,34 +435,6 @@
 	</th>
 	<td>
 		<input class="form-control" ng-model="total_amount" id="id_total_po_amount" name="total_po_amount" value="0.0" readonly="readonly" step="0.0001" type="currency">
-	</td>
-</tr>
-<tr class="bg-success">
-	<th width="150">
-		<label for="id_po_que">Po action:</label>
-	</th>
-	<td>
-		<select class="form-control" id="id_po_que" name="po_que">
-		<option value="0">None</option>
-		<option value="1">Print</option>
-		<option value="2">Fax</option>
-		<option value="3">Email</option>
-		<option value="4">Print &amp; Fax</option>
-		<option value="5">Print &amp; Email</option>
-		<option value="6">Print, Fax &amp; Email</option>
-		</select>
-	</td>
-	<th>
-		<label for="id_po_overwridden_by">Po overwridden by:</label>
-	</th>
-	<td>
-		<select class="form-control" id="id_po_overwridden_by" name="po_overwridden_by">
-		{% for user in adminusers %}
-			<option value="{{user.id}}">
-				{{ user.first_name }} {{ user.last_name }}
-			</option>
-		{% endfor %}
-		</select>
 	</td>
 </tr>
 

@@ -1,10 +1,9 @@
 from django.db import models
-from report.models import Printer
+from report.models import Printer, Report
 
 
 class SystemVariable(models.Model):
 	next_job_number = models.IntegerField(null=True, blank=False)
-	next_job_control_number = models.IntegerField(null=True, blank=False)
 	next_item_number = models.IntegerField(null=True, blank=False)
 	next_po_number = models.IntegerField(null=True, blank=False)
 	next_sl_number = models.IntegerField(null=True, blank=False)
@@ -19,6 +18,11 @@ class SystemVariable(models.Model):
 	default_printer_for_pl = models.ForeignKey(Printer,null=True, blank=True, related_name="default_printer_for_pl")
 	default_printer_for_invoice = models.ForeignKey(Printer,null=True, blank=True, related_name="default_printer_for_invoice")
 	default_printer_for_user = models.ForeignKey(Printer,null=True, blank=True, related_name="default_printer_for_user")
+
+	default_report_for_po = models.ForeignKey(Report,null=True, blank=True, related_name="default_report_for_po")
+	default_report_for_sl = models.ForeignKey(Report,null=True, blank=True, related_name="default_report_for_sl")
+	default_report_for_pl = models.ForeignKey(Report,null=True, blank=True, related_name="default_report_for_pl")
+	default_report_for_invoice = models.ForeignKey(Report,null=True, blank=True, related_name="default_report_for_invoice")
 
 	def __unicode__(self):
 		return self.id

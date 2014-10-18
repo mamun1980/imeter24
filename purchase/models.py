@@ -118,6 +118,8 @@ class PurchaseOrder(models.Model):
 		return dict(PO_STATUS)[int(self.po_status)]
 
 	def que_verbose(self):
+		if self.po_que == '':
+			self.po_que = '0'
 		return dict(PO_QUE)[int(self.po_que)]
 
 	def get_return_type(self):

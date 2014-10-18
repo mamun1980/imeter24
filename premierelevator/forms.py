@@ -27,14 +27,6 @@ class SystemVariableForm(forms.ModelForm):
 		check = True
 		while check:
 			try:
-				job = JobControl.objects.get(job_number=sv.next_job_control_number)
-				sv.next_job_control_number = sv.next_job_control_number + 1
-			except JobControl.DoesNotExist:
-				check = False
-				pass
-		check = True
-		while check:
-			try:
 				item = Item.objects.get(item_number=sv.next_item_number)
 				sv.next_item_number = sv.next_item_number + 1
 			except Item.DoesNotExist:
@@ -79,13 +71,6 @@ class SystemVariableForm(forms.ModelForm):
 		except Job.DoesNotExist:
 			return next_job_number
 
-	def clean_next_job_control_number(self):
-		next_job_control_number = self.cleaned_data['next_job_control_number']
-		try:
-			job = JobControl.objects.get(job_number=next_job_control_number)
-			raise ValidationError('Job number already exist ...')
-		except JobControl.DoesNotExist:
-			return next_job_control_number
 
 	def clean_next_item_number(self):
 		next_item_number = self.cleaned_data['next_item_number']

@@ -1,57 +1,80 @@
 <table class="table">
 <tr>
-	<th><label for="id_next_job_control_number">Next Job Control Number:</label></th>
-	<td>
-		{{ form.next_job_control_number.errors }}
-		<input class="form-control" id="id_next_job_control_number" name="next_job_control_number" placeholder="Next Job Control Number" type="number" value="{{sv.next_job_control_number}}">
-	</td>
 	<th><label for="id_next_job_number">Next Job Number:</label></th>
 	<td>
 		{{ form.next_job_number.errors }}
 		<input class="form-control" id="id_next_job_number" name="next_job_number" placeholder="Next Job Number" type="number" value="{{sv.next_job_number}}">
 	</td>
-</tr>
-<tr>
 	<th><label for="id_next_item_number">Next Item Number:</label></th>
 	<td>
 		{{ form.next_item_number.errors }}
 		<input class="form-control" id="id_next_item_number" name="next_item_number" placeholder="Next Item Number" type="number" value="{{sv.next_item_number}}">
 	</td>
-
-	<th><label for="id_default_printer_for_user">Default printer for User:</label></th>
-	<td>
-		{{ form.default_printer_for_user.errors }}
-		<select class="form-control" id="id_default_printer_for_user" name="default_printer_for_user">
-		{% for printer in printers %}
-			<option value="{{printer.printer_id}}" {% if sv.default_printer_for_user.printer_id == printer.printer_id %} selected='selected' {% endif %}>{{printer.printer_id}}</option>
-		{% endfor %}
-		</select>
-	</td>
 </tr>
 <tr>
-	<th><label for="id_next_po_number">Next PO Number:</label></th>
+	<th><label for="id_next_sl_number">Next SL Number:</label></th>
 	<td>
-		{{ form.next_po_number.errors }}
-		<input class="form-control" id="id_next_po_number" name="next_po_number" placeholder="Next PO Number" type="number" value="{{sv.next_po_number}}">
+		{{ form.next_sl_number.errors }}
+		<input class="form-control" id="id_next_sl_number" name="next_sl_number" placeholder="Next SL Number" type="number" value="{{sv.next_sl_number}}">
 	</td>
-	<th><label for="id_default_printer_for_po">Default printer for PO:</label></th>
+	<th><label for="id_next_invoice_number">Next Invoice Number:</label></th>
 	<td>
-		{{ form.default_printer_for_po.errors }}
-		<select class="form-control" id="id_default_printer_for_po" name="default_printer_for_po">
-		{% for printer in printers %}
-			<option value="{{printer.printer_id}}" {% if sv.default_printer_for_po.printer_id == printer.printer_id %} selected {% endif %}>{{printer.printer_id}}</option>
-		{% endfor %}
-		</select>
-	</td>
+		{{ form.next_invoice_number.errors }}
+		<input class="form-control" id="id_next_invoice_number" name="next_invoice_number" placeholder="Next Invoice Number" type="number" value="{{sv.next_invoice_number}}">
+	</td>	
 </tr>
-
 <tr>
 	<th><label for="id_next_pl_number">Next PL Number:</label></th>
 	<td>
 		{{ form.next_pl_number.errors }}
 		<input class="form-control" id="id_next_pl_number" name="next_pl_number" placeholder="Next PL Number" type="number" value="{{sv.next_pl_number}}">
 	</td>
-	<th><label for="id_default_printer_for_po">Default printer for PL:</label></th>
+	<th><label for="id_next_po_number">Next PO Number:</label></th>
+	<td>
+		{{ form.next_po_number.errors }}
+		<input class="form-control" id="id_next_po_number" name="next_po_number" placeholder="Next PO Number" type="number" value="{{sv.next_po_number}}">
+	</td>
+	
+</tr>
+<tr class="bg-primary">
+	<td colspan="4" align="center"><b>Default printer settings</b></td>
+</tr>
+<tr>
+	<th><label for="id_default_printer_for_invoice">Default printer for Invoice:</label></th>
+	<td>
+		{{ form.default_printer_for_invoice.errors }}
+		<select class="form-control" id="id_default_printer_for_invoice" name="default_printer_for_invoice">
+		<option value="">None selected</option>
+		{% for printer in printers %}
+			<option value="{{printer.printer_id}}" {% if sv.default_printer_for_invoice.printer_id == printer.printer_id %} selected {% endif %}>{{printer.printer_id}}</option>
+		{% endfor %}
+		</select>
+	</td>
+	<th><label for="id_default_printer_for_sl">Default printer for SL:</label></th>
+	<td>
+		{{ form.default_printer_for_sl.errors }}
+		<select class="form-control" id="id_default_printer_for_sl" name="default_printer_for_sl">
+		<option value="">None selected</option>
+		{% for printer in printers %}
+			<option value="{{printer.printer_id}}" {% if sv.default_printer_for_sl.printer_id == printer.printer_id %} selected {% endif %}>{{printer.printer_id}}</option>
+		{% endfor %}
+		</select>
+	</td>
+	
+</tr>
+<tr>
+	
+	<th><label for="id_default_printer_for_po">Default printer for PO:</label></th>
+	<td>
+		{{ form.default_printer_for_po.errors }}
+		<select class="form-control" id="id_default_printer_for_po" name="default_printer_for_po">
+		<option value="">None selected</option>
+		{% for printer in printers %}
+			<option value="{{printer.printer_id}}" {% if sv.default_printer_for_po.printer_id == printer.printer_id %} selected {% endif %}>{{printer.printer_id}}</option>
+		{% endfor %}
+		</select>
+	</td>
+	<th><label for="id_default_printer_for_pl">Default printer for PL:</label></th>
 	<td>
 		{{ form.default_printer_for_pl.errors }}
 		<select class="form-control" id="id_default_printer_for_pl" name="default_printer_for_pl">
@@ -62,37 +85,70 @@
 	</td>
 </tr>
 <tr>
-	<th><label for="id_next_sl_number">Next SL Number:</label></th>
-	<td>
-		{{ form.next_sl_number.errors }}
-		<input class="form-control" id="id_next_sl_number" name="next_sl_number" placeholder="Next SL Number" type="number" value="{{sv.next_sl_number}}">
-	</td>
-	<th><label for="id_default_printer_for_sl">Default printer for SL:</label></th>
-	<td>
-		{{ form.default_printer_for_sl.errors }}
-		<select class="form-control" id="id_default_printer_for_sl" name="default_printer_for_sl">
+	<th><label for="id_default_printer_for_user">Default printer for User:</label></th>
+	<td colspan="3">
+		{{ form.default_printer_for_user.errors }}
+		<select class="form-control" id="id_default_printer_for_user" name="default_printer_for_user">
+		<option value="">None selected</option>
 		{% for printer in printers %}
-			<option value="{{printer.printer_id}}" {% if sv.default_printer_for_sl.printer_id == printer.printer_id %} selected {% endif %}>{{printer.printer_id}}</option>
-		{% endfor %}
-		</select>
-	</td>
-</tr>
-<tr>
-	<th><label for="id_next_invoice_number">Next Invoice Number:</label></th>
-	<td>
-		{{ form.next_invoice_number.errors }}
-		<input class="form-control" id="id_next_invoice_number" name="next_invoice_number" placeholder="Next Invoice Number" type="number" value="{{sv.next_invoice_number}}">
-	</td>
-	<th><label for="id_default_printer_for_invoice">Default printer for Invoice:</label></th>
-	<td>
-		{{ form.default_printer_for_invoice.errors }}
-		<select class="form-control" id="id_default_printer_for_invoice" name="default_printer_for_invoice">
-		{% for printer in printers %}
-			<option value="{{printer.printer_id}}" {% if sv.default_printer_for_invoice.printer_id == printer.printer_id %} selected {% endif %}>{{printer.printer_id}}</option>
+			<option value="{{printer.printer_id}}" {% if sv.default_printer_for_user.printer_id == printer.printer_id %} selected='selected' {% endif %}>{{printer.printer_id}}</option>
 		{% endfor %}
 		</select>
 	</td>
 	
+</tr>
+<tr class="bg-primary">
+	<td colspan="4" align="center"><b>Default report settings</b></td>
+</tr>
+<tr>
+	<th><label for="id_default_report_for_invoice">Default report for Invoice:</label></th>
+	<td>
+		{{ form.default_report_for_invoice.errors }}
+		<select class="form-control" id="id_default_report_for_invoice" name="default_report_for_invoice">
+		<option value="">None selected</option>
+		{% for report in reports %}
+			<option value="{{report.id}}" {% if sv.default_report_for_invoice.id == report.id %} selected {% endif %}>{{report.report_type}}</option>
+		{% endfor %}
+		</select>
+	</td>
+	<th><label for="id_default_report_for_sl">Default report for SL:</label></th>
+	<td>
+		{{ form.default_printer_for_sl.errors }}
+		<select class="form-control" id="id_default_report_for_sl" name="default_report_for_sl">
+		<option value="">None selected</option>
+		{% for report in reports %}
+			<option value="{{report.id}}" {% if sv.default_report_for_sl.id == report.id %} selected {% endif %}>{{report.report_type}}</option>
+		{% endfor %}
+		</select>
+	</td>
+	
+</tr>
+<tr>
+	
+	<th><label for="id_default_report_for_po">Default report for PO:</label></th>
+	<td>
+		{{ form.default_report_for_po.errors }}
+		<select class="form-control" id="id_default_report_for_po" name="default_report_for_po">
+		<option value="">None selected</option>
+		{% for report in reports %}
+			<option value="{{report.id}}" {% if sv.default_report_for_po.id == report.id %} selected {% endif %}>{{report.report_type}}</option>
+		{% endfor %}
+		</select>
+	</td>
+	<th><label for="id_default_report_for_po">Default report for PL:</label></th>
+	<td>
+		{{ form.default_report_for_pl.errors }}
+		<select class="form-control" id="id_default_report_for_pl" name="default_report_for_pl">
+		<option value="">None selected</option>
+		{% for report in reports %}
+			<option value="{{report.id}}" {% if sv.default_report_for_pl.id == report.id %} selected {% endif %}>{{report.report_type}}</option>
+		{% endfor %}
+		</select>
+	</td>
+</tr>
+
+<tr class="bg-primary">
+	<td colspan="4" align="center"><b>Email server settings</b></td>
 </tr>
 <tr>
 	<th><label for="id_email_server_host_name">Email server host name:</label></th>
