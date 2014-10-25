@@ -44,14 +44,15 @@
 	<div class="col-md-8 col-md-offset-2">
 		<div class="panel panel-primary">
 			<div class="panel-heading">
-		    	<h4>Add/Update Inventory Item</h4>
+		    	<h4>Add / Update Inventory Item</h4>
 		  	</div>
 		  	<div class="panel-body">
 		  	<form action="/inventory/item/add/" enctype="multipart/form-data" name="inventory-item-form" method="POST">{% csrf_token %}
 		  		
-		  		{% include "inventory/item/add-item-form.html" %}
+		  		{% include "inventory/item/add-item-form-v2.html" %}
 	    		  	<div class="btn btn-lg">
-						<button class="btn btn-primary btn-lg" type="submit">Add Inventory Item</button>
+						<button class="btn btn-primary btn-lg" ng-disabled="submit_add" type="submit">Add Inventory Item</button>
+						<button class="btn btn-primary btn-lg" ng-disabled="!submit_add" type="submit">Update Inventory Item</button>
 					</div>
 					
 		  	</form>
@@ -224,6 +225,9 @@
 <script type="text/javascript">
 (function(){
 $("select#id_producer_of_item").hide();
+$("a.close").on("click", function(){
+	$(this).closest('table').hide();
+});
 // var str1 = "<input type=text name='producer_of_item_demo' placeholder='Start typing to search for supplier' id='id_producer_of_item_demo' class='form-control' ng-model='search_producer' autocomplete='off' >";
 // $("select#id_producer_of_item").closest("div").append(str1);
 
@@ -234,7 +238,6 @@ $(document).on("click", "#selectable-producer input[type='radio']", function(e){
 	$("select#id_producer_of_item option[value='"+ id.trim()+"']").prop("selected", true);
 	console.log(id);
 	console.log(c_n);
-
 });
 
 $("#selectable-producer a.close").on("click", function(){
@@ -249,6 +252,7 @@ var inventoryApp = angular.module("inventoryApp", [], function ($interpolateProv
         $interpolateProvider.startSymbol("{[{");
         $interpolateProvider.endSymbol("}]}");
 });
+
 inventoryApp.filter('googleSearchFilter', function(){
     return function(items, token) {
         // console.log(token);
@@ -288,7 +292,7 @@ inventoryApp.filter('googleSearchFilter', function(){
         }   
     }
 });
-inventoryApp.controller('AddItemController',['$scope', '$http', '$compile', function ($scope, $http, $compile) {
+inventoryApp.controller('AddItemController',['$scope', '$http', function ($scope, $http) {
 	
 	$scope.init = function() {
 		$http({method: 'GET', url: "/contacts/list/"}).
@@ -299,6 +303,9 @@ inventoryApp.controller('AddItemController',['$scope', '$http', '$compile', func
 
         $("#selectable").hide();
         $("#selectable-producer").hide();
+        $scope.submit_add = false;
+        $scope.show_item_list = false;
+
 	};
 
 	$scope.init();
@@ -346,25 +353,105 @@ inventoryApp.controller('AddItemController',['$scope', '$http', '$compile', func
         	} else {
         		$("#selectable-producer").hide();
         	}
-        } 
+        }
     });
+
+    
     $scope.searchItem = function(q) {
     	console.log(q);
-		if(q.length > 0) {
+		if(q.length > 1) {
 			
 			$http({method: 'GET', url: "/inventory/items/"}).
 	        	success(function(data, status, headers, config){
 	        	$scope.items = data;
 	        });
-			$("#items_list").show();
+			// $("#items_list").show();
+			$scope.show_item_list = true;
 		} else {
-			$("#items_list").hide();
+			// $("#items_list").hide();
+			$scope.show_item_list = false;
 		}
+		// $scope.$apply();
 		
 	};
 
 	$scope.selectItem = function(item) {
+		item_number = item.item_number
+		item_url = "/inventory/get-item/"+item_number+"/"
+		$scope.hello = false;
+		$http({method: 'GET', url: item_url}).
+        	success(function(data, status, headers, config){
+        	
+        	$scope.show_item_list = false;
+        	console.log(data);
+        	// $("#items_list").hide();
+        	$scope.submit_add = true;
 
+        	$("#id_item_number").val(data.item_number);
+        	$("#id_description").val(data.description);
+        	$("#id_quantity_on_hand").val(data.quantity_on_hand);
+        	$("#id_quantity_on_order").val(data.quantity_on_order);
+        	$("#id_qty_on_request").val(data.qty_on_request);
+        	$("#id_minimum_qty").val(data.minimum_qty);
+        	$("#id_max_order_qty").val(data.max_order_qty);
+        	$("#id_max_single_order_qty").val(data.max_single_order_qty);
+        	
+        	$("#id_primary_supplier").val(data.primary_supplier);
+
+        	$("#id_wholesale_cost").val(data.wholesale_cost);
+        	$("#id_currency").val(data.currency_id);
+        	$("#id_terms").val(data.terms_id);
+        	$("#id_department").val(data.department_id);
+        	$("#id_item_unit_measure").val(data.item_unit_measure_id);
+        	$("#id_warehouse_location").val(data.warehouse_location_id);
+        	$("#id_estimated_wholesale_cost").val(data.estimated_wholesale_cost);
+        	$("#id_retail_price").val(data.retail_price);
+        	$("#id_production_type").val(data.production_type_id);
+        	$("#id_catalog_number").val(data.catalog_number);
+        	$("#id_country_of_origin").val(data.country_of_origin);
+        	$("#id_lead_time").val(data.lead_time);
+        	$("#id_customs_designation").val(data.customs_designation);
+        	$("#id_customer_tariff_number").val(data.customer_tariff_number);
+        	$("#id_preference_criteria").val(data.preference_criteria);
+        	$("#id_producer_of_item").val(data.producer_of_item_id);
+        	$("#id_shipping_weight").val(data.shipping_weight);
+        	$("#id_minimum_qty_on_hand").val(data.minimum_qty_on_hand);
+        	$("#id_duty_percentage").val(data.duty_percentage);
+        	$("#id_website").val(data.website);
+
+        	// $scope.item_number = data.item_number;
+        	// $scope.description = data.description;
+        	// $scope.qonh = parseFloat(data.quantity_on_hand);
+        	// $scope.qono = data.quantity_on_order;
+        	// $scope.qonr = data.qty_on_request;
+        	// $scope.mqbr = data.minimum_qty;
+        	// $scope.moq = data.max_order_qty;
+        	// $scope.msoq = data.max_single_order_qty;
+        	// $scope.primary_supplier = data.primary_supplier;
+        	// $scope.wc = data.wholesale_cost;
+        	// $scope.currency = data.currency_id;
+        	// $scope.term = data.term_id;
+        	// $scope.department = data.department_id;
+        	// $scope.item_unit_measure = data.item_unit_measure_id;
+        	// $scope.location = data.location_id;
+        	// $scope.ewc = data.estimated_wholesale_cost;
+        	// $scope.rp = data.retail_price;
+        	// $scope.production_type = data.production_type_id;
+        	// $scope.catalog_number = data.catalog_number;
+        	// $scope.coo = data.country_of_origin;
+        	// $scope.lead_time = data.lead_time;
+        	// $scope.customdesignation = datacustomdesignation_id;
+        	// $scope.ctn = data.customer_tariff_number;
+        	// $scope.pcriteria = data.preference_criteria;
+        	// $scope.producer_of_item = data.producer_of_item;
+        	// $scope.sw = data.shipping_weight;
+        	// $scope.minqonh = data.minimum_qty_on_hand;
+        	// $scope.dutyp = data.duty_percentage;
+        	// $scope.website = data.website;
+        	// $scope.ctn = data.customer_tariff_number;
+        });
+		// $scope.$apply();
+		// alert(item.item_number);
 	}
 
 

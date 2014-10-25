@@ -157,9 +157,9 @@ class ItemForm(forms.ModelForm):
 	def save(self, commit=True):
 		item = super(ItemForm, self).save(commit=False)
 		sv = SystemVariable.objects.get(id=1)
-		item.item_number = str(sv.next_item_number)
-		sv.next_item_number = sv.next_item_number + 1
-		sv.save()
+		# sv.next_item_number = item.item_number
+		# sv.next_item_number = sv.next_item_number + 1
+		# sv.save()
 		item.search_string = item.item_number + " " + item.description
 		if item.primary_supplier:
 			item.search_string += " " + item.primary_supplier.contact_name

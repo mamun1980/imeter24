@@ -21,9 +21,19 @@ def add_item(request):
     production_types = ProductionType.objects.all()
     terms = PaymentTerm.objects.all()
     if request.method == "POST":
-        item_form = ItemForm(request.POST, request.FILES)
-        if item_form.is_valid():
-            item = item_form.save()
+        item_number = request.POST.get("item_number","")
+        if not item_number == "":
+            try:
+                item = Item.objects.get(item_number=item_number)
+                item_form = ItemForm(request.POST, request.FILES, instance=item)
+            except Exception, e:
+                item_form = ItemForm(request.POST, request.FILES)
+            else:
+                pass
+            finally:
+                if item_form.is_valid():
+                    item = item_form.save()
+        
             return HttpResponseRedirect("/inventory/list/#/inventory/items")  
     else:
         item_form = ItemForm()
@@ -32,7 +42,7 @@ def add_item(request):
 
     # return render(request, "inventory/item/test.html", {'item_form': item_form, 'page_title': 'Add Item'})
     
-    return render(request, "inventory/item/add-item.html", 
+    return render(request, "inventory/item/add-item-v2.html", 
         {'item_form': item_form, 'page_title': 'Add Item', 'currencies': currencies, 
         'departments': departments, 'unit_measures': unit_measures, 'locations': locations,
         'production_types': production_types, 'terms': terms})
@@ -204,7 +214,11 @@ def list_item(request):
         if item.warehouse_location:
             item_dict['warehouse_location'] = item.warehouse_location.warehouse_location
             item_dict['location_description'] = item.warehouse_location.description
-        item_dict['production_type'] = item.production_type
+        if item.production_type:
+            item_dict['production_type'] = item.production_type.production_type_name
+        else:
+            item_dict['production_type'] = None
+
         item_dict['search_string'] = item.search_string
 
 
@@ -237,6 +251,105 @@ def get_filtered_items(request):
         json_posts = json.dumps(inventory_dict_list)
         return HttpResponse(json_posts, mimetype='application/json')
 
+def get_item(request, itemnumber):
+    user = request.user
+    item = Item.objects.get(item_number=itemnumber)
+    item_dict = {}
+    item_dict['item_number'] = item.item_number
+    item_dict['label'] = item.item_number
+    item_dict['description'] = item.description
+    if item.qty_received:
+        item_dict['qty_received'] = float(item.qty_received)
+    else:
+        item_dict['qty_received'] = 0.0
+
+    if item.qty_received_date:
+        item_dict['qty_received_date'] = item.qty_received_date.strftime('%b, %d %Y')
+    else:
+        item_dict['qty_received_date'] = None
+
+    if item.wholesale_cost:
+        item_dict['wholesale_cost'] = item.wholesale_cost.to_eng_string()
+    else:
+        item_dict['wholesale_cost'] = 0.0
+
+    if item.currency:
+        item_dict['currency'] = item.currency.currency
+        item_dict['currency_id'] = item.currency.id
+    else:
+        item_dict['currency'] = None
+    if not item.quantity_on_hand:
+        item_dict['quantity_on_hand'] = 0
+    else:
+        item_dict['quantity_on_hand'] = float(item.quantity_on_hand)
+
+    if not item.quantity_on_order:
+        item_dict['quantity_on_order'] = 0
+    else:
+        item_dict['quantity_on_order'] = float(item.quantity_on_order)
+
+    if item.primary_supplier:
+        item_dict['primary_supplier'] = item.primary_supplier.contact_name
+    else:
+        item_dict['primary_supplier'] = None
+
+    if item.last_PO_date_ordered:
+        item_dict['last_ordered'] = item.last_PO_date_ordered.isoformat()
+    else:
+        item_dict['last_ordered'] = None
+
+
+    if item.department:
+        item_dict['department'] = item.department.name
+        item_dict['department_id'] = item.department.id
+    else:
+        item_dict['department'] = 'Not Configured'
+
+    if item.item_unit_measure:
+        item_dict['item_unit_measure'] = item.item_unit_measure.unit_name
+        item_dict['item_unit_measure_id'] = item.item_unit_measure.id
+    else:
+        item_dict['item_unit_measure'] = 'Unit not configured'
+
+    if item.terms:
+        item_dict['terms'] = item.terms.term
+        item_dict['terms_id'] = item.terms.id
+    else:
+        item_dict['terms'] = None
+
+    if item.warehouse_location:
+        item_dict['warehouse_location'] = item.warehouse_location.warehouse_location
+        item_dict['warehouse_location_id'] = item.warehouse_location.id
+        item_dict['location_description'] = item.warehouse_location.description
+    if item.production_type:
+        item_dict['production_type'] = item.production_type.production_type_name
+        item_dict['production_type_id'] = item.production_type.id
+    else:
+        item_dict['production_type'] = None
+
+    item_dict['customer_tariff_number'] = item.customer_tariff_number
+    item_dict['preference_criteria'] = item.preference_criteria
+    item_dict['shipping_weight'] = item.shipping_weight
+    item_dict['minimum_qty_on_hand'] = item.minimum_qty_on_hand
+    item_dict['duty_percentage'] = item.duty_percentage
+    item_dict['website'] = item.website
+
+    if item.customs_designation:
+        item_dict['customs_designation'] = item.customs_designation.designation
+        item_dict['customs_designation_id'] = item.customs_designation.id
+    else:
+        item_dict['customs_designation'] = None
+    item_dict['search_string'] = item.search_string
+
+
+    item_dict['permission'] = {}
+    item_dict['permission']['can_add_item'] = user.has_perm("inventory.add_item")
+    item_dict['permission']['can_view_item'] = user.has_perm("inventory.view_item")
+    item_dict['permission']['can_change_item'] = user.has_perm("inventory.change_item")
+    item_dict['permission']['can_delete_item'] = user.has_perm("inventory.delete_item")
+
+    item_json = json.dumps(item_dict)
+    return HttpResponse(item_json, mimetype='application/json')
 
 
 def inventory_items(request):

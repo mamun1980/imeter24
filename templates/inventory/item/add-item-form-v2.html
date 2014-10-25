@@ -5,12 +5,15 @@
 	</th>
 	<td colspan="5">
 		<div style="position: relative;">
-			<input class="form-control" ng-model='search_item' id="id_item_number" maxlength="25" name="item_number" type="search" ng-change="searchItem(search_item)" placeholder="search for item" autocomplete="off">
-				<ul id="item-list">
-					<li ng-repeat="item in items | filter:search_item" ng-click="selectItem(item)">
-						{[{item.item_number}]}
-					</li>
-				</ul>
+			<input class="form-control" ng-model='search_item' id="id_item_number" maxlength="25" type="search" name="item_number" ng-change="searchItem(search_item)" placeholder="search for item" autocomplete="off">
+				<div id="item-list" ng-show="show_item_list">
+
+					<ul class="search">
+						<li ng-repeat="item in items | filter:search_item">
+							<a href="#" class="list-group-item bg-info" ng-click="selectItem(item)"> {[{item.item_number}]} </a>
+						</li>
+					</ul>
+				</div>
 		</div>
 	</td>
 </tr>
@@ -20,7 +23,7 @@
 	</th>
 	<td colspan="5">
 		{{ item_form.description.errors }}
-		<textarea class="form-control" cols="40" id="id_description" name="description" placeholder="Item Description" rows="2"></textarea>
+		<textarea class="form-control" cols="40" id="id_description" name="description" placeholder="Item Description" rows="2" value=""></textarea>
 	</td>
 </tr>
 
@@ -30,21 +33,21 @@
 	</th>
 	<td>
 		{{ item_form.quantity_on_hand.errors }}
-		<input class="form-control decimal" id="id_quantity_on_hand" name="quantity_on_hand" placeholder="Quantity on hand" step="0.01" type="number">
+		<input class="form-control decimal" id="id_quantity_on_hand" name="quantity_on_hand" placeholder="Quantity on hand" type="text" value="">
 	</td>
 	<th>
 		<label for="id_quantity_on_order">Quantity on order:</label>
 	</th>
 	<td>
 		{{ item_form.quantity_on_order.errors }}
-		<input class="form-control decimal" id="id_quantity_on_order" name="quantity_on_order" placeholder="Quantity on order" step="0.01" type="number">
+		<input class="form-control decimal" id="id_quantity_on_order" name="quantity_on_order" placeholder="Quantity on order" type="text" value="">
 	</td>
 	<th>
 		<label for="id_qty_on_request">Qty on request:</label>
 	</th>
 	<td>
 		{{ item_form.qty_on_request.errors }}
-		<input class="form-control decimal" id="id_qty_on_request" name="qty_on_request" placeholder="Quantity on request" step="0.01" type="number">
+		<input class="form-control decimal" id="id_qty_on_request" name="qty_on_request" placeholder="Quantity on request" type="text"  value="">
 	</td>
 </tr>
 <tr>
@@ -53,21 +56,21 @@
 	</th>
 	<td>
 		{{ item_form.minimum_qty.errors }}
-		<input class="form-control decimal" id="id_minimum_qty" name="minimum_qty" placeholder="Minimum Quantity" step="0.01" type="number">
+		<input class="form-control decimal" id="id_minimum_qty" name="minimum_qty" placeholder="Minimum Quantity" type="text" value="">
 	</td>
 	<th>
 		<label for="id_max_order_qty">Max order qty:</label>
 	</th>
 	<td>
 		{{ item_form.max_order_qty.errors }}
-		<input class="form-control decimal" id="id_max_order_qty" name="max_order_qty" placeholder="Maximum Order Quenty" step="0.01" type="number">
+		<input class="form-control decimal" id="id_max_order_qty" name="max_order_qty" placeholder="Maximum Order Quenty" type="text" value="">
 	</td>
 	<th>
 		<label for="id_max_single_order_qty">Max single order qty:</label>
 	</th>
 	<td>
 		{{ item_form.max_single_order_qty.errors }}
-		<input class="form-control decimal" id="id_max_single_order_qty" name="max_single_order_qty" placeholder="Maximum Single Order Quenty" step="0.01" type="number">
+		<input class="form-control decimal" id="id_max_single_order_qty" name="max_single_order_qty" placeholder="Maximum Single Order Quenty" type="text">
 	</td>
 </tr>
 
@@ -80,9 +83,7 @@
 		<input type="text" name="primary_supplier_demo" placeholder="Start typing to search for supplier" id="id_primary_supplier_demo" class="form-control custom-form-control ng-pristine ng-valid" ng-model="search" autocomplete="off">
 		<a href="/admin/contacts/contact/add/" class="add-another" id="add_id_primary_supplier" onclick="return showAddAnotherPopup(this);"> <img src="/statics/admin/img/icon_addlink.gif" width="10" height="10" alt="Add Another"></a>
 		<div id="contact_info"></div>
-		<select class="form-control" id="id_primary_supplier" name="primary_supplier" style="display: none;">
-		<option value="" selected="selected">---------</option>
-		</select>
+		<input type="hidden" name="primary_supplier" id="id_primary_supplier" value="">
 	</td>
 </tr>
 <tr>
@@ -91,7 +92,7 @@
 	</th>
 	<td colspan="2">
 		{{ item_form.wholesale_cost.errors }}
-		<input class="form-control decimal" id="id_wholesale_cost" name="wholesale_cost" placeholder="Wholesale cost" step="0.01" type="number">
+		<input class="form-control decimal" id="id_wholesale_cost" name="wholesale_cost" placeholder="Wholesale cost" type="text" value="">
 	</td>
 
 	<th>
@@ -100,8 +101,7 @@
 	<td colspan="2">
 		{{ item_form.currency.errors }}
 		<select class="form-control" id="id_currency" name="currency">
-		
-		<option value="" selected="selected">---------</option>
+		<option value="">---------</option>
 		{% for currency in currencies %}
 			<option value="{{currency.id}}">
 				{{currency.get_currency_icon}} {{currency.currency}}
@@ -118,7 +118,7 @@
 	<td colspan="5">
 		{{ item_form.terms.errors }}
 		<select class="form-control" id="id_terms" name="terms">
-		<option value="" selected="selected">---------</option>
+		<option value="">---------</option>
 		{% for term in terms %}
 			<option value="{{term.id}}">{{term.term}}</option>
 		{% endfor %}
@@ -132,7 +132,7 @@
 	<td colspan="5">
 		{{ item_form.department.errors }}
 		<select class="form-control" id="id_department" name="department">
-		<option value="" selected="selected">---------</option>
+		<option value="">---------</option>
 		{% for department in departments %}
 			<option value="{{department.id}}">{{department.name}}</option>
 		{% endfor %}
@@ -146,7 +146,6 @@
 	<td colspan="5">
 		{{ item_form.item_unit_measure.errors }}
 		<select class="form-control" id="id_item_unit_measure" name="item_unit_measure">
-		<option value="" selected="selected">---------</option>
 		{% for unitmeasure in unit_measures %}
 			<option value="{{unitmeasure.id}}">{{unitmeasure.unit_name}}</option>
 		</select>
@@ -160,7 +159,6 @@
 	<td colspan="5">
 		{{ item_form.warehouse_location.errors }}
 		<select class="form-control" id="id_warehouse_location" name="warehouse_location">
-		<option value="" selected="selected">---------</option>
 		{% for location in locations %}
 		<option value="{{location.id}}">{{location.warehouse_location}}</option>
 		{% endfor %}
@@ -173,7 +171,7 @@
 	</th>
 	<td colspan="5">
 		{{ item_form.estimated_wholesale_cost.errors }}
-		<input class="form-control decimal" id="id_estimated_wholesale_cost" name="estimated_wholesale_cost" placeholder="Estimated wholesale cost" step="0.01" type="number">
+		<input class="form-control decimal" id="id_estimated_wholesale_cost" name="estimated_wholesale_cost" placeholder="Estimated wholesale cost" type="text">
 	</td>
 </tr>
 <tr>
@@ -182,7 +180,7 @@
 	</th>
 	<td colspan="5">
 		{{ item_form.retail_price.errors }}
-		<input class="form-control decimal" id="id_retail_price" name="retail_price" placeholder="Retail Price" step="0.01" type="number">
+		<input class="form-control decimal" id="id_retail_price" name="retail_price" placeholder="Retail Price" type="text">
 	</td>
 </tr>
 <tr>
@@ -192,7 +190,6 @@
 	<td colspan="5">
 		{{ item_form.production_type.errors }}
 		<select class="form-control" id="id_production_type" name="production_type">
-		<option value="" selected="selected">---------</option>
 		{% for production_type in production_types %}
 			<option value="{{production_type.id}}">{{production_type.production_type_name}}</option>
 		{% endfor %}
@@ -233,7 +230,6 @@
 	<td colspan="5">
 		{{ item_form.customs_designation.errors }}
 		<select class="form-control" id="id_customs_designation" name="customs_designation">
-		<option value="" selected="selected">---------</option>
 		{% for customdesignation in customdesignations %}
 			<option value="{{customdesignation.id}}">{{customdesignation.designation}}</option>
 		{% endfor %}
@@ -265,19 +261,19 @@
 	</th>
 	<td colspan="5">
 		{{ item_form.producer_of_item_demo.errors }}
-		<select class="form-control" id="id_producer_of_item" name="producer_of_item" style="display: none;">
-		
-		</select>
+		<input type="hidden" name="producer_of_item">
+
 		<input type="text" name="producer_of_item_demo" placeholder="Start typing to search for supplier" id="id_producer_of_item_demo" class="form-control ng-pristine ng-valid" ng-model="search_producer" autocomplete="off">
+		<input type="hidden" name="producer_of_item" id="id_producer_of_item">
 	</td>
 </tr>
 <tr>
 	<th colspan="1">
 		<label for="id_shipping_weight">Shipping weight:</label>
 	</th>
-	<td colspan="4 colspan="1"">
+	<td colspan="4" colspan="1">
 		{{ item_form.shipping_weight.errors }}
-		<input class="form-control" id="id_shipping_weight" name="shipping_weight" placeholder="Shipping weight" step="0.01" type="number">
+		<input class="form-control" id="id_shipping_weight" name="shipping_weight" placeholder="Shipping weight" type="text">
 	</td>
 </tr>
 <tr>
@@ -286,7 +282,7 @@
 	</th>
 	<td colspan="5">
 		{{ item_form.minimum_qty_on_hand.errors }}
-		<input class="form-control decimal" id="id_minimum_qty_on_hand" name="minimum_qty_on_hand" placeholder="Minimum quantity on hand" step="0.01" type="number">
+		<input class="form-control decimal" id="id_minimum_qty_on_hand" name="minimum_qty_on_hand" placeholder="Minimum quantity on hand" type="text">
 	</td>
 </tr>
 <tr>
@@ -295,7 +291,7 @@
 	</th>
 	<td colspan="5">
 		{{ item_form.number.errors }}
-		<input class="form-control decimal" id="id_duty_percentage" name="duty_percentage" placeholder="Duty percentage" step="0.01" type="number">
+		<input class="form-control decimal" id="id_duty_percentage" name="duty_percentage" placeholder="Duty percentage" type="text">
 	</td>
 </tr>
 

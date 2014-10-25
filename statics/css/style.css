@@ -468,3 +468,16 @@ ul.phone-list-ul {
 #massmail .failed {
 	background-color: #e83e3e;
 }
+
+
+#item-list{
+	position: absolute !important;
+	width: 400px !important;
+	
+}
+#item-list ul.search {
+	padding-left: 5px;
+}
+#item-list ul.search li{
+	list-style: none;
+}
