@@ -387,6 +387,8 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 
 		// Items
 		$("#items_list").hide();
+		// $("#po_list").hide();
+		$scope.show_po_list = false;
 		
 	}
 
@@ -469,6 +471,158 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
  //        	}
  //        } 
  //    });
+	$scope.searchPo = function(q) {
+		if(q.length > 1) {
+			// console.log(q);
+			$http({method: 'GET', url: "/purchase/get-purchase-orders/"}).
+	        	success(function(data, status, headers, config){
+	        	$scope.pos = data;
+	        	// console.log(data);
+	        });
+			// $("#po_list").show();
+			$scope.show_po_list = true;
+		} else {
+			// $("#po_list").hide();
+			$scope.show_po_list = false;
+		}
+		
+	}
+	$scope.selectPo = function(po){
+		var po_number = po.po_number;
+		// console.log(po.id);
+		var po_id = po.id;
+		var po_url = '/purchase/get-po-by-id/'+po_id+'/'
+		// console.log(po_url);
+		$http({method: 'GET', url: po_url}).
+			success(function(data, status, headers, config){
+			console.log(data);
+			$("#id_po_search").val(po_number);
+			$scope.show_po_list = false;
+			$scope.po_checked = true;
+			$("#id_po_number").val(po_number);
+			$("#id_date_issued").val(data.date_issued);
+			$("#id_date_expected").val(data.date_expected);
+			$("#id_date_issued").val(data.date_issued);
+
+			$scope.supplier_contact = data.supplier;
+			if(data.supplier){
+				$("#id_supplier").val(data.supplier.id);	
+			}
+			$("#supplier_contact_details").show();
+
+			$scope.ship_to_contact = data.ship_to;
+			if(data.ship_to) {
+				$("#id_ship_to").val(data.ship_to.id);	
+			}
+			$("#ship_to_contact_details").show();
+
+			if(data.ship_via){
+				$("#id_ship_via").val(data.ship_via.id);	
+			}
+
+			if(data.po_status) {
+				$("#id_po_status").val(data.po_status.id)	
+				console.log(data.po_status.id);
+			}
+
+			$("#id_fob").val(data.fob);
+			if(data.po_overwridden_by){
+				$("#id_po_overwridden_by").val(data.po_overwridden_by.id);	
+			}
+			$("#id_shipping_inst").val(data.shipping_inst);
+			if(data.deliver_internal){
+				$("#id_deliver_internal").val(data.deliver_internal.id);	
+			}
+			$("#id_date_confirmed").val(data.date_confirmed);
+			$("#id_blanket_po").val(data.blanket_po);
+			if(data.terms){
+				$("#id_terms").val(data.terms.id);	
+			}
+			if(data.purchasing_agent){
+				$("#id_purchasing_agent").val(data.purchasing_agent.id);
+			}
+			if(data.return_type){
+				$("#id_returned_type").val(data.return_type.id);	
+			}
+
+			$("#id_hst_taxable").val(data.hst_taxable);
+			if(data.hst_taxable == 1){
+				$("#id_hst_taxable_amount").val(data.hst_taxable_amount);
+			}
+			$("#id_pst_taxable").val(data.pst_taxable);
+			if(data.pst_taxable == 1){
+				$("#id_pst_taxable_amount").val(data.pst_taxable_amount);
+			}
+
+			$("#id_total_po_amount").val(data.total_po_amount);
+
+			var po_items = data.items;
+			console.log(po_items);
+			// Load items for this po
+			var myitem = $("tbody#add_item_list tr.add_item");
+			for (var i = 0; i < po_items.length; i++) {
+
+				var p_item_id = po_items[i].p_item_id;
+		    	var item_number = po_items[i].item_number;
+		    	var item_description = po_items[i].description;
+		    	var unit_measure_id = po_items[i].unit_measure_id;
+		    	var item_comment = po_items[i].comment;
+		    	var wholesale_cost = po_items[i].cost;
+		    	var item_qty = po_items[i].qty;
+		    	var item_sub_total = po_items[i].sub_total;
+		    	var item_job_number = po_items[i].job_number;
+		    	var item_job_number_id = po_items[i].job_number_id;
+		    	var item_qty_received = po_items[i].item_received;
+		    	var last_received_date = po_items[i].item_recv_date;
+		 //    	// console.log(item.qty_received_date);
+		    	
+		    	
+		    	var str = "<tr class='add_item'>";
+		    	str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+item_number+"' readonly></td>";
+		    	str += "<td><p class='bg-info item_desc'>"+item_description+"</p></td>";
+		    	
+		    	str += "<td><select class='form-control'>";
+		    	str += "<option ng-repeat='um in item_unit_measures' value='{[{um.id}]}'>{[{um.unit_name}]}</option>";
+		    	str += "</select></td>";
+
+		    	str += "<td><input type='currency' class='form-control' step='0.0001' name='item_cost' value='"+wholesale_cost+"'></td>";
+		    	str += "<td><input type='number' class='form-control decimal' step='0.01' name='item_qty' value='"+item_qty+"'></td>";
+		    	str += "<td><input type='currency' step='0.0001' name='item_sub_total' class='form-control' value='"+item_sub_total+"' readonly></td>";
+		    	str += "<td><input type='text' class='form-control item-job-number' name='item_job_number' value='"+item_job_number+"' placeholder='Start typing to search job'><input type='hidden' name='item_job_id' class='item_job_id' value='"+item_job_number_id+"'></td>";
+		    	str += "<td><textarea rows='1' class='form-control' name='item_comment' placeholder='Put your comments here'>"+item_comment+"</textarea></td>";
+		    	str += "<td><input type='number' step='0.01' name='qty_received' class='form-control' value='"+item_qty_received+"' readonly></td>";
+		    	str += "<td><input type='text' name='last_received_date' class='form-control' value='"+last_received_date+"' readonly></td>";
+
+
+		    	str += "<td><a class='remove-item btn' ng-click='removeField($event)'><span class='glyphicon glyphicon-remove'></span></a></td>";
+		    	str += "</tr>";
+		    	
+		    	var element = $compile(str)($scope);
+
+		    	$("tbody#add_item_list").append(element);
+		    	
+		 //    	$("tbody#add_item_list").prepend(element);
+
+				$( "input[name='item_job_number']" ).autocomplete({
+			      source: "/schedule/list-filter/",
+			      _renderItem: function( ul, item ) {
+					  return $( "<li>" )
+					    .attr( "data-value", item.value )
+					    .append( $( "<a>" ).text( item.label ) )
+					    .appendTo( ul );
+					},
+					select: function( event, ui ) {
+						// console.log(ui.item.id);
+						// $(this).attr("data-id", ui.id);
+						
+						$(event.target).siblings("input.item_job_id").val(ui.item.id);
+					}
+			    });
+			}
+        
+        });
+	}
+
 	$scope.searchItem = function(q) {
 		if(q.length > 1) {
 			console.log(q);

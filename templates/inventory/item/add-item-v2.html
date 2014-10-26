@@ -305,6 +305,7 @@ inventoryApp.controller('AddItemController',['$scope', '$http', function ($scope
         $("#selectable-producer").hide();
         $scope.submit_add = false;
         $scope.show_item_list = false;
+        $scope.item_checked = false;
 
 	};
 
@@ -374,20 +375,25 @@ inventoryApp.controller('AddItemController',['$scope', '$http', function ($scope
 		// $scope.$apply();
 		
 	};
+	
+	$scope.uncheck = function() {
+		console.log("hello...")
+	}
 
 	$scope.selectItem = function(item) {
-		item_number = item.item_number
-		item_url = "/inventory/get-item/"+item_number+"/"
+		var item_number = item.item_number
+		var item_url = "/inventory/get-item/"+item_number+"/"
 		$scope.hello = false;
 		$http({method: 'GET', url: item_url}).
         	success(function(data, status, headers, config){
         	
         	$scope.show_item_list = false;
+        	$scope.item_checked = true;
         	console.log(data);
         	// $("#items_list").hide();
         	$scope.submit_add = true;
-
         	$("#id_item_number").val(data.item_number);
+        	$("#id_item_number_search").val(data.item_number);
         	$("#id_description").val(data.description);
         	$("#id_quantity_on_hand").val(data.quantity_on_hand);
         	$("#id_quantity_on_order").val(data.quantity_on_order);
@@ -395,8 +401,46 @@ inventoryApp.controller('AddItemController',['$scope', '$http', function ($scope
         	$("#id_minimum_qty").val(data.minimum_qty);
         	$("#id_max_order_qty").val(data.max_order_qty);
         	$("#id_max_single_order_qty").val(data.max_single_order_qty);
+        	if(data.primary_supplier.id){
+        		$("#id_primary_supplier").val(data.primary_supplier.id);
+        		var id = data.primary_supplier.id;
+				var c_n = data.primary_supplier.contact_name;
+				var a_1 = data.primary_supplier.address_1;
+				var city = data.primary_supplier.city;
+				var phones = data.primary_supplier.phones
+				
+				var phone_str = '<ul class="phone-list-ul">';
+
+				for (var i = 0; i < phones.length; i++) {
+					phone_str += '<li>' + phones[i].phone_type + ' - ' + phones[i].phone + ' ( ext- ' + phones[i].phone_ext + ' ) ' + '</li>';
+				};
+					
+					
+
+				phone_str += "</ul></span>";
+				
+				var str = ''
+				if(c_n != '') {
+					str += c_n;
+				}
+
+				// console.log(str);
+
+				// $("select#id_primary_supplier option[value='"+ id.trim()+"']").prop("selected", true);
+				$("#id_primary_supplier_demo").val(str);
+
+
+				var txt = '';
+				txt += "<p class='bg-info'><b class='left-info'>CONTACT NAME</b> : "+ c_n + "</p>";
+				txt += "<p class='bg-info'><b class='left-info'>ADDRESS</b> : "+ a_1 + "</p>";
+				txt += "<p class='bg-info'><b class='left-info'>CITY</b> : " + city + "</p>";
+				txt += "<p class='bg-info' id='aaaaa'><b class='left-info'>CONTACT NUMBER</b> :  </p>";
+				
+				console.log(txt);
+				$("#contact_info").html(txt);
+				$("#aaaaa").append(phone_str);	
+        	}
         	
-        	$("#id_primary_supplier").val(data.primary_supplier);
 
         	$("#id_wholesale_cost").val(data.wholesale_cost);
         	$("#id_currency").val(data.currency_id);

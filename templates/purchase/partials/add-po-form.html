@@ -4,7 +4,20 @@
 		<label for="id_po_number">PO Number:</label>
 	</th>
 	<td>
-		<input class="form-control" id="id_po_number" name="po_number" placeholder="PO Number" type="text" value="NEW" readonly="readonly">
+		<div style="position: relative;">
+			<input class="form-control" ng-model='search_po' maxlength="25" id="id_po_search"  type="search" name="po_number_search" ng-change="searchPo(search_po)" placeholder="search for po" autocomplete="off" ng-disabled="po_checked">
+			
+				<div id="po_list" ng-show="show_po_list">
+
+					<ul class="search">
+						<li ng-repeat="po in pos | filter:search_po">
+							<a href="#" class="list-group-item bg-info" ng-click="selectPo(po)"> {[{po.po_number}]} ({[{po.po_currency_icon}]} {[{po.total_po_amount}]})</a>
+						</li>
+					</ul>
+				</div>
+		</div>
+		<input id="id_po_number" name="po_number" type="hidden">
+		
 	</td>
 	<th width="150">
 		<label for="id_next_number">Next Number:</label>
@@ -93,9 +106,7 @@
 			</tbody>
 		</table>
 
-		<select ng-model="supplier" class="form-control" id="id_supplier" name="supplier" style="display:none;">
-			<option ng-repeat="contact in contacts" value="{[{contact.id}]}">{[{ contact.contact_name }]}</option>
-		</select>
+		<input type="hidden" name="supplier" id="id_supplier">
 	</div>
 
 
@@ -139,9 +150,7 @@
 			</tbody>
 		</table>
 
-		<select ng-model="ship_to" class="form-control" id="id_ship_to" name="ship_to" style="display:none;">
-			<option ng-repeat="contact in contacts" value="{[{contact.id}]}">{[{ contact.contact_name }]}</option>
-		</select>
+		<input id="id_ship_to" name="ship_to" type="hidden">
 	</div>
 
 </td>

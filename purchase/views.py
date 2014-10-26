@@ -476,7 +476,7 @@ def get_po_by_id(request,pk):
     # po_contact = POContact.objects.filter(purchase_order=po.po_number)
 
     po_dict = {}
-    po_dict['id'] = str(po.id)
+    po_dict['po_id'] = po.id
     po_dict['po_number'] = po.po_number
     po_dict['next_number'] = po.next_number
     if po.date_issued:
@@ -578,7 +578,10 @@ def get_po_by_id(request,pk):
         po_dict['return_type'] = return_type
     else:
         po_dict['returned_type'] = None
-    po_dict['items_total'] = po.items_total.to_eng_string()
+    if po.items_total:
+        po_dict['items_total'] = po.items_total.to_eng_string()
+    else:
+        po_dict['items_total'] = None
     po_dict['hst_taxable'] = po.hst_taxable
     if po.hst_taxable_amount:
         po_dict['hst_taxable_amount'] = po.hst_taxable_amount.to_eng_string()
@@ -618,6 +621,56 @@ def get_po_by_id(request,pk):
         po_dict['po_created_by'] = None
 
     po_dict['search_string'] = po.search_string
+
+    purchase_items = PurchaseItem.objects.filter(po=po)
+    po_items = []
+    for po_item in purchase_items:
+        item = {}
+        item['p_item_id'] = po_item.id
+        if po_item.item:
+            item['item_number'] = po_item.item.item_number
+            item['description'] = po_item.item.description
+            if po_item.item.item_unit_measure:
+                item['unit_measure'] = po_item.item.item_unit_measure.unit_name
+                item['unit_measure_id'] = po_item.item.item_unit_measure.id
+            else:
+                item['unit_measure'] = None
+                item['unit_measure_id'] = None
+        if po_item.item.currency:
+            item['currency'] = po_item.item.currency.currency
+            item['currency_id'] = po_item.item.currency.id
+            item['currency_icon'] = po_item.item.currency.get_currency_icon()
+
+        if po_item.job_number:
+            item['job_number'] = po_item.job_number.job_number
+        item['qty'] = po_item.qty.to_eng_string()
+        item['cost'] = po_item.cost.to_eng_string()
+        
+        item['sub_total'] = po_item.sub_total.to_eng_string()
+        if po_item.purchase_status:
+            item['purchase_status'] = po_item.status_verbose()
+
+        item['comment'] = po_item.comment
+        if po_item.item_recv:
+            item['item_received'] = po_item.item_recv.to_eng_string()
+        else:
+            item['item_received'] = None
+
+        if po_item.item_recv_date:
+            item['item_recv_date'] = po_item.item_recv_date.isoformat()
+        else:
+            item['item_recv_date'] = None
+        if po_item.job_number:
+            item['job_number'] = po_item.job_number.job_number
+            item['job_number_id'] = po_item.job_number.id
+        else:
+            item['job_number'] = None
+            item['job_number_id'] = None
+
+
+        po_items.append(item)
+
+    po_dict['items'] = po_items
 
     json_posts = json.dumps(po_dict)
     return HttpResponse(json_posts, mimetype='application/json')

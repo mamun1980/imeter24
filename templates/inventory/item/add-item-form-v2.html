@@ -5,12 +5,13 @@
 	</th>
 	<td colspan="5">
 		<div style="position: relative;">
-			<input class="form-control" ng-model='search_item' id="id_item_number" maxlength="25" type="search" name="item_number" ng-change="searchItem(search_item)" placeholder="search for item" autocomplete="off">
-				<div id="item-list" ng-show="show_item_list">
+			<input class="form-control" ng-model='search_item' maxlength="25" id="id_item_number_search"  type="search" name="item_number_search" ng-change="searchItem(search_item)" placeholder="search for item" autocomplete="off" ng-disabled="item_checked">
+			<input type="hidden" name="item_number" id="id_item_number">
+				<div id="item-list" ng-show="show_item_list"  >
 
 					<ul class="search">
 						<li ng-repeat="item in items | filter:search_item">
-							<a href="#" class="list-group-item bg-info" ng-click="selectItem(item)"> {[{item.item_number}]} </a>
+							<a href="#" class="list-group-item bg-info" ng-click="selectItem(item)"> {[{item.item_number}]}: ({[{item.retail_price}]}) {[{item.description}]}</a>
 						</li>
 					</ul>
 				</div>
