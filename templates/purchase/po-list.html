@@ -56,7 +56,7 @@
 							<th>Supplier</th>
 							<th>items</th>
 							<th>Total PO Amount</th>
-							<th width='170'>Action</th>
+							<th width='280'>Action</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -76,15 +76,14 @@
 								{[{po.po_currency_icon}]} {[{po.total_po_amount}]}
 							</td>
 							<td>
-								<a href="/purchase/view/{[{po.id}]}/">View</a> 
-								<span ng-show="{[{po.can_edit}]}">
 								
-								/ <a href="/purchase/edit/{[{po.id}]}/">Edit</a>
-
-								/ <a class="po-delete" data-pid="{[{po.id}]}" href="">Delete</a>
-
-								/ <a class="po-cancel" data-pid="{[{po.id}]}" href="">Cancel</a>
-								</span>
+								
+								<div class="btn-group btn-group-sm">
+									<a class="btn btn-default" href="/purchase/view/{[{po.id}]}/">View</a>
+									<a class="btn btn-default po-delete" data-pid="{[{po.id}]}">Delete</a>
+									<a class="btn btn-default po-cancel" data-pid="{[{po.id}]}">Cancel</a>
+									<a class="btn btn-default" data-pid="{[{po.id}]}" href="/purchase/generate-po/{[{po.id}]}/" target="_blank">Gererate PO</a>
+								</div>
 							</td>
 						</tr>
 						<tr ng-show="!purchase_orders.length">
@@ -119,6 +118,22 @@
 (function(){
 	
 	$("#supplier-contact").hide();
+
+	$(document).on("click", "a.po-generate", function(){
+		console.log("generating po....");
+		var po_id = $(this).data("pid");
+		var url = "/purchase/generate-po/"+po_id+"/";
+		$.ajax({
+			url: url,
+			type: 'GET',
+			success: function(data){
+				console.log("po generated");
+			},
+			error: function(error) {
+				console.log(error);
+			}
+		})
+	});
 
 	$(document).on("hover", "span.show-contact", function(){
 		// e.preventDefault();

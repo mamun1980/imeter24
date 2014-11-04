@@ -429,8 +429,8 @@ def list_unit_measue(request):
     unit_measures = ItemUnitMeasure.objects.all()
     return render(request, "inventory/unit-measure/list-unit-measure.html", {'unit_measures': unit_measures, 'page_title': 'List Unit Measure'})
 
-@login_required
-def list_unit_measue_json(request):
+# @login_required
+def list_unit_measue_json2(request):
     unit_measures = ItemUnitMeasure.objects.filter(is_active=True)
     ums = []
     for unit in unit_measures:

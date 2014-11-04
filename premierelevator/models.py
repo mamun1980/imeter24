@@ -25,7 +25,7 @@ class SystemVariable(models.Model):
 	default_report_for_invoice = models.ForeignKey(Report,null=True, blank=True, related_name="default_report_for_invoice")
 
 	def __unicode__(self):
-		return self.id
+		return str(self.id)
 
 	class Meta:
 		verbose_name = "System variable"

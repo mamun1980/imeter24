@@ -347,16 +347,16 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 		$scope.dateIssued = now.dateFormat("m/d/Y");
 
 		// initialize po_status set set default value to 'New'
-		$scope.postatus_list = [
-			{'value':0, 'label':'New'},
-			{'value':1, 'label': 'Printed / Emailed'},
-			{'value':2, 'label':'Partial Received'},
-			{'value':3, 'label': 'Received / Completed'},
-			{'value':4, 'label': 'Accounting Confirmed'},
-			{'value':5, 'label': 'Closed'},
-			{'value':6, 'label': 'Canceled'},
-		]
-		$scope.poStatus = $scope.postatus_list[0];
+		// $scope.postatus_list = [
+		// 	{'value':0, 'label':'New'},
+		// 	{'value':1, 'label': 'Printed / Emailed'},
+		// 	{'value':2, 'label':'Partial Received'},
+		// 	{'value':3, 'label': 'Received / Completed'},
+		// 	{'value':4, 'label': 'Accounting Confirmed'},
+		// 	{'value':5, 'label': 'Closed'},
+		// 	{'value':6, 'label': 'Canceled'},
+		// ]
+		// $scope.poStatus = $scope.postatus_list[0];
 
 		// Get all contacts from the system
 
@@ -430,7 +430,6 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 			$("#id_terms").val(con.term_id);	
 		}
 		
-
 		// autoselect FOB
 		if(con.fob){
 			$("#id_fob").val(con.fob);	
@@ -489,17 +488,21 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 	}
 	$scope.selectPo = function(po){
 		var po_number = po.po_number;
-		// console.log(po.id);
+		console.log(po.id);
 		var po_id = po.id;
 		var po_url = '/purchase/get-po-by-id/'+po_id+'/'
 		// console.log(po_url);
 		$http({method: 'GET', url: po_url}).
 			success(function(data, status, headers, config){
 			console.log(data);
-			$("#id_po_search").val(po_number);
 			$scope.show_po_list = false;
 			$scope.po_checked = true;
-			$("#id_po_number").val(po_number);
+
+
+
+			$("#id_po_number_search").val(data.po_number);
+			$("#id_po_number").val(data.po_number);
+			$("#id_po_id").val(po_id);
 			$("#id_date_issued").val(data.date_issued);
 			$("#id_date_expected").val(data.date_expected);
 			$("#id_date_issued").val(data.date_issued);
@@ -521,8 +524,9 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 			}
 
 			if(data.po_status) {
-				$("#id_po_status").val(data.po_status.id)	
-				console.log(data.po_status.id);
+				$("#id_po_status").val(data.po_status.id);	
+				// console.log("po status :"+data.po_status.id);
+				// $scope.poStatus = data.po_status.label;
 			}
 
 			$("#id_fob").val(data.fob);
@@ -545,19 +549,39 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 				$("#id_returned_type").val(data.return_type.id);	
 			}
 
-			$("#id_hst_taxable").val(data.hst_taxable);
+			// $("#id_hst_taxable").val(data.hst_taxable);
 			if(data.hst_taxable == 1){
-				$("#id_hst_taxable_amount").val(data.hst_taxable_amount);
+				$scope.hst_tax = 1;
+				console.log("hst : "+data.hst_taxable_amount);
+				if(data.hst_taxable_amount == undefined) {
+					// $("#id_hst_taxable_amount").val(0);	
+					$scope.hst_tax_amount = 0;
+				} else {
+					// $("#id_hst_taxable_amount").val(data.hst_taxable_amount);
+					$scope.hst_tax_amount = data.hst_taxable_amount;
+				}
 			}
-			$("#id_pst_taxable").val(data.pst_taxable);
+			// $("#id_pst_taxable").val(data.pst_taxable);
 			if(data.pst_taxable == 1){
-				$("#id_pst_taxable_amount").val(data.pst_taxable_amount);
+				$scope.pst_tax = 1;
+				// console.log("pst : "+data.pst_taxable_amount);
+				if(data.pst_taxable_amount == undefined) {
+					$scope.pst_tax_amount = 0;
+				} else {
+					
+					$scope.pst_tax_amount = data.pst_taxable_amount;
+				}
+				
 			}
 
 			$("#id_total_po_amount").val(data.total_po_amount);
 
+			$("#items_total_qty").val(data.items_total);
+			$("#calculated_total_amount span.amount").text(data.total_po_amount);
+
 			var po_items = data.items;
-			console.log(po_items);
+			// console.log("po items.....");
+			// console.log(po_items);
 			// Load items for this po
 			var myitem = $("tbody#add_item_list tr.add_item");
 			for (var i = 0; i < po_items.length; i++) {
@@ -581,7 +605,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 		    	str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+item_number+"' readonly></td>";
 		    	str += "<td><p class='bg-info item_desc'>"+item_description+"</p></td>";
 		    	
-		    	str += "<td><select class='form-control'>";
+		    	str += "<td><select class='form-control' name='itme_unit_measure'>";
 		    	str += "<option ng-repeat='um in item_unit_measures' value='{[{um.id}]}'>{[{um.unit_name}]}</option>";
 		    	str += "</select></td>";
 
@@ -594,12 +618,12 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 		    	str += "<td><input type='text' name='last_received_date' class='form-control' value='"+last_received_date+"' readonly></td>";
 
 
-		    	str += "<td><a class='remove-item btn' ng-click='removeField($event)'><span class='glyphicon glyphicon-remove'></span></a></td>";
+		    	str += "<td><input type='hidden' name='pi_id' value='"+p_item_id+"'><a class='remove-item btn' ng-click='removeField($event)'><span class='glyphicon glyphicon-remove'></span></a></td>";
 		    	str += "</tr>";
 		    	
 		    	var element = $compile(str)($scope);
 
-		    	$("tbody#add_item_list").append(element);
+		    	$("tbody#add_item_list").prepend(element);
 		    	
 		 //    	$("tbody#add_item_list").prepend(element);
 
@@ -619,8 +643,9 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 					}
 			    });
 			}
-        
         });
+
+		
 	}
 
 	$scope.searchItem = function(q) {
@@ -637,6 +662,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 		
 	}
     $scope.selectItem = function(item) {
+    	console.log(item);
     	$scope.search_item = '';
     	$scope.mixed_currency == false;
     	$("#items_list").hide();
@@ -644,7 +670,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
     	var item_number = item.item_number;
     	var item_term = item.terms_id;
     	var item_description = item.description;
-    	var item_id = item.id;
+    	var item_id = item.p_item_id;
     	var currency_id = item.currency_id;
     	var unit_measure_id = item.item_unit_measure;
     	// console.log(unit_measure_id);
@@ -749,6 +775,8 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
         // $(event.target).closest('tr').remove();
         var myitem = $("tbody#add_item_list tr.add_item");
         var items_length = myitem.length;
+        var removed_item_id = $(event.target).closest('td').find("input[name='pi_id']").val();
+        console.log("removed item id:"+removed_item_id)
         
 		$(event.target).closest('tr').remove();
 		var item_total = 0;
@@ -769,7 +797,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 			var pst_tax_amount = parseFloat($("#id_pst_taxable_amount").val())
 			item_total += pst_tax_amount;
 		}
-
+		console.log("items total:"+item_total);
 		$("#id_total_po_amount").val(item_total.toFixed(4));
 		// recalculate total amount
 		var item_subtotal_qty = 0;
@@ -785,6 +813,9 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 			// window.location.reload();
 			$scope.first_currency_id = undefined;
 		}
+
+		var removed_item = "<input type='hidden' name='removed_item' value='"+removed_item_id+"'>";
+		$("#add_item_list tr.footer").append(removed_item);
     };
 
 

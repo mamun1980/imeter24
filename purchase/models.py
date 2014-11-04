@@ -78,7 +78,7 @@ class PurchaseOrder(models.Model):
 
 	'''
 	po_number = models.CharField(verbose_name='PO Number', max_length=20, blank=True, null= True, unique=True)
-	next_number = models.CharField(verbose_name='Next Number', max_length=20, blank=True, null= True, unique=True)
+	next_number = models.CharField(verbose_name='Next Number', max_length=20, blank=True, null= True)
 	date_issued = models.DateField(blank=True, null=True)
 	po_status = models.CharField(max_length=20, blank=True, null=True, default='New')
 	date_expected = models.DateField(blank=True, null=True)

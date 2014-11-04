@@ -17,7 +17,7 @@ urlpatterns = patterns('',
 
 
     url(r'^unit-measure-list/$', 'inventory.views.list_unit_measue', name='list-inventory-unit-measure'),
-    url(r'^unit-measure-list/json/$', 'inventory.views.list_unit_measue_json', name='list-inventory-unit-measure-json'),
+    url(r'^unit-measure-list/json/$', 'inventory.views.list_unit_measue_json2'),
     url(r'^unit-measure/add/$', 'inventory.views.add_unit_measue', name='add-inventory-unit-measure'),
     url(r'^unit-measure/edit/(?P<unit_mes_id>\w+)/$', 'inventory.views.edit_unit_measue', name='edit-inventory-unit-measure'),
     url(r'^unit-measure/delete/$', 'inventory.views.delete_unit_measue', name='delete-inventory-unit-measure'),

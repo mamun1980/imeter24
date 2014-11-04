@@ -3,6 +3,7 @@ from django.conf.urls import patterns, include, url
 urlpatterns = patterns('',
     # Examples:
     url(r'^jobs/$', 'schedule.views.home', name='schedule-home'),
+    url(r'^get-job/(?P<job_id>[\d]+)/$', 'schedule.views.get_job', name='get-job'),
     
     #  API view
     url(r'^all-jobs/$', 'schedule.views.job_list', name='job-list'),

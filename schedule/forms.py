@@ -7,6 +7,7 @@ from premierelevator.models import SystemVariable
 # from schedule.custom_field import MultiEmailField
 from django.core.validators import validate_email
 from datetime import datetime
+import re
 
 class JobForm(forms.ModelForm):
     job_number = forms.CharField( max_length=20,
@@ -83,15 +84,23 @@ class JobForm(forms.ModelForm):
 
 
     def save(self, commit=True):
+        # import pdb; pdb.set_trace()
         job = super(JobForm, self).save(commit=False)
+        job.job_number = "J"+str(re.sub(r"[A-Za-z]","",job.job_number))
         sv = SystemVariable.objects.get(id=1)
-        job.job_number = str(sv.next_job_number)
-        sv.next_job_number = sv.next_job_number + 1
+        # job.job_number = str(sv.next_job_number)
+        sv.next_job_number = int(job.job_number[1:]) + 1
         sv.save()
 
         job.search_string = job.job_number + " " + job.cab_designation + " " + job.job_name + " " + job.customer + " " + job.status + " " + job.description+ " " + job.address_1 + " " + job.customer_contact_name + " " + job.customer_contact_phone_number
         id = job.save()
-        job_status = JobStatus(job=job)
+        
+        try:
+            job_status, create = JobStatus.objects.get_or_create(job=job)
+            job_status.save()
+        except Exception, e:
+            raise e
+        
         return job_status
 
 

@@ -3,6 +3,8 @@ from purchase.models import *
 from purchase.choices import *
 from contacts.models import *
 from premierelevator.models import SystemVariable
+import datetime
+import re
 
 
 class CustomModelChoiceField(forms.ModelChoiceField):
@@ -100,11 +102,26 @@ class POForm(forms.ModelForm):
     po_que = forms.ChoiceField(required=False, choices=PO_QUE,
         widget=forms.Select(attrs={"class": "form-control"}))
 
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        self.action = kwargs.pop('action', None)
+        super(POForm, self).__init__(*args, **kwargs)
+
     def save(self, commit=True):
         po = super(POForm, self).save(commit=False)
         sv = SystemVariable.objects.get(id=1)
-        po.po_number = 'P'+str(sv.next_po_number)
-        sv.next_po_number = sv.next_po_number + 1
+        if self.action == 'new':
+            po.po_created_by = self.request.user
+            po.datetime = datetime.datetime.now()
+            po_number = re.sub(r"[A-Za-z]+","",self.request.POST['po_number_search'])
+            po.po_number = 'P'+str(po_number)
+            sv.next_po_number = int(po_number) + 1
+        elif self.action == 'update':
+            po.po_created_by = self.request.user
+            po.datetime = datetime.datetime.now()
+            # po_number = re.sub(r"[^\w]+","",po.po_number)
+            # po.po_number = 'P'+str(po_number)
+            # sv.next_po_number = int(po_number) + 1
         sv.save()
         po.save()
         return po

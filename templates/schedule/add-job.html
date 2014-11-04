@@ -1,6 +1,19 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style type="text/css">
+#job-list {
+	position: absolute;
+	width: 380px;
+}
+#job-list .list-group-item {
+	padding: 0px 5px 2px !important;
+
+}
+#job-list ul {
+	list-style: none;
+}
+</style>
 <div class="container shadow4 main-body" ng-app="scheduleApp">
 
 <section class="row" >
@@ -10,26 +23,14 @@
 		<form action="/schedule/job/add/" method="POST" enctype="multipart/form-data">{% csrf_token %}
 		<div class="panel panel-primary">
 			<div class="panel-heading">
-		    	<h4>ADD Job</h4>
+		    	<h4>Add/Update Job</h4>
 		  	</div>
 		  	<div class="panel-body">
 			  	<article class="row">
 			  		<section class="col-md-10 col-md-offset-1">
 			  			
-			  				
-			  				{{ jobform.non_field_errors }}
-			  				
-			  			
-					  	<table class="add-user-table">
-					  		{% for field in jobform %}
-					  			<tr>
-					  				<td>{{ field.label_tag }} {{field.error}}</td>
-					  				<td>{{ field.errors }}{{ field }}</td>
-					  			</tr>
-					  		{% endfor %}
-					  		
-						
-						</table>
+			  			{% include "schedule/partial/add-schedule-job-form.html" %}
+
 					</section>
 				
 				</article>
@@ -40,7 +41,10 @@
 					  		<tr>
 					  			
 								<td colspan="2">
-									<button type="submit" class="btn btn-primary btn-lg form-control login-btn">Add Job </button>
+									<div class="btn btn-lg">
+										<button class="btn btn-primary btn-lg" ng-disabled="submit_add" type="submit">Add Job</button>
+										<button class="btn btn-primary btn-lg" ng-disabled="!submit_add" type="submit">Update Job</button>
+									</div>
 								</td>
 							</tr>
 						</table>
@@ -63,6 +67,67 @@ var scheduleApp = angular.module("scheduleApp", ['ngRoute'], function ($interpol
 });
 
 scheduleApp.controller("AddScheduleController", ['$scope', '$http', function($scope, $http){
+	$scope.init = function() {
+	    $scope.submit_add = false;
+	    $scope.show_job_list = false;
+	    $scope.job_checked = false;
+
+	};
+
+	$scope.init();
+
+	$scope.searchJob = function(q) {
+		console.log(q);
+		if(q.length > 1) {
+			
+			$http({method: 'GET', url: "/schedule/all-jobs/"}).
+	        	success(function(data, status, headers, config){
+	        	$scope.jobs = data;
+	        });
+			// $("#items_list").show();
+			$scope.show_job_list = true;
+		} else {
+			// $("#items_list").hide();
+			$scope.show_job_list = false;
+		}
+		// $scope.$apply();
+		
+	};
+
+	$scope.selectJob = function(job){
+		$scope.show_job_list = false;
+		$scope.job_checked = true;
+		$scope.submit_add = true;
+		var job_id = job.id;
+		var url = "/schedule/get-job/"+job_id+"/";
+		$http({method: 'GET', url: url}).
+        	success(function(data, status, headers, config){
+        	console.log(data);
+        	$("#id_job_number").val(data.job_number);
+        	$("#id_job_id").val(data.id);
+        	$("#id_cab_designation").val(data.cab_designation);
+        	$("#id_date_opened").val(data.date_opened);
+        	$("#id_date_required").val(data.date_required);
+        	$("#id_status").val(data.status);
+        	$("#id_job_name").val(data.job_name);
+
+        	$("#id_address_1").val(data.address_1);
+        	$("#id_customer").val(data.customer);
+        	$("#id_customer_contact_name").val(data.customer_contact_name);
+        	$("#id_customer_contact_phone_number").val(data.customer_contact_phone_number);
+        	$("#id_contact_email").val(data.contact_email);
+        	$("#id_number_of_cabs").val(data.number_of_cabs);
+        	$("#id_description").val(data.description);
+        	$("#id_po_number").val(data.po_number);
+        	$("#id_status_notes").val(data.status_notes);
+        	$("#id_drawing_req_date").val(data.drawing_req_date);
+        	$("#id_drawing_sent_to_customer_date").val(data.drawing_sent_to_customer_date);
+        	$("#id_drawing_approved_date").val(data.drawing_approved_date);
+        	$("#id_eng_comment").val(data.eng_comment);
+
+
+        })
+	}
 	
 }]);
 

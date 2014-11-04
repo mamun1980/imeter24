@@ -17,6 +17,51 @@ def home(request):
     job_lookup_form = JobLookupForm()
     return render(request, 'schedule/job-list.html', {'jobs': jobs, 'job_lookup_form': job_lookup_form, 'page_title': 'List Job'})
 
+def get_job(request, job_id):
+    job = Job.objects.get(id=job_id)
+    job_dict = {}
+    job_dict['id'] = job.id
+    job_dict['job_number'] = job.job_number
+    job_dict['cab_designation'] = job.cab_designation
+    if job.date_opened:
+        job_dict['date_opened'] = job.date_opened.strftime('%m/%d/%Y')
+    else:
+        job_dict['date_opened'] = None
+    if job.date_required:
+        job_dict['date_required'] = job.date_required.strftime('%m/%d/%Y')
+    else:
+        job_dict['date_required'] = None
+
+    job_dict['status'] = job.status
+    job_dict['job_name'] = job.job_name
+    job_dict['address_1'] = job.address_1
+    job_dict['customer'] = job.customer
+    job_dict['customer_contact_name'] = job.customer_contact_name
+    job_dict['customer_contact_phone_number'] = job.customer_contact_phone_number
+    job_dict['contact_email'] = job.contact_email
+    job_dict['number_of_cabs'] = job.number_of_cabs
+    job_dict['description'] = job.description
+    job_dict['po_number'] = job.po_number
+    job_dict['status_notes'] = job.status_notes
+    if job.drawing_req_date:
+        job_dict['drawing_req_date'] = job.drawing_req_date.strftime('%m/%d/%Y')
+    else:
+        job_dict['drawing_req_date'] = None
+    if job.drawing_sent_to_customer_date:
+        job_dict['drawing_sent_to_customer_date'] = job.drawing_sent_to_customer_date.strftime('%m/%d/%Y')
+    else:
+         job_dict['drawing_sent_to_customer_date'] = None   
+    if job.drawing_approved_date:
+        job_dict['drawing_approved_date'] = job.drawing_approved_date.strftime('%m/%d/%Y')
+    else:
+        job_dict['drawing_approved_date'] = None
+    job_dict['eng_comment'] = job.eng_comment
+    job_dict['search_string'] = job.search_string
+
+    json_jobs = json.dumps(job_dict)
+
+    return HttpResponse(json_jobs, mimetype='application/json')
+
 
 def job_filter_view(request):
     if request.method == "POST":
@@ -290,12 +335,17 @@ def add_job(request):
     '''
     if request.method == "POST":
         # import pdb; pdb.set_trace()
-        job_form = JobForm(request.POST)
+        job_id = request.POST.get("job_id","")
+        if job_id != "":
+            job = Job.objects.get(id=job_id)
+            job_form = JobForm(request.POST, instance=job)
+        else:
+            job_form = JobForm(request.POST)
         
         if job_form.is_valid():
             job_status = job_form.save()
-            job_status_form = JobStatusForm(request.POST, instance=job_status)
-            job_status_form.save()
+            # job_status_form = JobStatusForm(request.POST, instance=job_status)
+            # job_status_form.save()
             return HttpResponseRedirect("/schedule/job-status/add/%s/" % job_status.id)
         else:
             return render(request, 'schedule/add-job.html', {'jobform': job_form, 'page_title': 'Add Job'})

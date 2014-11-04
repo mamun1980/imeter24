@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, render_to_response
 from django.http import HttpRequest, HttpResponseRedirect, HttpResponse
 from django.contrib import messages
 from purchase.forms import *
@@ -11,12 +11,56 @@ from django.contrib.auth.decorators import permission_required
 import json
 from decimal import Decimal
 import datetime
+from django.template.loader import get_template, render_to_string
+from django.template import Context
+import ho.pisa as pisa
+import cStringIO as StringIO
+import logging
+import sys
+import os
+# import reportlab
+# from reportlab.pdfgen import canvas
+# from reportlab.lib.pagesizes import letter, A4
+# from premierelevator.generate_report import write_pdf
+
+def html_to_pdf_response(html):
+    result = StringIO.StringIO()
+    pdf = pisa.pisaDocument(
+            StringIO.StringIO(html.encode("UTF-8")),
+            result
+    )
+
+    if not pdf.err:
+        return HttpResponse(
+                result.getvalue(),
+                mimetype='application/pdf'
+        )
+    else:
+        return HttpResponse('We had some errors')
+def generate_po(request, po_id):
+    resource_directory = os.path.dirname(os.path.dirname(__file__))
+    po = PurchaseOrder.objects.get(id=po_id)
+    purchase_items = PurchaseItem.objects.filter(po=po)
+    rendered_html = render_to_string("purchase/po-report.html", locals())
+    return html_to_pdf_response(rendered_html)
+    # po = PurchaseOrder.objects.get(id=po_id)
+    # return write_pdf('purchase/po-report.html',{
+    #     'pagesize' : 'A4',
+    #     'po' : po})
+    
+def preview_generete_po(request, po_id):
+    po = PurchaseOrder.objects.get(id=po_id)
+    purchase_items = PurchaseItem.objects.filter(po=po)
+    return render(request, "purchase/po-report.html", 
+        {'po': po, 'items': purchase_items})
+
 
 @login_required
 @permission_required("purchase.add_purchaserequest")
 @csrf_exempt
 def add_purchase_request(request):
     if request.method == 'POST':
+        # import pdb; pdb.set_trace();
         pr_add_form = PRAddForm(request.POST)
         if pr_add_form.is_valid():
             pr = pr_add_form.save()
@@ -242,6 +286,7 @@ def comment_purchase_request(request):
 @csrf_exempt
 def add_purchase_order(request):
     if request.method == 'POST':
+        # import pdb; pdb.set_trace();
         po_form = POForm(request.POST)
         if po_form.is_valid():
             po = po_form.save()
@@ -319,6 +364,7 @@ def add_purchase_order(request):
 
 @csrf_exempt
 def add_po(request):
+    # import pdb; pdb.set_trace()
     try:
         sv = SystemVariable.objects.get(id=1)
         next_number = sv.next_po_number
@@ -330,11 +376,19 @@ def add_po(request):
         return HttpResponseRedirect("/")
         pass
     if request.method == 'POST':
-        po_form = POForm(request.POST)
+        # import pdb; pdb.set_trace();
+        po_id = request.POST.get("po_id","")
+        if po_id != "":
+            po = PurchaseOrder.objects.get(id=po_id)
+            po_form = POForm(request.POST, instance=po, request=request, action='update')
+        else:
+            po_form = POForm(request.POST, request=request, action='new')
+
+
         if po_form.is_valid():
             po = po_form.save()
-            po.po_created_by = request.user
-            po.datetime = datetime.datetime.now()
+            # po.po_created_by = request.user
+            # po.datetime = datetime.datetime.now()
             po.save_final_draft = 0
             po.search_string = po.po_number + " "
             if po.supplier:
@@ -342,6 +396,11 @@ def add_po(request):
         
             items = []
             item_list = request.POST.getlist('added_item_number')
+            deleted_items = request.POST.getlist("removed_item")
+            if deleted_items:
+                for deleted_item in deleted_items:
+                    di = PurchaseItem.objects.get(id=deleted_item)
+                    di.delete()
             if item_list:
                 count = 0
                 for item in item_list:
@@ -366,9 +425,20 @@ def add_po(request):
 
                     except:
                         job = None
-                    pi = PurchaseItem(po=po, item=itemobj, job_number=job,
-                        qty=item['qty'], cost=item['cost'], sub_total=item['sub_total'],
-                        comment=item['comment'])
+
+                    try:
+                        pi, bol = PurchaseItem.objects.get_or_create(po=po, item=itemobj)
+                        pi.job_number = job
+                        pi.qty = item['qty']
+                        pi.cost = item['cost']
+                        pi.sub_total = item['sub_total']
+                        pi.comment = item['comment']
+                    except Exception, e:
+                        raise e
+                    # pi = PurchaseItem(po=po, item=itemobj, job_number=job,
+                    #     qty=item['qty'], cost=item['cost'], sub_total=item['sub_total'],
+                    #     comment=item['comment'])
+    
                     pi.purchase_status = 0
                     pi.save()
                     # Update inventory item for Last PO info
@@ -406,6 +476,7 @@ def add_po(request):
             'delivery_choices': delivery_choices, 'terms': terms,
             'deliver_internals': deliver_internals, 'users': users, 'item_unit_measures':item_unit_measures,
             'adminusers': adminusers})
+
 
 @csrf_exempt
 def save_po(request):

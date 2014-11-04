@@ -5,7 +5,7 @@
 	</th>
 	<td>
 		<div style="position: relative;">
-			<input class="form-control" ng-model='search_po' maxlength="25" id="id_po_search"  type="search" name="po_number_search" ng-change="searchPo(search_po)" placeholder="search for po" autocomplete="off" ng-disabled="po_checked">
+			<input class="form-control" ng-model='search_po' maxlength="25" id="id_po_number_search"  type="search" name="po_number_search" ng-change="searchPo(search_po)" placeholder="search for po" autocomplete="off" ng-disabled="po_checked">
 			
 				<div id="po_list" ng-show="show_po_list">
 
@@ -17,6 +17,7 @@
 				</div>
 		</div>
 		<input id="id_po_number" name="po_number" type="hidden">
+		<input id="id_po_id" name="po_id" type="hidden">
 		
 	</td>
 	<th width="150">
@@ -171,8 +172,14 @@
 		<label for="id_po_status">Po status:</label>
 	</th>
 	<td>
-		<select ng-model="poStatus" ng-options="postatus.label for postatus in postatus_list" class="form-control" id="id_po_status" name="po_status">
-		
+		<select class="form-control" id="id_po_status" name="po_status">
+			<option value="0">New</option>
+			<option value="1">Printed / Emailed</option>
+			<option value="2">Partial Received</option>
+			<option value="3">Received / Completed</option>
+			<option value="4">Accounting Confirmed</option>
+			<option value="5">Closed</option>
+			<option value="6">Canceled</option>		
 		</select>
 	</td>
 </tr>
@@ -345,6 +352,7 @@
 								<td colspan="10">No Items</td>
 							</tr>
 						</tbody>
+
 					</table>
 				</td>
 				<td>
@@ -380,7 +388,8 @@
 					<input type="text" class="form-control" placeholder="Last Recv Date" readonly="readonly">
 				</td>
 				<td></td>
-				</tr>				
+				</tr>
+				<tr class="footer"></tr>			
 			</tbody>
 			<tr id='calculated_total_amount'>
 				<td width="150">
@@ -412,7 +421,7 @@
 		<option value="1">YES</option>
 		</select>
 		
-		<input class="form-control decimal tax" ng-if="hst_tax" ng-model="hst_tax_amount" ng-blur="addHstAmount($event)" id="id_hst_taxable_amount" name="hst_taxable_amount" placeholder="HST Taxable Amount" value="0.0" step="0.0001" type="currency">
+		<input class="form-control decimal tax" ng-if="hst_tax" ng-model="hst_tax_amount" ng-blur="addHstAmount($event)" id="id_hst_taxable_amount" name="hst_taxable_amount" placeholder="HST Taxable Amount" type="text">
 	</td>
 	<th width="150">
 		<label for="id_pst_taxable">Pst taxable:</label>
@@ -422,7 +431,7 @@
 		<option value="0">NO</option>
 		<option value="1">YES</option>
 		</select>
-		<input class="form-control decimal tax" ng-if="pst_tax" ng-model="pst_tax_amount" id="id_pst_taxable_amount" name="pst_taxable_amount" ng-blur="addPstAmount($event)" placeholder="PST Taxable Amount" value="0.0" step="0.0001" type="currency">
+		<input class="form-control decimal tax" ng-if="pst_tax" ng-model="pst_tax_amount" id="id_pst_taxable_amount" name="pst_taxable_amount" ng-blur="addPstAmount($event)" placeholder="PST Taxable Amount" value="0.0" type="text">
 	</td>
 </tr>
 
@@ -443,7 +452,7 @@
 		<label for="id_total_po_amount">Total po amount:</label>
 	</th>
 	<td>
-		<input class="form-control" ng-model="total_amount" id="id_total_po_amount" name="total_po_amount" value="0.0" readonly="readonly" step="0.0001" type="currency">
+		<input class="form-control" ng-model="total_amount" id="id_total_po_amount" name="total_po_amount" value="0.0" readonly="readonly" type="text">
 	</td>
 </tr>
 

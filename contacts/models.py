@@ -118,7 +118,7 @@ class ContactProfile(models.Model):
 	
 	terms             = models.ForeignKey(PaymentTerm, null=True, blank=True)
 	
-	shipping_method    = models.ForeignKey(DeliveryChoice, null=True, blank=True)
+	shipping_method   = models.ForeignKey(DeliveryChoice, null=True, blank=True)
 	
 	ship_collect      = models.BooleanField(verbose_name="Ship Collect?", blank=False, default=False)
 	currency          = models.ForeignKey(Currency, null=True, blank=True)
