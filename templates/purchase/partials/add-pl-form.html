@@ -7,7 +7,20 @@
 					<label for="id_pl_number">PL Number:</label>
 				</th>
 				<td>
-					<input class="form-control" id="id_pl_number" name="pl_number" value="NEW" type="text" readonly="">
+					<div style="position: relative;">
+						<input class="form-control" ng-model='search_pl' maxlength="25" id="id_pl_number_search"  type="search" name="pl_number_search" ng-change="searchPl(search_pl)" placeholder="Search for PL leave Blank for New PL" autocomplete="off" ng-disabled="pl_checked">
+						
+							<div id="pl_list" ng-show="show_pl_list">
+
+								<ul class="search">
+									<li ng-repeat="pl in pls | filter:search_pl">
+										<a href="#" class="list-group-item bg-info" ng-click="selectPl(pl)"> {[{pl.pl_number}]}</a>
+									</li>
+								</ul>
+							</div>
+					</div>
+					<input id="id_pl_number" name="pl_number" type="hidden">
+					<input id="id_pl_id" name="pl_id" type="hidden">
 				</td>		
 			</tr>
 			<tr>
@@ -69,7 +82,7 @@
 				</td>
 				<td>
 				<div class="job_box">
-					<input type='text' ng-model="search_job" class='form-control item-job-number' name='item_job_number' placeholder='Start typing to search job'>
+					<input type='text' ng-model="search_job" class='form-control item-job-number' name='item_job_number' placeholder='Start typing to search job' autocomplete="off">
 					<table class="table table-bordered" id="job-details">
 					<tr>
 						<th class="bg-info">job number</th>
@@ -98,7 +111,7 @@
 					</tr>
 						
 					</table>
-					<input type='hidden' name='job_number' id='id_job_number' value="0">
+					<input type='hidden' name='job_number' id='id_job_number'>
 				</div>
 				</td>
 			</tr>
@@ -167,9 +180,8 @@
 							</tbody>
 						</table>
 
-						<select ng-model="customer_broker" class="form-control" id="id_customer_broker" name="customer_broker" style="display:none;">
-							<option ng-repeat="contact in contacts" value="{[{contact.id}]}">{[{ contact.contact_name }]}</option>
-						</select>
+						<input type="hidden" id="id_customer_broker" name="customer_broker">
+						
 					</div>
 				</td>
 			</tr>
@@ -190,7 +202,18 @@
 					<label for="id_sl_number">SL Number:</label>
 				</th>
 				<td>
-					<input class="form-control" id="id_sl_number" name="sl_number" placeholder="Start typing to search SL" type="text">
+					<div style="position: relative;">
+					<input class="form-control" id="id_sl_number_search" name="sl_number_search" type="search" placeholder="Search for SL leave Blank for New SL" ng-model="search_sl" ng-change="searchSl(search_sl)" ng-disabled="sl_checked" autocomplete="off">
+					<div id="sl_list" ng-show="show_sl_list" >
+
+								<ul class="search">
+									<li ng-repeat="sl in sls | filter:search_sl">
+										<a href="#" class="list-group-item bg-info" ng-click="selectSl(sl)">{[{sl.sl_number}]}</a>
+									</li>
+								</ul>
+							</div>
+					</div>
+					<input id="id_sl_number" name="sl_number" type="hidden" value="">
 				</td>		
 			</tr>
 			<tr>
@@ -253,7 +276,7 @@
 					<select class="form-control" name="generated_by" id="id_generated_by" 
 					{% if cuser.is_superuser == 0 %} disabled {% endif %}>
 					{% for us in users %}
-						<option value="{{us.id}}" {% if us.id == cuser.id %} selected {% endif %}>{{us.username}}</option>
+						<option value="{{us.id}}">{{us.username}}</option>
 					{% endfor %}
 					</select>
 				</td>
@@ -301,9 +324,88 @@
 	</td>
 </tr>
 <tr>
-<td></td>
+	<td colspan="2">
+	<div class="item_box">
+		<table class="table item">
+			<thead>
+				<tr>
+					<th width="180">Item Number</th>
+					<th width="">Description</th>
+					<th width="180">Unit</th>
+					<th width="180">Ordered</th>
+					<th width="180">Qty B/O</th>
+					<th width="200">Qty shipped</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody id="add_sl_item_list">
+				<tr style="border-top: 2px dotted red;">
+				<td style="position: relative;">
+					<input type="text" class="form-control added_item_number" name="" value="" ng-model="search_sl_item" ng-change="searchSlItem(search_sl_item)" placeholder="search for sl item" autocomplete="off">
+					<table class="table" ng-show="show_sl_item_list" id="sl_items_list">
+						<thead>
+							<tr>
+								<th width="150">Item Number</th>
+								<th width="250">Description</th>
+								<th width="120">Unit</th>
+								<th width="100">Ordered</th>
+								<th width="150">Qty B/O</th>
+								<th width="150">Qty shipped</th>
+								<th><a href="" class="close">x</a></th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="item in items | googleSearchFilter:search_sl_item" ng-click="selectSlItem(item)">
+								<td>{[{item.item_number}]}</td>
+								<td>{[{item.description}]}</td>
+								<td>{[{item.item_unit_measure}]}</td>
+								<td>{[{item.ordered}]}</td>
+								<td>{[{item.backordered}]}</td>
+								<td>{[{item.total_shipped}]}</td>
+								<td></td>
+							</tr>
+
+							<tr ng-show="!items.length">
+								<td colspan="10">No Items</td>
+							</tr>
+						</tbody>
+
+					</table>
+				</td>
+				<td>
+					<textarea rows="1" class="form-control" readonly=""></textarea>
+				</td>
+				<td>
+					<input type="text" class="form-control" placeholder="Unit" readonly="">
+				</td>
+				<td>
+					<input type="text" class="form-control" placeholder="Item Ordered" readonly="">
+				</td>
+				<td>
+					<input type="text" class="form-control" placeholder="Qty B/O" readonly="">
+				</td>
+				<td>
+					<input type="text" class="form-control" placeholder="Qty shipped" readonly="">
+				</td>
+				<td></td>
+				</tr>
+				<tr class="removed_item">
+					
+				</tr>
+				<tr class="footer"></tr>			
+			</tbody>
+		</table>				
+	</div>
+		
+	</td>
+</tr>
+<tr>
 	<td>
-		<input type="submit" class="form-control btn btn-primary" value="Add PL">
+		<input type="submit" ng-show="show_add_button" class="form-control btn btn-primary" value="Add PL">
+	</td>
+	<td>
+		
+		<input type="submit" ng-show="show_update_button" class="form-control btn btn-primary" value="Update PL">
 	</td>
 </tr>
 </table>

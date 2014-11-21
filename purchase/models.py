@@ -266,6 +266,9 @@ class ShippingList(models.Model):
 	def __unicode__(self):
 		return self.sl_number
 
+	def status_verbose(self):
+		return dict(SL_STATUS)[int(self.sl_status)]
+
 	class Meta:
 		verbose_name = u"Shipping List"
 		verbose_name_plural = u"Shipping Lists"
@@ -304,7 +307,7 @@ class ShippingItem(models.Model):
 
 class PackingList(models.Model):
 	pl_number = models.CharField(max_length=20, blank=True, null=True, unique=True)
-	sl_number = models.ForeignKey(ShippingList, related_name='pl-to-sl')
+	sl_number = models.ForeignKey(ShippingList, blank=True, null=True)
 	sold_to = models.ForeignKey(Contact, blank=True, null=True, related_name='sold_to')
 	ship_to = models.ForeignKey(Contact, blank=True, null=True, related_name='ship_to')
 	date_issued = models.DateField(blank=True, null=True)

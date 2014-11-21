@@ -50,14 +50,19 @@
 							<td>{[{ pl.pl_number }]}</td>
 							<td>{[{ pl.date_issued }]}</td>
 							<td>{[{ pl.date_shipped }]}</td>
-							<td>{[{ pl.sold_to }]}</td>
-							<td>{[{ pl.ship_to }]}</td>
+							<td>{[{ pl.sold_to.contact_name }]}</td>
+							<td>{[{ pl.ship_to.contact_name }]}</td>
 							<td>{[{ pl.customer_po_number }]}</td>
 							
-							<td width="100">
-								<a href="/purchase/view-pl/{[{pl.id}]}/">View</a> 
-								/ <a href="/purchase/edit-pl/{[{pl.id}]}/">Edit</a>
-								/ <a class="pl-delete" data-pid="{[{pl.id}]}" href="">Delete</a>
+							<td width="220">
+								
+								<div class="btn-group btn-group-sm">
+								<a class="btn btn-default" href="/purchase/view-pl/{[{pl.id}]}/">View</a> 
+								
+								<a class="pl-delete btn btn-default" data-pid="{[{pl.id}]}" href="">Delete</a>
+
+								<a class="btn btn-default" data-pid="{[{pl.id}]}" href="/purchase/generate-pl/{[{pl.id}]}/" target="_blank">Gererate PL</a>
+							</div>
 							</td>
 						</tr>
 						<tr ng-show="!packing_list.length">

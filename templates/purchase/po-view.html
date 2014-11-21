@@ -113,9 +113,13 @@
 							<th width="25%">Returned Type</th>
 							<td>{{po.returned_type}}</td>
 						</tr>
+						<tr class="bg-primary" align="center">
+							<th colspan="2" style="text-align:center;">
+								<b>Items</b>
+							</th>
+						</tr>
 						<tr>
-							<th width="25%">Items</th>
-							<td>
+							<td colspan="2">
 								<table class="table table-bordered table-striped">
 									<tr class="danger">
 										<th width="100">Item Number</th>
@@ -123,6 +127,8 @@
 										<th>Job Number</th>
 										<th>Qty</th>
 										<th>Cost</th>
+										<th>Qty Received</th>
+										<th>Last Recv Date</th>
 										<th>Subtotal</th>
 									</tr>
 									{% for item in purchase_items %}
@@ -132,6 +138,8 @@
 											<td>{{item.job_number.job_number}}</td>
 											<td>{{item.qty}}</td>
 											<td>{{item.cost}}</td>
+											<td>{{item.item_recv}}</td>
+											<td>{{item.item_recv_date}}</td>
 											<td>{{item.sub_total}}</td>
 
 										</tr>

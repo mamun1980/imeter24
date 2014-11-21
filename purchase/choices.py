@@ -62,11 +62,15 @@ PL_TYPE = (
 	(2, 'F.O.B Order'),
 	(3, 'Mod Parts Order Std'),
 	(4, 'Mod Parts Order Eng'),
-	
+)
+SL_STATUS = (
+	(0, 'New'),
+	(1, 'Partial Shipped'),
+	(2, 'All Shipped'),
 )
 SL_ITEM_STATUS = (
 	(0, 'Pending'),
-	(1, 'OnShipping'),
+	(1, 'Partial Shipping'),
 	(2, 'Done'),
 
 )

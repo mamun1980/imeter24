@@ -56,6 +56,15 @@ p.item_desc {
 .glyphicon {
 	color: red;
 }
+#sl_list {
+    position: absolute;
+    width: 450px;
+    z-index: 100;
+}
+#sl_list ul {
+    padding-left: 0px;
+    list-style: none;
+}
 </style>
 <div class="container-fluid shadow4 main-body" ng-app="slApp">
 
@@ -194,6 +203,8 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
         $("#ship_to_contact_details").hide();
 
         $("#items_list").hide();
+
+        $scope.show_sl_list = true;
         
         // $("#ship-to-container").hide();
 	};
@@ -324,7 +335,7 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
     	
     	str += "<td><input type='number' name='item_ordered' class='form-control demo_box' placeholder='Ordered'></td>";
 
-    	str += "<td><input type='number' name='item_shipped' class='form-control demo_box' placeholder='Shipped today'></td>";
+    	str += "<td><input type='number' name='item_shipped' class='form-control demo_box' placeholder='Shipped today' readonly></td>";
 
     	str += "<td><input type='number' name='shipped_total_to_date' class='form-control demo_box' placeholder='Shipped total to date' readonly></td>";
 
@@ -352,12 +363,93 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
     $scope.removeField = function (event) {
         // $(event.target).closest('tr').remove();
         var myitem = $("tbody#add_item_list tr.add_item");
+        var removed_item_id = event.currentTarget.attributes[1].value;
+        console.log(event.currentTarget.attributes[1].value);
         
 		$(event.target).closest('tr').remove();
+
+        var removed_item = "<input type='hidden' name='removed_item' value='"+removed_item_id+"'>";
+        $("#add_item_list tr.removed_item").append(removed_item);
 		
 
 	
     };
+
+    $scope.searchSl = function(q) {
+        if(q.length > 1) {
+            // console.log(q);
+            $http({method: 'GET', url: "/purchase/sl-list-json/"}).
+                success(function(data, status, headers, config){
+                $scope.sls = data;
+                // console.log(data);
+            });
+            // $("#po_list").show();
+            $scope.show_sl_list = true;
+        } else {
+            // $("#po_list").hide();
+            $scope.show_sl_list = false;
+        }
+        
+    }
+    $scope.selectSl = function(sl){
+        // console.log(sl.id);
+        $scope.search_sl = sl.sl_number;
+        $scope.sl_checked = true;
+        $scope.show_sl_list = false;
+        
+        $("#id_sl_number").val(sl.sl_number);
+        $("#id_sl_id").val(sl.id);
+        $("#id_item_job_number").val(sl.job_number);
+        $("#id_job_number").val(sl.job_number_id);
+
+        $("#sold_to_contact_details").show();
+        $scope.sold_to_contact = sl.sold_to;
+        $("#id_sold_to").val(sl.sold_to.id);
+
+        $("#ship_to_contact_details").show();
+        $scope.ship_to_contact = sl.ship_to;
+        $("#id_ship_to").val(sl.ship_to.id);
+
+        $("#id_ordered_date").val(sl.ordered_date);
+        $("#id_date_required").val(sl.date_required);
+        $("#id_customer_po_number").val(sl.customer_po_number);
+        $("#id_customer_job_number").val(sl.customer_job_number);
+        $("#id_ship_via").val(sl.ship_via_id);
+
+        var items = sl.items;
+        console.log(items);
+        var myitem = $("tbody#add_item_list tr.add_item");
+        for(i=0; i< items.length ; i++) {
+            var str = "<tr class='add_item'>";
+            str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+items[i].item+"' readonly></td>";
+            str += "<td><p class='bg-info item_desc'>"+items[i].description+"</p></td>";
+            
+            str += "<td><input type='number' name='item_ordered' class='form-control demo_box' placeholder='Ordered' value='"+items[i].ordered+"'></td>";
+
+            str += "<td><input type='number' name='item_shipped' class='form-control demo_box' placeholder='Shipped today' value='"+items[i].shipped+"' readonly></td>";
+
+            str += "<td><input type='number' name='shipped_total_to_date' class='form-control demo_box' placeholder='Shipped total to date' readonly value='"+items[i].shipped_total_to_date+"'></td>";
+
+            str += "<td><input type='text' name='item_backordered' class='form-control demo_box' placeholder='Backordered' value='"+items[i].backordered+"' autocomplete='off' readonly></td>";
+
+            str += "<td><input type='text' class='form-control demo_box' value='"+items[i].last_shipped+"' placeholder='Last shipped' autocomplete='off' readonly></td>";
+
+            str += "<td><input type='text' class='form-control' placeholder='PL Number' readonly='readonly'></td>";
+
+            str += "<td><a class='remove-item btn' data-item-id='"+items[i].sl_item_id+"' ng-click='removeField($event)'><span class='glyphicon glyphicon-remove'></span></a></td>";
+            str += "</tr>";
+            
+            var element = $compile(str)($scope);
+
+            $("tbody#add_item_list").prepend(element);
+
+        }
+        
+
+
+
+        
+    }
 
 
 

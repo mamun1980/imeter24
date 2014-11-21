@@ -39,6 +39,10 @@ tr.thead {
 					
 					<tbody>
 						<tr>
+							<th width="25%">SL ID</th>
+							<td>{{sl.id}}</td>
+						</tr>
+						<tr>
 							<th width="25%">SL Number</th>
 							<td>{{sl.sl_number}}</td>
 						</tr>
@@ -98,8 +102,15 @@ tr.thead {
 							<td>{{sl.customer_job_number}}</td>
 						</tr>
 						<tr>
-							<th> Items for this Shipping List</th>
-							<td>
+							<th>SL Status</th>
+							<td>{{sl.status_verbose}}</td>
+						</tr>
+						<tr>
+							<th colspan="2"><b>Items for this Shipping List</b></th>
+						</tr>
+						<tr>
+							
+							<td colspan="2">
 								<table class="table sl-items">
 									<thead>
 										<tr class="thead">
@@ -119,8 +130,8 @@ tr.thead {
 										<td>{{item.item.item_number}}</td>
 										<td>{{item.item.description}}</td>
 										<td>{{item.ordered}}</td>
-										<td>{{item.shipped}}</td>
-										<td>{{item.required}}</td>
+										<td>{{item.shipped_total_to_date}}</td>
+										<td>{{item.backordered}}</td>
 										<td>{{item.filled}}</td>
 										<td>{{item.item_ship_status_verbose}}</td>
 										

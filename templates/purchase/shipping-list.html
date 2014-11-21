@@ -13,7 +13,7 @@
 }
 
 </style>
-<div class="container shadow4 main-body" ng-app="premierApp" ng-controller='SLListController'>
+<div class="container-fluid shadow4 main-body" ng-app="premierApp" ng-controller='SLListController'>
 <section class="row">
 	<div class="col-md-6">
 		<input type='text' class="form-control" ng-model="search" placeholder="Filter SL">
@@ -38,7 +38,7 @@
 							<th>Customer PO Number</th>
 							<th>Customer Job Number</th>
 							
-							<th width='110'>Action</th>
+							<th width='220'>Action</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -78,14 +78,13 @@
 							<td>{[{ sl.customer_job_number }]}</td>
 							
 							<td>
-								<a href="/purchase/view-sl/{[{sl.id}]}/">View</a> 
-								<span ng-show="{[{sl.can_edit}]}">
-								/ <a href="/purchase/edit-sl/{[{sl.id}]}/">Edit</a>
-								</span>
+							<div class="btn-group btn-group-sm">
+								<a class="btn btn-default" href="/purchase/view-sl/{[{sl.id}]}/">View</a> 
+								
+								<a class="sl-delete btn btn-default" data-slid="{[{sl.id}]}" href="">Delete</a>
 
-								<span ng-show="{[{sl.can_edit}]}">
-								/ <a class="sl-delete" data-slid="{[{sl.id}]}" href="">Delete</a>
-								</span>
+								<a class="btn btn-default" data-pid="{[{sl.id}]}" href="/purchase/generate-sl/{[{sl.id}]}/" target="_blank">Gererate SL</a>
+							</div>
 							</td>
 						</tr>
 						<tr ng-show="!shipping_list.length">

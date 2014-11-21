@@ -4,11 +4,24 @@
 		<label for="id_sl_number">SL Number:</label>
 	</th>
 	<td>
-		<input class="form-control" id="id_sl_number" name="sl_number" value="NEW" type="text" readonly="">
+		<div style="position: relative;">
+		<input class="form-control" id="id_sl_number_search" name="sl_number_search" type="search" placeholder="Search for SL leave Blank for New SL" ng-model="search_sl" ng-change="searchSl(search_sl)" ng-disabled="sl_checked" autocomplete="off">
+		<div id="sl_list" ng-show="show_sl_list" >
+
+					<ul class="search">
+						<li ng-repeat="sl in sls | filter:search_sl">
+							<a href="#" class="list-group-item bg-info" ng-click="selectSl(sl)">{[{sl.sl_number}]}</a>
+						</li>
+					</ul>
+				</div>
+		</div>
+		<input id="id_sl_number" name="sl_number" type="hidden" value="{[{search_sl}]}">
+		<input id="id_sl_id" name="sl_id" type="hidden">
 	</td>
 	<td><label for="id_job_number">Job number:</label></td>
 	<td>
-		<input type='text' class='form-control item-job-number' name='item_job_number' placeholder='Start typing to search job'><input type='hidden' name='job_number' id='id_job_number'>
+		<input type='text' class='form-control item-job-number' name='item_job_number' placeholder='Start typing to search job' id="id_item_job_number">
+		<input type='hidden' name='job_number' id='id_job_number'>
 	</td>
 </tr>
 
@@ -28,7 +41,11 @@
 			</tr>
 			<tr>
 				<th>Phone</th>
-				<td>{[{ sold_to_contact.phone }]}</td>
+				<td>
+					<li ng-repeat="phone in sold_to_contact.phones" class="bg-info">
+						{[{phone.phone_type}]}: {[{phone.phone}]} ({[{phone.phone_ext}]})
+					</li>
+				</td>
 			</tr>
 			<tr>
 				<th>Email</th>
@@ -50,9 +67,7 @@
 			</tbody>
 		</table>
 
-		<select ng-model="sold_to" class="form-control" id="id_sold_to" name="sold_to" style="display:none;">
-			<option ng-repeat="contact in contacts" value="{[{contact.id}]}">{[{ contact.contact_name }]}</option>
-		</select>
+		<input type="hidden" id="id_sold_to" name="sold_to">
 	</div>
 </td>
 
@@ -69,7 +84,11 @@
 			</tr>
 			<tr>
 				<th>Phone</th>
-				<td>{[{ ship_to_contact.phone }]}</td>
+				<td>
+					<li ng-repeat="phone in ship_to_contact.phones" class="bg-info">
+						{[{phone.phone_type}]}: {[{phone.phone}]} ({[{phone.phone_ext}]})
+					</li>
+				</td>
 			</tr>
 			<tr>
 				<th>Email</th>
@@ -91,9 +110,7 @@
 			</tbody>
 		</table>
 
-		<select ng-model="ship_to" class="form-control" id="id_ship_to" name="ship_to" style="display:none;">
-			<option ng-repeat="contact in contacts" value="{[{contact.id}]}">{[{ contact.contact_name }]}</option>
-		</select>
+		<input type="hidden" id="id_ship_to" name="ship_to">
 	</div>
 </td>
 			  			
@@ -192,7 +209,7 @@
 								<td>{[{item.item_unit_measure}]}</td>
 								<td>{[{item.wholesale_cost}]}</td>
 								<td>{[{item.currency}]}</td>
-								<td>{[{item.primary_supplier}]}</td>
+								<td>{[{item.primary_supplier.contact_name}]}</td>
 								<td>{[{item.quantity_on_hand}]}</td>
 								<td>{[{item.quantity_on_order}]}</td>
 								<td>{[{item.last_ordered}]}</td>
@@ -215,7 +232,7 @@
 				</td>
 				
 				<td>
-					<input type='number' class='form-control demo_box' placeholder='Shipped today'>
+					<input type='number' class='form-control demo_box' placeholder='Shipped today' readonly>
 				</td>
 				<td>
 					<input type='number' class='form-control demo_box' placeholder='Shipped total to date' readonly>
@@ -233,7 +250,11 @@
 				<td></td>
 				
 				</tr>				
+				<tr class="removed_item">
+					
+				</tr>
 			</tbody>
+			
 							
 			</table>
 				

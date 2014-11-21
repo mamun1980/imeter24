@@ -195,9 +195,9 @@ class ItemReeiveForm(forms.ModelForm):
 
 
 class PackingListForm(forms.ModelForm):
-    pl_number = forms.CharField( max_length=20, required=True, label='PL Number',
-        widget=forms.TextInput(attrs={"class": "form-control", "value": "NEW", "readonly": "readonly"}))
-    sl_number = forms.ModelChoiceField(required=False,label='SL Number', queryset=ShippingList.objects.all(), 
+    pl_number = forms.CharField( max_length=20, required=False, label='PL Number',
+        widget=forms.TextInput(attrs={"class": "form-control"}))
+    sl_number = forms.ModelChoiceField(required=False, label='SL Number', queryset=ShippingList.objects.all(), 
         widget=forms.Select(attrs={"class": "form-control"}))
     sold_to = forms.ModelChoiceField(required=False, queryset=Contact.objects.all(), 
         widget=forms.Select(attrs={"class": "form-control"}))
@@ -231,6 +231,26 @@ class PackingListForm(forms.ModelForm):
     invoiced_on = forms.DateField(required=False,
         widget=forms.DateInput(attrs={"class": "form-control datepicker", 'placeholder': 'Invoiced On'}))
 
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        self.action = kwargs.pop('action', None)
+        super(PackingListForm, self).__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        # import pdb; pdb.set_trace();
+        pl = super(PackingListForm, self).save(commit=False)
+        sv = SystemVariable.objects.get(id=1)
+        # pl.generated_by = self.request.user
+        if self.action == 'new':
+            pl_number = re.sub(r"[A-Za-z]+","",self.request.POST['pl_number_search'])
+            pl.pl_number = 'PL'+str(pl_number)
+            sv.next_pl_number = int(pl_number) + 1
+            # po_number = re.sub(r"[^\w]+","",po.po_number)
+            # po.po_number = 'P'+str(po_number)
+            # sv.next_po_number = int(po_number) + 1
+        sv.save()
+        pl.save()
+        return pl
 
     class Meta:
         model = PackingList
@@ -262,10 +282,30 @@ class ShippingListForm(forms.ModelForm):
         widget=forms.Select(attrs={"class": "form-control"}))
 
 
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        self.action = kwargs.pop('action', None)
+        super(ShippingListForm, self).__init__(*args, **kwargs)
 
     class Meta:
         model = ShippingList
         exclude = ['search_string', 'sl_status']
+
+    def save(self, commit=True):
+        sl = super(ShippingListForm, self).save(commit=False)
+        sv = SystemVariable.objects.get(id=1)
+        if self.action == 'new':
+            sl_number = re.sub(r"[A-Za-z]+","",self.request.POST['sl_number_search'])
+            sl.sl_number = 'SL'+str(sl_number)
+            sv.next_sl_number = int(sl_number) + 1
+        elif self.action == 'update':
+            pass
+            # po_number = re.sub(r"[^\w]+","",po.po_number)
+            # po.po_number = 'P'+str(po_number)
+            # sv.next_po_number = int(po_number) + 1
+        sv.save()
+        sl.save()
+        return sl
 
 
 
