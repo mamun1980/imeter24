@@ -2,8 +2,10 @@ from django.db import models
 from contacts.models import *
 from scomuser.models import *
 from inventory.choices import *
-
+# from purchase.models import PurchaseItem
+from django_fsm import FSMField, transition
 # Create your models here.
+
 
 class ItemUnitMeasure(models.Model):
 	unit_name = models.CharField(max_length=20, null=True, blank=True)
@@ -69,9 +71,9 @@ class Location(models.Model):
 class Item(models.Model):
 	item_number = models.CharField(max_length=20, primary_key=True)
 	description  = models.TextField(blank=True, null=True)
-	quantity_on_hand = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, default=0)
+	quantity_on_hand = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
 	department = models.ForeignKey(Department, blank=True, null=True)
-	quantity_on_order = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+	quantity_on_order = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True)
 	primary_supplier = models.ForeignKey(Contact, blank=True, null=True, related_name='item_supplier')
 	
 	'''
@@ -89,7 +91,7 @@ class Item(models.Model):
 	comments = models.TextField(blank=True, null=True, help_text="Anything entered here will print on reports")
 	item_unit_measure = models.ForeignKey(ItemUnitMeasure, blank=True, null=True)
 	
-	stock_status_type = models.CharField(max_length=25, choices=STOCK_STATUS_TYPE, default="normal")
+	stock_status_type = models.CharField(max_length=10, choices=STOCK_STATUS_TYPE, default="normal")
 	currency = models.ForeignKey(Currency, max_length=20, blank=True, null=True)
 	warehouse_location = models.ForeignKey(Location, blank=True, null=True)
 
@@ -103,10 +105,11 @@ class Item(models.Model):
 	# shop_order_expected = models.DateField(blank=True, null=True)
 	# shop_order_status = models.CharField(max_length=10, choices=SHOP_STATUS_CHOICES, default="0", blank=False, null=False)
 	
-	qty_on_request = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-	minimum_qty = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-	max_order_qty = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-	max_single_order_qty = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+	qty_on_request = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True)
+	max_order_qty = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True)
+	max_single_order_qty = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True)
+	# This field value give remaining qty of item for max_order_qty
+	max_order_qty_remains = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True)
 	wholesale_cost = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, default=0.0)
 	retail_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
 	
@@ -123,7 +126,7 @@ class Item(models.Model):
 	preference_criteria = models.CharField(max_length=50, blank=True, null=True)
 	producer_of_item = models.ForeignKey(Contact, blank=True, null=True)
 	shipping_weight = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-	minimum_qty_on_hand = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+	minimum_qty_on_hand = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True)
 	duty_percentage = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
 	# notes = GenericRelation(Comment, object_id_field='object_pk', 
 	# 	help_text=_("Anything entered here can only be displayed online."))
@@ -136,6 +139,7 @@ class Item(models.Model):
 	date_modified = models.DateTimeField('date modified', auto_now=True)
 	terms = models.ForeignKey(PaymentTerm, blank=True, null=True, related_name='item_payment_terms')
 	search_string 	  = models.TextField(null=True, blank=True, verbose_name='Search String')
+	state = FSMField(default='new')
 
 	def __unicode__(self):
 		return self.item_number
@@ -143,6 +147,14 @@ class Item(models.Model):
 	def get_currency(self):
 		if self.currency:
 			pass
+	def order_restriction(self):
+		if self.max_order_qty_remains and self.max_single_order_qty:
+			if self.max_order_qty_remains <= self.max_single_order_qty:
+				return self.max_order_qty_remains
+			else:
+				return self.max_single_order_qty
+		else:
+			return -1
 
 	class Meta:
 		verbose_name = "Item"
@@ -168,6 +180,3 @@ class ItemComment(models.Model):
 		permissions = (
     		('view_itemcomment', 'Can View Item comment'),
     	)
-
-
-

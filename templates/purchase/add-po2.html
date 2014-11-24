@@ -129,6 +129,9 @@ span.email {
 #add_item_list .form-control {
 	font-size: 12px;
 }
+input.ng-invalid-max {
+	background-color: red;
+}
 </style>
 <div class="container-fluid" ng-app="poApp">
 {% if messages %}
@@ -147,7 +150,7 @@ span.email {
 	  	</div>
 		<div class="panel-body">
 
-			<form action="/purchase/add-po/" method="POST" enctype="multipart/form-data">	
+			<form name='purchase-add-form' action="/purchase/add-po/" method="POST" enctype="multipart/form-data">	
 			{% include "purchase/partials/add-po-form.html" %}
 			</form>
 		</div>
@@ -341,6 +344,8 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 		$scope.total_amount = 0.0;
 		$scope.hst_tax_amount = 0.0;
 		$scope.pst_tax_amount = 0.0;
+		$scope.show_add_button = false;
+		$scope.show_update_button = false;
 		
 		// intialize dateIssued value to current date
 		var now = new Date();
@@ -472,6 +477,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
  //    });
 	$scope.searchPo = function(q) {
 		if(q.length > 1) {
+			$scope.show_add_button = true;
 			// console.log(q);
 			$http({method: 'GET', url: "/purchase/get-purchase-orders/"}).
 	        	success(function(data, status, headers, config){
@@ -487,6 +493,8 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 		
 	}
 	$scope.selectPo = function(po){
+		$scope.show_update_button = true;
+		$scope.show_add_button = false;
 		var po_number = po.po_number;
 		console.log(po.id);
 		var po_id = po.id;
@@ -589,7 +597,9 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 				var p_item_id = po_items[i].p_item_id;
 		    	var item_number = po_items[i].item_number;
 		    	var item_description = po_items[i].description;
-		    	var unit_measure_id = po_items[i].unit_measure_id;
+		    	var unit_measure_id = po_items[i].unit;
+		    	console.log("unit measure:"+unit_measure_id);
+
 		    	var item_comment = po_items[i].comment;
 		    	var wholesale_cost = po_items[i].cost;
 		    	var item_qty = po_items[i].qty;
@@ -605,12 +615,12 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 		    	str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+item_number+"' readonly></td>";
 		    	str += "<td><p class='bg-info item_desc'>"+item_description+"</p></td>";
 		    	
-		    	str += "<td><select class='form-control' name='itme_unit_measure'>";
-		    	str += "<option ng-repeat='um in item_unit_measures' value='{[{um.id}]}'>{[{um.unit_name}]}</option>";
+		    	str += "<td><select class='form-control' name='unit'>";
+		    	str += "<option ng-repeat='um in item_unit_measures' value='{[{um.id}]}' ng-selected='{[{um.id}]} == "+unit_measure_id+"'>{[{um.unit_name}]}</option>";
 		    	str += "</select></td>";
 
 		    	str += "<td><input type='currency' class='form-control' step='0.0001' name='item_cost' value='"+wholesale_cost+"'></td>";
-		    	str += "<td><input type='number' class='form-control decimal' step='0.01' name='item_qty' value='"+item_qty+"'></td>";
+		    	str += "<td><input type='number' class='form-control decimal' step='0.01' name='item_qty' value='"+item_qty+"' readonly></td>";
 		    	str += "<td><input type='currency' step='0.0001' name='item_sub_total' class='form-control' value='"+item_sub_total+"' readonly></td>";
 		    	str += "<td><input type='text' class='form-control item-job-number' name='item_job_number' value='"+item_job_number+"' placeholder='Start typing to search job'><input type='hidden' name='item_job_id' class='item_job_id' value='"+item_job_number_id+"'></td>";
 		    	str += "<td><textarea rows='1' class='form-control' name='item_comment' placeholder='Put your comments here'>"+item_comment+"</textarea></td>";
@@ -662,7 +672,6 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 		
 	}
     $scope.selectItem = function(item) {
-    	console.log(item);
     	$scope.search_item = '';
     	$scope.mixed_currency == false;
     	$("#items_list").hide();
@@ -672,13 +681,19 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
     	var item_description = item.description;
     	var item_id = item.p_item_id;
     	var currency_id = item.currency_id;
-    	var unit_measure_id = item.item_unit_measure;
-    	// console.log(unit_measure_id);
-    	// var item_qty_received = parseFloat(item.qty_received).toFixed(4);
-    	// var last_received_date = item.qty_received_date;
+    	var unit_measure_id = item.item_unit_measure_id;
 
-    	var item_qty_received = 0.00;
-    	var last_received_date = null;
+    	var item_qty_received = parseFloat(item.qty_received).toFixed(4);
+    	var last_received_date = item.qty_received_date;
+    	var max_single_order_qty = item.max_single_order_qty;
+    	var max_order_qty_remains = item.max_order_qty_remains;
+    	
+    	if(max_single_order_qty < max_order_qty_remains) {
+    		var order_constrain = max_single_order_qty;
+    	} else {
+    		var order_constrain = max_order_qty_remains;
+    	}
+
     	// console.log(item.qty_received_date);
     	var wholesale_cost = item.wholesale_cost;
 
@@ -710,7 +725,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 	    			
 	    		});
 	    	} catch(e) {
-	    		console.log(e);
+
 	    		return;
 
 	    	}
@@ -719,7 +734,6 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
     		
     		if($scope.supplier_contact == undefined) {
 				$("#id_terms").val(item_term);
-				console.log(item_term);
     		}
     	}
     	
@@ -727,12 +741,12 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
     	str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+item_number+"' readonly></td>";
     	str += "<td><p class='bg-info item_desc'>"+item_description+"</p></td>";
     	
-    	str += "<td><select class='form-control'>";
-    	str += "<option ng-repeat='um in item_unit_measures' value='{[{um.id}]}'>{[{um.unit_name}]}</option>";
+    	str += "<td><select class='form-control' name='unit'>";
+    	str += "<option ng-repeat='um in item_unit_measures' value='{[{um.id}]}' ng-selected='{[{um.id}]} == "+unit_measure_id+"'>{[{um.unit_name}]}</option>";
     	str += "</select></td>";
 
     	str += "<td><input type='currency' class='form-control' step='0.0001' name='item_cost' value='"+wholesale_cost+"'></td>";
-    	str += "<td><input type='number' class='form-control decimal' step='0.01' name='item_qty' value='0'></td>";
+    	str += "<td><input type='number' class='form-control' step='0.01' name='item_qty' value='0' ng-model='item_qty"+item_number+"' max='"+order_constrain+"'></td>";
     	str += "<td><input type='currency' step='0.0001' name='item_sub_total' class='form-control' value='0.0' readonly></td>";
     	str += "<td><input type='text' class='form-control item-job-number' name='item_job_number' placeholder='Start typing to search job'><input type='hidden' name='item_job_id' class='item_job_id'></td>";
     	str += "<td><textarea rows='1' class='form-control' name='item_comment' placeholder='Put your comments here'></textarea></td>";

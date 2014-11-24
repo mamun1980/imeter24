@@ -142,13 +142,14 @@ class PurchaseItem(models.Model):
 	'''
 	Purchase Item will be added when PO is saved.
 
-	Initial status for PurchaseItem is 'Not Received'.
-	When item is received it will be changed to 'partial received'.
-	If all items are received status will be changed to 'All Received'
+	Initial status for PurchaseItem is 'Ordered'.
+	When item is received it will be changed to 'Partial Received'.
+	If all items are received status will be changed to 'Received'
 	'''
 	po = models.ForeignKey(PurchaseOrder, blank=True, null=True)
 	item = models.ForeignKey(Item, blank=True, null=True)
 	job_number = models.ForeignKey(Job, blank=True, null=True)
+	unit = models.CharField(max_length=20, blank=True, null=True)
 	qty = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
 	cost = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
 	sub_total = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
@@ -307,7 +308,7 @@ class ShippingItem(models.Model):
 
 class PackingList(models.Model):
 	pl_number = models.CharField(max_length=20, blank=True, null=True, unique=True)
-	sl_number = models.ForeignKey(ShippingList, blank=True, null=True)
+	sl = models.ForeignKey(ShippingList, blank=True, null=True)
 	sold_to = models.ForeignKey(Contact, blank=True, null=True, related_name='sold_to')
 	ship_to = models.ForeignKey(Contact, blank=True, null=True, related_name='ship_to')
 	date_issued = models.DateField(blank=True, null=True)
@@ -329,6 +330,9 @@ class PackingList(models.Model):
 
 	def __unicode__(self):
 		return self.pl_number
+
+	def status_verbose(self):
+		return dict(PL_STATUS)[int(self.status)]
 
 	def order_type_verbose(self):
 		return dict(PL_TYPE)[int(self.order_type)]

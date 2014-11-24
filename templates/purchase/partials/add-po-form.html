@@ -49,7 +49,7 @@
 	<th width="150">
 		<label for="id_supplier">Supplier:</label>
 	</th>
-	<td colspan="3">
+	<td>
 	<div class="contact_box">
 		<input type="text" ng-model="search_supplier" placeholder="start typing to search supplier" class="form-control">
 
@@ -112,12 +112,10 @@
 
 
 	</td>
-</tr>
-<tr class="bg-info">
 	<th width="150">
 		<label for="id_ship_to">Ship to:</label>
 	</th>
-	<td colspan="3">
+	<td>
 	<div class="contact_box">
 		
 	
@@ -339,7 +337,7 @@
 								<td>{[{item.item_unit_measure}]}</td>
 								<td>{[{item.wholesale_cost}]}</td>
 								<td>{[{item.currency}]}</td>
-								<td>{[{item.primary_supplier}]}</td>
+								<td>{[{item.primary_supplier.contact_name}]}</td>
 								<td>{[{item.quantity_on_hand}]}</td>
 								<td>{[{item.quantity_on_order}]}</td>
 								<td>{[{item.last_ordered}]}</td>
@@ -359,27 +357,27 @@
 					<textarea rows="1" class="form-control demo_box" readonly=""></textarea>
 				</td>
 				<td>
-					<select class="form-control">
+					<select class="form-control" disabled="true">
 					{% for unit_measue in item_unit_measures %}
 						<option value="{{unit_measue.id}}">{{unit_measue.unit_name}}</option>
 					{% endfor %}
 					</select>
 				</td>
 				<td>
-					<input type="currency" class="form-control demo_box" placeholder="Cost">
+					<input type="currency" class="form-control demo_box" placeholder="Cost"readonly="readonly">
 				</td>
 				<td>
-					<input type="number" class="form-control demo_box" placeholder="Qty">
+					<input type="number" class="form-control demo_box" placeholder="Qty" readonly="readonly">
 				</td>
 				<td>
 					<input type="currency" step="0.0001" class="form-control demo_box" placeholder="Subtotal" readonly="readonly">
 				</td>
 				<td>
 					
-					<input type="text" class="form-control demo_box" placeholder="job number" autocomplete="off">
+					<input type="text" class="form-control demo_box" placeholder="job number" autocomplete="off" readonly="readonly">
 				</td>
 				<td>
-					<textarea rows="1" class="form-control demo_box" placeholder="Put your comments here"></textarea>
+					<textarea rows="1" class="form-control demo_box" placeholder="Put your comments here" readonly="readonly"></textarea>
 				</td>
 				<td>
 					<input type="number" step="0.01" class="form-control" placeholder="Qty Received" readonly="readonly">
@@ -395,11 +393,11 @@
 				<td width="150">
 					Items Total Qty:
 				</td>
-				<td colspan="3">
+				<td colspan="2">
 					<span id='items_total_qty'>0.0</span>
 					<input class="form-control" id="id_items_total" name="items_total" type="hidden">
 				</td>
-				<td>Total Amount</td>
+				<td colspan="2">Total Amount</td>
 				<td width="120">{{ currency.get_currency_icon }}<span class="amount">0</span></td>
 				<td width="10" colspan="5"></td>
 			</tr>
@@ -457,11 +455,11 @@
 </tr>
 
 <tr>
-	<td colspan="3">
-		
+	<td colspan="2">
+		<button type="submit" ng-show="show_update_button" class="btn btn-primary btn-large form-control">Update PO</button>
 	</td>
-	<td>
-		<button type="submit" class="btn btn-primary form-control">Add PO</button>
+	<td colspan="2">
+		<button type="submit" ng-show="show_add_button" class="btn btn-primary btn-large form-control">Add PO</button>
 	</td>
 </tr>
 </table>

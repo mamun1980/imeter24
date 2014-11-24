@@ -51,9 +51,9 @@ PR_STATUS = (
 )
 
 PT_STATUS = (
-	(0, 'NotReceived'),
-	(1, 'PartialReceived'),
-	(2, 'AllReceived'),
+	(0, 'Ordered'),
+	(1, 'Partial Received'),
+	(2, 'Received'),
 )
 
 PL_TYPE = (
@@ -63,14 +63,20 @@ PL_TYPE = (
 	(3, 'Mod Parts Order Std'),
 	(4, 'Mod Parts Order Eng'),
 )
+PL_STATUS = (
+	(0, 'New'),
+	(1, 'Partial Shipped'),
+	(2, 'All Shipped'),
+	(3, 'Archived'),
+)
 SL_STATUS = (
 	(0, 'New'),
 	(1, 'Partial Shipped'),
 	(2, 'All Shipped'),
+	(3, 'Archived'),
 )
 SL_ITEM_STATUS = (
 	(0, 'Pending'),
 	(1, 'Partial Shipping'),
 	(2, 'Done'),
-
 )

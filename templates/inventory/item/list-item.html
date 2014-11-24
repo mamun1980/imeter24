@@ -40,18 +40,15 @@
 		  			<td>{{ item.location }}</td>
 		  			<td>{{ item.production_type }}</td>
 		  			<td>
-		  				<a href="/inventory/item/view/{{ item.item_number }}/"> View </a>
-		  				{%if perms.inventory.change_item %}
+			  			<div class="btn-group btn-group-sm">
+			  				<a class="btn btn-default" href="/inventory/item/view/{{ item.item_number }}/"> View </a>
 
-		  				/ <a href="/inventory/item/edit/{{ item.item_number }}/"> Edit </a>
+			  				{% if perms.inventory.delete_item %}
 
-		  				{% endif %}
+			  				<a class="btn btn-default" class="delete-item" data-item-id="{{ item.item_number }}" href=""> Delete </a>
 
-		  				{%if perms.inventory.delete_item %}
-
-		  				/ <a class="delete-item" data-item-id="{{ item.item_number }}" href=""> Delete </a>
-
-		  				{% endif %}
+			  				{% endif %}
+			  			</div>
 
 		  			</td>
 

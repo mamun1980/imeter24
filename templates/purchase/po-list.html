@@ -61,7 +61,7 @@
 					</thead>
 					<tbody>
 						
-						<tr ng-repeat="po in purchase_orders | googleSearchFilter:search | filter:status">
+						<tr ng-repeat="po in purchase_orders | googleSearchFilter:search | filter:status" class="{[{po.status}]}">
 							<td>{[{ po.po_number }]}</td>
 							<td>{[{ po.date_issued }]}</td>
 							<td>{[{ po.date_expected }]}</td>

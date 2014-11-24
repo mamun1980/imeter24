@@ -296,7 +296,7 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
 	};
     $scope.searchSlItem = function(q) {
         console.log(q);
-        var sl_id = $("#id_sl_number").val();
+        var sl_id = $("#id_sl").val();
         $scope.slid = sl_id;
         if(sl_id) {
             var url2 = "/purchase/sl-item-json/"+sl_id+"/";    
@@ -324,6 +324,17 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
         $scope.show_sl_item_list = false;
         var myitem = $("tbody#add_sl_item_list");
         var item_number = item.item_number;
+        if(item.shipping_list){
+            var quantity_on_hand = item.quantity_on_hand;
+            var backordered = item.backordered;
+            var qty_constraint = quantity_on_hand < backordered ?quantity_on_hand:backordered;
+        
+        } else {
+            var qty_constraint = item.quantity_on_hand;
+        }
+        
+        console.log("Qty on hand: " + qty_constraint);
+
         var item_description = item.description;
         var item_unit = item.item_unit_measure_id;
         var item_ordered = item.ordered;
@@ -336,7 +347,7 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
         str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+item_number+"' readonly><input type='hidden'  name='pl_item_id' value='new'><input type='hidden' name='sl_item_id' value='"+sl_item_id+"'></td>";
         str += "<td><p class='bg-info item_desc'>"+item_description+"</p></td>";
         
-        str += "<td><select class='form-control' name='item_unit'>";
+        str += "<td><select class='form-control' name='unit'>";
         str += "<option ng-repeat='um in item_unit_measures' value='{[{um.id}]}' ng-selected='{[{um.id}]} == "+item_unit+"'>{[{um.unit_name}]}</option>";
         str += "</select></td>";
 
@@ -348,7 +359,7 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
             str += "<td><input type='text' class='form-control decimal' name='item_qtybo' value='' readonly></td>";
         }
         
-        str += "<td><input type='text' name='item_shipped' class='form-control' value=''></td>";
+        str += "<td><input type='number' name='item_shipped' class='form-control' value='' max='"+qty_constraint+"'></td>";
         
         str += "<td><a class='remove-item btn' ng-click='removeSLItem($event)'><span class='glyphicon glyphicon-remove'></span></a></td>";
         str += "</tr>";
@@ -386,15 +397,20 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
         
         $("#id_pl_number").val(pl.pl_number);
         $("#id_pl_id").val(pl.id);
-        $scope.sold_to_contact = pl.sold_to;
-        $("#sold_to_contact_details").show();
-        $("#id_sold_to").val(pl.sold_to.id);
-
+        if(pl.sold_to){
+            $scope.sold_to_contact = pl.sold_to;
+            $("#sold_to_contact_details").show();
+            $("#id_sold_to").val(pl.sold_to.id);    
+        }
+        
         $("#id_date_issued").val(pl.date_issued);
         
-        $("#id_job_number").val(pl.schedule_job.id);
-        $scope.schedule_job = pl.schedule_job;
-        $("#job-details").show();
+        if(pl.schedule_job) {
+            $("#id_job_number").val(pl.schedule_job.id);
+            $scope.schedule_job = pl.schedule_job;
+            $("#job-details").show();    
+        }
+        
 
         $("#id_order_type").val(pl.order_type);
         if(pl.hold_at_dept_for_pickup == true){
@@ -403,9 +419,12 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
             $("#id_hold_at_dept_for_pickup").val(0);
         }
 
-        $scope.customer_broker_contact = pl.customer_broker;
-        $("#customer_broker_contact_details").show();
-        $("#id_customer_broker").val(pl.customer_broker.id);
+        if(pl.customer_broker) {
+            $scope.customer_broker_contact = pl.customer_broker;
+            $("#customer_broker_contact_details").show();
+            $("#id_customer_broker").val(pl.customer_broker.id);    
+        }
+        
         
         $("#id_freight_charges").val(pl.freight_charges);
 
@@ -414,9 +433,12 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
         $scope.search_sl = pl.sl_number;
         $scope.sl_checked = true;
 
-        $scope.ship_to_contact = pl.ship_to;
-        $("#ship_to_contact_details").show();
-        $("#id_ship_to").val(pl.ship_to.id);
+        if(pl.ship_to) {
+            $scope.ship_to_contact = pl.ship_to;
+            $("#ship_to_contact_details").show();
+            $("#id_ship_to").val(pl.ship_to.id);    
+        }
+        
 
         $("#id_date_shipped").val(pl.date_shipped);
         $("#id_generated_by").val(pl.generated_by_id);
@@ -437,15 +459,15 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
             str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+pl_items[i].item_number+"' readonly><input type='hidden'  name='pl_item_id' value='"+pl_items[i].id+"'><input type='hidden'  name='sl_item_id' value='"+pl_items[i].shipping_item+"'></td>";
             str += "<td><p class='bg-info item_desc'>"+pl_items[i].description+"</p></td>";
             
-            str += "<td><select class='form-control' name='item_unit'>";
+            str += "<td><select class='form-control' name='unit' disabled='true'>";
             str += "<option ng-repeat='um in item_unit_measures' value='{[{um.id}]}' ng-selected='{[{um.id}]} == "+pl_items[i].unit+"'>{[{um.unit_name}]}</option>";
             str += "</select></td>";
 
             str += "<td><input type='text' class='form-control' name='item_ordered' value='"+pl_items[i].qty_ordered+"' readonly></td>";
             str += "<td><input type='text' class='form-control decimal' name='item_qtybo' value='"+pl_items[i].qty_bo+"' readonly></td>";
-            str += "<td><input type='text' name='item_shipped' class='form-control' value='"+pl_items[i].qty_shipped+"'></td>";
+            str += "<td><input type='number' name='item_shipped' class='form-control' value='"+pl_items[i].qty_shipped+"' readonly></td>";
             
-            str += "<td><a class='remove-item btn' data-item-id='"+pl_items[i].id+"'  ng-click='removeSLItem($event)'><span class='glyphicon glyphicon-remove'></span></a></td>";
+            str += "<td><a class='remove-item btn' data-item-id='"+pl_items[i].id+"'  ng-click='removeSLItem($event)'></a></td>";
             str += "</tr>";
             
             var element = $compile(str)($scope);
@@ -479,7 +501,7 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
         $scope.sl_checked = true;
         $scope.show_sl_list = false;
         
-        $("#id_sl_number").val(sl.id);
+        $("#id_sl").val(sl.id);
     }
 
 }]);

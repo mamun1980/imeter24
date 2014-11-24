@@ -19,7 +19,7 @@
 								</ul>
 							</div>
 					</div>
-					<input id="id_pl_number" name="pl_number" type="hidden">
+					<input id="id_pl_number" name="pl_number" type="hidden" value="{[{search_pl}]}">
 					<input id="id_pl_id" name="pl_id" type="hidden">
 				</td>		
 			</tr>
@@ -213,7 +213,8 @@
 								</ul>
 							</div>
 					</div>
-					<input id="id_sl_number" name="sl_number" type="hidden" value="">
+					<input id="id_sl_number" name="sl_number" type="hidden" value="{[{search_sl}]}">
+					<input id="id_sl" name="sl" type="hidden">
 				</td>		
 			</tr>
 			<tr>
@@ -342,6 +343,7 @@
 				<tr style="border-top: 2px dotted red;">
 				<td style="position: relative;">
 					<input type="text" class="form-control added_item_number" name="" value="" ng-model="search_sl_item" ng-change="searchSlItem(search_sl_item)" placeholder="search for sl item" autocomplete="off">
+					<input type="hidden" id='id_item_number' name="item_number" value="{[{search_sl_item}]}">
 					<table class="table" ng-show="show_sl_item_list" id="sl_items_list">
 						<thead>
 							<tr>

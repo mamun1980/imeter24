@@ -23,16 +23,13 @@
 		<td>{[{ item.warehouse_location }]}</td>
 		<td>{[{ item.production_type }]}</td>
 		<td width="120">
-			<a href="/inventory/item/view/{[{ item.item_number }]}/"> View </a>
-			
-			<span ng-show="{[{ item.permission.can_change_item }]}">
-			/ <a href="/inventory/item/edit/{[{ item.item_number }]}/"> Edit </a>
-			</span>
+		<div class="btn-group btn-group-sm">
+			  				
+			<a class="btn btn-default" href="/inventory/item/view/{[{ item.item_number }]}/"> View </a>
 						
-			<span ng-show="{[{ item.permission.can_delete_item }]}">
-			/ <a class="delete-item" data-item-id="{[{ item.item_number }]}" href=""> Delete </a>
+			<a class="btn btn-default delete-item" data-item-id="{[{ item.item_number }]}" href="" ng-show="{[{ item.permission.can_delete_item }]}"> Delete </a>
 
-			</span>
+		</div>
 
 		</td>
 

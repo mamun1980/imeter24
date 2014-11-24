@@ -22,7 +22,8 @@ def contact_list(request):
     # import pdb; pdb.set_trace();
     user = request.user
     
-    contacts = Contact.objects.all() #.values('id','contact_name', 'address_1', 'attention_to', 'city', 'province', 'country', 'postal_code', 'search_string')
+    contacts = Contact.objects.all() 
+    #.values('id','contact_name', 'address_1', 'attention_to', 'city', 'province', 'country', 'postal_code', 'search_string')
     contact_dict_list = []
     for con in contacts:
         contact_dict = {}
@@ -35,15 +36,19 @@ def contact_list(request):
         contact_dict['country'] = con.country
         contact_dict['postal_code'] = con.postal_code
         contact_dict['search_string'] = con.search_string
-        if con.contactprofile:
-            if con.contactprofile.fob:
-                contact_dict['fob'] = con.contactprofile.fob
-            if con.contactprofile.terms:
-                contact_dict['terms'] = con.contactprofile.terms.term
-                contact_dict['term_id'] = con.contactprofile.terms.id
-            if con.contactprofile.shipping_method:
-                contact_dict['shipvia'] = con.contactprofile.shipping_method.delivery_choice
-                contact_dict['shipvia_id'] = con.contactprofile.shipping_method.id
+        try:
+            contactprofile, created = ContactProfile.objects.get_or_create(contact=con)
+        except Exception, e:
+            raise e
+        
+        if contactprofile.fob:
+            contact_dict['fob'] = contactprofile.fob
+        if contactprofile.terms:
+            contact_dict['terms'] = contactprofile.terms.term
+            contact_dict['term_id'] = contactprofile.terms.id
+        if contactprofile.shipping_method:
+            contact_dict['shipvia'] = contactprofile.shipping_method.delivery_choice
+            contact_dict['shipvia_id'] = contactprofile.shipping_method.id
 
         contact_dict['permission'] = {}
         contact_dict['permission']['can_add_contact'] = user.has_perm("contacts.add_contact")

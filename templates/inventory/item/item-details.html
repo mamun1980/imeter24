@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<div class="container shadow4 main-body">
+<div class="container-fluid shadow4 main-body">
 
 <section class="row"  id="add-inventory-item">
 	
@@ -17,9 +17,12 @@
 		  		<table class="table item-details">
 		  			<tr>
 		  				<th width="15%">Item Number</th>
-		  				<td width="35%">{{ item.item_number }}</td>
+		  				<td colspan="3">{{ item.item_number }}</td>
+		  				
+		  			</tr>
+		  			<tr>
 		  				<th width="15%">Description</th>
-		  				<td width="35%">{{ item.description }}</td>
+		  				<td colspan="3">{{ item.description }}</td>
 		  			</tr>
 		  			<tr>
 		  				<th width="15%">Quantity on hand</th>
@@ -35,7 +38,7 @@
 		  			</tr>
 		  			<tr>
 		  				<th width="15%">Primary Supplier</th>
-		  				<td width="35%">
+		  				<td colspan="3">
 		  					<p class='bg-info'><b class='left-info'>NAME : 
 		  						<a href="/contacts/{{item.primary_supplier.id}}/">	{{item.primary_supplier.contact_name}}</a>
 		  					</b></p>
@@ -48,6 +51,9 @@
 		  						
 		  					</p>
 		  				</td>
+		  				
+		  			</tr>
+		  			<tr>
 		  				<th width="15%">Duty Percentage</th>
 		  				<td width="35%">{{ item.duty_percentage }}</td>
 		  			</tr>
@@ -67,8 +73,8 @@
 		  			<tr>
 		  				<th width="15%">Quantity on request</th>
 		  				<td width="35%">{{ item.qty_on_request }}</td>
-		  				<th width="15%">Minimum Quantity</th>
-		  				<td width="35%">{{ item.minimum_qty }}</td>
+		  				<th width="15%">Minimum Quantity On Hand</th>
+		  				<td width="35%">{{ item.minimum_qty_on_hand }}</td>
 		  			</tr>
 		  			<tr>
 		  				<th width="15%">Maximum order quantity</th>
@@ -89,10 +95,10 @@
 		  				<td width="35%">{{ item.production_type }}</td>
 		  			</tr>
 		  			<tr>
-		  				<th width="15%">PO Status</th>
-		  				<td width="35%">{{ item.PO_status }}</td>
 		  				<th width="15%">Catalog Number</th>
 		  				<td width="35%">{{ item.catalog_number }}</td>
+		  				<th width="15%">Shipping Weight</th>
+		  				<td width="35%">{{ item.shipping_weight }}</td>
 		  			</tr>
 		  			<tr>
 		  				<th width="15%">Country of origin</th>
@@ -113,23 +119,20 @@
 		  				<td width="35%">{{ item.producer_of_item }}</td>
 		  			</tr>
 		  			<tr>
-		  				<th width="15%">Shipping Weight</th>
-		  				<td width="35%">{{ item.shipping_weight }}</td>
-		  				<th width="15%">Minimum Qty On Hand</th>
-		  				<td width="35%">{{ item.minimum_qty_on_hand }}</td>
+		  				<th width="15%">Item Webite</th>
+		  				<td colspan="3">{{ item.website }}</td>
+		  				
+		  				
 		  			</tr>
 		  			<tr>
-		  				<th width="15%">Item Webite</th>
-		  				<td width="35%">{{ item.website }}</td>
 		  				<th width="15%">Item Image</th>
-		  				<td width="35%">
+		  				<td colspan="3">
 		  				{% if item.item_image %}
 		  					<img src="/media/{{ item.item_image }}" width="100" height="100">
 		  				{% else %}
 		  					<p>No Image</p>
 		  				{% endif %}
 		  				</td>
-		  				
 		  			</tr>
 
 		  			

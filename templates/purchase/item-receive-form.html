@@ -9,12 +9,14 @@
 	<input type="hidden" name="item_po" value="{{item_po}}">
 	<input type="hidden" name="purchase_item" value="{{purchase_item}}">
 	<table class="add-user-table">
-	{% for fl in item_rcv_form %}
 		<tr>
-			<td>{{ fl.label_tag }}</td>
-			<td>{{ fl.errors }}{{ fl }}</td>
+			<td><label for="id_qty_received">Qty received:</label></td>
+			<td><input class="form-control decimal" id="id_qty_received" max="{{order_restriction}}" name="qty_received" ng-model="qty" placeholder="qty received" step="0.01" type="number"></td>
 		</tr>
-	{% endfor %}
+		<tr>
+			<td><label for="id_comment">Comment:</label></td>
+			<td><textarea class="form-control" cols="40" id="id_comment" name="comment" placeholder="Comments" rows="2"></textarea></td>
+		</tr>
 	</table>
 </div>
 

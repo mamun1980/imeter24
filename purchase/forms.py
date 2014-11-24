@@ -20,7 +20,8 @@ class PRAddForm(forms.ModelForm):
     description = forms.CharField(required=False,
         widget=forms.Textarea(attrs={"class": "form-control", "rows":3, 'placeholder':"Describe why needed.."}))
     order_qty = forms.DecimalField( max_digits=10, required=False, decimal_places=2,
-        widget=forms.NumberInput(attrs={"class": "form-control decimal", 'placeholder': "qty"}))
+        widget=forms.NumberInput(attrs={"class": "form-control decimal", 
+            'placeholder': "qty"}))
     item_require_before = forms.DateField(required=False, widget=forms.DateInput(
         attrs={"class": "form-control datepicker", 'placeholder':"Item Require Before",}))
 
@@ -184,7 +185,8 @@ class ItemReeiveForm(forms.ModelForm):
     # item_po = forms.ModelChoiceField(required=False, queryset=PurchaseOrder.objects.all(), 
     #   widget=forms.Select(attrs={"class": "form-control"}))
     qty_received = forms.DecimalField( max_digits=10, required=False, decimal_places=2,
-        widget=forms.NumberInput(attrs={"class": "form-control decimal", 'placeholder': "qty received"}))
+        widget=forms.NumberInput(attrs={"class": "form-control decimal", "ng-model":"qty",
+            'placeholder': "qty received", 'max':"{{order_restriction}}"}))
     comment = forms.CharField(max_length=1000, required=False,
         widget=forms.Textarea(attrs={"class": "form-control", "rows":2, 'placeholder':"Comments"}))
 
@@ -197,7 +199,7 @@ class ItemReeiveForm(forms.ModelForm):
 class PackingListForm(forms.ModelForm):
     pl_number = forms.CharField( max_length=20, required=False, label='PL Number',
         widget=forms.TextInput(attrs={"class": "form-control"}))
-    sl_number = forms.ModelChoiceField(required=False, label='SL Number', queryset=ShippingList.objects.all(), 
+    sl = forms.ModelChoiceField(required=False, label='SL Number', queryset=ShippingList.objects.all(), 
         widget=forms.Select(attrs={"class": "form-control"}))
     sold_to = forms.ModelChoiceField(required=False, queryset=Contact.objects.all(), 
         widget=forms.Select(attrs={"class": "form-control"}))
@@ -245,6 +247,7 @@ class PackingListForm(forms.ModelForm):
             pl_number = re.sub(r"[A-Za-z]+","",self.request.POST['pl_number_search'])
             pl.pl_number = 'PL'+str(pl_number)
             sv.next_pl_number = int(pl_number) + 1
+            pl.status = 0
             # po_number = re.sub(r"[^\w]+","",po.po_number)
             # po.po_number = 'P'+str(po_number)
             # sv.next_po_number = int(po_number) + 1

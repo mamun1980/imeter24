@@ -88,7 +88,7 @@ table#item-list {
 		<table id="item-selectable" class="ui-autocomplete ui-widget-content-custom ui-corner-all">
 			<thead>
 				<tr>
-					<th>#</th><th>Item Number</th><th>description</th><th>Qty on hand</th><th><a href="" class="close">x</a></th>
+					<th>#</th><th>Item Number</th><th>description</th><th>Qty on hand</th><th><a class="close">x</a></th>
 					
 				</tr>
 			</thead>
@@ -96,7 +96,7 @@ table#item-list {
 				<tr class="ui-menu-item" ng-repeat="item in items | googleSearchFilter:search_item">
 					
 					<td class="select-item">
-						<input type='radio' name='item' value="{[{item.item_number}]}" >
+						<input type='radio' name='item' value="{[{item.item_number}]}" data-order-restriction="{[{item.order_restriction}]}">
 					</td>
 					<td class="item_number">{[{item.item_number}]}</td>
 					<td class="item-description">{[{item.description}]}</td>
@@ -123,18 +123,25 @@ $(document).on("change", "input.decimal", function(e){
 // Item google search ============
 
 $("select#id_item").hide();
-var str1 = "<input type=text name='item_demo' id='id_item_demo' class='form-control custom-form-control' ng-model='search_item' autocomplete='off'>";
+var str1 = "<input type=text name='item_demo' id='id_item_demo' class='form-control custom-form-control' ng-model='search_item' autocomplete='off' placeholder='search for item'>";
 var str2 = '<div id="item_info"></div>';
 $("select#id_item").closest("div").append(str1+str2);
 
 
+$(document).on("click", "a.close", function(e){
+	$("#item-selectable").hide();
+})
 // Item select ========
 
 $(document).on('change', 'input[type="radio"]', function(){
 	var item_number = $(this).val();
+	var max_value = $(this).data("order-restriction");
 	$("#id_item").val(item_number);
 	$("#id_item_demo").val(item_number);
 	$("#item-selectable").hide();
+
+	$("#id_order_qty").attr("max", max_value);
+	console.log("max_value"+ max_value);
 
 })
 

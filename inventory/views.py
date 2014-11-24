@@ -47,6 +47,43 @@ def add_item(request):
         'departments': departments, 'unit_measures': unit_measures, 'locations': locations,
         'production_types': production_types, 'terms': terms})
 
+
+def add_new_item(request):
+    currencies = Currency.objects.all()
+    departments = Department.objects.all()
+    unit_measures = ItemUnitMeasure.objects.all()
+    locations = Location.objects.all()
+    production_types = ProductionType.objects.all()
+    terms = PaymentTerm.objects.all()
+    if request.method == "POST":
+        item_number = request.POST.get("item_number","")
+        if item_number:
+            try:
+                item = Item.objects.get(item_number=item_number)
+                item_form = ItemForm(request.POST, request.FILES, instance=item, 
+                    request=request, action='update')
+            except Exception, e:
+                item_form = ItemForm(request.POST, request.FILES, request=request, action='new')
+                pass
+        else:
+            return HttpResponseRedirect("/inventory/item/add/")
+            
+        if item_form.is_valid():
+            try:
+                item = item_form.save()
+                return HttpResponseRedirect("/inventory/list/#/inventory/items")
+            except Exception, e:
+                raise e           
+            
+    else:
+        item_form = ItemForm()
+
+    return render(request, "inventory/item/add-new-item.html", 
+        {'item_form': item_form, 'page_title': 'Add Item', 'currencies': currencies, 
+        'departments': departments, 'unit_measures': unit_measures, 'locations': locations,
+        'production_types': production_types, 'terms': terms})
+
+
 @login_required
 @permission_required("inventory.add_item")
 @csrf_exempt
@@ -153,10 +190,31 @@ def list_item(request):
         item_dict['item_number'] = item.item_number
         item_dict['label'] = item.item_number
         item_dict['description'] = item.description
+        item_dict['order_restriction'] = float(item.order_restriction())
         if item.qty_received:
             item_dict['qty_received'] = float(item.qty_received)
         else:
             item_dict['qty_received'] = 0.0
+
+        if item.max_order_qty:
+            item_dict['max_order_qty'] = float(item.max_order_qty)
+        else:
+            item_dict['max_order_qty'] = 0.0
+
+        if item.max_order_qty_remains:
+            item_dict['max_order_qty_remains'] = float(item.max_order_qty_remains)
+        else:
+            item_dict['max_order_qty_remains'] = -1
+
+        if item.max_single_order_qty:
+            item_dict['max_single_order_qty'] = float(item.max_single_order_qty)
+        else:
+            item_dict['max_single_order_qty'] = 0.0
+
+        if item.qty_on_request:
+            item_dict['qty_on_request'] = float(item.qty_on_request)
+        else:
+            item_dict['qty_on_request'] = 0.0
 
         if item.qty_received_date:
             item_dict['qty_received_date'] = item.qty_received_date.strftime('%b, %d %Y')
@@ -278,11 +336,28 @@ def get_item(request, itemnumber):
     else:
         item_dict['wholesale_cost'] = 0.0
 
+    if item.lead_time:
+        item_dict['lead_time'] = item.lead_time
+    else:
+        item_dict['lead_time'] = None
+
+    if item.retail_price:
+        item_dict['retail_price'] = item.retail_price.to_eng_string()
+    else:
+        item_dict['retail_price'] = 0.0
+
+    if item.estimated_wholesale_cost:
+        item_dict['estimated_wholesale_cost'] = float(item.estimated_wholesale_cost)
+    else:
+        item_dict['estimated_wholesale_cost'] = 0.0
+
     if item.currency:
         item_dict['currency'] = item.currency.currency
         item_dict['currency_id'] = item.currency.id
     else:
         item_dict['currency'] = None
+
+
 
     if not item.quantity_on_hand:
         item_dict['quantity_on_hand'] = 0
@@ -330,6 +405,11 @@ def get_item(request, itemnumber):
     else:
         item_dict['last_ordered'] = None
 
+    if item.last_PO:
+        item_dict['last_po'] = item.last_PO
+    else:
+        item_dict['last_po'] = None
+
 
     if item.department:
         item_dict['department'] = item.department.name
@@ -361,17 +441,21 @@ def get_item(request, itemnumber):
 
     item_dict['customer_tariff_number'] = item.customer_tariff_number
     item_dict['preference_criteria'] = item.preference_criteria
-    item_dict['shipping_weight'] = item.shipping_weight
+
+    if item.shipping_weight:
+        item_dict['shipping_weight'] = float(item.shipping_weight)
+    else:
+        item_dict['shipping_weight'] = 0.0
     # import pdb; pdb.set_trace();
     if item.minimum_qty_on_hand:
         item_dict['minimum_qty_on_hand'] = float(item.minimum_qty_on_hand)
     else:
         item_dict['minimum_qty_on_hand'] = 0
-    
-    if item.minimum_qty:
-        item_dict['minimum_qty'] = float(item.minimum_qty)
+
+    if item.catalog_number:
+        item_dict['catalog_number'] = item.catalog_number
     else:
-        item_dict['minimum_qty'] = 0
+        item_dict['catalog_number'] = None
     
     if item.max_order_qty:
         item_dict['max_order_qty'] = float(item.max_order_qty)
@@ -383,14 +467,29 @@ def get_item(request, itemnumber):
     else:
         item_dict['max_single_order_qty'] = 0
 
-    item_dict['duty_percentage'] = item.duty_percentage
+    if item.duty_percentage:
+        item_dict['duty_percentage'] = float(item.duty_percentage)
+    else:
+        item_dict['duty_percentage'] = 0.0
     item_dict['website'] = item.website
+
+    if item.producer_of_item:
+        item_dict['producer_of_item'] = item.producer_of_item.contact_name
+        item_dict['producer_of_item_id'] = item.producer_of_item.id
+    else:
+        item_dict['producer_of_item'] = None
 
     if item.customs_designation:
         item_dict['customs_designation'] = item.customs_designation.designation
         item_dict['customs_designation_id'] = item.customs_designation.id
     else:
         item_dict['customs_designation'] = None
+
+    if item.country_of_origin:
+        item_dict['country_of_origin'] = item.country_of_origin
+    else:
+        item_dict['country_of_origin'] = None
+
     item_dict['search_string'] = item.search_string
 
 

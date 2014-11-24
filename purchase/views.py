@@ -103,6 +103,10 @@ def add_purchase_request(request):
             if not pr.requeste_created_at:
                 pr.requeste_created_at = datetime.datetime.now()
             pr.save()
+
+            item = pr.item
+            item.qty_on_request = pr.order_qty
+            item.save()
             
             return HttpResponseRedirect("/purchase/list-purchase-requests/")
 
@@ -203,6 +207,22 @@ def approve_purchase_request(request, pk):
             pi.purchase_status = 0
             pi.save()
 
+            # Update Inventory item
+            item = pr.item
+
+            if item.qty_on_request:
+                item.qty_on_request = item.qty_on_request - Decimal(new_approved_qty)
+            else:
+                item.qty_on_request = Decimal(new_approved_qty)
+            if item.quantity_on_order:
+                item.quantity_on_order = item.quantity_on_order + Decimal(new_approved_qty)
+            else:
+                item.quantity_on_order = Decimal(new_approved_qty)
+
+            item.max_order_qty_remains = item.max_order_qty_remains - Decimal(new_approved_qty)
+
+            item.save()
+
             sv.next_po_number = sv.next_po_number + 1
             sv.save()
         
@@ -221,6 +241,9 @@ def declien_purchase_request(request):
         pr = PurchaseRequest.objects.get(id=pr_id)
         pr.status = 3
         pr.save()
+        item = pr.item
+        item.qty_on_request = item.qty_on_request - (pr.order_qty - pr.approved_qty)
+        item.save()
         return HttpResponse(pr_id)
 
 @csrf_exempt
@@ -422,8 +445,9 @@ def add_purchase_order(request):
             {'poform': po_form, 'po_contact_form': po_contact_form, 
             'po_number': po_number, 'po_contacts': po_contacts, 'next_number': sv.next_po_number})
 
+
 @csrf_exempt
-def add_po(request):
+def add_new_po(request):
     # import pdb; pdb.set_trace()
     try:
         sv = SystemVariable.objects.get(id=1)
@@ -467,6 +491,7 @@ def add_po(request):
                     item_dict = {}
                     item_dict['item_number'] = item
                     item_dict['qty'] = float(request.POST.getlist('item_qty')[count])
+                    item_dict['unit'] = request.POST.getlist('unit')[count]
                     item_dict['comment'] = request.POST.getlist('item_comment')[count]
                     item_dict['job_number'] = request.POST.getlist('item_job_number')[count]
                     item_dict['job_id'] = request.POST.getlist('item_job_id')[count]
@@ -487,27 +512,37 @@ def add_po(request):
                         job = None
 
                     try:
-                        pi, bol = PurchaseItem.objects.get_or_create(po=po, item=itemobj)
-                        pi.job_number = job
-                        pi.qty = item['qty']
-                        pi.cost = item['cost']
-                        pi.sub_total = item['sub_total']
-                        pi.comment = item['comment']
+                        pi, created = PurchaseItem.objects.get_or_create(po=po, item=itemobj)
+                        if created:
+                            pi.job_number = job
+                            pi.qty = item['qty']
+                            pi.unit = item['unit']
+                            pi.cost = item['cost']
+                            pi.sub_total = item['sub_total']
+                            pi.comment = item['comment']
+
+                            pi.purchase_status = 0
+                            pi.save()
                     except Exception, e:
                         raise e
                     # pi = PurchaseItem(po=po, item=itemobj, job_number=job,
                     #     qty=item['qty'], cost=item['cost'], sub_total=item['sub_total'],
                     #     comment=item['comment'])
     
-                    pi.purchase_status = 0
-                    pi.save()
+                    
                     # Update inventory item for Last PO info
-                    itemobj.last_PO = po.po_number
-                    itemobj.last_PO_date_ordered = po.date_issued
-                    itemobj.last_PO_date_expected = po.date_expected
-                    itemobj.last_cost_paid = item['cost']
-                    itemobj.last_PO_ordered_by = po.po_created_by
-                    itemobj.last_PO_supplier = po.supplier
+                    if created:
+                        if itemobj.quantity_on_order:
+                            itemobj.quantity_on_order = itemobj.quantity_on_order + Decimal(pi.qty)
+                        else:
+                            itemobj.quantity_on_order = pi.qty
+                        itemobj.last_PO = po.po_number
+                        itemobj.last_PO_date_ordered = po.date_issued
+                        itemobj.last_PO_date_expected = po.date_expected
+                        itemobj.last_cost_paid = pi.cost
+                        itemobj.last_PO_ordered_by = po.po_created_by
+                        itemobj.last_PO_supplier = po.supplier
+                        itemobj.max_order_qty_remains = itemobj.max_order_qty_remains - Decimal(pi.qty)
                     itemobj.save()
             
             po.save()
@@ -758,15 +793,11 @@ def get_po_by_id(request,pk):
     for po_item in purchase_items:
         item = {}
         item['p_item_id'] = po_item.id
+        item['unit'] = po_item.unit
         if po_item.item:
             item['item_number'] = po_item.item.item_number
             item['description'] = po_item.item.description
-            if po_item.item.item_unit_measure:
-                item['unit_measure'] = po_item.item.item_unit_measure.unit_name
-                item['unit_measure_id'] = po_item.item.item_unit_measure.id
-            else:
-                item['unit_measure'] = None
-                item['unit_measure_id'] = None
+            
         if po_item.item.currency:
             item['currency'] = po_item.item.currency.currency
             item['currency_id'] = po_item.item.currency.id
@@ -810,7 +841,7 @@ def get_po_by_id(request,pk):
 def get_purchase_orders(request):
     # import pdb; pdb.set_trace()
     
-    purchase_orders = PurchaseOrder.objects.filter(save_final_draft=1)
+    purchase_orders = PurchaseOrder.objects.all()
     po_list = []
     for po in purchase_orders:
         po_dict = {}
@@ -1205,12 +1236,12 @@ def purchase_received_list(request):
 @permission_required("purchase.receive_purchase_item")
 @csrf_exempt
 def receive_item(request, item_id):
+    purchase_item = PurchaseItem.objects.get(id=item_id)
+    order_restriction = purchase_item.qty - purchase_item.item_recv
     if request.method == 'POST':
-        # import pdb; pdb.set_trace()
         item_rcv_form = ItemReeiveForm(request.POST)
         if item_rcv_form.is_valid():
             rcv_item = item_rcv_form.save()
-            purchase_item = PurchaseItem.objects.get(id=item_id)
             item = Item.objects.get(item_number=purchase_item.item.item_number)
             po = purchase_item.po
 
@@ -1236,6 +1267,7 @@ def receive_item(request, item_id):
                 purchase_item.purchase_status = 1
 
             purchase_item.save()
+            # Update PO Status
             pitems = PurchaseItem.objects.filter(po=po, purchase_status__lte=1)
             if not pitems:
                 po.po_status = 4
@@ -1244,8 +1276,16 @@ def receive_item(request, item_id):
             po.save()
 
             # Update Inventory item
-            item.quantity_on_hand = item.quantity_on_hand + purchase_item.item_recv
-            item.qty_received = purchase_item.item_recv
+            if item.quantity_on_hand:
+                item.quantity_on_hand = item.quantity_on_hand + rcv_item.qty_received
+            else:
+                item.quantity_on_hand = purchase_item.item_recv
+            item.quantity_on_order = item.quantity_on_order - rcv_item.qty_received
+            item.max_order_qty_remains = item.max_order_qty_remains + rcv_item.qty_received
+            if item.qty_received:
+                item.qty_received = item.qty_received + rcv_item.qty_received
+            else:
+                item.qty_received = rcv_item.qty_received
             item.qty_received_date = datetime.datetime.now()
             item.save()
 
@@ -1253,7 +1293,8 @@ def receive_item(request, item_id):
     else:
         item_rcv_form = ItemReeiveForm()
         return render(request, "purchase/item-receive-form.html", 
-            {'item_rcv_form': item_rcv_form, 'item_id': item_id})
+            {'item_rcv_form': item_rcv_form, 'item_id': item_id, 
+            'order_restriction':order_restriction})
 
 
 
@@ -1270,80 +1311,94 @@ def add_packing_list(request):
         else:
             pl_form = PackingListForm(request.POST, request=request, action='new')
         
-        item_unit = request.POST.getlist('item_unit',"")
-        # item_qtybo = request.POST.getlist('item_qtybo')
-        # item_ordered = request.POST.getlist('item_ordered')
-        items = request.POST.getlist('added_item_number',"")
-        sl_number = request.POST.get("sl_number")
-        sl_item_ids = request.POST.getlist("sl_item_id","")
-        pl_item_ids = request.POST.getlist("pl_item_id","")
-        item_shipped = request.POST.getlist('item_shipped',"")
-
+            item_unit = request.POST.getlist('unit',"")
+            # item_qtybo = request.POST.getlist('item_qtybo')
+            # item_ordered = request.POST.getlist('item_ordered')
+            items = request.POST.getlist('added_item_number',"")
+            sl_number = request.POST.get("sl_number","")
+            sl_id = request.POST.get("sl","")
+            sl_item_ids = request.POST.getlist("sl_item_id","")
+            pl_item_ids = request.POST.getlist("pl_item_id","")
+            item_shipped = request.POST.getlist('item_shipped',"")
+        # import pdb; pdb.set_trace()
         if pl_form.is_valid():
-            import pdb; pdb.set_trace()
             pl = pl_form.save()
-            deleted_items = request.POST.getlist("removed_item")
-            if deleted_items:
-                for deleted_item in deleted_items:
-                    di = PackingItem.objects.get(id=deleted_item)
-                    di.delete()
-            for i, item in enumerate(items):
-                item_obj = Item.objects.get(item_number=item)
-                if sl_number:
-                    ship_item = ShippingItem.objects.get(id=sl_item_ids[i])
-                if pl_item_ids[i] != 'new':
-                    try:
-                        packing_item = PackingItem.objects.get(id=pl_item_ids[i])
-                    except PackingItem.DoesNotExist:
-                        raise
-                else:
-                    if sl_number:
-                        packing_item = PackingItem.objects.create(shipping_item=ship_item)
+            if pl_id == "":
+                deleted_items = request.POST.getlist("removed_item")
+                if deleted_items:
+                    for deleted_item in deleted_items:
+                        di = PackingItem.objects.get(id=deleted_item)
+                        di.delete()
+                for i, item in enumerate(items):
+                    item_obj = Item.objects.get(item_number=item)
+                    if sl_id:
+                        ship_item = ShippingItem.objects.get(id=sl_item_ids[i])
+                    if pl_item_ids[i] != 'new':
+                        try:
+                            packing_item = PackingItem.objects.get(id=pl_item_ids[i])
+                        except PackingItem.DoesNotExist:
+                            raise
                     else:
-                        packing_item = PackingItem.objects.create()
-                
-                packing_item.unit = item_unit[i]
-                if not item_shipped[i] == 'null' and not item_shipped[i] == 'undefined':
-                    if packing_item.qty_shipped:
-                        packing_item.qty_shipped = Decimal(item_shipped[i]) + packing_item.qty_shipped
-                    else:
-                        packing_item.qty_shipped = Decimal(item_shipped[i])
-                if not item_ordered[i] == 'null' and not item_ordered[i] == 'undefined':
-                    packing_item.qty_ordered = Decimal(item_ordered[i])
-                # if not item_qtybo[i] == 'null' and not item_qtybo[i] == 'undefined':
-                #     packing_item.qty_bo = Decimal(item_qtybo[i])
-                # packing_item.ship_status = 0
-                packing_item.pl = pl
-                packing_item.search_string = ship_item.shipping_list.sl_number + " "+ ship_item.item.item_number
-                # packing_item.save()
-
-                # import pdb; pdb.set_trace();
-
-                # Update ShippingItem object to check all its ordered item is shipped.
-                if sl_number:
-                    if ship_item.shipped_total_to_date:
-                        ship_item.shipped_total_to_date = ship_item.shipped_total_to_date + Decimal(item_shipped[i])
-                    else:
-                        ship_item.shipped_total_to_date = Decimal(item_shipped[i])
-                    ship_item.last_shipped = datetime.datetime.now()
-                    ship_item.shipped = Decimal(item_shipped[i])
+                        if sl_id:
+                            packing_item = PackingItem.objects.create(shipping_item=ship_item)
+                        else:
+                            packing_item = PackingItem.objects.create()
                     
-                    if ship_item.ordered <= ship_item.shipped_total_to_date:
-                        ship_item.item_ship_status = 2
-                        ship_item.backordered = 0
+                    packing_item.unit = item_unit[i]
+                    if not item_shipped[i] == 'null' and not item_shipped[i] == 'undefined':
+                        if packing_item.qty_shipped:
+                            packing_item.qty_shipped = Decimal(item_shipped[i]) + packing_item.qty_shipped
+                        else:
+                            packing_item.qty_shipped = Decimal(item_shipped[i])
+                    # if not item_ordered[i] == 'null' and not item_ordered[i] == 'undefined':
+                    #     packing_item.qty_ordered = Decimal(item_ordered[i])
+                    # if not item_qtybo[i] == 'null' and not item_qtybo[i] == 'undefined':
+                    #     packing_item.qty_bo = Decimal(item_qtybo[i])
+                    # packing_item.ship_status = 0
+                    packing_item.pl = pl
+                    packing_item.search_string = ship_item.shipping_list.sl_number + " "+ ship_item.item.item_number
+                    # packing_item.save()
+
+                    # import pdb; pdb.set_trace();
+
+                    # Update ShippingItem object to check all its ordered item is shipped.
+                    if sl_id:
+                        if ship_item.shipped_total_to_date:
+                            ship_item.shipped_total_to_date = ship_item.shipped_total_to_date + Decimal(item_shipped[i])
+                        else:
+                            ship_item.shipped_total_to_date = Decimal(item_shipped[i])
+                        ship_item.last_shipped = datetime.datetime.now()
+                        if item_shipped[i]:
+                            ship_item.shipped = Decimal(item_shipped[i])
+                        
+                        if ship_item.ordered <= ship_item.shipped_total_to_date:
+                            ship_item.item_ship_status = 2
+                            ship_item.backordered = 0
+                        else:
+                            ship_item.item_ship_status = 1
+                            ship_item.backordered = ship_item.ordered - ship_item.shipped_total_to_date
+
+                        packing_item.qty_bo = ship_item.backordered
+                        packing_item.qty_ordered = ship_item.ordered
+                        ship_item.save()
                     else:
-                        ship_item.item_ship_status = 1
-                        ship_item.backordered = ship_item.ordered - ship_item.shipped_total_to_date
+                        packing_item.qty_bo = packing_item.qty_ordered - packing_item.qty_shipped
 
-                    packing_item.qty_bo = ship_item.backordered
-                    packing_item.qty_ordered = ship_item.ordered
-                    ship_item.save()
-                else:
-                    packing_item.qty_bo = packing_item.qty_ordered - packing_item.qty_shipped
+                    packing_item.save()
 
-                packing_item.save()
+                    # Update inventory item for this action
+                    item = ship_item.item
+                    # item.stock_status_type = 
+                    item.quantity_on_hand = item.quantity_on_hand - packing_item.qty_shipped
+                    item.save()
 
                 
+                if sl_id:
+                    sl = ShippingList.objects.get(id=sl_id)
+                    sl_unshipped_items = ShippingItem.objects.filter(shipping_list=sl, item_ship_status__lte=1)
+                    if not sl_unshipped_items:
+                        sl.sl_status = 2
+                    sl.save()
 
             pl.search_string = pl.pl_number + ' '
             if pl.sold_to:
@@ -1365,16 +1420,16 @@ def add_packing_list(request):
 
 def pl_list(request):
     # import pdb; pdb.set_trace()
-    packing_list = PackingList.objects.all()
+    packing_list = PackingList.objects.filter(status__lte=2)
     pl_list = []
     for pl in packing_list:
         pack = {}
         pack['id'] = pl.id
         pack['customer_po_number'] = pl.customer_po_number
         pack['pl_number'] = pl.pl_number
-        if pl.sl_number:
-            pack['sl_number'] = pl.sl_number.sl_number
-            pack['sl_number_id'] = pl.sl_number.id
+        if pl.sl:
+            pack['sl_number'] = pl.sl.sl_number
+            pack['sl_number_id'] = pl.sl.id
         if pl.date_issued:
             pack['date_issued'] = pl.date_issued.isoformat()
         if pl.date_shipped:
@@ -1518,7 +1573,7 @@ def pl_list(request):
 
         pack['search_string'] = pl.search_string
 
-        pl_items = PackingItem.objects.filter(pl=packing_list)
+        pl_items = PackingItem.objects.filter(pl=pl)
         items=[]
         for it in pl_items:
             item = {}
@@ -1643,7 +1698,8 @@ def delete_packing_list(request):
     plid = request.POST.get('pl_id', '')
     if plid:
         pl = PackingList.objects.get(id=plid)
-        pl.delete()
+        pl.status = 3
+        pl.save()
         return HttpResponse(plid)
     else:
         return HttpResponse('failed')
@@ -1678,7 +1734,6 @@ def add_shipping_list(request):
         
 
         if sl_form.is_valid():
-            import pdb; pdb.set_trace()
             try:
                 sl = sl_form.save()
                 
@@ -1941,6 +1996,7 @@ def get_sl_item_json(request, sl_id=None):
         sl_item_dict = {}
         sl_item_dict['id'] = sl_item.id
         sl_item_dict['item_number'] = sl_item.item.item_number
+        sl_item_dict['quantity_on_hand'] = float(sl_item.item.quantity_on_hand)
         sl_item_dict['description'] = sl_item.description
         if sl_item.ordered:
             sl_item_dict['ordered'] = float(sl_item.ordered)
