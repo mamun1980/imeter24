@@ -28,10 +28,10 @@ class PurchaseRequest(models.Model):
 	user_requested = models.ForeignKey(User, blank=True, null=True, related_name='po_requested_user')
 	item = models.ForeignKey(Item, blank=True, null=True)
 	description = models.TextField(blank=True, null=True)
-	order_qty = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+	order_qty = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True,default=0.0)
 	item_require_before = models.DateField(blank=True, null=True)
 	requeste_created_at = models.DateTimeField(blank=True, null=True)
-	approved_qty = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+	approved_qty = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
 	approved_date = models.DateField(blank=True, null=True)
 	status = models.CharField(max_length=15, blank=True, null=True)
 
@@ -96,7 +96,7 @@ class PurchaseOrder(models.Model):
 		related_name='purchasing_agent')
 	returned_type = models.CharField(max_length=100, blank=True, null=True)
 	# items = models.ManyToManyField(PurchaseItem, blank=True, null=True)
-	items_total = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, default=0.0)
+	items_total = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
 	hst_taxable = models.CharField(max_length=2, blank=True, null=True)
 	hst_taxable_amount = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
 	pst_taxable = models.CharField(max_length=2, blank=True, null=True)
@@ -181,10 +181,10 @@ class RequestItem(models.Model):
 	"""
 	pr = models.ForeignKey(PurchaseRequest, blank=True, null=True)
 	item = models.ForeignKey(Item, blank=True, null=True)
-	approved_qty = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+	approved_qty = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
 	approved_date = models.DateField(blank=True, null=True)
 	po = models.ForeignKey(PurchaseOrder, blank=True, null=True)
-	total_po_qty = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, default=0.0)
+	total_po_qty = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
 	status = models.IntegerField(max_length=2, blank=True, null=True)
 
 	def __unicode__(self):
@@ -230,7 +230,7 @@ class POContact(models.Model):
 class ReceivedItemHistory(models.Model):
 	purchase_item = models.ForeignKey(PurchaseItem, blank=True, null=True)
 	item_po = models.ForeignKey(PurchaseOrder, blank=True, null=True)
-	qty_received = models.DecimalField(max_digits=10,decimal_places=4, blank=True, null=True)
+	qty_received = models.DecimalField(max_digits=10,decimal_places=4, blank=True, null=True, default=0.0)
 	sub_total = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
 	item_received_date = models.DateTimeField(blank=True, null=True)
 	reveived_by = models.ForeignKey(User, blank=True, null=True, related_name='item_recv_by')
@@ -281,13 +281,14 @@ class ShippingList(models.Model):
 class ShippingItem(models.Model):
 	item = models.ForeignKey(Item, related_name='shipping-item')
 	description = models.TextField(null=True, blank=True)
-	ordered = models.DecimalField(max_digits=10,decimal_places=4, blank=True, null=True)
-	shipped = models.DecimalField(max_digits=10,decimal_places=4, blank=True, null=True, verbose_name='Shipped today')
-	shipped_total_to_date = models.DecimalField(max_digits=10,decimal_places=4, blank=True, null=True)
+	ordered = models.DecimalField(max_digits=10,decimal_places=4, blank=True, null=True, default=0.0)
+	shipped = models.DecimalField(max_digits=10,decimal_places=4, blank=True, null=True, default=0.0, verbose_name='Shipped today')
+	shipped_total_to_date = models.DecimalField(max_digits=10,decimal_places=4, blank=True, null=True, default=0.0)
 	shipped_by = models.ForeignKey(User, blank=True, null=True, related_name='item_shipped_by')
 	last_shipped = models.DateField(blank=True, null=True)
-	backordered = models.DecimalField(max_digits=10,decimal_places=4, blank=True, null=True)
-	filled = models.DecimalField(max_digits=10,decimal_places=4, blank=True, null=True)
+	backordered = models.DecimalField(max_digits=10,decimal_places=4, blank=True, null=True, default=0.0)
+	filled = models.DecimalField(max_digits=10,decimal_places=4, blank=True, null=True, default=0.0)
+	# price = models.DecimalField(max_digits=10,decimal_places=4, blank=True, null=True, default=0.0)
 	shipping_list = models.ForeignKey(ShippingList, related_name='sl-item')
 	item_ship_status = models.CharField(max_length=10, blank=True, null=True)
 	search_string = models.TextField(null=True, blank=True, verbose_name='Search String')
@@ -322,7 +323,7 @@ class PackingList(models.Model):
 	hold_at_dept_for_pickup = models.BooleanField(default=False)
 	customer_broker = models.ForeignKey(Contact, blank=True, null=True, related_name='pl_customer_broker')
 	customer_po_number = models.CharField(max_length=50, blank=True, null=True)
-	freight_charges = models.DecimalField(max_digits=10,decimal_places=2, blank=True, null=True)
+	freight_charges = models.DecimalField(max_digits=10,decimal_places=4, blank=True, null=True, default=0.0)
 	status = models.CharField(max_length=20, blank=True, null=True)
 	invoiced_on = models.DateField(blank=True, null=True)
 	# items = models.ManyToManyField(PackingItem, blank=True, null=True)
@@ -350,10 +351,11 @@ class PackingItem(models.Model):
 	description = models.TextField(blank=True, null=True)
 	unit = models.CharField(max_length=20, blank=True, null=True)
 	qty_ordered = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
-	qty_bo = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True)
-	qty_shipped = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True)	
-	ship_status = models.CharField(max_length=10, blank=True, null=True)
-	pl = models.ForeignKey(PackingList,blank=True, null=True)
+	qty_bo = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
+	qty_shipped = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)	
+	# price = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
+	status = models.BooleanField(default=0)
+	pl = models.ForeignKey(PackingList, blank=True, null=True)
 	search_string = models.TextField(null=True, blank=True, verbose_name='Search String')
 
 	def __unicode__(self):
@@ -368,3 +370,63 @@ class PackingItem(models.Model):
 			('view_packing_item', 'Can View Packing Item'),
 		)
 
+
+
+class Invoice(models.Model):
+	invoice_number = models.CharField(max_length=20, blank=True, null=True, unique=True)
+	invoiced_by = models.ForeignKey(User, blank=True, null=True, related_name='invoiced_by')
+	# shipping_item = models.ForeignKey(ShippingItem, blank=True, null=True)
+	sold_to = models.ForeignKey(Contact, blank=True, null=True, related_name='invoice-sold-to')
+	ship_to = models.ForeignKey(Contact, blank=True, null=True, related_name='invoice-ship-to')
+	broker = models.ForeignKey(Contact, blank=True, null=True, verbose_name='Packing Slip', related_name='invoice_broker')
+	pl = models.ForeignKey(PackingList, blank=True, null=True, related_name='packing-list')
+	date = models.DateField(blank=True, null=True)
+	ship_via = models.ForeignKey(DeliveryChoice, blank=True, null=True, related_name='invoice_shipping_method')
+	po = models.CharField(max_length=50, blank=True, null=True)
+	job =  models.ForeignKey(Job, blank=True, null=True, verbose_name='Contract/Job')
+	terms = models.ForeignKey(PaymentTerm, blank=True, null=True, related_name='invoice_payment_terms')
+	fob = models.CharField(max_length=200, blank=True, null=True)
+	
+	invoice_qty = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
+	sub_total = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
+	discount = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
+	discount_type = models.CharField(max_length=20, blank=True, null=True)
+	comment = models.TextField(blank=True, null=True)
+	discounted_sub_total = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
+	hst_taxable = models.CharField(max_length=2, blank=True, null=True)
+	hst_taxable_amount = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
+	pst_taxable = models.CharField(max_length=2, blank=True, null=True)
+	pst_taxable_amount = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
+	invoice_currency = models.ForeignKey(Currency, max_length=20, blank=True, null=True)
+	total_amount = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
+	status = models.CharField(max_length=5, blank=True, null=True)
+
+	def __unicode__(self):
+		return str(self.id)
+
+	class Meta:
+		verbose_name = u"Invoice"
+		verbose_name_plural = u"Invoices"
+
+		permissions = (
+			('view_invoice', 'Can View Invoice'),
+		)
+
+class InvoicedItem(models.Model):
+	invoice = models.ForeignKey(Invoice, blank=True, null=True)
+	item = models.ForeignKey(PackingItem, blank=True, null=True, unique=True)
+	unit = models.CharField(max_length=20, blank=True, null=True)
+	qty = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
+	price = models.DecimalField(max_digits=10,decimal_places=4, blank=True, null=True, default=0.0)
+	sub_total = models.DecimalField(max_digits=10,decimal_places=4, blank=True, null=True, default=0.0)
+
+	def __unicode__(self):
+		return str(self.id)
+
+	class Meta:
+		verbose_name = u"Invoice Item"
+		verbose_name_plural = u"Invoice Items"
+
+		permissions = (
+			('view_invoice_item', 'Can View Invoice item'),
+		)

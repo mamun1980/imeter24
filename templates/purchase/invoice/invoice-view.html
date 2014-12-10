@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block angular %}
+	<script type="text/javascript" src="/statics/js/angular.min.js"></script>
+	
+	<script type="text/javascript" src="/statics/js/bootstrap-multiselect.js"></script>
+	<link rel="stylesheet" href="/statics/css/bootstrap-multiselect.css" type="text/css"/>
+	<script type="text/javascript" src="/statics/js/ui-bootstrap-0.9.0.min.js"></script>
+{% endblock angular %}
+
+{% block content %}
+<style type="text/css">
+	table {
+		background-color: #EEE;
+	}
+	table tr th {
+		background-color: #fea;
+	}
+</style>
+<div class="container-fluid" ng-app="invoiceApp">
+	{% if messages %}
+	<section id="message">
+		{% for message in messages %}
+	    	<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+	    {% endfor %}
+	</section>
+	{% endif %}
+
+	<section class="row " ng-controller="InvoiceController">
+		<article class="col-md-8 col-md-offset-2">
+			<div class="panel panel-primary">
+				<div class="panel-heading">
+			    	<h4>Invoice Details</h4>
+			  	</div>
+				<div class="panel-body">
+				<table class="table">
+									
+					<tbody>
+					
+						<tr>
+							<th width="200">Invoice Number</th>
+							<td>{{invoice.invoice_number}}</td>
+						</tr>
+						<tr>
+							<th>PL Number</th>
+							<td>{{invoice.pl}}</td>
+						</tr>
+						<tr>
+							<th>Sold To</th>
+							<td>
+								<table class="table">
+									<tr>
+										<th width="200">
+											Contact Name
+										</th>
+										<td>
+											{{invoice.sold_to.contact_name}}	
+										</td>
+									</tr>
+									<tr>
+										<th width="200">
+											Phones
+										</th>
+										<td>
+											{{invoice.sold_to.phones}}	
+										</td>
+									</tr>
+									<tr>
+										<th width="200">
+											Emails
+										</th>
+										<td>
+											{{invoice.sold_to.emails}}	
+										</td>
+									</tr>
+
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<th>Ship To</th>
+							<td>
+								<table class="table">
+									<tr>
+										<th width="200">
+											Contact Name
+										</th>
+										<td>
+											{{invoice.ship_to.contact_name}}	
+										</td>
+									</tr>
+									<tr>
+										<th width="200">
+											Phones
+										</th>
+										<td>
+											{{invoice.ship_to.phones}}	
+										</td>
+									</tr>
+									<tr>
+										<th width="200">
+											Emails
+										</th>
+										<td>
+											{{invoice.ship_to.emails}}	
+										</td>
+									</tr>
+
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<th>Broker</th>
+							<td>
+								<table class="table">
+									<tr>
+										<th width="200">
+											Contact Name
+										</th>
+										<td>
+											{{invoice.broker.contact_name}}	
+										</td>
+									</tr>
+									<tr>
+										<th width="200">
+											Phones
+										</th>
+										<td>
+											{{invoice.broker.phones}}	
+										</td>
+									</tr>
+									<tr>
+										<th width="200">
+											Emails
+										</th>
+										<td>
+											{{invoice.broker.emails}}	
+										</td>
+									</tr>
+
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<th>PL Number</th>
+							<td>{{invoice.pl}}</td>
+						</tr>
+						<tr>
+							<th>Invoice Date</th>
+							<td>{{invoice.date}}</td>
+						</tr>
+						<tr>
+							<th>Ship Via</th>
+							<td>{{invoice.ship_via}}</td>
+						</tr>
+						<tr>
+							<th>po</th>
+							<td>{{invoice.po}}</td>
+						</tr>
+						<tr>
+							<th>Job</th>
+							<td>{{invoice.job}}</td>
+						</tr>
+						<tr>
+							<th>Terms</th>
+							<td>{{invoice.terms}}</td>
+						</tr>
+						<tr>
+							<th>FOB</th>
+							<td>{{invoice.fob}}</td>
+						</tr>
+						<tr>
+							<th>Invoice Qty</th>
+							<td>{{invoice.invoice_qty}}</td>
+						</tr>
+						<tr>
+							<th>Sub Total</th>
+							<td>{{invoice.sub_total}}</td>
+						</tr>
+						<tr>
+							<th>Discount</th>
+							<td>{{invoice.discount}}</td>
+						</tr>							
+						<tr>
+							<th>Tax</th>
+							<td>{{invoice.pst_taxable_amount}} + {{invoice.hst_taxable_amount}}</td>
+						</tr>
+						<tr>
+							<th>Total</th>
+							<td>{{invoice.total_amount}}</td>
+						</tr>
+						
+					</tbody>
+				</table>
+				</div>
+			</div>
+		</article>
+	</section>
+</div>
+	
+{% endblock content %}

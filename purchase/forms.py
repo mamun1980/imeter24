@@ -11,6 +11,33 @@ class CustomModelChoiceField(forms.ModelChoiceField):
      def label_from_instance(self, obj):
          return "%s %s" % (obj.first_name, obj.last_name)
 
+class InvoiceForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        self.action = kwargs.pop('action', None)
+        super(InvoiceForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = Invoice
+
+    def save(self, commit=True):
+        invoice = super(InvoiceForm, self).save(commit=False)
+        sv = SystemVariable.objects.get(id=1)
+        if self.action == 'new':
+            # invoice.invoiced_by = self.request.user
+            invoice.status = 0
+            invoice_number = re.sub(r"[A-Za-z]+","",self.request.POST['invoice_number_search'])
+            invoice.invoice_number = 'IN-'+str(invoice_number)
+            sv.next_po_number = int(invoice_number) + 1
+        elif self.action == 'update':
+            pass
+            # po_number = re.sub(r"[^\w]+","",po.po_number)
+            # po.po_number = 'P'+str(po_number)
+            # sv.next_po_number = int(po_number) + 1
+        sv.save()
+        invoice.save()
+        return invoice
 
 class PRAddForm(forms.ModelForm):
     user_requested = CustomModelChoiceField(required=False, queryset=User.objects.filter(id__gte=0), 

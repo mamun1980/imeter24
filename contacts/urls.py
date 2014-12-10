@@ -3,6 +3,7 @@ from django.conf.urls import patterns, include, url
 urlpatterns = patterns('',
     # Examples:
     url(r'^$', 'contacts.views.sc_contact_home', name='sc-contact'),
+    url(r'^search/$', 'contacts.views.search_contact', name='search-contact'),
     url(r'^list/$', 'contacts.views.contact_list', name='sc-contact-list'),
     url(r'^(?P<cid>\d+)/$', 'contacts.views.sc_contact_view', name='sc-contact-view'),
 

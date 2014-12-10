@@ -1343,6 +1343,8 @@ def add_packing_list(request):
                             packing_item = PackingItem.objects.create(shipping_item=ship_item)
                         else:
                             packing_item = PackingItem.objects.create()
+                        # For new packeing item
+                        packing_item.status = 0
                     
                     packing_item.unit = item_unit[i]
                     if not item_shipped[i] == 'null' and not item_shipped[i] == 'undefined':
@@ -1588,7 +1590,7 @@ def pl_list(request):
                 item['qty_bo'] = float(it.qty_bo)
             if it.qty_shipped:
                 item['qty_shipped'] = float(it.qty_shipped)
-            item['ship_status'] = it.ship_status
+            item['status'] = it.status
             item['pl'] = it.pl.id
             item['search_string'] = it.search_string
             items.append(item)
@@ -1664,27 +1666,33 @@ def edit_packing_list(request, id):
     
     return render(request, 'purchase/edit-pl.html', {'pl_form': pl_form, 'pl_id': id, 'pl_items': pl_items})
 
-def get_pl_items(request, id):
-    try:
-        pl = PackingList.objects.get(id=id)
-    except PackingList.DoesNotExist:
-        json_posts = {
-            'PurchaseOrder DoesNotExist',
-        }
-        return HttpResponse(json_posts, mimetype='application/json')
-        
+def get_pl_items(request, id=None):
+    if id:
+        try:
+            pl = PackingList.objects.get(id=id)
+            pl_items = PackingItem.objects.filter(pl=pl, status=0)
+        except PackingList.DoesNotExist:
+            json_posts = {
+                'PurchaseOrder DoesNotExist',
+            }
+            return HttpResponse(json_posts, mimetype='application/json')
+    else:
+        pl_items = PackingItem.objects.filter(status=0)
     
-    pl_items = pl.items.all()
+    
     plitems = []
     for item in pl_items:
         item_dict = {}
-        item_dict['item_number'] = item.item.item_number
-        item_dict['description'] = item.item.description
-
-        item_dict['ordered'] = float(item.ordered)
-        item_dict['qty_bo'] = float(item.qty_bo)
-        item_dict['shipped'] = float(item.shipped)
-        item_dict['ship_status'] = item.ship_status
+        item_dict['id'] = item.id
+        item_dict['item_number'] = item.shipping_item.item.item_number
+        item_dict['description'] = item.description
+        item_dict['unit'] = item.unit
+        item_dict['price'] = float(item.shipping_item.item.retail_price)
+        item_dict['shipped'] = float(item.qty_shipped)
+        item_dict['sub_total'] = float(item.qty_shipped) * float(item.shipping_item.item.retail_price)
+        item_dict['pl'] = item.pl.pl_number
+        item_dict['search_string'] = item.search_string
+        
         
         plitems.append(item_dict)
     
@@ -2224,3 +2232,295 @@ def sl_reindex(request):
         sl.save()
 
     return HttpResponseRedirect("/")
+
+
+def get_invoices(request):
+    # invoices = Invoice.objects.filter(status=0)
+    invoices = Invoice.objects.all()
+    invoice_list = []
+    for inv in invoices:
+        invoice = {}
+        inv_items = InvoicedItem.objects.filter(invoice=inv)
+        if inv_items:
+            items = []
+            for inv_item in inv_items:
+                item = {}
+                item['id'] = inv_item.id
+                item['invoice_number'] = inv_item.invoice.invoice_number
+                item['packingitem_id'] = inv_item.item.id
+                item['item_number'] = inv_item.item.shipping_item.item.item_number
+                item['description'] = inv_item.item.description
+                item['unit'] = inv_item.unit
+                item['qty'] = float(inv_item.qty)
+                item['price'] = float(inv_item.price)
+                item['sub_total'] = float(inv_item.sub_total)
+                items.append(item)
+            invoice['invoice_items'] = items
+        else:
+            invoice['invoice_items'] = None
+
+        invoice['id'] = inv.id
+        invoice['invoice_number'] = inv.invoice_number
+        if inv.date:
+            invoice['invoice_date'] = inv.date.isoformat()
+        if inv.pl:
+            invoice['pl_number'] = inv.pl.pl_number
+            invoice['pl_id'] = inv.pl.id
+
+        if inv.sold_to:
+            sold_to = {}
+            sold_to['id'] = inv.sold_to.id
+            sold_to['contact_name'] = inv.sold_to.contact_name
+            sold_to['city'] = inv.sold_to.city
+            sold_to['province'] = inv.sold_to.province
+            sold_to['country'] = inv.sold_to.country
+
+            phone_list = inv.sold_to.contactphone_set.all()
+            if phone_list:
+                sold_to['phones'] = []
+                for ph in phone_list:                    
+                    phone = {}
+                    phone['phone_type'] = ph.phone_type.phone_type
+                    phone['phone'] = ph.phone
+                    phone['phone_ext'] = ph.phone_ext
+                    sold_to['phones'].append(phone)
+            else:
+                sold_to['phones'] = None
+            
+            email_list = inv.sold_to.contactemailaddress_set.all()
+            if email_list:
+                sold_to['emails'] = []
+                for em in emails:
+                    email = {}
+                    email['email_address_type'] = em.email_address_type.email_type
+                    email['email_address'] = em.email_address
+                    sold_to['emails'].append(email)
+
+            else:
+                sold_to['emails'] = None
+
+            invoice['sold_to'] = sold_to
+
+        if inv.ship_to:
+            ship_to = {}
+            ship_to['id'] = inv.ship_to.id
+            ship_to['contact_name'] = inv.ship_to.contact_name
+            ship_to['city'] = inv.ship_to.city
+            ship_to['province'] = inv.ship_to.province
+            ship_to['country'] = inv.ship_to.country
+
+            phone_list = inv.ship_to.contactphone_set.all()
+            if phone_list:
+                ship_to['phones'] = []
+                for ph in phone_list:                    
+                    phone = {}
+                    phone['phone_type'] = ph.phone_type.phone_type
+                    phone['phone'] = ph.phone
+                    phone['phone_ext'] = ph.phone_ext
+                    ship_to['phones'].append(phone)
+            else:
+                ship_to['phones'] = None
+            
+            email_list = inv.ship_to.contactemailaddress_set.all()
+            if email_list:
+                ship_to['emails'] = []
+                for em in emails:
+                    email = {}
+                    email['email_address_type'] = em.email_address_type.email_type
+                    email['email_address'] = em.email_address
+                    ship_to['emails'].append(email)
+
+            else:
+                ship_to['emails'] = None
+
+            invoice['ship_to'] = ship_to
+
+        if inv.broker:
+            broker = {}
+            broker['id'] = inv.broker.id
+            broker['contact_name'] = inv.broker.contact_name
+            broker['city'] = inv.broker.city
+            broker['province'] = inv.broker.province
+            broker['country'] = inv.broker.country
+
+            phone_list = inv.broker.contactphone_set.all()
+            if phone_list:
+                broker['phones'] = []
+                for ph in phone_list:                    
+                    phone = {}
+                    phone['phone_type'] = ph.phone_type.phone_type
+                    phone['phone'] = ph.phone
+                    phone['phone_ext'] = ph.phone_ext
+                    broker['phones'].append(phone)
+            else:
+                broker['phones'] = None
+            
+            email_list = inv.broker.contactemailaddress_set.all()
+            if email_list:
+                broker['emails'] = []
+                for em in emails:
+                    email = {}
+                    email['email_address_type'] = em.email_address_type.email_type
+                    email['email_address'] = em.email_address
+                    broker['emails'].append(email)
+
+            else:
+                broker['emails'] = None
+
+            invoice['broker'] = broker
+
+        if inv.ship_via:
+            invoice['ship_via'] = inv.ship_via.delivery_choice
+            invoice['ship_via_id'] = inv.ship_via.id
+
+        invoice['po'] = inv.po
+
+        if inv.job:
+            invoice['job'] = inv.job.job_number
+            invoice['job_id'] = inv.job.id
+
+        if inv.terms:
+            invoice['term'] = inv.terms.term
+            invoice['term_id'] = inv.terms.id
+
+        invoice['fob'] = inv.fob
+        if inv.invoice_qty:
+            invoice['invoice_qty'] = float(inv.invoice_qty)
+        else:
+            invoice['invoice_qty'] = 0.0
+        if inv.sub_total:
+            invoice['sub_total'] = float(inv.sub_total)
+        else:
+            invoice['sub_total'] = 0.0
+        if inv.discount:
+            invoice['discount'] = float(inv.discount)
+        else:
+            invoice['discount'] = 0.0
+
+        invoice['discount_type'] = inv.discount_type
+        invoice['comment'] = inv.comment
+        if inv.discounted_sub_total:
+            invoice['discounted_sub_total'] = float(inv.discounted_sub_total)
+        else:
+            invoice['discounted_sub_total'] = 0.0
+        invoice['hst_taxable'] = inv.hst_taxable
+
+        if inv.hst_taxable_amount:
+            invoice['hst_taxable_amount'] = float(inv.hst_taxable_amount)
+        else:
+            invoice['hst_taxable_amount'] = 0.0
+        invoice['pst_taxable'] = inv.pst_taxable
+        if inv.pst_taxable_amount:
+            invoice['pst_taxable_amount'] = float(inv.pst_taxable_amount)
+        else:
+            invoice['pst_taxable_amount'] = 0.0
+
+        if inv.invoice_currency:
+            invoice['invoice_currency'] = inv.invoice_currency.currency
+            invoice['invoice_currency_id'] = inv.invoice_currency.id
+        invoice['status'] = inv.status
+
+        if inv.total_amount:
+            invoice['total_amount'] = float(inv.total_amount)
+        else:
+            invoice['total_amount'] = 0.0
+        invoice_list.append(invoice)
+    json_posts = json.dumps(invoice_list)
+    return HttpResponse(json_posts, mimetype='application/json')
+
+
+
+def get_invoice_items(request):
+    invoice_items = InvoicedItem.objects.all(status=0)
+    item_list = []
+    for item in invoice_items:
+        item_dict = {}
+        item_dict['invoice_id'] = item.invoice.id
+        item_dict['invoice_item_id'] = item.id
+        item_dict['packing_item'] = item.item.id
+        item_dict['unit'] = item.unit
+        item_dict['qty'] = item.qty
+        item_dict['price'] = item.price
+        item_dict['sub_total'] = item.sub_total
+        item_list.append(item_dict)
+
+    json_posts = json.dumps(item_list)
+    return HttpResponse(json_posts, mimetype='application/json')
+
+
+
+@csrf_exempt
+def add_invoice(request):
+    # import pdb; pdb.set_trace()
+    sv = SystemVariable.objects.get(id=1)
+    users = User.objects.all().exclude(id__in=[-1]).order_by("username")
+    terms = PaymentTerm.objects.all()
+    delivery_choices = DeliveryChoice.objects.all()
+    currencies = Currency.objects.all()
+    if sv.next_invoice_number:
+        next_invoice_number = sv.next_invoice_number
+    else:
+        next_invoice_number = 0
+
+    if request.method == 'POST':
+        invoice_id = request.POST.get("invoice_id","")
+        if invoice_id != "":
+            invoice = Invoice.objects.get(id=invoice_id)
+            invoice_form = InvoiceForm(request.POST, instance=invoice, request=request, action='update')
+        else:
+            invoice_form = InvoiceForm(request.POST, request=request, action='new')
+        
+        units = request.POST.getlist('unit',"")
+        items = request.POST.getlist("item","")
+        qtys = request.POST.getlist("qty","")
+        prices = request.POST.getlist("price","")
+        sub_totals = request.POST.getlist("sub_total","")
+        
+        if invoice_form.is_valid():
+            invoice = invoice_form.save()
+            if invoice_id != "":
+                deleted_items = request.POST.getlist("removed_item")
+                if deleted_items:
+                    for deleted_item in deleted_items:
+                        di = InvoicedItem.objects.get(id=deleted_item)
+                        di.delete()
+            for i, item  in enumerate(items):
+                packingitem = PackingItem.objects.get(id=item)
+                try:
+                    invoice_item = InvoicedItem.objects.get(item=packingitem)
+                except InvoicedItem.DoesNotExist:
+                    invoice_item = InvoicedItem.objects.create(item=packingitem)
+                    invoice_item.invoice = invoice
+                    invoice_item.unit = units[i]
+                    invoice_item.qty = qtys[i]
+                    invoice_item.price = prices[i]
+                    invoice_item.sub_total = sub_totals[i]
+                    invoice_item.save()
+
+            return HttpResponseRedirect("/purchase/invoice-list/")
+    else:
+        form = InvoiceForm(request.POST)
+        return render(request, 'purchase/invoice/invoice.html', 
+            {'form': form, 'next_invoice_number': next_invoice_number, 'currencies': currencies,
+            'adminusers': users, 'terms': terms, 'delivery_choices': delivery_choices})
+
+
+def invoice_list(request):
+    invoices = Invoice.objects.all()
+    return render(request, 'purchase/invoice/invoice-list.html', 
+        {'invoices': invoices})
+
+
+def invoice_view(request, invoice_id):
+    invoice = Invoice.objects.get(id=invoice_id)
+    return render(request, 'purchase/invoice/invoice-view.html', 
+        {'invoice': invoice})
+
+@csrf_exempt
+def delete_invoice(request):
+    import pdb; pdb.set_trace()
+    id = request.POST.get("invoice_id","")
+    if id:
+        invoice = Invoice.objects.get(id=id)
+        invoice.delete()
+        return HttpResponse(id)

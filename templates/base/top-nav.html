@@ -453,6 +453,25 @@
 								</li>
 								{% endif %}
 
+								{% if perms.purchase.view_invoice %}
+								<li class="divider"></li>
+								<li class="dropdown-submenu">
+									<a href="/purchase/invoice-list/">Invoice</a>
+									<ul class="dropdown-menu">
+										<li>
+											<a href="/purchase/add-invoice/">
+												Add / Update Invoice
+											</a>
+										</li>
+										<li>
+											<a href="/purchase/invoice-list/">
+												View Invoice List 
+											</a>
+										</li>
+									</ul>
+								</li>
+								{% endif %}
+
 							</ul>
 						</li>
 
@@ -629,33 +648,6 @@
 					</li>
 					{% endif %}
 					<!-- End of Events menu -->
-
-					<!--  Start of Utility menu -->
-					{% if perms.invoice.view_invoice %}
-						<li class="dropdown">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Invoice <b class="caret"></b></a>
-							<ul class="dropdown-menu">
-								{% if perms.invoice.add_invoice %}
-								<li>
-									<a href="/invoice/add/">
-										Add / Update Invoice
-									</a>
-								</li>
-								<li class="divider"></li>
-								{% endif %}
-
-								
-								<li>
-									<a href="/invoice/list/">
-										List Invoice
-									</a>
-								</li>
-								
-								
-
-							</ul>
-						</li>
-					{% endif %}
 
 
 					<!-- Unitility menu -->

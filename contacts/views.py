@@ -11,6 +11,87 @@ from contacts.forms import *
 from contacts.models import *
 import json
 
+from haystack.forms import ModelSearchForm, SearchForm
+from haystack.query import SearchQuerySet, EmptySearchQuerySet
+from haystack.views import SearchView
+from haystack.inputs import Raw, Clean, AutoQuery
+
+
+def autocomplete(request):
+    sqs = SearchQuerySet().autocomplete(content_auto=request.GET.get('q', ''))[:5]
+    suggestions = [result.contact_name for result in sqs]
+    # Make sure you return a JSON object, not a bare list.
+    # Otherwise, you could be vulnerable to an XSS attack.
+    the_data = json.dumps({
+        'results': suggestions
+    })
+    return HttpResponse(the_data, content_type='application/json')
+
+def search_contact(request):
+    query = request.GET.get('q','')
+    if request.GET.get('q'):
+        contacts = SearchQuerySet().filter(content=AutoQuery(query)).load_all()[:50]
+        # contacts = SearchQuerySet().autocomplete(content_auto=query)
+        
+    else:
+        contacts = SearchQuerySet().all()[:20]
+
+    user = request.user
+    contact_list = []
+    for con in contacts:
+        contact_dict = {}
+        contact_dict['id'] = con.object.id
+        contact_dict['contact_name'] = con.contact_name
+        contact_dict['address_1'] = con.address_1
+        contact_dict['attention_to'] = con.attention_to
+        contact_dict['city'] = con.city
+        contact_dict['province'] = con.province
+        contact_dict['country'] = con.country
+        contact_dict['postal_code'] = con.postal_code
+        contact_dict['search_string'] = con.search_string
+        try:
+            contactprofile, created = ContactProfile.objects.get_or_create(contact=con.object)
+        except Exception, e:
+            raise e
+        
+        if contactprofile.fob:
+            contact_dict['fob'] = contactprofile.fob
+        if contactprofile.terms:
+            contact_dict['terms'] = contactprofile.terms.term
+            contact_dict['term_id'] = contactprofile.terms.id
+        if contactprofile.shipping_method:
+            contact_dict['shipvia'] = contactprofile.shipping_method.delivery_choice
+            contact_dict['shipvia_id'] = contactprofile.shipping_method.id
+
+        contact_dict['permission'] = {}
+        contact_dict['permission']['can_add_contact'] = user.has_perm("contacts.add_contact")
+        contact_dict['permission']['can_view_contact'] = user.has_perm("contacts.view_contact")
+        contact_dict['permission']['can_change_contact'] = user.has_perm("contacts.change_contact")
+        contact_dict['permission']['can_delete_contact'] = user.has_perm("contacts.delete_contact")
+        cid = int(con.object.id)
+        contact_dict['phones'] = []
+        for cphone in con.object.contactphone_set.all():
+            phone = {}
+            phone['type'] = cphone.phone_type.phone_type
+            phone['number'] = cphone.phone
+            phone['phone_ext'] = cphone.phone_ext
+            contact_dict['phones'].append(phone)
+
+        contact_dict['emails'] = []
+
+        for cemail in con.object.contactemailaddress_set.all():
+            email = {}
+            email['email_address_type'] = cemail.email_address_type.email_type
+            email['email_address'] = cemail.email_address
+            contact_dict['emails'].append(email)
+
+        contact_list.append(contact_dict)
+
+        
+
+    json_data = json.dumps(contact_list)
+    return HttpResponse(json_data)
+
 
 def sc_contact_home(request):
     

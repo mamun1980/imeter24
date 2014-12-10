@@ -80,3 +80,9 @@ SL_ITEM_STATUS = (
 	(1, 'Partial Shipping'),
 	(2, 'Done'),
 )
+INVOICE_STATUS = (
+	(0, 'New'),
+	(1, 'Paid'),
+	(2, 'On Hold'),
+	(3, 'Archived'),
+)

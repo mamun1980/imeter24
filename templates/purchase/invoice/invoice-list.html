@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block angular %}
+	<script type="text/javascript" src="/statics/js/angular.min.js"></script>
+{% endblock angular %}
+
+{% block content %}
+<div class="container-fluid">
+	{% if messages %}
+	<section id="message">
+		{% for message in messages %}
+	    	<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+	    {% endfor %}
+	</section>
+	{% endif %}
+
+	<section class="row " >
+		<article class="col-md-12">
+			<div class="panel panel-primary">
+				<div class="panel-heading">
+			    	<h4>Create / Update Invoice</h4>
+			  	</div>
+				<div class="panel-body">
+				<table class="table">
+					<thead>
+						<tr>
+							<th>Invoice Number</th>
+							<th>PL Number</th>
+							<th>Sold To</th>
+							<th>Sub Total</th>
+							<th>Discount</th>
+							<th>Tax</th>
+							<th>Total</th>
+							<th width="220">Action</th>
+						</tr>
+					</thead>
+				
+					<tbody>
+					{% for invoice in invoices %}
+						<tr>
+							<td>{{invoice.invoice_number}}</td>
+							<td>{{invoice.pl}}</td>
+							<td>{{invoice.sold_to}}</td>
+							<td>{{invoice.sub_total}}</td>
+							<td>{{invoice.discount}}</td>
+							<td>{{invoice.pst_taxable_amount}} + {{invoice.hst_taxable_amount}}</td>
+							<td>{{invoice.total_amount}}</td>
+							<td>
+								<div class="btn-group btn-group-sm">
+									<a class="btn btn-default" href="/purchase/invoice-view/{{invoice.id}}/">View</a>
+									<a class="btn btn-default invoice-delete" data-invoiceid="{{invoice.id}}">Delete</a>
+									<a class="btn btn-default" data-invoiceid="{{invoice.id}}" href="/purchase/invoice-pdf/{{invoice.id}}/" target="_blank">PDF Invoice</a>
+								</div>
+							</td>
+						</tr>
+						
+					{% endfor %}
+					</tbody>
+				</table>
+				</div>
+			</div>
+		</article>
+	</section>
+</div>
+
+<script type="text/javascript">
+(function(){
+	$(document).on("click", "a.invoice-delete", function(){
+		console.log("invoice delete clicked.");
+		var id = $(this).data("invoiceid");
+		var url = "/purchase/delete-invoice/";
+		$.ajax({
+			url: url,
+			type: 'POST',
+			data: {
+				'invoice_id': id,
+			},
+			success: function(data){
+				alert("Invoice deleted!");
+				window.location.reload(true);
+			},
+			error: function(error) {
+				console.log(error);
+			}
+		})
+	});
+})(jQuery)
+</script>
+	
+{% endblock content %}
