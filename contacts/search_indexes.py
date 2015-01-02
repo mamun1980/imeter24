@@ -11,6 +11,7 @@ class ContactIndex(indexes.SearchIndex, indexes.Indexable):
     address_1 = indexes.CharField(model_attr='address_1')
     attention_to = indexes.CharField(model_attr='attention_to')
     postal_code = indexes.CharField(model_attr='postal_code',  indexed=False)
+    search_string = indexes.EdgeNgramField(model_attr='search_string')
 
     def get_model(self):
         return Contact

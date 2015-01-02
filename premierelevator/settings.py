@@ -81,14 +81,6 @@ DATABASES = {
     }
 }
 
-HAYSTACK_CONNECTIONS = {
-    'default': {
-        # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
-        'ENGINE': 'premierelevator.search_backend.ConfigurableElasticSearchEngine',
-        'URL': 'http://127.0.0.1:9200/',
-        'INDEX_NAME': 'haystack',
-    },
-}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
@@ -138,3 +130,56 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'guardian.backends.ObjectPermissionBackend',
 )
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        }
+    },
+    'handlers': {
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler'
+        }
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+        'elasticsearch': {
+            'handlers': ['mail_admins'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    }
+}
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+        'ENGINE': 'premierelevator.search_backend.ConfigurableElasticSearchEngine',
+        'URL': 'http://127.0.0.1:9200/',
+        'INDEX_NAME': 'contact',
+        'EXCLUDED_INDEXES': ['inventory.search_indexes.ItemIndex',],
+    },
+    'auto': {
+        'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+        # 'ENGINE': 'premierelevator.search_backend.ConfigurableElasticSearchEngine',
+        'URL': 'http://127.0.0.1:9200/',
+        'INDEX_NAME': 'contact_auto',
+        'EXCLUDED_INDEXES': ['inventory.search_indexes.ItemIndex',],
+    },
+    'inventory': {
+        # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+        'ENGINE': 'premierelevator.search_backend.ConfigurableElasticSearchEngine',
+        'URL': 'http://127.0.0.1:9200/',
+        'INDEX_NAME': 'inventory',
+        'EXCLUDED_INDEXES': ['contacts.search_indexes.ContactIndex',],
+    },
+}
+
+HAYSTACK_DEFAULT_OPERATOR = 'AND'
