@@ -2524,3 +2524,11 @@ def delete_invoice(request):
         invoice = Invoice.objects.get(id=id)
         invoice.delete()
         return HttpResponse(id)
+
+
+def pl_reindex(request):
+    pass
+
+
+def show_draft_po(request):
+    pass

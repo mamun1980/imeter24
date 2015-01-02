@@ -179,11 +179,12 @@ def sc_contact_view(request, cid):
     contact_profile = ContactProfile.objects.get(contact=contact)
     contact_phones = ContactPhone.objects.filter(contact=contact)
     contact_emails = ContactEmailAddress.objects.filter(contact=contact)
+    distribution_methods = ContactDistributionMethod.objects.filter(contact=contact)
     comments = Comment.objects.filter(contact=contact)
     page_title = 'Contact Details of ('+ contact.contact_name +')'
     return render_to_response("contacts/contact-details.html", 
-        {'contact': contact, 'cp': contact_profile, 'contact_phones': contact_phones, 'page_title': page_title,
-        'contact_emails': contact_emails, 'comments': comments}, 
+        {'contact': contact, 'contact_profile': contact_profile, 'contact_phones': contact_phones, 'page_title': page_title,
+        'contact_emails': contact_emails, 'comments': comments, 'distribution_methods': distribution_methods}, 
         context_instance=RequestContext(request))
 
 @login_required

@@ -10,15 +10,6 @@
 }
 </style>
 <div class="container main-body">
-<section class="row header">
-	<article class="col-md-12">
-		<div class="btn-group">
-		  	<a href="" class="btn-lg btn-default">Print</a> 
-		  	<a href="" class="btn-lg btn-default">Print</a>
-		</div>
-	</article>
-	
-</section>
 <section class="row ">
 	<article class="col-md-6">
 		<div class="panel panel-primary">
@@ -69,9 +60,13 @@
 						<td>{{ contact.postal_code }}</td>
 					</tr>
 					<tr>
+						<th>Web page</th>
+						<td>{{ contact.webpage }}</td>
+					</tr>
+					<tr>
 						<th>Contact Emails</th>
 						<td>
-							{% for cemail in contact.contactemailaddress_set.all %}
+							{% for cemail in contact_emails %}
 								<span class="items">{{ cemail.email_address }} ({{ cemail.email_address_type }})</span>
 							{% empty %}
 								<p><span class="items">No email address added</span></p>
@@ -82,7 +77,7 @@
 						<th>Contact Phone Numbers</th>
 						<td>
 						
-							{% for cphone in contact.contactphone_set.all %}
+							{% for cphone in contact_phones %}
 								
 								<span class="items">
 									{{ cphone.phone_type }} : {{ cphone.phone }} ({{ cphone.phone_ext }})
@@ -94,47 +89,44 @@
 						
 						</td>
 					</tr>
-					<tr>
-						<th>Webpage</th>
-						<td>{{ contact.webpage }}</td>
-					</tr>
+					
 					<tr>
 						<th>GST Number</th>
-						<td>{{ contact.contactprofile.gst_number }}</td>
+						<td>{{ contact_profile.gst_number }}</td>
 					</tr>
 					<tr>
 						<th>gst tax exempt</th>
-						<td>{{ contact.contactprofile.gst_tax_exempt }}</td>
+						<td>{{ contact_profile.gst_tax_exempt }}</td>
 					</tr>
 					<tr>
 						<th>HST Number</th>
-						<td>{{ contact.contactprofile.hst_number }}</td>
+						<td>{{ contact_profile.hst_number }}</td>
 					</tr>
 					<tr>
 						<th>hst tax exempt</th>
-						<td>{{ contact.contactprofile.hst_tax_exempt }}</td>
+						<td>{{ contact_profile.hst_tax_exempt }}</td>
 					</tr>
 					<tr>
 						<th>PST Number</th>
-						<td>{{ contact.contactprofile.pst_number }}</td>
+						<td>{{ contact_profile.pst_number }}</td>
 					</tr>
 					<tr>
 						<th>pst tax exempt</th>
-						<td>{{ contact.contactprofile.pst_tax_exempt }}</td>
+						<td>{{ contact_profile.pst_tax_exempt }}</td>
 					</tr>
 					<tr>
 						<th>Payment Terms</th>
-						<td>{{ contact.contactprofile.terms }}</td>
+						<td>{{ contact_profile.terms }}</td>
 					</tr>
 					<tr>
 						<th>Shipping Method</th>
-						<td>{{ contact.contactprofile.shipping_method }}</td>
+						<td>{{ contact_profile.shipping_method }}</td>
 					</tr>
 					
 					<tr>
 						<th>Distribution Method</th>
 						<td>
-							{% for dm in contact.contactprofile.distribution_methods.all %}
+							{% for dm in distribution_methods %}
 								<span class="items">{{ dm.distribution_method }}</span>
 							{% empty %}
 							<p>No distribution method is selected</p>
@@ -144,39 +136,36 @@
 
 					<tr>
 						<th>Ship Collect</th>
-						<td>{{ contact.contactprofile.ship_collect }}</td>
+						<td>{{ contact_profile.ship_collect }}</td>
 					</tr>
 					<tr>
 						<th>Currency</th>
-						<td>{{ contact.contactprofile.currency.currency }}</td>
+						<td>{{ contact_profile.currency.currency }}</td>
 					</tr>
 					<tr>
 						<th>FOB</th>
-						<td>{{ contact.contactprofile.fob }}</td>
+						<td>{{ contact_profile.fob }}</td>
 					</tr>
 					<tr>
 						<th>AP Contact</th>
-						<td>{{ contact.contactprofile.ap_contact }}</td>
+						<td>{{ contact_profile.ap_contact }}</td>
 					</tr>
 					<tr>
 						<th>BV A/P Account</th>
-						<td>{{ contact.contactprofile.bv_ap_account }}</td>
+						<td>{{ contact_profile.bv_ap_account }}</td>
 					</tr>
 					<tr>
 						<th>BV A/R Account</th>
-						<td>{{ contact.contactprofile.bv_ar_account }}</td>
+						<td>{{ contact_profile.bv_ar_account }}</td>
 					</tr>
 					<tr>
 						<th>Record Created</th>
-						<td>{{ contact.contactprofile.record_created }}</td>
+						<td>{{ contact_profile.record_created }}</td>
 					</tr>
 					<tr>
 						<th>Last Activity</th>
-						<td>{{ contact.contactprofile.last_activity }}</td>
+						<td>{{ contact_profile.last_activity }}</td>
 					</tr>
-					
-
-
 					
 				</table>
 			</div>

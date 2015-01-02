@@ -834,3 +834,6 @@ def elevetor_type_delete(request):
     et = ElevetorType.objects.get(id=et_id)
     et.delete()
     return HttpResponse(et_id)
+
+def job_control_edit(request):
+    pass
