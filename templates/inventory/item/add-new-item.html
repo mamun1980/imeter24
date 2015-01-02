@@ -69,7 +69,7 @@
 				</tr>
 			</thead>
 			<tbody>
-			<tr class="ui-menu-item" ng-repeat="contact in contacts | googleSearchFilter:search">
+			<tr class="ui-menu-item" ng-repeat="contact in contacts">
 				<td>
 					<input type="radio" name="contact" value="{[{contact.id}]}">
 					<div class='phone' ng-repeat="phon in contact.phones">
@@ -103,7 +103,7 @@
 				</tr>
 			</thead>
 			<tbody>
-			<tr class="ui-menu-item" ng-repeat="contact in contacts | googleSearchFilter:search">
+			<tr class="ui-menu-item" ng-repeat="contact in contacts">
 				<td>
 					<input type="radio" name="contact" value="{[{contact.id}]}">
 					<div class='phone' ng-repeat="phon in contact.phones">
@@ -255,53 +255,14 @@ var inventoryApp = angular.module("inventoryApp", [], function ($interpolateProv
         $interpolateProvider.endSymbol("}]}");
 });
 
-inventoryApp.filter('googleSearchFilter', function(){
-    return function(items, token) {
-        // console.log(token);
-        if(token != undefined && token != "") {
-            var output=[];
-            var filter_output = [];
-            output = items;
-            // console.log(output);
-            
-            var searchArr = token.split(" ");
-
-            for(var j=0; j<searchArr.length; j++) {
-
-                for(var i=0; i<output.length; i++) {
-                    // console.log(output[i]);
-                    var search_str = output[i].search_string;
-                    // We can remove this if statement when all is updated.
-                    // console.log(search_str);
-                    if (search_str != null) {
-                        var n = search_str.search(new RegExp(searchArr[j], "i"));    
-                        // console.log('search_str is not null');
-                    }
-                    // console.log(n);
-                    if(n != -1) {
-                        filter_output.push(output[i]);
-                    }
-
-                }
-                output = filter_output;
-                filter_output = [];  
-            }
-            
-            return output;
-
-        } else {
-            return items;
-        }   
-    }
-});
 inventoryApp.controller('AddItemController',['$scope', '$http', function ($scope, $http) {
 	
 	$scope.init = function() {
-		$http({method: 'GET', url: "/contacts/list/"}).
-            success(function(data, status, headers, config) {
-                // console.log(data);
-                $scope.contacts = data;
-            });
+		// $http({method: 'GET', url: "/contacts/list/"}).
+  //           success(function(data, status, headers, config) {
+  //               // console.log(data);
+  //               $scope.contacts = data;
+  //           });
 
         $("#selectable").hide();
         $("#selectable-producer").hide();
@@ -317,47 +278,52 @@ inventoryApp.controller('AddItemController',['$scope', '$http', function ($scope
 		// console.log('hello');
 		console.log(search);
 	};
-	$scope.$watch('search', function (newValue, oldValue) {
-        if(newValue != undefined) {
-        	if(newValue.length > 1) {
-        		$( "#container" ).css('width', function(){
-        			var wid = $(this).innerWidth();
-        			console.log(wid);
-        			return wid;
-        		}).position({
-					my: "left-40 top-1",
-					at: "left bottom",
-					of: "#id_primary_supplier_demo",
-					collision: "fit"
-				});
+	$scope.searchContact = function (q) {
+		console.log(q);
+    	if(q.length > 1) {
+    		url = "/contacts/auto/?q=" + q
+    		$http({method: 'GET', url: url}).
+	            success(function(data, status, headers, config) {
+	                console.log(data.results);
+	                $scope.contacts = data.results;
+	            });
+    		$( "#container" ).css('width', function(){
+    			var wid = $(this).innerWidth();
+    			console.log(wid);
+    			return wid;
+    		}).position({
+				my: "left-40 top-1",
+				at: "left bottom",
+				of: "#id_primary_supplier_demo",
+				collision: "fit"
+			});
 
-        		$("#selectable").show();
-        	} else {
-        		$("#selectable").hide();
-        	}
-        } 
-    });
+    		$("#selectable").show();
+    	} else {
+    		$("#selectable").hide();
+    	}
+    };
 
-    $scope.$watch('search_producer', function (newValue, oldValue) {
-        if(newValue != undefined) {
-        	if(newValue.length > 1) {
-        		$( "#container-producer" ).css('width', function(){
-        			var wid = $(this).innerWidth();
-        			console.log(wid);
-        			return wid;
-        		}).position({
-					my: "left-40 top-1",
-					at: "left bottom",
-					of: "#id_producer_of_item_demo",
-					collision: "fit"
-				});
+    // $scope.$watch('search_producer', function (newValue, oldValue) {
+    //     if(newValue != undefined) {
+    //     	if(newValue.length > 1) {
+    //     		$( "#container-producer" ).css('width', function(){
+    //     			var wid = $(this).innerWidth();
+    //     			console.log(wid);
+    //     			return wid;
+    //     		}).position({
+				// 	my: "left-40 top-1",
+				// 	at: "left bottom",
+				// 	of: "#id_producer_of_item_demo",
+				// 	collision: "fit"
+				// });
 
-        		$("#selectable-producer").show();
-        	} else {
-        		$("#selectable-producer").hide();
-        	}
-        }
-    });
+    //     		$("#selectable-producer").show();
+    //     	} else {
+    //     		$("#selectable-producer").hide();
+    //     	}
+    //     }
+    // });
 
     
     $scope.searchItem = function(q) {

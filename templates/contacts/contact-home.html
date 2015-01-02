@@ -13,15 +13,13 @@
 
 	<section class="row">
 		<div class="col-md-6">
-			<input type="search" ng-model='search' name="q" class="form-control" ng-change="searchContact(search)" autocomplete="off">
+			<input type="search" ng-model='search' name="q" class="form-control" ng-change="searchContact(search)" autocomplete="off" placeholder="start typing to filter contact">
 		</div>
 		
 		
 	</section>
 
 <section class="row"  id="contact-list">
-	
-
 	<div class="col-md-12">
 		<div class="panel panel-primary">
 			<div class="panel-heading">
@@ -109,7 +107,6 @@
 	$(document).on("click","a.contact-delete", function(e){
 		e.preventDefault();
 		cid = $(this).data("cid");
-		console.log(cid)
 
 		$( "#delete-contact-confirm" ).dialog({
 			resizable: false,
@@ -149,13 +146,8 @@ var premierApp = angular.module("premierApp", [], function ($interpolateProvider
 });
 
 premierApp.controller('ContactController',['$scope', '$http', function ($scope, $http) {
-    $scope.customers = [
-      {name: 'Mamun', age: 33},
-      {name: 'Martin', age: 3},
-    ]
     $scope.init = function(){
-        $http.get("/contacts/search/").success(function(data){
-   			console.log(data);       
+        $http.get("/contacts/search/").success(function(data){  
           	$scope.contacts = data;
           	$scope.full_contact = data;
         })
@@ -163,8 +155,7 @@ premierApp.controller('ContactController',['$scope', '$http', function ($scope, 
     $scope.init();
 
     $scope.searchContact = function(q) {
-        if(q.length > 2) {
-            
+        if(q.length > 1) {
             var url = "/contacts/search/?q=" + q;
             $http({method: 'GET', url: url}).
 	            success(function(data, status, headers, config){

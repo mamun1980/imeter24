@@ -9,6 +9,10 @@ from django.contrib.auth.decorators import permission_required
 import json
 
 from contacts.models import *
+from haystack.forms import ModelSearchForm, SearchForm
+from haystack.query import SearchQuerySet, EmptySearchQuerySet
+from haystack.views import SearchView
+from haystack.inputs import Raw, Clean, AutoQuery
 
 @login_required
 @permission_required("inventory.add_item")
@@ -71,7 +75,7 @@ def add_new_item(request):
         if item_form.is_valid():
             try:
                 item = item_form.save()
-                return HttpResponseRedirect("/inventory/list/#/inventory/items")
+                return HttpResponseRedirect("/inventory/list/")
             except Exception, e:
                 raise e           
             
@@ -505,6 +509,32 @@ def get_item(request, itemnumber):
 
 def inventory_items(request):
     return render(request, "inventory/item/items.html",{})
+
+
+def search_item(request):
+    query = request.GET.get('q','')
+    if request.GET.get('q'):
+        items = SearchQuerySet().using('inventory').filter(text=AutoQuery(query)).load_all()[:20]
+    else:
+        items = SearchQuerySet().using('inventory').all().load_all()[:20]
+
+    user = request.user
+    item_list = []
+    for item in items:
+        item_dict = {}
+        item_dict['id'] = item.pk
+        item_dict['description'] = item.description
+        item_dict['quantity_on_hand'] = item.quantity_on_hand
+        item_dict['department'] = item.department
+        item_dict['item_unit_measure'] = item.item_unit_measure
+        item_dict['currency'] = item.currency
+        item_dict['search_string'] = item.search_string
+
+        item_list.append(item_dict)
+        
+    json_data = json.dumps(item_list)
+    return HttpResponse(json_data)
+
 
 @csrf_exempt
 @permission_required('inventory.delete_item')

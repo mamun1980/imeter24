@@ -51,9 +51,67 @@
 
 	</tbody>
 </table>
-
+<div id="delete-contact-confirm" title="Do you want to delete?">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;">
+  </span>This will delete the contact from your system?</p>
+</div>
 <script type="text/javascript">
 
 
-	
+	(function(){
+		$(document).on("click", "a.call-contact", function(e){
+			e.preventDefault();
+			var number = $(this).data("number");
+			var ext = $(this).data("ext");
+			$.ajax({
+				type: 'POST',
+				url: "/contacts/make-call/",
+				data: {
+					'phone_number': number,
+					'extension': ext
+				},
+				success: function(rdata) {
+					console.log(rdata);
+					alert("you just called "+rdata);
+				}
+			})
+		});
+
+		$(document).on("click","a.contact-delete", function(e){
+			e.preventDefault();
+			cid = $(this).data("cid");
+			console.log(cid)
+
+			$( "#delete-contact-confirm" ).dialog({
+				resizable: false,
+				height:200,
+				modal: true,
+				buttons: {
+					"Delete Contact": function() {
+										
+						$( this ).dialog( "close" );
+						$.ajax({
+							type: "POST",
+							url: "/contacts/delete/",
+							data: {
+								'cid': cid,
+							},
+							success: function(rdata) {
+								
+								$('a[data-cid="'+rdata+'"]').closest("tr").remove();
+								$( this ).dialog( "close" );
+							},
+							error: function() {
+								alert("contact not deleted");
+							}
+						})
+					},
+					Cancel: function() {
+						$( this ).dialog( "close" );
+					}
+				}
+			});
+
+		})
+	})(jQuery)
 </script>

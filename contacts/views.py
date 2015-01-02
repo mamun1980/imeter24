@@ -15,11 +15,47 @@ from haystack.forms import ModelSearchForm, SearchForm
 from haystack.query import SearchQuerySet, EmptySearchQuerySet
 from haystack.views import SearchView
 from haystack.inputs import Raw, Clean, AutoQuery
+import re
+
+
+def remove_qout(request):
+    contacts = Contact.objects.all()
+    for contact in contacts:
+        contact.contact_name = re.sub('\"', '', contact.contact_name)
+        contact.attention_to = re.sub('\"', '', contact.attention_to)
+        contact.address_1 = re.sub('\"', '', contact.address_1)
+        contact.address_1 = re.sub('\"', '', contact.address_1)
+        contact.city = re.sub('\"', '', contact.city)
+        contact.province = re.sub('\"', '', contact.province)
+        contact.country = re.sub('\"', '', contact.country)
+        contact.save()
+    return HttpResponse('Hello')
+
+
+def contact_test(request):
+    return render_to_response("contacts/contact-test.html", {},
+        context_instance=RequestContext(request))
 
 
 def autocomplete(request):
-    sqs = SearchQuerySet().autocomplete(content_auto=request.GET.get('q', ''))[:5]
-    suggestions = [result.contact_name for result in sqs]
+    query = request.GET.get('q', '')
+    suggestions = []
+    if len(query) > 1:
+        sqs = SearchQuerySet().using('auto').filter(search_string=query)[:10]
+        suggestions = []
+        for con in sqs:
+            contact_dict = {}
+            contact_dict['id'] = con.pk
+            contact_dict['contact_name'] = con.contact_name
+            contact_dict['address_1'] = con.address_1
+            contact_dict['attention_to'] = con.attention_to
+            contact_dict['city'] = con.city
+            contact_dict['province'] = con.province
+            contact_dict['country'] = con.country
+            contact_dict['postal_code'] = con.postal_code
+            contact_dict['search_string'] = con.search_string
+            suggestions.append(contact_dict)
+
     # Make sure you return a JSON object, not a bare list.
     # Otherwise, you could be vulnerable to an XSS attack.
     the_data = json.dumps({
@@ -30,17 +66,15 @@ def autocomplete(request):
 def search_contact(request):
     query = request.GET.get('q','')
     if request.GET.get('q'):
-        contacts = SearchQuerySet().filter(content=AutoQuery(query)).load_all()[:50]
-        # contacts = SearchQuerySet().autocomplete(content_auto=query)
-        
+        contacts = SearchQuerySet().using('default').filter(text=AutoQuery(query)).load_all()[:20]
     else:
-        contacts = SearchQuerySet().all()[:20]
+        contacts = SearchQuerySet().using('default').all().load_all()[:20]
 
     user = request.user
     contact_list = []
     for con in contacts:
         contact_dict = {}
-        contact_dict['id'] = con.object.id
+        contact_dict['id'] = con.pk
         contact_dict['contact_name'] = con.contact_name
         contact_dict['address_1'] = con.address_1
         contact_dict['attention_to'] = con.attention_to
@@ -49,46 +83,9 @@ def search_contact(request):
         contact_dict['country'] = con.country
         contact_dict['postal_code'] = con.postal_code
         contact_dict['search_string'] = con.search_string
-        try:
-            contactprofile, created = ContactProfile.objects.get_or_create(contact=con.object)
-        except Exception, e:
-            raise e
-        
-        if contactprofile.fob:
-            contact_dict['fob'] = contactprofile.fob
-        if contactprofile.terms:
-            contact_dict['terms'] = contactprofile.terms.term
-            contact_dict['term_id'] = contactprofile.terms.id
-        if contactprofile.shipping_method:
-            contact_dict['shipvia'] = contactprofile.shipping_method.delivery_choice
-            contact_dict['shipvia_id'] = contactprofile.shipping_method.id
-
-        contact_dict['permission'] = {}
-        contact_dict['permission']['can_add_contact'] = user.has_perm("contacts.add_contact")
-        contact_dict['permission']['can_view_contact'] = user.has_perm("contacts.view_contact")
-        contact_dict['permission']['can_change_contact'] = user.has_perm("contacts.change_contact")
-        contact_dict['permission']['can_delete_contact'] = user.has_perm("contacts.delete_contact")
-        cid = int(con.object.id)
-        contact_dict['phones'] = []
-        for cphone in con.object.contactphone_set.all():
-            phone = {}
-            phone['type'] = cphone.phone_type.phone_type
-            phone['number'] = cphone.phone
-            phone['phone_ext'] = cphone.phone_ext
-            contact_dict['phones'].append(phone)
-
-        contact_dict['emails'] = []
-
-        for cemail in con.object.contactemailaddress_set.all():
-            email = {}
-            email['email_address_type'] = cemail.email_address_type.email_type
-            email['email_address'] = cemail.email_address
-            contact_dict['emails'].append(email)
 
         contact_list.append(contact_dict)
-
         
-
     json_data = json.dumps(contact_list)
     return HttpResponse(json_data)
 

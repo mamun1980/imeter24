@@ -3,6 +3,9 @@ from django.conf.urls import patterns, include, url
 urlpatterns = patterns('',
     # Examples:
     url(r'^$', 'contacts.views.sc_contact_home', name='sc-contact'),
+    url(r'^remove-qout/$', 'contacts.views.remove_qout', name='remove_qout'),
+    url(r'^test/$', 'contacts.views.contact_test', name='contact-test'),
+    url(r'^auto/$', 'contacts.views.autocomplete', name='sc-sugessions'),
     url(r'^search/$', 'contacts.views.search_contact', name='search-contact'),
     url(r'^list/$', 'contacts.views.contact_list', name='sc-contact-list'),
     url(r'^(?P<cid>\d+)/$', 'contacts.views.sc_contact_view', name='sc-contact-view'),

@@ -10,7 +10,7 @@ class ContactIndex(indexes.SearchIndex, indexes.Indexable):
     province = indexes.CharField(model_attr='province')
     address_1 = indexes.CharField(model_attr='address_1')
     attention_to = indexes.CharField(model_attr='attention_to')
-    content_auto = indexes.EdgeNgramField(model_attr='contact_name')
+    postal_code = indexes.CharField(model_attr='postal_code',  indexed=False)
 
     def get_model(self):
         return Contact

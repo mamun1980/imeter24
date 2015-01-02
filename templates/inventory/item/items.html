@@ -7,10 +7,10 @@
 
 {% block content %}
 
-<div class="container-fluid shadow4 main-body" ng-app="premierApp">
+<div class="container-fluid shadow4 main-body" ng-app="premierApp" ng-controller="InventoryController">
 <section class="row">
 	<div class="col-md-6">
-		<input type='text' class="form-control" ng-model="search" placeholder="Filter By Item Number">
+		<input type='text' class="form-control" ng-model="search" ng-change="searchItem(search)" autocomplete="off" placeholder="Filter By Item Number">
 	</div>
 </section>
 
@@ -23,7 +23,44 @@
 		    	<h4>Inventory Item List</h4>
 		  	</div>
 		  	<div class="panel-body">
-		  		<div ng-view></div>
+		  		<table class="table" ng-show="items">
+					<thead>
+					<tr>
+						<th>Item ID</th>
+						<th>Description</th>
+						<th>Quantity On Hand</th>
+						<th>Department</th>
+						<th>Item Unit Measure</th>
+						<th>Currency</th>
+						<th>Warehouse Location</th>
+						<th>Production Type</th>
+						<th>Action</th>
+					</tr>
+					</thead>
+					
+					<tr ng-repeat="item in items">
+						<td>{[{ item.id }]}</td>
+						<td>{[{ item.description }]}</td>
+						<td>{[{ item.quantity_on_hand }]}</td>
+						<td>{[{ item.department }]}</td>
+						<td>{[{ item.item_unit_measure }]}</td>
+						<td>{[{ item.currency }]}</td>
+						<td>{[{ item.warehouse_location }]}</td>
+						<td>{[{ item.production_type }]}</td>
+						<td width="120">
+						<div class="btn-group btn-group-sm">
+							  				
+							<a class="btn btn-default" href="/inventory/item/view/{[{ item.item_number }]}/"> View </a>
+										
+							<a class="btn btn-default delete-item" data-item-id="{[{ item.item_number }]}" href="" ng-show="{[{ item.permission.can_delete_item }]}"> Delete </a>
+
+						</div>
+
+						</td>
+
+					</tr>
+					
+				</table>
 			</div>
 		</div>
 	</div>
@@ -32,9 +69,27 @@
 </div>
 
 <script type="text/javascript">
-premierApp.controller('InventoryController',['$scope', '$http', 'InventoryService', 'items', function ($scope, $http, InventoryService, items) {
-	console.log(items);
-	$scope.items = items;
+premierApp.controller('InventoryController',['$scope', '$http', function ($scope, $http) {
+	$scope.init = function(){
+        $http.get("/inventory/search/").success(function(data){  
+          	$scope.items = data;
+          	console.log(data);
+        })
+    }
+    $scope.init();
+
+    $scope.searchItem = function(q) {
+        if(q.length > 1) {
+            var url = "/inventory/search/?q=" + q;
+            $http({method: 'GET', url: url}).
+	            success(function(data, status, headers, config){
+	            $scope.items = data;
+	        });
+            
+        }
+        
+        
+    }
 }]);
 
 </script>

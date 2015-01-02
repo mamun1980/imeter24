@@ -58,7 +58,7 @@
 	</th>
 	<td colspan="5">
 		{{ item_form.primary_supplier.errors }}
-		<input type="text" name="primary_supplier_demo" placeholder="Start typing to search for supplier" id="id_primary_supplier_demo" class="form-control custom-form-control ng-pristine ng-valid" ng-model="search" autocomplete="off">
+		<input type="text" name="primary_supplier_demo" placeholder="Start typing to search for supplier" id="id_primary_supplier_demo" class="form-control custom-form-control ng-pristine ng-valid" ng-model="search" autocomplete="off" ng-change="searchContact(search)">
 		<a href="/admin/contacts/contact/add/" class="add-another" id="add_id_primary_supplier" onclick="return showAddAnotherPopup(this);"> <img src="/statics/admin/img/icon_addlink.gif" width="10" height="10" alt="Add Another"></a>
 		<div id="contact_info"></div>
 		<input type="hidden" name="primary_supplier" id="id_primary_supplier" value="">
@@ -236,7 +236,7 @@
 		{{ item_form.producer_of_item_demo.errors }}
 		<input type="hidden" name="producer_of_item">
 
-		<input type="text" name="producer_of_item_demo" placeholder="Start typing to search for supplier" id="id_producer_of_item_demo" class="form-control ng-pristine ng-valid" ng-model="search_producer" autocomplete="off">
+		<input type="text" name="producer_of_item_demo" placeholder="Start typing to search for supplier" id="id_producer_of_item_demo" class="form-control ng-pristine ng-valid" ng-model="search_producer" autocomplete="off" ng-change="searchContact(search_producer)">
 		<input type="hidden" name="producer_of_item" id="id_producer_of_item">
 	</td>
 </tr>

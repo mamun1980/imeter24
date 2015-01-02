@@ -386,8 +386,8 @@ class Invoice(models.Model):
 	job =  models.ForeignKey(Job, blank=True, null=True, verbose_name='Contract/Job')
 	terms = models.ForeignKey(PaymentTerm, blank=True, null=True, related_name='invoice_payment_terms')
 	fob = models.CharField(max_length=200, blank=True, null=True)
-	
 	invoice_qty = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
+	
 	sub_total = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
 	discount = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
 	discount_type = models.CharField(max_length=20, blank=True, null=True)
