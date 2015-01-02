@@ -9,15 +9,14 @@
 
 {% block content %}
 
-<div class="container shadow4 main-body" ng-app="premierApp" ng-controller="ContactController">
+<div class="container-fluid shadow4 main-body" ng-app="premierApp" ng-controller="ContactController">
 
 	<section class="row">
 		<div class="col-md-6">
 			<input type="search" ng-model='search' name="q" class="form-control" ng-change="searchContact(search)" autocomplete="off" placeholder="start typing to filter contact">
 		</div>
-		
-		
 	</section>
+
 
 <section class="row"  id="contact-list">
 	<div class="col-md-12">
@@ -26,6 +25,15 @@
 		    	<h4>CONTACT LIST</h4>
 		  	</div>
 		  	<div class="panel-body" >
+		  		<table class="table">
+		  			<thead>
+		  				<tr>
+		  					<th>
+		  						{% include "contacts/partials/pagination.html" %}
+		  					</th>
+		  				</tr>
+		  			</thead>
+		  		</table>
 			  	<table class="table">
 					<thead>
 						<tr>
@@ -40,7 +48,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr class="contact-list-item" ng-repeat="contact in contacts">
+						<tr class="contact-list-item" ng-repeat="contact in contacts.results">
 							<td>{[{ contact.id }]}</td>
 							<td>{[{ contact.contact_name }]}</td>
 							<td>{[{ contact.attention_to }]}</td>

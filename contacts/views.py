@@ -17,6 +17,8 @@ from haystack.views import SearchView
 from haystack.inputs import Raw, Clean, AutoQuery
 import re
 
+from django.core.paginator import Paginator, EmptyPage, InvalidPage
+from rest_framework.pagination import PaginationSerializer
 
 def remove_qout(request):
     contacts = Contact.objects.all()
@@ -66,9 +68,9 @@ def autocomplete(request):
 def search_contact(request):
     query = request.GET.get('q','')
     if request.GET.get('q'):
-        contacts = SearchQuerySet().using('default').filter(text=AutoQuery(query)).load_all()[:20]
+        contacts = SearchQuerySet().using('default').filter(text=AutoQuery(query)).load_all()
     else:
-        contacts = SearchQuerySet().using('default').all().load_all()[:20]
+        contacts = SearchQuerySet().using('default').all().load_all()
 
     user = request.user
     contact_list = []
@@ -85,9 +87,23 @@ def search_contact(request):
         contact_dict['search_string'] = con.search_string
 
         contact_list.append(contact_dict)
-        
-    json_data = json.dumps(contact_list)
-    return HttpResponse(json_data)
+    try:
+        page = int(request.GET.get('page','1'))
+    except ValueError:
+        page = 1
+    paginator = Paginator(contact_list, 20)
+    try:
+        pages = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        pages = paginator.page(paginator.num_pages)
+
+    serializer = PaginationSerializer(instance=pages)
+    
+    results = serializer.data
+
+    data = json.dumps(results)
+    return HttpResponse(data)
+
 
 
 def sc_contact_home(request):
