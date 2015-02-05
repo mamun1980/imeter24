@@ -33,7 +33,7 @@
 	<div class="contact_box">
 		
 	
-		<input type="text" ng-model="search_sold_to" placeholder="start typing to search sold to contact" class="form-control">
+		<input type="text" ng-model="search_sold_to" placeholder="start typing to search sold to contact" class="form-control" ng-change="searchSoldTo(search_sold_to)">
 		<table class="table table-bordered" id="sold_to_contact_details">
 			<tr>
 				<th width="150">Contact Name</th>
@@ -43,13 +43,17 @@
 				<th>Phone</th>
 				<td>
 					<li ng-repeat="phone in sold_to_contact.phones" class="bg-info">
-						{[{phone.type}]}: {[{phone.number}]} ({[{phone.phone_ext}]})
+						{[{phone.type}]}: {[{phone.number}]} ({[{phone.ext}]})
 					</li>
 				</td>
 			</tr>
 			<tr>
 				<th>Email</th>
-				<td><span class='bg-info email' ng-repeat="em in sold_to_contact.emails">{[{ em.email_address}]}</span></td>
+				<td>
+					<li ng-repeat="em in sold_to_contact.emails">
+						<span class='bg-info email'>{[{ em.email_address}]} ({[{em.email_type}]})</span>
+					</li>
+				</td>
 			</tr>
 		</table>
 		<table class="table sold_to_contact" id="sold_to_contact_list">
@@ -59,7 +63,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr ng-repeat="con in contacts | googleSearchFilter:search_sold_to" ng-click="selectSoldTo(con)">
+				<tr ng-repeat="con in soldto" ng-click="selectSoldTo(con)">
 					
 					<td>{[{con.contact_name}]}</td>
 					<td>{[{con.city}]}</td>
@@ -76,7 +80,7 @@
 </td>
 <td>
 	<div class="contact_box">
-		<input type="text" ng-model="search_ship_to" placeholder="start typing to search ship to contact" class="form-control">
+		<input type="text" ng-model="search_ship_to" placeholder="start typing to search ship to contact" class="form-control" ng-change="searchShipTo(search_ship_to)">
 		<table class="table table-bordered" id="ship_to_contact_details">
 			<tr>
 				<th width="150">Contact Name</th>
@@ -86,13 +90,17 @@
 				<th>Phone</th>
 				<td>
 					<li ng-repeat="phone in ship_to_contact.phones" class="bg-info">
-						{[{phone.type}]}: {[{phone.number}]} ({[{phone.phone_ext}]})
+						{[{phone.type}]}: {[{phone.number}]} ({[{phone.ext}]})
 					</li>
 				</td>
 			</tr>
 			<tr>
 				<th>Email</th>
-				<td><span class='bg-info email' ng-repeat="em in ship_to_contact.emails">{[{ em.email_address}]}</span></td>
+				<td>
+					<li ng-repeat="em in ship_to_contact.emails">
+						<span class='bg-info email'>{[{ em.email_address}]} ({[{em.email_type}]})</span>
+					</li>
+				</td>
 			</tr>
 		</table>
 		<table class="table ship_to_contact" id="ship_to_contact_list">
@@ -102,7 +110,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr ng-repeat="con in contacts | googleSearchFilter:search_ship_to" ng-click="selectShipTo(con)">
+				<tr ng-repeat="con in shipto" ng-click="selectShipTo(con)">
 					
 					<td>{[{con.contact_name}]}</td>
 					<td>{[{con.city}]}</td>

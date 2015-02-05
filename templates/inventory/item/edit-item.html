@@ -28,6 +28,35 @@
 	background-color: #333 !important;
 	color: #FFF;
 }
+.form-control {
+	margin-top: 5px; 
+}
+.contact_box {
+	position: relative;
+}
+.supplier_contact {
+	position: absolute;
+	z-index: 100;
+	width: 550px;
+	left: -100px;
+	border: 1px solid #000;
+}
+table#supplier_contact_details, table#sproducer_details {
+	margin-top: 10px;
+}
+table#supplier_contact_details th, table#sproducer_details th{
+	background-color: #83AD9E;
+}
+table.supplier_contact thead {
+	background-color: #000;
+	color: #FF0;
+}
+table.supplier_contact tbody tr {
+	background-color: #EEE;
+}
+table.supplier_contact tbody tr:hover {
+	background-color: #FFF;
+}
 </style>
 
 <div class="container shadow4 main-body" ng-app="premierApp">
@@ -42,21 +71,16 @@
 		  	</div>
 		  	<div class="panel-body">
 		  	<form action="/inventory/item/edit/{{itemid}}/" enctype="multipart/form-data" name="inventory-item-form" method="POST">{% csrf_token %}
-		  		<input type="hidden" name="contact_id" value="{{contact_id}}">
-		  		{% for field in item_form %}
-		        
-		            <div class="col-md-5 topmargin">
-		            {{ field.label_tag }}
-		            </div>
-		            <div class="col-md-7 topmargin">
-		                {{ field }}
-		            </div>
-		        
-		        {% endfor %}
-					
+
+		  		{% include "inventory/item/item-update-form.html" %}
+		  		
+				<div class="row">
+					<div class="col-md-5  col-md-offset-3">
 					  	<div class="btn btn-lg">
 							<button class="btn btn-primary btn-lg" type="submit">Update Inventory Item</button>
 						</div>
+					</div>
+				</div>
 					
 		  	</form>
 			</div>
@@ -102,56 +126,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	<div id="container" style="z-index: 999999;">
-		<table id="selectable" class="ui-autocomplete ui-widget-content-custom ui-corner-all">
-			<thead>
-				<tr>
-					<th>#</th><th>ID</th><th>Contact Name</th><th>Address 1</th><th> City </th>
-					<th><span ng-show="{[{ contact.permission.can_change_contact }]}">Action</span> <a href="" class="close">x</a></th>
-				</tr>
-			</thead>
-			<tbody>
-			<tr class="ui-menu-item" ng-repeat="contact in contacts | googleSearchFilter:search">
-				<td>
-					<input type="radio" name="contact" value="{[{contact.id}]}">
-					<div class='phone' ng-repeat="phon in contact.phones">
-					<input type="hidden" data-phone-number="{[{phon.number}]}" data-ext="{[{phon.phone_ext}]}" data-phone-type="{[{phon.type}]}">
-					</div>
-				</td>
-				<td class="sid">{[{contact.id}]}</td>
-				<td class="contact_name">{[{contact.contact_name}]}</td>
-				<td class="address_1">{[{contact.address_1}]}</td>
-				<td class="city">{[{contact.city}]}</td>
-				
-				<td>
-					<span ng-show="{[{ contact.permission.can_change_contact }]}">
-						<a class="edit-contact" data-id="{[{contact.id}]}" href="#">Edit</a>
-					</span>
-				</td>
-				
-			</tr>
-			</tbody>
-		</table>
-
-	</div>
 </section>
 </div>
 
@@ -160,6 +134,15 @@
 {% include "modals/add-modal.html" %}
 <script type="text/javascript">
 (function(){
+$(".datepicker").datepicker();
+$(document).on("change", "input.decimal", function(e){
+	var myval = parseFloat($(this).val())
+	$(this).val(myval.toFixed(2));
+})
+$("a.close").on("click", function(){
+	$(this).closest('table').hide();
+});
+
 	$("form[name='item-comment']").on("submit", function(e){
 		e.preventDefault();
 		form_data = $(this).serialize();
@@ -187,22 +170,7 @@
 
 <script type="text/javascript">
 (function(){
-	$(document).on("change", "input.decimal", function(e){
-		var myval = parseFloat($(this).val())
-		$(this).val(myval.toFixed(2));
-	});
 	
-	$("select#id_primary_supplier").hide();
-	// var pr_sup = $("select#id_primary_supplier option[selected='selected']").text();
-	// console.log("PR: "+pr_sup);
-
-	var str1 = "<input type=text name='primary_supplier_demo' id='id_primary_supplier_demo' class='form-control custom-form-control' ng-model='search' placeholder='Start typing to search supplier'>";
-	var str2 = '<a href="/admin/contacts/contact/add/" class="add-another" id="add_id_primary_supplier" onclick="return showAddAnotherPopup(this);"> <img src="/statics/admin/img/icon_addlink.gif" width="10" height="10" alt="Add Another"></a><div id="contact_info"></div>'
-	$("select#id_primary_supplier").closest("div").append(str1+str2);
-	
-	// $("input#id_primary_supplier_demo").val(pr_sup);
-	
-
 
 	$("a#add_id_primary_supplier").on("click", function(e){
 		e.preventDefault();
@@ -218,69 +186,22 @@
 		$("#selectable").hide();
 	});
 
-	$(document).on("click", "#selectable input[type='radio']", function(e){
-		// e.preventDefault();
-		var id = $(this).val();
-		// console.log(id);
-		// $("#selectable tr").removeClass("ui-selected");
-		var c_n = $(this).closest('tr').find("td.contact_name").text();
-		var a_1 = $(this).closest('tr').find("td.address_1").text();
-		var city = $(this).closest('tr').find("td.city").text();
-		
-		var phone_str = '<ul class="phone-list-ul">';
-
-		$(this).closest('tr').find("div.phone input").each(function( index ){
-			var phtype = $(this).data('phone-type');
-			var number = $(this).data('phone-number');
-			var ext = $(this).data('ext');
-			
-			phone_str += '<li>' + phtype + ' - ' + number + ' ( ext- ' + ext + ' ) ' + '</li>';
-
-		});
-		phone_str += "</ul></span>";
-		
-
-		var str = ''
-		if(c_n != '') {
-			str += c_n;
-		}
-
-		// console.log(str);
-
-		$("select#id_primary_supplier option[value='"+ id.trim()+"']").prop("selected", true);
-		$("#id_primary_supplier_demo").val(str);
-
-
-		var txt = '';
-		txt += "<p class='bg-info'><b class='left-info'>CONTACT NAME</b> : "+ c_n + "</p>";
-		txt += "<p class='bg-info'><b class='left-info'>ADDRESS</b> : "+ a_1 + "</p>";
-		txt += "<p class='bg-info'><b class='left-info'>CITY</b> : " + city + "</p>";
-		txt += "<p class='bg-info' id='aaaaa'><b class='left-info'>CONTACT NUMBER</b> :  </p>";
-		
-
-		$("#contact_info").html(txt);
-		$("#aaaaa").append(phone_str);
-
-
-		// console.log(id);
-		$("#selectable").hide();
-
-	});
-
-	$(document).on("click", "#selectable a.edit-contact", function(e){
-		e.preventDefault();
-		var cid = $(this).data("id");
-
-		e.preventDefault();
-		url = "/contacts/edit/basic/" + cid + "/",
-		mdal = $('#addModal');
-		mdal.on("shown.bs.modal", function(){
-			$("#addModal .modal-content").load(url);
-			// console.log(url);
-		}).modal();
-		return false;
 	
-	})
+
+	// $(document).on("click", "#selectable a.edit-contact", function(e){
+	// 	e.preventDefault();
+	// 	var cid = $(this).data("id");
+
+	// 	e.preventDefault();
+	// 	url = "/contacts/edit/basic/" + cid + "/",
+	// 	mdal = $('#addModal');
+	// 	mdal.on("shown.bs.modal", function(){
+	// 		$("#addModal .modal-content").load(url);
+	// 		// console.log(url);
+	// 	}).modal();
+	// 	return false;
+	
+	// })
 
 
 })(jQuery)
@@ -291,78 +212,82 @@
 premierApp.controller('EditItemController',['$scope', '$http', function ($scope, $http) {
 	
 	$scope.init = function() {
-		$http({method: 'GET', url: "/contacts/list/"}).
-            success(function(data, status, headers, config) {
-                // console.log(data);
-                $scope.contacts = data;
-            });
-        // var pr_sup = $("select#id_primary_supplier option[selected='selected']").text();
-        // console.log("PR: "+pr_sup);
-        // $scope.search = pr_sup;
-        // $scope.editpage = true;
+
         var cid = $("input[name='contact_id']").val();
-        console.log("Contact ID: "+cid);
-        $http({ method: 'GET', url: "/contacts/get-contact/"+cid+"/"}).
-        	success(function(data, status, headers, config){
-	        	$scope.contact = data;
-	        	console.log($scope.contact.contact_numbers.length);
-	        	var phone_str2 = '<ul class="phone-list-ul">';
-	        	for (var i=0; i<$scope.contact.contact_numbers.length; i++) {
-	        		console.log($scope.contact.contact_numbers[i]);
-	        		phtype = $scope.contact.contact_numbers[i]['type'];
-	        		number = $scope.contact.contact_numbers[i]['number'];
-	        		ext = $scope.contact.contact_numbers[i]['phone_ext'];
 
-	        		phone_str2 += '<li>' + phtype + ' - ' + number + ' ( ext- ' + ext + ' ) ' + '</li>';
+        $("#supplier_contact_list").hide();
+        $("#producer_of_item_list").hide();
+        
+        if(cid != undefined) {
+        	var url = "/contacts/get-contact/"+cid+"/"
+	        $http({method: 'GET', url: url}).
+		            success(function(data, status, headers, config) {
+		                $scope.supplier_contact = data;
+		            });
+		    $scope.show_supplier_contact = true;
+        }
 
-	        	}
-
-	        	var txt = '';
-				txt += "<p class='bg-info'><b class='left-info'>CONTACT NAME</b> : "+ $scope.contact.contact_name + "</p>";
-				txt += "<p class='bg-info'><b class='left-info'>ADDRESS</b> : "+ $scope.contact.address_1 + "</p>";
-				txt += "<p class='bg-info'><b class='left-info'>CITY</b> : " + $scope.contact.city + "</p>";
-				txt += "<p class='bg-info' id='aaaaa'><b class='left-info'>CONTACT NUMBER</b></p>";
-				
-
-				
-
-				$("#contact_info").append(txt);
-				$("#aaaaa").append(phone_str2);
-        	});
-
-        $("#selectable").hide();
+	    var pid = $("input[name='producer']").val();
+	    console.log("producer of item"+pid);
+	    if(pid != undefined && pid != 'None') {
+	    	var url = "/contacts/get-contact/"+pid+"/"
+	    	$http({method: 'GET', url: url}).
+	            success(function(data, status, headers, config) {
+	                $scope.producer = data;
+	            });	
+	        $scope.show_producer_contact = true;
+	    }
+	    
 	};
 
 	$scope.init();
 
-	$scope.showContacts = function(search) {
-		// console.log('hello');
-		console.log(search);
-	};
-	$scope.$watch('search', function (newValue, oldValue) {
-		// console.log(oldValue);
-		// console.log(newValue);
-        if(newValue != undefined) {
-        	if(newValue.length > 1) {
-        		$( "#container" ).css('width', function(){
-        			var wid = $(this).innerWidth();
-        			console.log(wid);
-        			return wid;
-        		}).position({
-					my: "left-40 top-1",
-					at: "left bottom",
-					of: "#id_primary_supplier_demo",
-					collision: "fit"
-				});
-        		
-        			$("#selectable").show();	
-        	
-        		
-        	} else {
-        		$("#selectable").hide();
-        	}
-        } 
-    });
+
+	$scope.searchSupplier = function(q) {
+		if(q.length > 1) {
+    		url = "/contacts/auto/?q=" + q
+    		$http({method: 'GET', url: url}).
+	            success(function(data, status, headers, config) {
+	                console.log(data.results);
+	                $scope.suppliers = data.results;
+	            });
+	        $("#supplier_contact_list").show();
+	        
+    		
+    	} else {
+    		$("#supplier_contact_list").hide();
+    	}
+	}
+	$scope.setSupplier = function(con){
+		$scope.show_supplier_contact = true;
+		$("#supplier_contact_list").hide();
+		$scope.supplier_contact = con;
+		$scope.search_supplier = '';
+	}
+
+	$scope.searchProducer = function(q) {
+		if(q.length > 1) {
+    		url = "/contacts/auto/?q=" + q
+    		$http({method: 'GET', url: url}).
+	            success(function(data, status, headers, config) {
+	                console.log(data.results);
+	                $scope.producers = data.results;
+	            });
+	        $("#producer_of_item_list").show();
+	        
+    		
+    	} else {
+    		$("#producer_of_item_list").hide();
+    	}
+	}
+	$scope.setProducer = function(con){
+		$scope.show_producer_contact = true;
+		$("#producer_of_item_list").hide();
+		$scope.producer = con;
+		$scope.search_producer = '';
+
+
+	}
 
 }]);
 </script>

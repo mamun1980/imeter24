@@ -4,6 +4,7 @@ from contacts.models import *
 
 admin.site.register(Contact)
 admin.site.register(ContactProfile)
+admin.site.register(PhoneType)
 admin.site.register(ContactPhone)
 admin.site.register(PaymentTerm)
 admin.site.register(DeliveryChoice)

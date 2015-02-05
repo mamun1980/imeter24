@@ -162,14 +162,12 @@ class ItemForm(forms.ModelForm):
 	def save(self, commit=True):
 		item = super(ItemForm, self).save(commit=False)
 		if self.action == 'new':
-			sv = SystemVariable.objects.get(id=1)
-			item_number = re.sub(r"[A-Za-z]+","",item.item_number)
-			item.item_number = int(item_number)
-			sv.next_item_number = item.item_number + 1
-			sv.save()
+			# sv = SystemVariable.objects.get(id=1) // This is for next item number
+			# item_number = re.sub(r"[A-Za-z]+","",item.item_number)
+			# item.item_number = int(item_number)
 			item.max_order_qty_remains = item.max_order_qty
 		
-		item.search_string = str(item.item_number) + " " + item.description
+		item.search_string = item.item_number + " " + item.description
 		if item.primary_supplier:
 			item.search_string += " " + item.primary_supplier.contact_name
 		item.save()

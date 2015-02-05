@@ -835,5 +835,5 @@ def elevetor_type_delete(request):
     et.delete()
     return HttpResponse(et_id)
 
-def job_control_edit(request):
+def job_control_edit(request, jobid):
     pass

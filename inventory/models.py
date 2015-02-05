@@ -180,3 +180,31 @@ class ItemComment(models.Model):
 		permissions = (
     		('view_itemcomment', 'Can View Item comment'),
     	)
+
+
+# ===================================
+
+from django.db.models.signals import post_save, post_delete
+from premierelevator.tasks import run_update_index
+from celery.app.control import Control
+# from django.core.management import call_command
+from premierelevator.celery import app
+
+def run_update_index_command(sender, **kwargs):
+	i = app.control.inspect()
+	tasks = i.scheduled()
+	if tasks:
+	
+		if tasks.itervalues().next():
+			for task in tasks.itervalues():
+				tid = task[0]['request']['id']
+				app.control.revoke(tid)
+		run_update_index.apply_async(countdown=60)
+	else:
+		# Send admin asking to start worker for celery
+		print "Worker is not running."
+	
+
+
+# post_save.connect(run_update_index_command, sender=Item)
+# post_delete.connect(run_update_index_command, sender=Item)

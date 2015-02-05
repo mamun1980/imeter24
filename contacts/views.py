@@ -11,6 +11,7 @@ from contacts.forms import *
 from contacts.models import *
 import json
 
+
 from haystack.forms import ModelSearchForm, SearchForm
 from haystack.query import SearchQuerySet, EmptySearchQuerySet
 from haystack.views import SearchView
@@ -18,7 +19,7 @@ from haystack.inputs import Raw, Clean, AutoQuery
 import re
 
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
-from rest_framework.pagination import PaginationSerializer
+
 
 def remove_qout(request):
     contacts = Contact.objects.all()
@@ -26,10 +27,11 @@ def remove_qout(request):
         contact.contact_name = re.sub('\"', '', contact.contact_name)
         contact.attention_to = re.sub('\"', '', contact.attention_to)
         contact.address_1 = re.sub('\"', '', contact.address_1)
-        contact.address_1 = re.sub('\"', '', contact.address_1)
+        contact.address_2 = re.sub('\"', '', contact.address_2)
         contact.city = re.sub('\"', '', contact.city)
         contact.province = re.sub('\"', '', contact.province)
         contact.country = re.sub('\"', '', contact.country)
+        contact.postal_code = re.sub('\"', '', contact.postal_code)
         contact.save()
     return HttpResponse('Hello')
 
@@ -43,7 +45,7 @@ def autocomplete(request):
     query = request.GET.get('q', '')
     suggestions = []
     if len(query) > 1:
-        sqs = SearchQuerySet().using('auto').filter(search_string=query)[:10]
+        sqs = SearchQuerySet().using('default').filter(content=query)[:10]
         suggestions = []
         for con in sqs:
             contact_dict = {}
@@ -55,7 +57,9 @@ def autocomplete(request):
             contact_dict['province'] = con.province
             contact_dict['country'] = con.country
             contact_dict['postal_code'] = con.postal_code
-            contact_dict['search_string'] = con.search_string
+            contact_dict['phones'] = con.phones
+            contact_dict['emails'] = con.emails
+            # contact_dict['search_string'] = con.search_string
             suggestions.append(contact_dict)
 
     # Make sure you return a JSON object, not a bare list.
@@ -66,27 +70,30 @@ def autocomplete(request):
     return HttpResponse(the_data, content_type='application/json')
 
 def search_contact(request):
+    # import pdb; pdb.set_trace();
     query = request.GET.get('q','')
     if request.GET.get('q'):
-        contacts = SearchQuerySet().using('default').filter(text=AutoQuery(query)).load_all()
+        contacts = SearchQuerySet().using('default').filter(content=AutoQuery(query)).load_all()[:30]
     else:
-        contacts = SearchQuerySet().using('default').all().load_all()
+        contacts = SearchQuerySet().using('default').all().load_all()[:30]
 
-    user = request.user
     contact_list = []
-    for con in contacts:
-        contact_dict = {}
-        contact_dict['id'] = con.pk
-        contact_dict['contact_name'] = con.contact_name
-        contact_dict['address_1'] = con.address_1
-        contact_dict['attention_to'] = con.attention_to
-        contact_dict['city'] = con.city
-        contact_dict['province'] = con.province
-        contact_dict['country'] = con.country
-        contact_dict['postal_code'] = con.postal_code
-        contact_dict['search_string'] = con.search_string
+    if contacts:
+        for con in contacts:
+            contact_dict = {}
+            contact_dict['id'] = con.pk
+            contact_dict['contact_name'] = con.contact_name
+            contact_dict['address_1'] = con.address_1
+            contact_dict['attention_to'] = con.attention_to
+            contact_dict['city'] = con.city
+            contact_dict['province'] = con.province
+            contact_dict['country'] = con.country
+            contact_dict['postal_code'] = con.postal_code
+            # contact_dict['search_string'] = con.search_string
+            contact_dict['phones'] = con.phones
+            contact_dict['emails'] = con.emails
 
-        contact_list.append(contact_dict)
+            contact_list.append(contact_dict)
     try:
         page = int(request.GET.get('page','1'))
     except ValueError:
@@ -97,9 +104,7 @@ def search_contact(request):
     except (EmptyPage, InvalidPage):
         pages = paginator.page(paginator.num_pages)
 
-    serializer = PaginationSerializer(instance=pages)
-    
-    results = serializer.data
+    results = pages.object_list
 
     data = json.dumps(results)
     return HttpResponse(data)
@@ -152,7 +157,8 @@ def contact_list(request):
         cid = int(con.id)
         
         contact_dict['phones'] = []
-        for cphone in con.contactphone_set.all():
+        cphones = ContactPhone.objects.filter(contact=con)
+        for cphone in cphones:
             phone = {}
             phone['type'] = cphone.phone_type.phone_type
             phone['number'] = cphone.phone
@@ -160,8 +166,9 @@ def contact_list(request):
             contact_dict['phones'].append(phone)
 
         contact_dict['emails'] = []
+        cemails = ContactEmailAddress.objects.filter(contact=con)
 
-        for cemail in con.contactemailaddress_set.all():
+        for cemail in cemails:
             email = {}
             email['email_address_type'] = cemail.email_address_type.email_type
             email['email_address'] = cemail.email_address
@@ -174,9 +181,8 @@ def contact_list(request):
 @login_required
 @permission_required("contacts.view_contact")
 def sc_contact_view(request, cid):
-    
     contact = Contact.objects.get(id=cid)
-    contact_profile = ContactProfile.objects.get(contact=contact)
+    contact_profile, cp_created = ContactProfile.objects.get_or_create(contact=contact)
     contact_phones = ContactPhone.objects.filter(contact=contact)
     contact_emails = ContactEmailAddress.objects.filter(contact=contact)
     distribution_methods = ContactDistributionMethod.objects.filter(contact=contact)
@@ -282,7 +288,7 @@ def contact_delete(request):
 @permission_required('contacts.change_contact')
 def contact_edit(request, pk):
     contact = Contact.objects.get(id=pk)
-    contact_profile = ContactProfile.objects.get(contact=contact)
+    contact_profile, ap_created = ContactProfile.objects.get_or_create(contact=contact)
 
     CForm = ContactForm(instance=contact)
     CPForm = ContactProfileForm(instance=contact_profile)
@@ -640,6 +646,7 @@ def sc_email_delete(request):
 def sc_phone_delete(request):
 
     if request.method == 'POST':
+        # import pdb; pdb.set_trace()
         
         phone_id = request.POST.get("phone_id")
         phone = ContactPhone.objects.get(id=phone_id)
@@ -1200,6 +1207,7 @@ def get_contact(request, pk):
     cprofile = ContactProfile.objects.get(contact=contact)
 
     con_dict = {}
+    con_dict['id'] = contact.id
     con_dict['contact_name'] = contact.contact_name
     con_dict['address_1'] = contact.address_1
     con_dict['city'] = contact.city

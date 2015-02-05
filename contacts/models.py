@@ -3,7 +3,7 @@ from django.db.models.signals import post_save
 from django.contrib.auth.models import User
 from datetime import datetime
 from contacts.choices import *
-
+from django.contrib import messages
 # Create your models here.
 
 class DistributionMethod(models.Model):
@@ -151,7 +151,7 @@ class PhoneType(models.Model):
 		verbose_name_plural = "Phone Types"
 
 class ContactPhone(models.Model):
-	contact 		= models.ForeignKey(Contact, null=True, blank=True)
+	contact 		= models.ForeignKey(Contact, null=True, blank=True, related_name='contact_phone')
 	phone_type      = models.ForeignKey(PhoneType, null=True, blank=True)
 	phone           = models.CharField(max_length=15, verbose_name='Phone Number', null=True, blank=True)
 	phone_ext       = models.CharField(max_length=10, verbose_name='Phone Extension', null=True, blank=True)
@@ -213,7 +213,7 @@ class EmailAddressType(models.Model):
 
 
 class ContactEmailAddress(models.Model):
-	contact 			= models.ForeignKey(Contact,  null=True, blank=True)
+	contact 			= models.ForeignKey(Contact, null=True, blank=True, related_name='contact_emails')
 	email_address_type 	= models.ForeignKey(EmailAddressType,  null=False)
 	email_address 		= models.EmailField(max_length=100)
 
@@ -263,3 +263,35 @@ class Comment(models.Model):
 		permissions = (
     		('view_comment', 'Can View Comments'),
     	)
+
+'''
+from django.db.models.signals import post_save, post_delete
+from premierelevator.tasks import run_update_index
+from celery.app.control import Control
+# from django.core.management import call_command
+from premierelevator.celery import app
+
+def run_update_index_command(sender, **kwargs):
+	i = app.control.inspect()
+	tasks = i.scheduled()
+	if tasks:
+	
+		if tasks.itervalues().next():
+			for task in tasks.itervalues():
+				tid = task[0]['request']['id']
+				app.control.revoke(tid)
+		run_update_index.apply_async(countdown=60)
+	else:
+		# Send admin asking to start worker for celery
+		print "Worker is not running."
+	
+
+'''
+# post_save.connect(run_update_index_command, sender=ContactPhone)
+# post_delete.connect(run_update_index_command, sender=ContactPhone)
+
+# post_save.connect(run_update_index_command, sender=ContactEmailAddress)
+# post_delete.connect(run_update_index_command, sender=ContactEmailAddress)
+
+# post_save.connect(run_update_index_command, sender=Contact)
+# post_delete.connect(run_update_index_command, sender=Contact)

@@ -23,6 +23,16 @@ import os
 # from reportlab.lib.pagesizes import letter, A4
 # from premierelevator.generate_report import write_pdf
 
+from haystack.forms import ModelSearchForm, SearchForm
+from haystack.query import SearchQuerySet, EmptySearchQuerySet
+from haystack.views import SearchView
+from haystack.inputs import Raw, Clean, AutoQuery
+import re
+
+from django.core.paginator import Paginator, EmptyPage, InvalidPage
+
+
+
 def html_to_pdf_response(html):
     result = StringIO.StringIO()
     pdf = pisa.pisaDocument(
@@ -449,18 +459,18 @@ def add_purchase_order(request):
 @csrf_exempt
 def add_new_po(request):
     # import pdb; pdb.set_trace()
-    try:
-        sv = SystemVariable.objects.get(id=1)
-        next_number = sv.next_po_number
-        if not next_number:
-            messages.warning(request, "System varible is not set for PO. Please ask your admin to update System variable.")
-            return HttpResponseRedirect("/")
-    except Exception, e:
-        messages.warning(request, "System varible is not set for PO. Please ask your admin to update System variable.")
-        return HttpResponseRedirect("/")
-        pass
+    # try:
+    #     sv = SystemVariable.objects.get(id=1)
+    #     next_number = sv.next_po_number
+    #     if not next_number:
+    #         messages.warning(request, "System varible is not set for PO. Please ask your admin to update System variable.")
+    #         return HttpResponseRedirect("/")
+    # except Exception, e:
+    #     messages.warning(request, "System varible is not set for PO. Please ask your admin to update System variable.")
+    #     return HttpResponseRedirect("/")
+    #     pass
     if request.method == 'POST':
-        # import pdb; pdb.set_trace();
+        import pdb; pdb.set_trace();
         po_id = request.POST.get("po_id","")
         if po_id != "":
             po = PurchaseOrder.objects.get(id=po_id)
@@ -468,7 +478,7 @@ def add_new_po(request):
         else:
             po_form = POForm(request.POST, request=request, action='new')
 
-
+        return HttpResponse("hello world!")
         if po_form.is_valid():
             po = po_form.save()
             # po.po_created_by = request.user
@@ -525,11 +535,6 @@ def add_new_po(request):
                             pi.save()
                     except Exception, e:
                         raise e
-                    # pi = PurchaseItem(po=po, item=itemobj, job_number=job,
-                    #     qty=item['qty'], cost=item['cost'], sub_total=item['sub_total'],
-                    #     comment=item['comment'])
-    
-                    
                     # Update inventory item for Last PO info
                     if created:
                         if itemobj.quantity_on_order:
@@ -565,9 +570,8 @@ def add_new_po(request):
         # POContact.objects.filter(purchase_order=po_number).delete()
         po_contact_form = POContactForm()
 
-        return render(request, "purchase/add-po2.html", 
-            {"po_number":'NEW' , 'next_number': next_number,
-            'po_contact_form': po_contact_form, 'currencies': currencies,
+        return render(request, "purchase/add-po.html", 
+            {"po_number":'NEW' , 'po_contact_form': po_contact_form, 'currencies': currencies,
             'delivery_choices': delivery_choices, 'terms': terms,
             'deliver_internals': deliver_internals, 'users': users, 'item_unit_measures':item_unit_measures,
             'adminusers': adminusers})
@@ -589,6 +593,43 @@ def save_po(request):
         po.delete()
 
     return HttpResponseRedirect("/purchase/list-purchase-orders/")
+
+
+def search_po(request):
+    query = request.GET.get('q','')
+    if request.GET.get('q'):
+        purchase_orders = SearchQuerySet().using('po').filter(content=AutoQuery(query)).load_all()[:30]
+    else:
+        purchase_orders = SearchQuerySet().using('po').all().load_all()[:30]
+
+    # import pdb; pdb.set_trace();
+    po_list = []
+    for po in purchase_orders:
+        po_dict = {}
+        po_dict['id'] = po.pk
+        po_dict['po_number'] = po.po_number
+        po_dict['po_status'] = po.po_status
+        po_dict['supplier'] = po.supplier
+        po_dict['terms'] = po.terms
+        po_dict['shipping_inst'] = po.shipping_inst
+
+        po_list.append(po_dict)
+
+    try:
+        page = int(request.GET.get('page','1'))
+    except ValueError:
+        page = 1
+    paginator = Paginator(po_list, 30)
+    try:
+        pages = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        pages = paginator.page(paginator.num_pages)
+
+    results = pages.object_list
+
+    data = json.dumps(results)
+    return HttpResponse(data)
+
 
 
 
@@ -665,7 +706,8 @@ def get_po_by_id(request,pk):
         supplier['city'] = po.supplier.city
         supplier['province'] = po.supplier.province
         supplier['emails'] = []
-        for email in po.supplier.contactemailaddress_set.all():
+        semails = ContactEmailAddress.objects.filter(contact=po.supplier)
+        for email in semails:
             email_dict = {}
             email_dict['email_type'] = email.email_address_type.email_type
             email_dict['email_address'] = email.email_address
@@ -681,7 +723,8 @@ def get_po_by_id(request,pk):
         ship_to['city'] = po.ship_to.city
         ship_to['province'] = po.ship_to.province
         ship_to['emails'] = []
-        for email in po.ship_to.contactemailaddress_set.all():
+        shemails = semails = ContactEmailAddress.objects.filter(contact=po.ship_to)
+        for email in shemails:
             email_dict = {}
             email_dict['email_type'] = email.email_address_type.email_type
             email_dict['email_address'] = email.email_address
@@ -839,13 +882,11 @@ def get_po_by_id(request,pk):
 
 
 def get_purchase_orders(request):
-    # import pdb; pdb.set_trace()
     
     purchase_orders = PurchaseOrder.objects.all()
     po_list = []
     for po in purchase_orders:
         po_dict = {}
-        po_dict['id'] = po.id
         po_dict['po_number'] = po.po_number
         if po.total_po_amount:
             po_dict['total_po_amount'] = po.total_po_amount.to_eng_string()

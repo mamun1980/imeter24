@@ -77,7 +77,7 @@ class PurchaseOrder(models.Model):
 	PurchaseOrder will be added for one or more PR.
 
 	'''
-	po_number = models.CharField(verbose_name='PO Number', max_length=20, blank=True, null= True, unique=True)
+	po_number = models.CharField(verbose_name='PO Number', max_length=20, primary_key=True)
 	next_number = models.CharField(verbose_name='Next Number', max_length=20, blank=True, null= True)
 	date_issued = models.DateField(blank=True, null=True)
 	po_status = models.CharField(max_length=20, blank=True, null=True, default='New')
@@ -251,7 +251,7 @@ class ReceivedItemHistory(models.Model):
 
 
 class ShippingList(models.Model):
-	sl_number = models.CharField(max_length=20, blank=True, null=True, unique=True)
+	sl_number = models.CharField(max_length=20, primary_key=True)
 	sold_to = models.ForeignKey(Contact, blank=True, null=True, related_name='sl_sold_to')
 	ship_to = models.ForeignKey(Contact, blank=True, null=True, related_name='sl_ship_to')
 	ordered_date = models.DateField(blank=True, null=True)
@@ -308,7 +308,7 @@ class ShippingItem(models.Model):
 		)
 
 class PackingList(models.Model):
-	pl_number = models.CharField(max_length=20, blank=True, null=True, unique=True)
+	pl_number = models.CharField(max_length=20, primary_key=True)
 	sl = models.ForeignKey(ShippingList, blank=True, null=True)
 	sold_to = models.ForeignKey(Contact, blank=True, null=True, related_name='sold_to')
 	ship_to = models.ForeignKey(Contact, blank=True, null=True, related_name='ship_to')
@@ -373,7 +373,7 @@ class PackingItem(models.Model):
 
 
 class Invoice(models.Model):
-	invoice_number = models.CharField(max_length=20, blank=True, null=True, unique=True)
+	invoice_number = models.CharField(max_length=20, primary_key=True)
 	invoiced_by = models.ForeignKey(User, blank=True, null=True, related_name='invoiced_by')
 	# shipping_item = models.ForeignKey(ShippingItem, blank=True, null=True)
 	sold_to = models.ForeignKey(Contact, blank=True, null=True, related_name='invoice-sold-to')

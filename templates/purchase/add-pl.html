@@ -112,42 +112,7 @@ var plApp = angular.module("plApp", [], function ($interpolateProvider) {
         $interpolateProvider.startSymbol("{[{");
         $interpolateProvider.endSymbol("}]}");
 });
-plApp.filter('googleSearchFilter', function(){
-    return function(items, token) {
-        
-        if(token != undefined && token != "") {
-            var output=[];
-            var filter_output = [];
-            output = items;
-            console.log(output);
-            
-            var searchArr = token.split(" ");
-            console.log(searchArr);
 
-            for(var j=0; j<searchArr.length; j++) {
-
-                for(var i=0; i<output.length; i++) {
-
-                    var search_str = output[i].search_string;
-                    if (search_str != null) {
-                        var n = search_str.search(new RegExp(searchArr[j], "i"));    
-                    }
-                    if(n != -1) {
-                        filter_output.push(output[i]);
-                    }
-
-                }
-                output = filter_output;
-                filter_output = [];  
-            }
-            
-            return output;
-
-        } else {
-            return items;
-        }   
-    }
-});
 plApp.controller('AddPLController',['$scope', '$http','$compile', function ($scope, $http, $compile) {
 	
 	$scope.init = function() {
@@ -164,11 +129,6 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
             $scope.item_unit_measures = data;
         });
 
-        $http({method: 'GET', url: "/contacts/list/"}).
-            success(function(data, status, headers, config) {
-                // console.log(data);
-                $scope.contacts = data;
-            });
 
         $http({method: 'GET', url: "/schedule/all-jobs/"}).
             success(function(data, status, headers, config) {
@@ -224,38 +184,53 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
         }
     });
 
-    $scope.$watch('search_sold_to', function (newValue, oldValue) {
-        if(newValue != undefined) {
-        	if(newValue.length > 1) {
-        		$("#sold_to_contact_list").show();
-        		console.log(newValue);
-        	} else {
-        		$("#sold_to_contact_list").hide();
-        	}
+    $scope.searchSoldTo  = function(q) {
+        if(q.length > 1) {
+            url = "/contacts/auto/?q=" + q
+            $http({method: 'GET', url: url}).
+                success(function(data, status, headers, config) {
+                    console.log(data.results);
+                    $scope.soldto = data.results;
+                });
+            $("#sold_to_contact_list").show();
+            
+            
+        } else {
+            $("#sold_to_contact_list").hide();
         }
-    });
+    }
 
-    $scope.$watch('search_ship_to', function (newValue, oldValue) {
-        if(newValue != undefined) {
-        	if(newValue.length > 1) {
-        		$("#ship_to_contact_list").show();
-        		console.log(newValue);
-        	} else {
-        		$("#ship_to_contact_list").hide();
-        	}
-        } 
-    });
+    $scope.searchShipTo  = function(q) {
+        if(q.length > 1) {
+            url = "/contacts/auto/?q=" + q
+            $http({method: 'GET', url: url}).
+                success(function(data, status, headers, config) {
+                    console.log(data.results);
+                    $scope.shipto = data.results;
+                });
+            $("#ship_to_contact_list").show();
+            
+            
+        } else {
+            $("#ship_to_contact_list").hide();
+        }
+    }
 
-    $scope.$watch('search_customer_broker', function (newValue, oldValue) {
-        if(newValue != undefined) {
-        	if(newValue.length > 1) {
-        		$("#customer_broker_contact_list").show();
-        		console.log(newValue);
-        	} else {
-        		$("#customer_broker_contact_list").hide();
-        	}
-        } 
-    });
+    $scope.searchCustomerBroker  = function(q) {
+        if(q.length > 1) {
+            url = "/contacts/auto/?q=" + q
+            $http({method: 'GET', url: url}).
+                success(function(data, status, headers, config) {
+                    console.log(data.results);
+                    $scope.customer_brokers = data.results;
+                });
+            $("#customer_broker_contact_list").show();
+            
+            
+        } else {
+            $("#customer_broker_contact_list").hide();
+        }
+    }
 
 	$scope.selectShipTo = function(con) {
 		$("#ship_to_contact_list").hide();

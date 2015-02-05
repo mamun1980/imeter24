@@ -4,6 +4,8 @@ urlpatterns = patterns('',
     # Examples:
     url(r'^items/$', 'inventory.views.list_item', name='item-list'),
     url(r'^search/$', 'inventory.views.search_item', name='item-search'),
+    url(r'^auto/$', 'inventory.views.autocomplete', name='item-sugessions'),
+
     url(r'^get-item/(?P<itemnumber>[\w ,\'-]+)/$', 'inventory.views.get_item', name='get-item'),
     url(r'^filter-items/$', 'inventory.views.get_filtered_items', name='filter-items'),
     url(r'^list/$', 'inventory.views.inventory_items', name='inventory-list'),

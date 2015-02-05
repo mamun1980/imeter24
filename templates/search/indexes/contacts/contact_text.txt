@@ -1,2 +1,3 @@
+{{ object.contact_name }}
 {{ object.country }}
 {{ object.attention_to }}

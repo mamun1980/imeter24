@@ -43,6 +43,7 @@ INSTALLED_APPS = (
     'selectable',
     'guardian',
     'haystack',
+
 )
 
 MIDDLEWARE_CLASSES = (
@@ -73,7 +74,7 @@ WSGI_APPLICATION = 'premierelevator.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'premier_test',                      # Or path to database file if using sqlite3.
+        'NAME': 'premier',                      # Or path to database file if using sqlite3.
         'USER': 'postgres',                      # Not used with sqlite3.
         'PASSWORD': 'qweqwe',                  # Not used with sqlite3.
         'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -96,6 +97,9 @@ USE_L10N = True
 USE_TZ = True
 
 
+MEDIA_ROOT = '/home/mamun/django/premierelevator/media'
+
+MEDIA_URL = ''
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
@@ -164,22 +168,41 @@ HAYSTACK_CONNECTIONS = {
         'ENGINE': 'premierelevator.search_backend.ConfigurableElasticSearchEngine',
         'URL': 'http://127.0.0.1:9200/',
         'INDEX_NAME': 'contact',
-        'EXCLUDED_INDEXES': ['inventory.search_indexes.ItemIndex',],
-    },
-    'auto': {
-        'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
-        # 'ENGINE': 'premierelevator.search_backend.ConfigurableElasticSearchEngine',
-        'URL': 'http://127.0.0.1:9200/',
-        'INDEX_NAME': 'contact_auto',
-        'EXCLUDED_INDEXES': ['inventory.search_indexes.ItemIndex',],
+        "INDEX": "not_analyzed",
+        'EXCLUDED_INDEXES': ['inventory.search_indexes.ItemIndex', 'schedule.search_indexes.JobIndex',
+                            'purchase.search_indexes.PurchaseOrderIndex', ],
     },
     'inventory': {
         # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
         'ENGINE': 'premierelevator.search_backend.ConfigurableElasticSearchEngine',
         'URL': 'http://127.0.0.1:9200/',
         'INDEX_NAME': 'inventory',
-        'EXCLUDED_INDEXES': ['contacts.search_indexes.ContactIndex',],
+        'EXCLUDED_INDEXES': ['contacts.search_indexes.ContactIndex', 'schedule.search_indexes.JobIndex',
+                            'purchase.search_indexes.PurchaseOrderIndex', ],
+    },
+    'job': {
+        # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+        'ENGINE': 'premierelevator.search_backend.ConfigurableElasticSearchEngine',
+        'URL': 'http://127.0.0.1:9200/',
+        'INDEX_NAME': 'job',
+        'EXCLUDED_INDEXES': ['contacts.search_indexes.ContactIndex', 'inventory.search_indexes.ItemIndex',
+                            'purchase.search_indexes.PurchaseOrderIndex', ],
+    },
+    'po': {
+        # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+        'ENGINE': 'premierelevator.search_backend.ConfigurableElasticSearchEngine',
+        'URL': 'http://127.0.0.1:9200/',
+        'INDEX_NAME': 'po',
+        'EXCLUDED_INDEXES': ['contacts.search_indexes.ContactIndex', 'inventory.search_indexes.ItemIndex',
+                            'schedule.search_indexes.JobIndex', ],
     },
 }
+# ELASTICSEARCH_INDEX_SETTINGS = {
+#     # index settings
+# }
 
-HAYSTACK_DEFAULT_OPERATOR = 'AND'
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+# HAYSTACK_SIGNAL_PROCESSOR = 'contacts.signals.RelatedRealtimeSignalProcessor'
+
+
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'

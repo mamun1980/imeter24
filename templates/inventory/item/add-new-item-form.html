@@ -7,15 +7,29 @@
 		<div style="position: relative;">
 			<input class="form-control" ng-model='search_item' maxlength="25" id="id_item_number_search"  type="search" name="item_number_search" ng-change="searchItem(search_item)" placeholder="search for item" autocomplete="off" ng-disabled="item_checked">
 			<input type="hidden" name="item_number" id="id_item_number" value="{[{search_item}]}">
-				<div id="item-list" ng-show="show_item_list"  >
-
-					<ul class="search">
-						<li ng-repeat="item in items | filter:search_item">
-							<a href="#" class="list-group-item bg-info" ng-click="selectItem(item)"> {[{item.item_number}]}: ({[{item.retail_price}]}) {[{item.description}]}</a>
-						</li>
-					</ul>
-				</div>
+			<div id="item-list" ng-show="items.length">
+				<table class="table">
+					<thead>
+						<th>Item Number</th>
+						<th>Description</th>
+						<th>Supplier</th>
+						<th>Terms</th>
+						<th>Cost</th>
+						<th><a href="#" class="close">X</a></th>
+					</thead>
+					<tbody>
+						<tr ng-repeat="item in items" ng-click="selectItem(item)">
+							<td>{[{item.item_number}]}</td>
+							<td colspan="2">{[{item.description}]}</td>
+							<td>{[{item.primary_supplier}]}</td>
+							<td>{[{item.terms}]}</td>
+							<td>{[{item.cost}]}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 		</div>
+		<div ng-show="!items.length && show_item_list" class="bg-info text-danger">No Items found!</div>
 	</td>
 </tr>
 <tr>
@@ -57,10 +71,66 @@
 		<label for="id_primary_supplier">Primary supplier:</label>
 	</th>
 	<td colspan="5">
+		<div id="supplier">
 		{{ item_form.primary_supplier.errors }}
-		<input type="text" name="primary_supplier_demo" placeholder="Start typing to search for supplier" id="id_primary_supplier_demo" class="form-control custom-form-control ng-pristine ng-valid" ng-model="search" autocomplete="off" ng-change="searchContact(search)">
+		<input type="text" name="primary_supplier_demo" placeholder="Start typing to search for supplier" id="id_primary_supplier_demo" class="form-control custom-form-control ng-pristine ng-valid" ng-model="search_supplier" autocomplete="off" ng-change="searchContact(search_supplier)">
 		<a href="/admin/contacts/contact/add/" class="add-another" id="add_id_primary_supplier" onclick="return showAddAnotherPopup(this);"> <img src="/statics/admin/img/icon_addlink.gif" width="10" height="10" alt="Add Another"></a>
-		<div id="contact_info"></div>
+		<div class="contact_info" ng-show="show_supplier">
+			<table class='table'>
+				<tr class="bg-success">
+					<th><b>CONTACT NAME</b> :</th>
+					<td>{[{supplier.contact_name}]}</td>
+				</tr>
+				<tr class="bg-info">
+					<th><b>ADDRESS</b> :</th>
+					<td>{[{supplier.address_1}]}</td>
+				</tr>
+				<tr class="bg-success">
+					<th><b>CITY</b> :</th>
+					<td>{[{supplier.city}]}</td>
+				</tr>
+
+				<tr class="bg-info">
+					<td><b>CONTACT NUMBER</b> :</td>
+					<td>
+						<li ng-repeat="ph in supplier.phones">
+							{[{ph.type}]} {[{ph.number}]} {[{ph.ext}]}
+						</li>
+					</td>
+				</tr>
+			</table>
+		</div>
+			
+		
+			<table class="table selectable" class="ui-autocomplete ui-widget-content-custom ui-corner-all">
+				<thead>
+					<tr>
+						<th>#</th><th>ID</th><th>Contact Name</th><th>Address 1</th><th> City </th>
+						<th><a href="" class="close">x</a></th>
+					</tr>
+				</thead>
+				<tbody>
+				<tr class="ui-menu-item" ng-repeat="contact in suppliers" ng-click="selectPriSupplier(contact)">
+					<td>
+						<input type="radio" name="contact" value="{[{contact.id}]}">
+						<div class='phone' ng-repeat="phon in contact.phones">
+						<input type="hidden" data-phone-number="{[{phon.number}]}" data-ext="{[{phon.phone_ext}]}" data-phone-type="{[{phon.type}]}">
+						</div>
+					</td>
+					<td class="sid">{[{contact.id}]}</td>
+					<td class="contact_name">{[{contact.contact_name}]}</td>
+					<td class="address_1">{[{contact.address_1}]}</td>
+					<td class="city">{[{contact.city}]}</td>
+					
+					<td>
+						
+					</td>
+					
+				</tr>
+				</tbody>
+			</table>
+		
+		</div>
 		<input type="hidden" name="primary_supplier" id="id_primary_supplier" value="">
 	</td>
 </tr>
@@ -203,7 +273,7 @@
 	<td colspan="5">
 		{{ item_form.customs_designation.errors }}
 		<select class="form-control" id="id_customs_designation" name="customs_designation">
-		{% for customdesignation in customdesignations %}
+		{% for customdesignation in designations %}
 			<option value="{{customdesignation.id}}">{{customdesignation.designation}}</option>
 		{% endfor %}
 		</select>
@@ -233,11 +303,67 @@
 		<label for="id_producer_of_item">Producer of item:</label>
 	</th>
 	<td colspan="5">
-		{{ item_form.producer_of_item_demo.errors }}
-		<input type="hidden" name="producer_of_item">
+		<div id="producer">
+			{{ item_form.producer_of_item_demo.errors }}
+			
+			<input type="hidden" name="producer_of_item">
 
-		<input type="text" name="producer_of_item_demo" placeholder="Start typing to search for supplier" id="id_producer_of_item_demo" class="form-control ng-pristine ng-valid" ng-model="search_producer" autocomplete="off" ng-change="searchContact(search_producer)">
-		<input type="hidden" name="producer_of_item" id="id_producer_of_item">
+			<input type="text" name="producer_of_item_demo" placeholder="Start typing to search for producer" id="id_producer_of_item_demo" class="form-control ng-pristine ng-valid" ng-model="search_producer" autocomplete="off" ng-change="searchProducer(search_producer)">
+			<div class="contact_info" ng-show="show_producer">
+				<table class='table'>
+					<tr class="bg-success">
+						<th><b>CONTACT NAME</b> :</th>
+						<td>{[{producer.contact_name}]}</td>
+					</tr>
+					<tr class="bg-info">
+						<th><b>ADDRESS</b> :</th>
+						<td>{[{producer.address_1}]}</td>
+					</tr>
+					<tr class="bg-success">
+						<th><b>CITY</b> :</th>
+						<td>{[{producer.city}]}</td>
+					</tr>
+
+					<tr class="bg-info">
+						<td><b>CONTACT NUMBER</b> :</td>
+						<td>
+							<li ng-repeat="ph in producer.phones">
+								{[{ph.type}]}: {[{ph.number}]} (ext-{[{ph.ext}]})
+							</li>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<table class="table selectable" class="ui-autocomplete ui-widget-content-custom ui-corner-all">
+				<thead>
+					<tr>
+						<th>#</th><th>ID</th><th>Contact Name</th><th>Address 1</th><th> City </th>
+						<th><a href="" class="close">x</a></th>
+					</tr>
+				</thead>
+				<tbody>
+				<tr class="ui-menu-item" ng-repeat="contact in producers" ng-click="selectProducer(contact)">
+					<td>
+						<input type="radio" name="contact" value="{[{contact.id}]}">
+						<div class='phone' ng-repeat="phon in contact.phones">
+						<input type="hidden" data-phone-number="{[{phon.number}]}" data-ext="{[{phon.phone_ext}]}" data-phone-type="{[{phon.type}]}">
+						</div>
+					</td>
+					<td class="sid">{[{contact.id}]}</td>
+					<td class="contact_name">{[{contact.contact_name}]}</td>
+					<td class="address_1">{[{contact.address_1}]}</td>
+					<td class="city">{[{contact.city}]}</td>
+					
+					<td>
+						
+					</td>
+					
+				</tr>
+				</tbody>
+			</table>
+			
+			<input type="hidden" name="producer_of_item" id="id_producer_of_item">
+		</div>
 	</td>
 </tr>
 <tr>
@@ -276,6 +402,7 @@
 	<td colspan="5">
 		{{ item_form.item_image.errors }}
 		<input id="id_item_image" name="item_image" type="file">
+		<img src="" id='item_image' class="image-rounded" width="100" height="100" style="margin-top: 10px;">
 	</td>
 </tr>
 </table>

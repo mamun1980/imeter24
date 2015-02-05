@@ -19,6 +19,12 @@
 
 
 <section class="row"  id="contact-list">
+<style type="text/css">
+.show_phone_numbers {
+	display: block;
+	width: 200px;
+}
+</style>
 	<div class="col-md-12">
 		<div class="panel panel-primary">
 			<div class="panel-heading">
@@ -48,7 +54,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr class="contact-list-item" ng-repeat="contact in contacts.results">
+						<tr class="contact-list-item" ng-repeat="contact in contacts">
 							<td>{[{ contact.id }]}</td>
 							<td>{[{ contact.contact_name }]}</td>
 							<td>{[{ contact.attention_to }]}</td>
@@ -56,25 +62,29 @@
 							<td>{[{ contact.city }]}</td>
 							<td>{[{ contact.province }]}</td>
 							<td>
-								<li ng-repeat="phone in contact.phones">
-								<a href="" class="call-contact" data-number="{[{phone.number}]}" data-ext="{[{phone.phone_ext}]}">
-									{[{phone.type}]}-{[{phone.number}]}({[{phone.phone_ext}]})
-								</a>
-								</li>
+								<ul>
+									<li ng-repeat="phone in contact.phones">
+									<a href="" class="call-contact" data-number="{[{phone.number}]}" data-ext="{[{phone.ext}]}">
+										{[{phone.type}]}-{[{phone.number}]}({[{phone.ext}]})
+									</a>
+									</li>
+								</ul>
+								<ul>
+									<li ng-repeat="email in contact.emails">
+										<a href="mailto:{[{email.email_address}]}">
+											<b>{[{ email.email_type }]}</b>: {[{ email.email_address }]}
+										</a>
+									</li>
+								</ul>
+								
 							</td>
 							
 							
 							<td>
 							
 								<a href="/contacts/{[{ contact.id }]}/"> view</a>
-							<span ng-show="{[{ contact.permission.can_change_contact }]}">
 							 / 
 								<a href="/contacts/edit/{[{ contact.id }]}/"> Edit</a>
-							</span>
-							<span ng-show="{[{ contact.permission.can_delete_contact }]}">
-							 / 
-								<a class="contact-delete" data-cid="{[{ contact.id }]}" href="">delete</a>
-							</span>
 							
 							</td>
 						</tr>
@@ -94,6 +104,21 @@
 </div>
 <script type="text/javascript">
 (function(){
+$.widget("ui.tooltip", $.ui.tooltip, {
+    options: {
+        content: function () {
+            return $(this).prop('title');
+        }
+    }
+});
+
+
+$('span.cnp').attr('title', function(){
+    return $(this).next('.show_phone_numbers').remove().html()
+})
+$(document).tooltip();
+
+
 	$(document).on("click", "a.call-contact", function(e){
 		e.preventDefault();
 		var number = $(this).data("number");
@@ -161,6 +186,7 @@ premierApp.controller('ContactController',['$scope', '$http', function ($scope, 
         })
     }
     $scope.init();
+
 
     $scope.searchContact = function(q) {
         if(q.length > 1) {

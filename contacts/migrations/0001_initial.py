@@ -35,7 +35,8 @@ class Migration(SchemaMigration):
         # Adding model 'Currency'
         db.create_table(u'contacts_currency', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('currency', self.gf('django.db.models.fields.CharField')(max_length=5, null=True, blank=True)),
+            ('currency', self.gf('django.db.models.fields.CharField')(max_length=10, null=True, blank=True)),
+            ('currency_icon', self.gf('django.db.models.fields.CharField')(max_length=2, null=True, blank=True)),
         ))
         db.send_create_signal(u'contacts', ['Currency'])
 
@@ -51,6 +52,7 @@ class Migration(SchemaMigration):
             ('country', self.gf('django.db.models.fields.CharField')(default='Canada', max_length=40, null=True)),
             ('postal_code', self.gf('django.db.models.fields.CharField')(max_length=15, null=True, blank=True)),
             ('webpage', self.gf('django.db.models.fields.URLField')(max_length=200, null=True, blank=True)),
+            ('search_string', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
         ))
         db.send_create_signal(u'contacts', ['Contact'])
 
@@ -89,7 +91,7 @@ class Migration(SchemaMigration):
         # Adding model 'ContactPhone'
         db.create_table(u'contacts_contactphone', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('contact', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['contacts.Contact'])),
+            ('contact', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='contact_phone', null=True, to=orm['contacts.Contact'])),
             ('phone_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['contacts.PhoneType'], null=True, blank=True)),
             ('phone', self.gf('django.db.models.fields.CharField')(max_length=15, null=True, blank=True)),
             ('phone_ext', self.gf('django.db.models.fields.CharField')(max_length=10, null=True, blank=True)),
@@ -124,7 +126,7 @@ class Migration(SchemaMigration):
         # Adding model 'ContactEmailAddress'
         db.create_table(u'contacts_contactemailaddress', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('contact', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['contacts.Contact'])),
+            ('contact', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='contact_emails', null=True, to=orm['contacts.Contact'])),
             ('email_address_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['contacts.EmailAddressType'])),
             ('email_address', self.gf('django.db.models.fields.EmailField')(max_length=100)),
         ))
@@ -243,6 +245,7 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'postal_code': ('django.db.models.fields.CharField', [], {'max_length': '15', 'null': 'True', 'blank': 'True'}),
             'province': ('django.db.models.fields.CharField', [], {'default': "'Ontario'", 'max_length': '64', 'blank': 'True'}),
+            'search_string': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'webpage': ('django.db.models.fields.URLField', [], {'max_length': '200', 'null': 'True', 'blank': 'True'})
         },
         u'contacts.contactcontacttype': {
@@ -261,14 +264,14 @@ class Migration(SchemaMigration):
         },
         u'contacts.contactemailaddress': {
             'Meta': {'object_name': 'ContactEmailAddress'},
-            'contact': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contacts.Contact']"}),
+            'contact': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'contact_emails'", 'null': 'True', 'to': u"orm['contacts.Contact']"}),
             'email_address': ('django.db.models.fields.EmailField', [], {'max_length': '100'}),
             'email_address_type': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contacts.EmailAddressType']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
         },
         u'contacts.contactphone': {
             'Meta': {'object_name': 'ContactPhone'},
-            'contact': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contacts.Contact']"}),
+            'contact': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'contact_phone'", 'null': 'True', 'to': u"orm['contacts.Contact']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'phone': ('django.db.models.fields.CharField', [], {'max_length': '15', 'null': 'True', 'blank': 'True'}),
             'phone_ext': ('django.db.models.fields.CharField', [], {'max_length': '10', 'null': 'True', 'blank': 'True'}),
@@ -305,7 +308,8 @@ class Migration(SchemaMigration):
         },
         u'contacts.currency': {
             'Meta': {'object_name': 'Currency'},
-            'currency': ('django.db.models.fields.CharField', [], {'max_length': '5', 'null': 'True', 'blank': 'True'}),
+            'currency': ('django.db.models.fields.CharField', [], {'max_length': '10', 'null': 'True', 'blank': 'True'}),
+            'currency_icon': ('django.db.models.fields.CharField', [], {'max_length': '2', 'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
         },
         u'contacts.deliverychoice': {

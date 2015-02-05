@@ -40,6 +40,7 @@
 		  				<th>Installed By</th>
 		  				<th>Job Name</th>
 		  				<th>estimated price for job</th>
+		  				<th>Action</th>
 		  			</tr>
 		  		</thead>
 		  		<tbody>
@@ -55,6 +56,9 @@
 		  				<td>{[{jc.installed_by}]}</td>
 		  				<td>{[{jc.job_name}]}</td>
 		  				<td>{[{jc.estimated_price_for_job}]}</td>
+		  				<td>
+		  					<a href="/schedule/job-control/edit/{[{jc.id}]}/">EDIT</a>
+		  				</td>
 		  			</tr>
 		  			<tr ng-show="!job_controls.length">
 						<td colspan="11">No Items</td>

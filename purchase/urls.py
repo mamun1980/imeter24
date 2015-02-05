@@ -19,6 +19,7 @@ urlpatterns = patterns('',
     url(r'^preview-generate-po/(?P<po_id>\d+)/$', 'purchase.views.preview_generete_po', name='preview-generate-po'),
 
     # url(r'^add-po/$', 'purchase.views.add_po', name='add-po'),
+    url(r'^po/search/$', 'purchase.views.search_po', name='search-po'),
     url(r'^add-po/$', 'purchase.views.add_new_po', name='add-new-po'),
     url(r'^save-po/$', 'purchase.views.save_po', name='save-po'),
     url(r'^show-draft-po/$', 'purchase.views.show_draft_po', name='draft-po'),

@@ -128,45 +128,7 @@ var slApp = angular.module("slApp", [], function ($interpolateProvider) {
         $interpolateProvider.startSymbol("{[{");
         $interpolateProvider.endSymbol("}]}");
 });
-slApp.filter('googleSearchFilter', function(){
-    return function(items, token) {
-        
-        if(token != undefined && token != "") {
-            var output=[];
-            var filter_output = [];
-            output = items;
-            // console.log(output);
-            
-            var searchArr = token.split(" ");
 
-            for(var j=0; j<searchArr.length; j++) {
-
-                for(var i=0; i<output.length; i++) {
-                    // console.log(output[i]);
-                    var search_str = output[i].search_string;
-                    // We can remove this if statement when all is updated.
-                    // console.log(search_str);
-                    if (search_str != null) {
-                        var n = search_str.search(new RegExp(searchArr[j], "i"));    
-                        // console.log('search_str is not null');
-                    }
-                    // console.log(n);
-                    if(n != -1) {
-                        filter_output.push(output[i]);
-                    }
-
-                }
-                output = filter_output;
-                filter_output = [];  
-            }
-            
-            return output;
-
-        } else {
-            return items;
-        }   
-    }
-});
 slApp.controller('AddSLController',['$scope', '$http','$compile', function ($scope, $http, $compile) {
 	
 	$scope.init = function() {
@@ -176,12 +138,6 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
             success(function(data, status, headers, config) {
                 // console.log(data);
                 $scope.items = data;
-            });
-
-        $http({method: 'GET', url: "/contacts/list/"}).
-            success(function(data, status, headers, config) {
-                // console.log(data);
-                $scope.contacts = data;
             });
 
         $http({method: 'GET', url: "/schedule/all-jobs/"}).
@@ -211,27 +167,21 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
 
 	$scope.init();
 
-	$scope.$watch('search_sold_to', function (newValue, oldValue) {
-        if(newValue != undefined) {
-        	if(newValue.length > 1) {
-        		$("#sold_to_contact_list").show();
-        		console.log(newValue);
-        	} else {
-        		$("#sold_to_contact_list").hide();
-        	}
+    $scope.searchShipTo  = function(q) {
+        if(q.length > 1) {
+            url = "/contacts/auto/?q=" + q
+            $http({method: 'GET', url: url}).
+                success(function(data, status, headers, config) {
+                    console.log(data.results);
+                    $scope.shipto = data.results;
+                });
+            $("#ship_to_contact_list").show();
+            
+            
+        } else {
+            $("#ship_to_contact_list").hide();
         }
-    });
-
-    $scope.$watch('search_ship_to', function (newValue, oldValue) {
-        if(newValue != undefined) {
-        	if(newValue.length > 1) {
-        		$("#ship_to_contact_list").show();
-        		console.log(newValue);
-        	} else {
-        		$("#ship_to_contact_list").hide();
-        	}
-        } 
-    });
+    }
 
 	$scope.selectShipTo = function(con) {
 		$("#ship_to_contact_list").hide();
@@ -242,9 +192,26 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
 
 
 	};
+
+    $scope.searchSoldTo  = function(q) {
+        if(q.length > 1) {
+            url = "/contacts/auto/?q=" + q
+            $http({method: 'GET', url: url}).
+                success(function(data, status, headers, config) {
+                    console.log(data.results);
+                    $scope.soldto = data.results;
+                });
+            $("#sold_to_contact_list").show();
+            
+            
+        } else {
+            $("#sold_to_contact_list").hide();
+        }
+    }
+
     $scope.selectSoldTo = function(con) {
 		$("#sold_to_contact_list").hide();
-		$scope.search_ship_to = ""
+		$scope.search_sold_to = '';
 		$scope.sold_to_contact = con;
 		$("#id_sold_to").val(con.id);
 		$("#sold_to_contact_details").show();

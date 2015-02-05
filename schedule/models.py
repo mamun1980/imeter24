@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 
 
 class Job(models.Model):
-	job_number = models.CharField(max_length=20, blank=True, null=True)
+	job_number = models.CharField(max_length=20, primary_key=True)
 	cab_designation = models.CharField(max_length=50, blank=True, null=True)
 	date_opened = models.DateField(null=True, blank=True)
 	date_required = models.DateField(null=True, blank=True)
@@ -174,7 +174,7 @@ class ElevetorType(models.Model):
 
 
 class JobControl(models.Model):
-	job_number = models.CharField(max_length=20, null=True, blank=True)
+	job_number = models.CharField(max_length=20, primary_key=True)
 	# next_job_number = models.CharField(max_length=20, null=True, blank=True)
 	sold_to = models.ForeignKey(Contact, null=True, blank=True, related_name='job-control-sold_to')
 	ship_to = models.ForeignKey(Contact, null=True, blank=True, related_name='job-control-ship_to')

@@ -9,24 +9,72 @@
 <style>
 #feedback { font-size: 1.4em; }
 /*#selectable .ui-selecting { background: #FECA40; }*/
-#selectable .ui-selected, #selectable-producer .ui-selected { background: #F39814; color: white; }
-#selectable,#selectable-producer { list-style-type: none; margin: 0; padding: 0px 2px 0px 0px; width: 100%; }
-#selectable thead tr, #selectable-producer thead tr { margin: 0px 3px; padding: 0.4em; font-size: 1.4em; height: 35px; background-color: #ed791a; }
-#selectable tbody tr, #selectable-producer tbody tr { margin: 0px 3px; padding: 0.4em; font-size: 1.4em; height: 35px; border-bottom: 1px solid #EEE; }
-#selectable tbody tr:hover, #selectable-producer tbody tr:hover { background-color: #FECA40; color: #000; }
-#selectable td, #selectable th, #selectable-producer td, #selectable-producer th {
+.selectable .ui-selected, #selectable-producer .ui-selected { background: #F39814; color: white; }
+.selectable,#selectable-producer { list-style-type: none; margin: 0; padding: 0px 2px 0px 0px; width: 100%; }
+.selectable thead tr, #selectable-producer thead tr { margin: 0px 3px; padding: 0.4em; font-size: 1.4em; height: 35px; background-color: #ed791a; }
+.selectable tbody tr, #selectable-producer tbody tr { margin: 0px 3px; padding: 0.4em; font-size: 1.4em; height: 35px; border-bottom: 1px solid #EEE; }
+.selectable tbody tr:hover, #selectable-producer tbody tr:hover { background-color: #FECA40; color: #000; }
+.selectable td, #selectable th, #selectable-producer td, #selectable-producer th {
 	padding: 3px 10px;
 }
-
+#supplier, #producer {
+	width: 550px;
+	position: relative;
+}
 #contact-list {
 	/*border: 2px solid #333;*/
 }
-#container,#container-producer {
+#container, #container-producer {
 	width: 520px;
+	position: absolute;
+}
+.selectable {
+	position: absolute;
+	top: 32px;
+	border: 1px solid #000;
+	background-color: #333 !important;
+	color: #FFF;
+	z-index: 1000;
 }
 #container .ui-widget-content-custom, #container-producer .ui-widget-content-custom {
 	background-color: #333 !important;
 	color: #FFF;
+}
+.contact_info {
+	margin-top: 10px;
+}
+.contact_info p.bg-info {
+	background-color: #d9edf7;
+	padding: 5px;
+	margin: 0 0 2px;
+}
+#item-list {
+	border: 1px solid #333;
+	z-index: 1001;
+}
+#item-list table {
+	margin-bottom: 0px !important;
+}
+#item-list thead {
+	background-color: #000;
+	color: #FFF;
+	z-index: 1000;
+}
+#item-list tbody tr {
+	background-color: #EEE;
+}
+#item-list tbody tr:hover {
+	background-color: #FFF;
+}
+#item-list {
+	width: 90% !important;
+}
+a.close {
+	color: red;
+}
+.bg-info {
+	padding: 5px 10px;
+	margin-top: 10px;
 }
 </style>
 
@@ -50,82 +98,15 @@
 		  	<form action="/inventory/item/add/" enctype="multipart/form-data" name="inventory-item-form" method="POST">{% csrf_token %}
 		  		
 		  		{% include "inventory/item/add-new-item-form.html" %}
-	    		  	<div class="btn btn-lg">
-						<button class="btn btn-primary btn-lg" ng-disabled="submit_add" type="submit">Add Inventory Item</button>
-						<button class="btn btn-primary btn-lg" ng-disabled="!submit_add" type="submit">Update Inventory Item</button>
-					</div>
+    		  	<div class="btn btn-lg">
+					<button class="btn btn-primary btn-lg" type="submit">Update Inventory Item</button>
+				</div>
 					
 		  	</form>
 			</div>
 		</div>
 	</div>
 
-	<div id="container">
-		<table id="selectable" class="ui-autocomplete ui-widget-content-custom ui-corner-all">
-			<thead>
-				<tr>
-					<th>#</th><th>ID</th><th>Contact Name</th><th>Address 1</th><th> City </th>
-					<th><span ng-show="{[{ contact.permission.can_change_contact }]}">Action</span> <a href="" class="close">x</a></th>
-				</tr>
-			</thead>
-			<tbody>
-			<tr class="ui-menu-item" ng-repeat="contact in contacts">
-				<td>
-					<input type="radio" name="contact" value="{[{contact.id}]}">
-					<div class='phone' ng-repeat="phon in contact.phones">
-					<input type="hidden" data-phone-number="{[{phon.number}]}" data-ext="{[{phon.phone_ext}]}" data-phone-type="{[{phon.type}]}">
-					</div>
-				</td>
-				<td class="sid">{[{contact.id}]}</td>
-				<td class="contact_name">{[{contact.contact_name}]}</td>
-				<td class="address_1">{[{contact.address_1}]}</td>
-				<td class="city">{[{contact.city}]}</td>
-				
-				<td>
-					<span ng-show="{[{ contact.permission.can_change_contact }]}">
-						<a class="edit-contact" data-id="{[{contact.id}]}" href="#">Edit</a>
-					</span>
-				</td>
-				
-			</tr>
-			</tbody>
-		</table>
-
-	</div>
-
-
-	<div id="container-producer">
-		<table id="selectable-producer" class="ui-autocomplete ui-widget-content-custom ui-corner-all">
-			<thead>
-				<tr>
-					<th>#</th><th>ID</th><th>Contact Name</th><th>Address 1</th><th> City </th>
-					<th><span ng-show="{[{ contact.permission.can_change_contact }]}">Action</span> <a href="" class="close">x</a></th>
-				</tr>
-			</thead>
-			<tbody>
-			<tr class="ui-menu-item" ng-repeat="contact in contacts">
-				<td>
-					<input type="radio" name="contact" value="{[{contact.id}]}">
-					<div class='phone' ng-repeat="phon in contact.phones">
-					<input type="hidden" data-phone-number="{[{phon.number}]}" data-ext="{[{phon.phone_ext}]}" data-phone-type="{[{phon.type}]}">
-					</div>
-				</td>
-				<td class="sid">{[{contact.id}]}</td>
-				<td class="contact_name">{[{contact.contact_name}]}</td>
-				<td class="address_1">{[{contact.address_1}]}</td>
-				<td class="city">{[{contact.city}]}</td>
-				
-				<td>
-					<span ng-show="{[{ contact.permission.can_change_contact }]}">
-						<a class="edit-contact" data-id="{[{contact.id}]}" href="#">Edit</a>
-					</span>
-				</td>
-				
-			</tr>
-			</tbody>
-		</table>
-
-	</div>
 
 </section>
 </div>
@@ -150,57 +131,8 @@
 		}).modal();
 		return false;
 	});
-	$("#selectable a.close").on("click", function(){
-		$("#selectable").hide();
-	});
-
-	$(document).on("click", "#selectable input[type='radio']", function(e){
-		// e.preventDefault();
-		var id = $(this).val();
-		// console.log(id);
-		// $("#selectable tr").removeClass("ui-selected");
-		var c_n = $(this).closest('tr').find("td.contact_name").text();
-		var a_1 = $(this).closest('tr').find("td.address_1").text();
-		var city = $(this).closest('tr').find("td.city").text();
-		
-		var phone_str = '<ul class="phone-list-ul">';
-
-		$(this).closest('tr').find("div.phone input").each(function( index ){
-			var phtype = $(this).data('phone-type');
-			var number = $(this).data('phone-number');
-			var ext = $(this).data('ext');
-			
-			phone_str += '<li>' + phtype + ' - ' + number + ' ( ext- ' + ext + ' ) ' + '</li>';
-
-		});
-		phone_str += "</ul></span>";
-		
-		var str = ''
-		if(c_n != '') {
-			str += c_n;
-		}
-
-		// console.log(str);
-
-		$("select#id_primary_supplier option[value='"+ id.trim()+"']").prop("selected", true);
-		$("#id_primary_supplier_demo").val(str);
-
-
-		var txt = '';
-		txt += "<p class='bg-info'><b class='left-info'>CONTACT NAME</b> : "+ c_n + "</p>";
-		txt += "<p class='bg-info'><b class='left-info'>ADDRESS</b> : "+ a_1 + "</p>";
-		txt += "<p class='bg-info'><b class='left-info'>CITY</b> : " + city + "</p>";
-		txt += "<p class='bg-info' id='aaaaa'><b class='left-info'>CONTACT NUMBER</b> :  </p>";
-		
-
-		$("#contact_info").html(txt);
-		$("#aaaaa").append(phone_str);
-
-
-		// console.log(id);
-		$("#selectable").hide();
-		$("#id_primary_supplier").val(id);
-
+	$("a.close").on("click", function(){
+		$(".selectable").hide();
 	});
 
 	$(document).on("click", "#selectable a.edit-contact", function(e){
@@ -227,23 +159,22 @@
 (function(){
 $("select#id_producer_of_item").hide();
 $("a.close").on("click", function(){
-	$(this).closest('table').hide();
+	$(this).closest('div').hide();
 });
-// var str1 = "<input type=text name='producer_of_item_demo' placeholder='Start typing to search for supplier' id='id_producer_of_item_demo' class='form-control' ng-model='search_producer' autocomplete='off' >";
-// $("select#id_producer_of_item").closest("div").append(str1);
-
-$(document).on("click", "#selectable-producer input[type='radio']", function(e){
+/*
+$(document).on("click", "#producer input[type='radio']", function(e){
 	var id = $(this).val();
 	var c_n = $(this).closest('tr').find("td.contact_name").text();
-	$("#id_producer_of_item_demo").val(c_n);
+	$("#id_producer_of_item_demo").val('');
 	$("select#id_producer_of_item option[value='"+ id.trim()+"']").prop("selected", true);
 	
 	$("#selectable-producer").hide();
 	$("#id_producer_of_item").val(id);
 });
+*/
 
-$("#selectable-producer a.close").on("click", function(){
-	$("#selectable-producer").hide();
+$("#producer > .selectable > a.close").on("click", function(){
+	$("#producer .selectable").hide();
 });
 
 })(jQuery)
@@ -258,81 +189,77 @@ var inventoryApp = angular.module("inventoryApp", [], function ($interpolateProv
 inventoryApp.controller('AddItemController',['$scope', '$http', function ($scope, $http) {
 	
 	$scope.init = function() {
-		// $http({method: 'GET', url: "/contacts/list/"}).
-  //           success(function(data, status, headers, config) {
-  //               // console.log(data);
-  //               $scope.contacts = data;
-  //           });
 
-        $("#selectable").hide();
-        $("#selectable-producer").hide();
+        $(".selectable").hide();
         $scope.submit_add = false;
         $scope.show_item_list = false;
         $scope.item_checked = false;
+        $scope.show_producer = false;
 
 	};
 
 	$scope.init();
 
-	$scope.showContacts = function(search) {
-		// console.log('hello');
-		console.log(search);
-	};
 	$scope.searchContact = function (q) {
+		// console.log(q);
+    	if(q.length > 1) {
+    		url = "/contacts/auto/?q=" + q
+    		$http({method: 'GET', url: url}).
+	            success(function(data, status, headers, config) {
+	                // console.log(data.results);
+	                $scope.suppliers = data.results;
+	            });
+	        $("#supplier .selectable").show();
+	        
+    		
+    	} else {
+    		$("#supplier .selectable").hide();
+    	}
+    };
+
+    $scope.selectPriSupplier = function(con){
+    	$("#supplier .selectable").hide();
+    	$("#id_primary_supplier").val(con.id);
+    	$scope.supplier = con;
+    	$scope.show_supplier = true;
+    	$scope.search_supplier = '';
+    	
+
+    }
+
+    $scope.searchProducer = function (q) {
 		console.log(q);
     	if(q.length > 1) {
     		url = "/contacts/auto/?q=" + q
     		$http({method: 'GET', url: url}).
 	            success(function(data, status, headers, config) {
 	                console.log(data.results);
-	                $scope.contacts = data.results;
+	                $scope.producers = data.results;
 	            });
-    		$( "#container" ).css('width', function(){
-    			var wid = $(this).innerWidth();
-    			console.log(wid);
-    			return wid;
-    		}).position({
-				my: "left-40 top-1",
-				at: "left bottom",
-				of: "#id_primary_supplier_demo",
-				collision: "fit"
-			});
-
-    		$("#selectable").show();
+	        $("#producer .selectable").show();
+	        
+    		
     	} else {
-    		$("#selectable").hide();
+    		$("#producer .selectable").hide();
     	}
     };
-
-    // $scope.$watch('search_producer', function (newValue, oldValue) {
-    //     if(newValue != undefined) {
-    //     	if(newValue.length > 1) {
-    //     		$( "#container-producer" ).css('width', function(){
-    //     			var wid = $(this).innerWidth();
-    //     			console.log(wid);
-    //     			return wid;
-    //     		}).position({
-				// 	my: "left-40 top-1",
-				// 	at: "left bottom",
-				// 	of: "#id_producer_of_item_demo",
-				// 	collision: "fit"
-				// });
-
-    //     		$("#selectable-producer").show();
-    //     	} else {
-    //     		$("#selectable-producer").hide();
-    //     	}
-    //     }
-    // });
-
-    
+    $scope.selectProducer = function(con) {
+    	console.log(con.id);
+    	$("#producer .selectable").hide();
+    	$("#id_producer_of_item").val(con.id);
+    	$scope.producer = con;
+    	$scope.show_producer = true;
+    	$scope.search_producer = '';
+    }
+ 
     $scope.searchItem = function(q) {
     	console.log(q);
 		if(q.length > 1) {
 			
-			$http({method: 'GET', url: "/inventory/items/"}).
-	        	success(function(data, status, headers, config){
-	        	$scope.items = data;
+			var url = "/inventory/search/?q=" + q;
+            $http({method: 'GET', url: url}).
+	            success(function(data, status, headers, config){
+	            $scope.items = data;
 	        });
 			// $("#items_list").show();
 			$scope.show_item_list = true;
@@ -349,6 +276,7 @@ inventoryApp.controller('AddItemController',['$scope', '$http', function ($scope
 	}
 
 	$scope.selectItem = function(item) {
+		$("#item-list").hide();
 		var item_number = item.item_number
 		var item_url = "/inventory/get-item/"+item_number+"/"
 		$scope.hello = false;
@@ -357,7 +285,7 @@ inventoryApp.controller('AddItemController',['$scope', '$http', function ($scope
         	
         	$scope.show_item_list = false;
         	$scope.item_checked = true;
-        	console.log(data);
+
         	// $("#items_list").hide();
         	$scope.submit_add = true;
         	$("#id_item_number").val(data.item_number);
@@ -368,44 +296,10 @@ inventoryApp.controller('AddItemController',['$scope', '$http', function ($scope
         	$("#id_max_single_order_qty").val(data.max_single_order_qty);
         	
         	if(data.primary_supplier){
-        		console.log("ID:"+data.primary_supplier.id);
+        		console.log(data.primary_supplier);
+        		$scope.supplier = data.primary_supplier;
+        		$scope.show_supplier = true;
         		$("#id_primary_supplier").val(data.primary_supplier.id);
-        		var id = data.primary_supplier.id;
-				var c_n = data.primary_supplier.contact_name;
-				var a_1 = data.primary_supplier.address_1;
-				var city = data.primary_supplier.city;
-				var phones = data.primary_supplier.phones
-				
-				var phone_str = '<ul class="phone-list-ul">';
-
-				for (var i = 0; i < phones.length; i++) {
-					phone_str += '<li>' + phones[i].phone_type + ' - ' + phones[i].phone + ' ( ext- ' + phones[i].phone_ext + ' ) ' + '</li>';
-				};
-					
-					
-
-				phone_str += "</ul></span>";
-				
-				var str = ''
-				if(c_n != '') {
-					str += c_n;
-				}
-
-				// console.log(str);
-
-				// $("select#id_primary_supplier option[value='"+ id.trim()+"']").prop("selected", true);
-				$("#id_primary_supplier_demo").val(str);
-
-
-				var txt = '';
-				txt += "<p class='bg-info'><b class='left-info'>CONTACT NAME</b> : "+ c_n + "</p>";
-				txt += "<p class='bg-info'><b class='left-info'>ADDRESS</b> : "+ a_1 + "</p>";
-				txt += "<p class='bg-info'><b class='left-info'>CITY</b> : " + city + "</p>";
-				txt += "<p class='bg-info' id='aaaaa'><b class='left-info'>CONTACT NUMBER</b> :  </p>";
-				
-				console.log(txt);
-				$("#contact_info").html(txt);
-				$("#aaaaa").append(phone_str);	
         	}
         	
 
@@ -424,43 +318,18 @@ inventoryApp.controller('AddItemController',['$scope', '$http', function ($scope
         	$("#id_customs_designation").val(data.customs_designation);
         	$("#id_customer_tariff_number").val(data.customer_tariff_number);
         	$("#id_preference_criteria").val(data.preference_criteria);
-        	$("#id_producer_of_item").val(data.producer_of_item_id);
-        	$("#id_producer_of_item_demo").val(data.producer_of_item);
+        	if(data.producer_of_item){
+        		$("#id_producer_of_item").val(data.producer_of_item.id);
+        		$("#id_producer_of_item_demo").val('');
+        		$scope.producer = data.producer_of_item;
+        		$scope.show_producer = true;
+        	}
+        	
         	$("#id_shipping_weight").val(data.shipping_weight);
 
         	$("#id_duty_percentage").val(data.duty_percentage);
         	$("#id_website").val(data.website);
-
-        	// $scope.item_number = data.item_number;
-        	// $scope.description = data.description;
-        	// $scope.qonh = parseFloat(data.quantity_on_hand);
-        	// $scope.qono = data.quantity_on_order;
-        	// $scope.qonr = data.qty_on_request;
-        	// $scope.mqbr = data.minimum_qty;
-        	// $scope.moq = data.max_order_qty;
-        	// $scope.msoq = data.max_single_order_qty;
-        	// $scope.primary_supplier = data.primary_supplier;
-        	// $scope.wc = data.wholesale_cost;
-        	// $scope.currency = data.currency_id;
-        	// $scope.term = data.term_id;
-        	// $scope.department = data.department_id;
-        	// $scope.item_unit_measure = data.item_unit_measure_id;
-        	// $scope.location = data.location_id;
-        	// $scope.ewc = data.estimated_wholesale_cost;
-        	// $scope.rp = data.retail_price;
-        	// $scope.production_type = data.production_type_id;
-        	// $scope.catalog_number = data.catalog_number;
-        	// $scope.coo = data.country_of_origin;
-        	// $scope.lead_time = data.lead_time;
-        	// $scope.customdesignation = datacustomdesignation_id;
-        	// $scope.ctn = data.customer_tariff_number;
-        	// $scope.pcriteria = data.preference_criteria;
-        	// $scope.producer_of_item = data.producer_of_item;
-        	// $scope.sw = data.shipping_weight;
-        	// $scope.minqonh = data.minimum_qty_on_hand;
-        	// $scope.dutyp = data.duty_percentage;
-        	// $scope.website = data.website;
-        	// $scope.ctn = data.customer_tariff_number;
+        	$("#item_image").attr("src", "/media/"+data.item_image);
         });
 		// $scope.$apply();
 		// alert(item.item_number);
@@ -470,20 +339,3 @@ inventoryApp.controller('AddItemController',['$scope', '$http', function ($scope
 }]);
 </script>
 {% endblock content %}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	

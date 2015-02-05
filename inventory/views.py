@@ -8,11 +8,39 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import permission_required
 import json
 
+from django.core.paginator import Paginator, EmptyPage, InvalidPage
+
 from contacts.models import *
 from haystack.forms import ModelSearchForm, SearchForm
 from haystack.query import SearchQuerySet, EmptySearchQuerySet
 from haystack.views import SearchView
 from haystack.inputs import Raw, Clean, AutoQuery
+
+
+def autocomplete(request):
+    query = request.GET.get('q', '')
+    suggestions = []
+    if len(query) > 1:
+        sqs = SearchQuerySet().using('default').filter(content=query)[:10]
+
+        items_list = []
+        for item in items:
+            item_dict = {}
+            item_dict['id'] = item.pk
+            item_dict['item_number'] = item.item_number
+            item_dict['description'] = item.description
+            item_dict['primary_supplier'] = item.primary_supplier
+            item_dict['last_PO'] = item.last_PO
+            item_dict['terms'] = item.terms
+            item_dict['cost'] = item.wholesale_cost
+            item_dict['quantity_on_hand'] = item.quantity_on_hand
+
+            items_list.append(item_dict)
+        the_data = json.dumps({
+            'results': items_list
+        })
+        return HttpResponse(the_data, content_type='application/json')
+
 
 @login_required
 @permission_required("inventory.add_item")
@@ -59,14 +87,16 @@ def add_new_item(request):
     locations = Location.objects.all()
     production_types = ProductionType.objects.all()
     terms = PaymentTerm.objects.all()
+    designations = CustomsDesignation.objects.all()
     if request.method == "POST":
+        
         item_number = request.POST.get("item_number","")
         if item_number:
             try:
                 item = Item.objects.get(item_number=item_number)
                 item_form = ItemForm(request.POST, request.FILES, instance=item, 
                     request=request, action='update')
-            except Exception, e:
+            except Item.DoesNotExist:
                 item_form = ItemForm(request.POST, request.FILES, request=request, action='new')
                 pass
         else:
@@ -85,7 +115,7 @@ def add_new_item(request):
     return render(request, "inventory/item/add-new-item.html", 
         {'item_form': item_form, 'page_title': 'Add Item', 'currencies': currencies, 
         'departments': departments, 'unit_measures': unit_measures, 'locations': locations,
-        'production_types': production_types, 'terms': terms})
+        'production_types': production_types, 'terms': terms, 'designations': designations})
 
 
 @login_required
@@ -110,25 +140,35 @@ def add_another_item(request):
 @permission_required("inventory.change_item")
 @csrf_exempt
 def edit_item(request, itemid):
-    # import pdb; pdb.set_trace()
     item = Item.objects.get(item_number=itemid)
     if item.primary_supplier:
         contact_id = item.primary_supplier.id
     else:
         contact_id = None
+    if item.producer_of_item:
+        producer_of_item_id = item.producer_of_item.id
+    else:
+        producer_of_item_id = None
     if request.method == 'POST':
-        # import pdb; pdb.set_trace();
         item_form = ItemForm(request.POST,request.FILES, instance=item)
         if item_form.is_valid():
             item_form.save()
-            return HttpResponseRedirect("/inventory/list/#/inventory/items")
+            return HttpResponseRedirect("/inventory/list/")
     else:
-        item_form = ItemForm(instance=item)
         item_comment_form = ItemCommentForm()
+        currencies = Currency.objects.all()
+        departments = Department.objects.all()
+        production_types = ProductionType.objects.all()
+        unit_measures = ItemUnitMeasure.objects.all()
+        locations = Location.objects.all()
+        myterms = PaymentTerm.objects.all()
+        designations = CustomsDesignation.objects.all()
         item_comments = ItemComment.objects.filter(item=item).order_by("-id")
         return render(request, "inventory/item/edit-item.html", 
-            {'item_form': item_form, 'itemid':itemid, 'contact_id': contact_id, 
-            'page_title': 'Update Item', 'item_comments': item_comments,
+            {'item': item, 'itemid':itemid, 'contact_id': contact_id, 'producer_of_item_id': producer_of_item_id,
+            'page_title': 'Update Item', 'item_comments': item_comments, 'currencies': currencies,
+            'departments': departments, 'production_types': production_types, 'terms': myterms,
+            'unit_measures': unit_measures, 'locations': locations, 'designations': designations,
             'item_comment_form': item_comment_form})
 
 @csrf_exempt
@@ -390,14 +430,14 @@ def get_item(request, itemnumber):
         item_dict['primary_supplier']['city'] = item.primary_supplier.city
         item_dict['primary_supplier']['address_1'] = item.primary_supplier.address_1
 
-        if item.primary_supplier.contactphone_set.all():
-            phones = item.primary_supplier.contactphone_set.all()
+        phones = ContactPhone.objects.filter(contact=item.primary_supplier)
+        if phones:
             phone_list = []
             for phone in phones:
                 phone_dict = {}
-                phone_dict['phone_type'] = phone.phone_type.phone_type
-                phone_dict['phone'] = phone.phone
-                phone_dict['phone_ext'] = phone.phone_ext
+                phone_dict['type'] = phone.phone_type.phone_type
+                phone_dict['number'] = phone.phone
+                phone_dict['ext'] = phone.phone_ext
                 phone_list.append(phone_dict)
             item_dict['primary_supplier']['phones'] = phone_list
 
@@ -477,9 +517,24 @@ def get_item(request, itemnumber):
         item_dict['duty_percentage'] = 0.0
     item_dict['website'] = item.website
 
-    if item.producer_of_item:
-        item_dict['producer_of_item'] = item.producer_of_item.contact_name
-        item_dict['producer_of_item_id'] = item.producer_of_item.id
+    if item.producer_of_item:        
+        item_dict['producer_of_item'] = {}
+        item_dict['producer_of_item']['contact_name'] = item.producer_of_item.contact_name
+        item_dict['producer_of_item']['id'] = item.producer_of_item.id
+        item_dict['producer_of_item']['city'] = item.producer_of_item.city
+        item_dict['producer_of_item']['address_1'] = item.producer_of_item.address_1
+
+        phones = ContactPhone.objects.filter(contact=item.producer_of_item)
+        if phones:
+            
+            phone_list = []
+            for phone in phones:
+                phone_dict = {}
+                phone_dict['phone_type'] = phone.phone_type.phone_type
+                phone_dict['phone'] = phone.phone
+                phone_dict['phone_ext'] = phone.phone_ext
+                phone_list.append(phone_dict)
+            item_dict['producer_of_item']['phones'] = phone_list
     else:
         item_dict['producer_of_item'] = None
 
@@ -495,6 +550,9 @@ def get_item(request, itemnumber):
         item_dict['country_of_origin'] = None
 
     item_dict['search_string'] = item.search_string
+
+    if item.item_image:
+        item_dict['item_image'] = item.item_image.url
 
 
     item_dict['permission'] = {}
@@ -514,26 +572,44 @@ def inventory_items(request):
 def search_item(request):
     query = request.GET.get('q','')
     if request.GET.get('q'):
-        items = SearchQuerySet().using('inventory').filter(text=AutoQuery(query)).load_all()[:20]
+        items = SearchQuerySet().using('inventory').filter(content=AutoQuery(query)).load_all()[:20]
     else:
         items = SearchQuerySet().using('inventory').all().load_all()[:20]
 
-    user = request.user
     item_list = []
     for item in items:
+
         item_dict = {}
-        item_dict['id'] = item.pk
+        item_dict['item_number'] = item.item_number
         item_dict['description'] = item.description
+        item_dict['primary_supplier'] = item.primary_supplier
+        item_dict['last_PO'] = item.last_PO
+        item_dict['terms'] = item.terms
+        item_dict['cost'] = item.wholesale_cost
         item_dict['quantity_on_hand'] = item.quantity_on_hand
+        item_dict['production_type'] = item.production_type
+        item_dict['currency'] = item.currency
         item_dict['department'] = item.department
         item_dict['item_unit_measure'] = item.item_unit_measure
-        item_dict['currency'] = item.currency
-        item_dict['search_string'] = item.search_string
+        item_dict['warehouse_location'] = item.warehouse_location
+
 
         item_list.append(item_dict)
-        
-    json_data = json.dumps(item_list)
-    return HttpResponse(json_data)
+    
+    try:
+        page = int(request.GET.get('page','1'))
+    except ValueError:
+        page = 1
+    paginator = Paginator(item_list, 20)
+    try:
+        pages = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        pages = paginator.page(paginator.num_pages)
+
+    results = pages.object_list
+
+    data = json.dumps(results)
+    return HttpResponse(data)
 
 
 @csrf_exempt
@@ -543,13 +619,13 @@ def delete_item(request):
     Delete job of id = jobid. jobid is recieved from ajax call through request object.
     '''
     if request.method == "POST":
-        itemid = request.POST.get("itemid")
-        item = Item.objects.get(item_number=itemid)
+        item_number = json.loads(request.body).get('item_number')
+        item = Item.objects.get(item_number=item_number)
         try:
             item.delete()
-            return HttpResponse(itemid)
+            return HttpResponse(item_number)
         except:
-            return HttpResponse(itemid)
+            return HttpResponse(item_number)
 
 
 @login_required
