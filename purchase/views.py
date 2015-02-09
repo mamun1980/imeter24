@@ -49,7 +49,7 @@ def html_to_pdf_response(html):
         return HttpResponse('We had some errors')
 def generate_po(request, po_id):
     resource_directory = os.path.dirname(os.path.dirname(__file__))
-    po = PurchaseOrder.objects.get(id=po_id)
+    po = PurchaseOrder.objects.get(po_number=po_id)
     purchase_items = PurchaseItem.objects.filter(po=po)
     rendered_html = render_to_string("purchase/po-report.html", locals())
     return html_to_pdf_response(rendered_html)
@@ -470,7 +470,6 @@ def add_new_po(request):
     #     return HttpResponseRedirect("/")
     #     pass
     if request.method == 'POST':
-        import pdb; pdb.set_trace();
         po_id = request.POST.get("po_id","")
         if po_id != "":
             po = PurchaseOrder.objects.get(id=po_id)
@@ -478,7 +477,6 @@ def add_new_po(request):
         else:
             po_form = POForm(request.POST, request=request, action='new')
 
-        return HttpResponse("hello world!")
         if po_form.is_valid():
             po = po_form.save()
             # po.po_created_by = request.user
@@ -958,8 +956,7 @@ def get_purchase_orders(request):
 
 
 def view_purchase_order(request, pk):
-    # import pdb; pdb.set_trace()
-    po = PurchaseOrder.objects.get(id=pk)
+    po = PurchaseOrder.objects.get(po_number=pk)
     pitems = PurchaseItem.objects.filter(po=po)
     status_comments = POStatus.objects.filter(po=po)
 
@@ -989,7 +986,7 @@ def cancel_po_status(request, pk):
         po.save()
         return HttpResponse(po_status.pk)
     else:
-        po = PurchaseOrder.objects.get(id=pk)
+        po = PurchaseOrder.objects.get(po_number=pk)
         po_status_form = POStatusForm()
         return render(request, "purchase/po-status-change.html", {'po_status_form': po_status_form, 'po_id': pk, 'po_number': po.po_number})
 
@@ -1157,7 +1154,7 @@ def get_po_items(request, po_id):
 def delete_purchase_order(request):
     if request.method == "POST":
         po_id = request.POST.get("po_id")
-        po = PurchaseOrder.objects.get(id=po_id)
+        po = PurchaseOrder.objects.get(po_number=po_id)
         po.delete();
         return HttpResponse(po_id)
 

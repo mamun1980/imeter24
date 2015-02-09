@@ -15,7 +15,7 @@ urlpatterns = patterns('',
 
     url(r'^add-po2/$', 'purchase.views.add_purchase_order', name='add-purchase-order'),
     
-    url(r'^generate-po/(?P<po_id>\d+)/$', 'purchase.views.generate_po', name='generate-po'),
+    url(r'^generate-po/(?P<po_id>\w+)/$', 'purchase.views.generate_po', name='generate-po'),
     url(r'^preview-generate-po/(?P<po_id>\d+)/$', 'purchase.views.preview_generete_po', name='preview-generate-po'),
 
     # url(r'^add-po/$', 'purchase.views.add_po', name='add-po'),
@@ -32,14 +32,14 @@ urlpatterns = patterns('',
     # url(r'^po-items/$', 'purchase.views.get_purchase_orders', name='get-purchase-orders'),
 
 
-    url(r'^view/(?P<pk>\d+)/$', 'purchase.views.view_purchase_order', name='view-purchase-order'),
-    url(r'^edit/(?P<pk>\d+)/$', 'purchase.views.edit_purchase_order', name='view-purchase-order'),
+    url(r'^view/(?P<pk>\w+)/$', 'purchase.views.view_purchase_order', name='view-purchase-order'),
+    url(r'^edit/(?P<pk>\w+)/$', 'purchase.views.edit_purchase_order', name='view-purchase-order'),
     url(r'^po-delete/$', 'purchase.views.delete_purchase_order', name='delete-purchase-order'),
 
-    url(r'^po-status-cancel/(?P<pk>\d+)/$', 'purchase.views.cancel_po_status', name='cancel-po-status'),
+    url(r'^po-status-cancel/(?P<pk>\w+)/$', 'purchase.views.cancel_po_status', name='cancel-po-status'),
     url(r'^po-change/$', 'purchase.views.change_po', name='cancel-po'),
 
-    url(r'^get-po-items/(?P<po_id>\d+)/$', 'purchase.views.get_po_items', name='get-purchase-order-items'),
+    url(r'^get-po-items/(?P<po_id>\w+)/$', 'purchase.views.get_po_items', name='get-purchase-order-items'),
 
     url(r'^add-po-contact/(?P<po_id>[\w ,\'-]+)/$', 'purchase.views.add_po_contact', name='add-purchase-order-contact'),
 

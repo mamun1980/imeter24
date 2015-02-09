@@ -587,10 +587,14 @@ def search_item(request):
         item_dict['terms'] = item.terms
         item_dict['cost'] = item.wholesale_cost
         item_dict['quantity_on_hand'] = item.quantity_on_hand
+        item_dict['max_single_order_qty'] = item.quantity_on_hand
+        item_dict['max_order_qty_remains'] = item.quantity_on_hand
+        item_dict['max_order_qty'] = item.max_order_qty
         item_dict['production_type'] = item.production_type
         item_dict['currency'] = item.currency
         item_dict['department'] = item.department
         item_dict['item_unit_measure'] = item.item_unit_measure
+        item_dict['item_unit_measure_id'] = item.item_unit_measure_id
         item_dict['warehouse_location'] = item.warehouse_location
 
 
