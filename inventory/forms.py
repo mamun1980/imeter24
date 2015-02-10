@@ -58,11 +58,11 @@ class ItemForm(forms.ModelForm):
         widget=forms.Textarea(attrs={"class": "form-control", 'rows':2, 'required': 'False', 'placeholder':"Item Description"}))
 	currency = forms.ModelChoiceField(required=False, queryset=Currency.objects.all(),
         widget=forms.Select(attrs={"class": "form-control"}))
-	wholesale_cost = forms.DecimalField(max_digits=10, decimal_places=2, required=False,
+	wholesale_cost = forms.DecimalField(max_digits=10, decimal_places=4, required=False,
         widget=forms.NumberInput(attrs={"class": "form-control decimal", 'placeholder':"Wholesale cost"}))
-	quantity_on_hand = forms.DecimalField(max_digits=10, decimal_places=2, required=False,
+	quantity_on_hand = forms.DecimalField(max_digits=10, decimal_places=4, required=False,
         widget=forms.NumberInput(attrs={"class": "form-control decimal", 'placeholder':"Quantity on hand", "step": 1}))
-	quantity_on_order = forms.DecimalField(max_digits=10, decimal_places=2, required=False,
+	quantity_on_order = forms.DecimalField(max_digits=10, decimal_places=4, required=False,
         widget=forms.NumberInput(attrs={"class": "form-control decimal", 'placeholder':"Quantity on order", "step": 1}))
 	
 	department = forms.ModelChoiceField(required=False, queryset=Department.objects.all(),
@@ -95,13 +95,13 @@ class ItemForm(forms.ModelForm):
 	# qty_on_request = forms.DecimalField(max_digits=10, decimal_places=2, required=False,
  #        widget=forms.NumberInput(attrs={"class": "form-control decimal", 'placeholder':"Quantity on request"}))
 	
-	max_order_qty = forms.DecimalField(max_digits=10, decimal_places=2, required=False,
+	max_order_qty = forms.DecimalField(max_digits=10, decimal_places=4, required=False,
         widget=forms.NumberInput(attrs={"class": "form-control decimal", 'placeholder':"Maximum Order Quenty"}))
-	max_single_order_qty = forms.DecimalField(max_digits=10, decimal_places=2, required=False,
+	max_single_order_qty = forms.DecimalField(max_digits=10, decimal_places=4, required=False,
         widget=forms.NumberInput(attrs={"class": "form-control decimal", 'placeholder':"Maximum Single Order Quenty"}))
-	retail_price = forms.DecimalField(max_digits=10, decimal_places=2, required=False,
+	retail_price = forms.DecimalField(max_digits=10, decimal_places=4, required=False,
         widget=forms.NumberInput(attrs={"class": "form-control decimal", 'placeholder':"Retail Price"}))
-	estimated_wholesale_cost = forms.DecimalField(max_digits=10, decimal_places=2, required=False,
+	estimated_wholesale_cost = forms.DecimalField(max_digits=10, decimal_places=4, required=False,
         widget=forms.NumberInput(attrs={"class": "form-control decimal", 'placeholder':"Estimated wholesale cost"}))
 	production_type = forms.ModelChoiceField(required=False, queryset=ProductionType.objects.all(),
         widget=forms.Select(attrs={"class": "form-control"}))
@@ -120,11 +120,11 @@ class ItemForm(forms.ModelForm):
         widget=forms.TextInput(attrs={"class": "form-control", 'placeholder':"Preference Criteria"}))
 	producer_of_item = forms.ModelChoiceField(required=False, queryset=Contact.objects.all(),
         widget=forms.Select(attrs={"class": "form-control"}))
-	shipping_weight = forms.DecimalField(max_digits=10, decimal_places=2, required=False,
+	shipping_weight = forms.DecimalField(max_digits=10, decimal_places=4, required=False,
         widget=forms.NumberInput(attrs={"class": "form-control", 'placeholder':"Shipping weight"}))
-	minimum_qty_on_hand = forms.DecimalField(max_digits=10, decimal_places=2, required=False,
+	minimum_qty_on_hand = forms.DecimalField(max_digits=10, decimal_places=4, required=False,
         widget=forms.NumberInput(attrs={"class": "form-control decimal", 'placeholder':"Minimum quantity on hand"}))
-	duty_percentage = forms.DecimalField(max_digits=10, decimal_places=2, required=False,
+	duty_percentage = forms.DecimalField(max_digits=10, decimal_places=4, required=False,
         widget=forms.NumberInput(attrs={"class": "form-control decimal", 'placeholder':"Duty percentage"}))
 	# site = forms.ModelChoiceField(required=False, queryset=Contact.objects.all(),
  #        widget=forms.Select(attrs={"class": "form-control"}))

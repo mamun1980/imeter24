@@ -99,11 +99,6 @@ class Contact(models.Model):
 	def __unicode__(self):
 		return self.contact_name
 
-def create_contact_profile(sender, instance, created, **kwargs):
-	if created:
-		ContactProfile.objects.create(contact=instance)
-
-post_save.connect(create_contact_profile, sender=Contact)
 
 class ContactProfile(models.Model):	
 	contact           = models.OneToOneField(Contact,  null=False, on_delete=models.CASCADE)

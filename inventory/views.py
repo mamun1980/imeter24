@@ -153,6 +153,7 @@ def edit_item(request, itemid):
         item_form = ItemForm(request.POST,request.FILES, instance=item)
         if item_form.is_valid():
             item_form.save()
+            item.save()
             return HttpResponseRedirect("/inventory/list/")
     else:
         item_comment_form = ItemCommentForm()

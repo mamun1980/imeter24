@@ -26,6 +26,9 @@ class FuzzyBackend(ElasticsearchSearchBackend):
 class ConfigurableElasticSearchEngine(ElasticsearchSearchEngine):
     backend = FuzzyBackend
 
+
+
+
 # DEFAULT_SETTINGS = {
 #     'settings': {
 #         "analysis": {

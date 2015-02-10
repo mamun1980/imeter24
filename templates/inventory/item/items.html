@@ -83,8 +83,10 @@ premierApp.controller('InventoryController',['$scope', '$http', function ($scope
     $scope.searchItem = function(q) {
         if(q.length > 1) {
             var url = "/inventory/search/?q=" + q;
+            console.log(url);
             $http({method: 'GET', url: url}).
 	            success(function(data, status, headers, config){
+	            	console.log(data);
 	            $scope.items = data;
 	        });
             

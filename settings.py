@@ -215,11 +215,12 @@ LOGGING = {
         },
     }
 }
-'http://10.221.0.42:9200/'
+
 HAYSTACK_CONNECTIONS = {
     'default': {
         # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
         'ENGINE': 'premierelevator.search_backend.ConfigurableElasticSearchEngine',
+        # 'ENGINE': 'elasticstack.backends.ConfigurableElasticSearchEngine',
         'URL': 'http://10.221.0.42:9200/',
         'INDEX_NAME': 'contact',
         "INDEX": "not_analyzed",
@@ -231,6 +232,7 @@ HAYSTACK_CONNECTIONS = {
         'ENGINE': 'premierelevator.search_backend.ConfigurableElasticSearchEngine',
         'URL': 'http://10.221.0.42:9200/',
         'INDEX_NAME': 'inventory',
+        "INDEX": "not_analyzed",
         'EXCLUDED_INDEXES': ['contacts.search_indexes.ContactIndex', 'schedule.search_indexes.JobIndex',
                             'purchase.search_indexes.PurchaseOrderIndex', ],
     },
@@ -251,9 +253,9 @@ HAYSTACK_CONNECTIONS = {
                             'schedule.search_indexes.JobIndex', ],
     },
 }
-# ELASTICSEARCH_INDEX_SETTINGS = {
-#     # index settings
-# }
+
+HAYSTACK_DEFAULT_OPERATOR = 'AND'
 ELASTICSEARCH_DEFAULT_ANALYZER = "whitespace"
 HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
-HAYSTACK_DEFAULT_OPERATOR = 'AND'
+
+HAYSTACK_ROUTERS = ['inventory.routers.MasterRouter', 'haystack.routers.DefaultRouter']

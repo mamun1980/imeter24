@@ -423,6 +423,7 @@ def contact_phone_add(request):
         profile = Contact.objects.get(id=cid)
         contact_phone = ContactPhone(contact=profile,phone_type=phone_type, phone=phone, phone_ext=phone_ext)
         contact_phone.save()
+        profile.save()
         
         return render_to_response("contacts/partials/contact-phone-item-partial.html",
             {"contact_phone": contact_phone},
@@ -440,6 +441,11 @@ def contact_phone_edit(request, pid):
         contact_phone_form = ContactPhoneForm(request.POST, instance=phone)
         if contact_phone_form.is_valid():
             contact_phone = contact_phone_form.save()
+            try:
+                contact = phone.contact
+                contact.save()
+            except Exception, e:
+                pass
             return render_to_response("contacts/partials/phone-item-tmpl.html",
             {'contact_phone': contact_phone},context_instance=RequestContext(request))
     elif request.method == "GET":
@@ -581,6 +587,7 @@ def contact_email_add(request):
 
         contact_email_address = ContactEmailAddress(contact=contact, email_address_type=email_type, email_address=email_add)
         contact_email_address.save()
+        contact.save()
         return render_to_response("contacts/partials/email-item-tmpl.html", {"contact_email": contact_email_address},
             context_instance=RequestContext(request))
 
@@ -592,9 +599,11 @@ def contact_email_edit(request, eid):
         
         eid = request.POST.get("eid")
         email = ContactEmailAddress.objects.get(id=eid)
+        contact = email.contact
         contact_email_form = ContactEmailAddressForm(request.POST, instance=email)
         if contact_email_form.is_valid():
             contact_email = contact_email_form.save()
+            contact.save()
             return render_to_response("contacts/partials/email-item-tmpl.html",
             {'contact_email': contact_email},context_instance=RequestContext(request))
     elif request.method == "GET":
@@ -617,8 +626,10 @@ def sc_email_delete(request):
     if request.method == 'POST':
         email_id = request.POST.get("email_id")
         email = ContactEmailAddress.objects.get(id=email_id)
+        contact = email.contact
         try:
             email.delete()
+            contact.save()
             return HttpResponse(email_id)
         except:
             messages.errors(request, "Email is not deleted.")
@@ -651,7 +662,10 @@ def sc_phone_delete(request):
         phone_id = request.POST.get("phone_id")
         phone = ContactPhone.objects.get(id=phone_id)
         try:
+            contact = phone.contact
             phone.delete()
+            contact.save()
+
             return HttpResponse(phone_id)
         except:
             messages.errors(request, "Phone is not deleted.")

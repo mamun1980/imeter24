@@ -80,7 +80,7 @@ class ContactTypeForm(forms.ModelForm):
         model = ContactType
         exclude = ['is_active',]
 
-class ContactForm(forms.ModelForm):
+class ContactForm(forms.ModelForm):    
     contact_name = forms.CharField( max_length=64, required=False,
         widget=forms.TextInput(attrs={"class": "form-control", 'placeholder':"Contact Name"}))
     attention_to = forms.CharField( max_length=64, required=False,
@@ -107,9 +107,13 @@ class ContactForm(forms.ModelForm):
 
     def save(self, commit=True):
         contact = super(ContactForm, self).save(commit=False)
-        contact.search_string = contact.contact_name + " " + contact.city + " " + contact.province + " " + contact.attention_to
-        contact.save()
-        return contact
+        try:
+            contact.save()    
+            return contact
+        except Exception, e:
+            raise e
+        
+        
 
 class ContactProfileForm(forms.ModelForm):
     gst_number = forms.CharField(max_length=17, required=False,

@@ -24,6 +24,10 @@ class ItemIndex(indexes.SearchIndex, indexes.Indexable):
     def get_model(self):
         return Item
 
+    def index_queryset(self, using=None):
+        """Used when the entire index for model is updated."""
+        return self.get_model().objects.all()
+
     # def prepare_department(self, obj):
     #     if obj.department:
     #         return obj.department.name
@@ -54,6 +58,4 @@ class ItemIndex(indexes.SearchIndex, indexes.Indexable):
     #     else:
     #         return 'None'
 
-    def index_queryset(self, using=None):
-        """Used when the entire index for model is updated."""
-        return self.get_model().objects.all()
+    

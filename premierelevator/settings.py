@@ -74,7 +74,7 @@ WSGI_APPLICATION = 'premierelevator.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'premier',                      # Or path to database file if using sqlite3.
+        'NAME': 'premier_test',                      # Or path to database file if using sqlite3.
         'USER': 'postgres',                      # Not used with sqlite3.
         'PASSWORD': 'qweqwe',                  # Not used with sqlite3.
         'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -165,8 +165,8 @@ LOGGING = {
 HAYSTACK_CONNECTIONS = {
     'default': {
         # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
-        # 'ENGINE': 'premierelevator.search_backend.ConfigurableElasticSearchEngine',
-        'ENGINE': 'elasticstack.backends.ConfigurableElasticSearchEngine',
+        'ENGINE': 'premierelevator.search_backend.ConfigurableElasticSearchEngine',
+        # 'ENGINE': 'elasticstack.backends.ConfigurableElasticSearchEngine',
         'URL': 'http://127.0.0.1:9200/',
         'INDEX_NAME': 'contact',
         "INDEX": "not_analyzed",
@@ -178,6 +178,7 @@ HAYSTACK_CONNECTIONS = {
         'ENGINE': 'premierelevator.search_backend.ConfigurableElasticSearchEngine',
         'URL': 'http://127.0.0.1:9200/',
         'INDEX_NAME': 'inventory',
+        "INDEX": "not_analyzed",
         'EXCLUDED_INDEXES': ['contacts.search_indexes.ContactIndex', 'schedule.search_indexes.JobIndex',
                             'purchase.search_indexes.PurchaseOrderIndex', ],
     },
@@ -198,12 +199,17 @@ HAYSTACK_CONNECTIONS = {
                             'schedule.search_indexes.JobIndex', ],
     },
 }
+
+HAYSTACK_DEFAULT_OPERATOR = 'AND'
 # ELASTICSEARCH_INDEX_SETTINGS = {
 #     # index settings
 # }
 
+# HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 # HAYSTACK_SIGNAL_PROCESSOR = 'contacts.signals.RelatedRealtimeSignalProcessor'
 
 
 # CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+
+HAYSTACK_ROUTERS = ['inventory.routers.MasterRouter', 'haystack.routers.DefaultRouter']
