@@ -87,10 +87,10 @@ class JobForm(forms.ModelForm):
         # import pdb; pdb.set_trace()
         job = super(JobForm, self).save(commit=False)
         job.job_number = "J"+str(re.sub(r"[A-Za-z]","",job.job_number))
-        sv = SystemVariable.objects.get(id=1)
+        # sv = SystemVariable.objects.get(id=1)
         # job.job_number = str(sv.next_job_number)
-        sv.next_job_number = int(job.job_number[1:]) + 1
-        sv.save()
+        # sv.next_job_number = int(job.job_number[1:]) + 1
+        # sv.save()
 
         job.search_string = job.job_number + " " + job.cab_designation + " " + job.job_name + " " + job.customer + " " + job.status + " " + job.description+ " " + job.address_1 + " " + job.customer_contact_name + " " + job.customer_contact_phone_number
         id = job.save()
@@ -317,7 +317,25 @@ class JobLookupForm(forms.Form):
 class JobControlForm(forms.ModelForm):
     class Meta:
         model = JobControl
-        exclude = ['job_number', ]
+        exclude = ['job_number',]
+
+    def __init__(self, *args, **kwargs):
+        # self.request = kwargs.pop('request', None)
+        self.action = kwargs.pop('action', None)
+        super(JobControlForm, self).__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        job_control = super(JobControlForm, self).save(commit=False)
+        if self.action == 'new':
+            sv = SystemVariable.objects.get(id=1)
+            job_control.job_number = 'JC'+str(sv.next_job_number)
+            job_control.save()
+
+            sv.next_job_number = int(sv.next_job_number) + 1
+            sv.save()
+        else:
+            job_control.save()
+        return job_control
 
 class ElevetorTypeForm(forms.ModelForm):
     elevetor_type = forms.CharField( max_length=50, required=False,

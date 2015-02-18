@@ -6,8 +6,8 @@ from django.contrib.auth.models import User
 # Create your models here.
 
 
-class Job(models.Model):
-	job_number = models.CharField(max_length=20)
+class Job_back(models.Model):
+	job_number = models.CharField(max_length=20, primary_key=True)
 	cab_designation = models.CharField(max_length=50, blank=True, null=True)
 	date_opened = models.DateField(null=True, blank=True)
 	date_required = models.DateField(null=True, blank=True)
@@ -29,7 +29,7 @@ class Job(models.Model):
 	search_string = models.TextField(max_length=1000, blank=True, null=True)
 
 	def __unicode__(self):
-		return str(self.id)
+		return unicode(self.job_number)
 
 	class Meta:
 		verbose_name = "Job"
@@ -40,8 +40,8 @@ class Job(models.Model):
     		('view_customer_job', 'Can View Customer Job'),
     	)
 
-class Comment(models.Model):
-	job_number = models.CharField(max_length=20, blank=True, null=True)
+class Comment_back(models.Model):
+	job = models.ForeignKey(Job_back)
 	job_comment = models.TextField(max_length=500, blank=True, null=True)
 	comment_by = models.CharField(max_length=100, blank=True, null=True)
 	datetime = models.DateTimeField(default=datetime.now, blank=True, null=True)
@@ -59,8 +59,8 @@ class Comment(models.Model):
 
 
 
-class JobStatus(models.Model):
-	job = models.OneToOneField(Job)
+class JobStatus_back(models.Model):
+	job = models.OneToOneField(Job_back)
 	fixtures_req_by = models.CharField(max_length=20, null=True, blank=True)
 	fixtures_is_done = models.CharField(max_length=20, choices=DONE_CHOICES, default='none', null=True, blank=True)
 	fixtures_comment = models.TextField(max_length=200, blank=True, null=True)
@@ -146,7 +146,7 @@ class JobStatus(models.Model):
 	
 
 	def __unicode__(self):
-		return str(self.id)
+		return unicode(self.job.id) + ' status'
 
 	class Meta:
 		verbose_name = "Job Status"
@@ -156,12 +156,12 @@ class JobStatus(models.Model):
     		('view_jobstatus', 'Can View Job Status'),
     	)
 
-class ElevetorType(models.Model):
+class ElevetorType_back(models.Model):
 	elevetor_type = models.CharField(max_length=50, null=True, blank=True)
 	description = models.TextField(max_length=200, blank=True, null=True)
 
 	def __unicode__(self):
-		return str(self.id)
+		return self.id
 
 	class Meta:
 		verbose_name = "Elevetor type"
@@ -173,14 +173,12 @@ class ElevetorType(models.Model):
 
 
 
-class JobControl(models.Model):
+class JobControl_back(models.Model):
 	job_number = models.CharField(max_length=20, primary_key=True)
 	# next_job_number = models.CharField(max_length=20, null=True, blank=True)
-	job_name = models.CharField(max_length=20, null=True, blank=True)
-	number_of_cabs = models.CharField(max_length=20, null=True, blank=True)
-	sold_to = models.ForeignKey(Contact, null=True, blank=True, related_name='job-control-sold_to')
-	ship_to = models.ForeignKey(Contact, null=True, blank=True, related_name='job-control-ship_to')
-	elevetor_type = models.ForeignKey(ElevetorType, null=True, blank=True, related_name='job-con-elevetor-type')
+	sold_to = models.ForeignKey(Contact, null=True, blank=True, related_name='job-control-back-sold_to')
+	ship_to = models.ForeignKey(Contact, null=True, blank=True, related_name='job-control-back-ship_to')
+	elevetor_type = models.ForeignKey(ElevetorType_back, null=True, blank=True, related_name='job-con-back-elevetor-type')
 	number_of_floors = models.IntegerField(null=True, blank=True)
 	front = models.CharField(max_length=20, null=True, blank=True)
 	rear = models.CharField(max_length=20, null=True, blank=True)
@@ -190,11 +188,12 @@ class JobControl(models.Model):
 	delivery_date = models.DateField(blank=True, null=True)
 	start_date = models.DateField(blank=True, null=True)
 	installed_by = models.ForeignKey(Contact, null=True, blank=True)
+	job_name = models.CharField(max_length=20, null=True, blank=True)
 	estimated_price_for_job = models.DecimalField(max_digits=10, decimal_places=4, null=True, blank=True)
 	search_string = models.TextField(max_length=1000, blank=True, null=True)
 
 	def __unicode__(self):
-		return str(self.job_number)
+		return self.id
 
 	class Meta:
 		verbose_name = "Job control"

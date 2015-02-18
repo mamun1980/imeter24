@@ -5,3 +5,4 @@ from schedule.models import *
 admin.site.register(Job)
 admin.site.register(Comment)
 admin.site.register(JobStatus)
+admin.site.register(JobControl)

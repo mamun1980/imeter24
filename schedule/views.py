@@ -6,7 +6,14 @@ from django.contrib.auth.decorators import permission_required
 from schedule.forms import *
 from schedule.models import *
 import json, datetime
-from premierelevator.models import SystemVariable
+
+from haystack.forms import ModelSearchForm, SearchForm
+from haystack.query import SearchQuerySet, EmptySearchQuerySet
+from haystack.views import SearchView
+from haystack.inputs import Raw, Clean, AutoQuery
+
+from django.core.paginator import Paginator, EmptyPage, InvalidPage
+# from premierelevator.models import SystemVariable
 # Create your views here.
 def home(request):
     '''
@@ -732,28 +739,72 @@ def job_reindex(request):
 
 def job_control_add(request):
     elevetor_types = ElevetorType.objects.all()
-    contacts = Contact.objects.all()
+    # contacts = Contact.objects.all()
     if request.method == 'POST':
-        jc_form = JobControlForm(request.POST)
+        job_number = request.POST.get("job_number", '')
+        if job_number:
+            job = JobControl.objects.get(job_number=job_number)
+            jc_form = JobControlForm(request.POST, instance=job, action='update')
+        else:
+            jc_form = JobControlForm(request.POST, action='new')
         if jc_form.is_valid():
             jc = jc_form.save()
-            try:
-                sv = SystemVariable.objects.get(id=1)
-                jc.job_number = str(sv.next_job_control_number)
-                jc.save()
-                sv.next_job_control_number = sv.next_job_control_number + 1
-                sv.save()
-            except Exception, e:
-                sv = None
-                pass
+            
             return HttpResponseRedirect("/schedule/job-control/list/")
         else:
             return render(request, "schedule/add-job-control.html", 
-                {'form': jc_form,'elevetor_types': elevetor_types, 'contacts': contacts})
+                {'form': jc_form,'elevetor_types': elevetor_types,})
     else:
         jc_form = JobControlForm()
         return render(request, "schedule/add-job-control.html", 
-            {'form': jc_form,'elevetor_types': elevetor_types, 'contacts': contacts})
+            {'form': jc_form,'elevetor_types': elevetor_types,})
+
+
+def job_control_search(request):
+    query = request.GET.get('q','')
+    if request.GET.get('q'):
+        jobs = SearchQuerySet().using('jobcontrol').filter(content=AutoQuery(query)).load_all()[:20]
+    else:
+        jobs = SearchQuerySet().using('jobcontrol').all().load_all()[:20]
+
+    job_list = []
+    if jobs:
+        for job in jobs:
+            if job != None:
+                job_dict = {}
+                job_dict['job_number'] = job.job_number
+                job_dict['job_name'] = job.job_name
+                job_dict['sold_to'] = job.sold_to
+                job_dict['ship_to'] = job.ship_to
+                job_dict['elevetor_type'] = job.elevetor_type
+                job_dict['number_of_cabs'] = job.number_of_cabs
+                job_dict['number_of_floors'] = job.number_of_floors
+                job_dict['front'] = job.front
+                job_dict['rear'] = job.rear
+                job_dict['rgw'] = job.rgw
+
+                job_dict['capacity'] = job.capacity
+                job_dict['customer_po_number'] = job.customer_po_number
+                job_dict['delivery_date'] = job.delivery_date
+                job_dict['start_date'] = job.start_date
+                job_dict['installed_by'] = job.installed_by
+                job_dict['estimated_price_for_job'] = job.estimated_price_for_job
+                job_list.append(job_dict)
+    try:
+        page = int(request.GET.get('page','1'))
+    except ValueError:
+        page = 1
+    paginator = Paginator(job_list, 20)
+    try:
+        pages = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        pages = paginator.page(paginator.num_pages)
+
+    results = pages.object_list
+
+    data = json.dumps(results)
+    return HttpResponse(data)
+
 
 def job_control_list(request):
     return render(request, "schedule/list-job-control.html", {})
@@ -764,7 +815,7 @@ def job_control_list_json(request):
     jc_list = []
     for jc in job_controls:
         jc_dict = {}
-        jc_dict['id'] = jc.id
+        # jc_dict['id'] = jc.id
         jc_dict['job_number'] = jc.job_number
         if jc.sold_to:
             jc_dict['sold_to'] = jc.sold_to.contact_name

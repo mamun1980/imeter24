@@ -2,13 +2,32 @@
 
 {% block content %}
 <style type="text/css">
+#job {
+	position: relative;
+}
+#show_job_list {
+	position: absolute;
+	width: 90%;
+	z-index: 1000;
+	
+}
+#show_job_list table {
+	border: 1px solid #000;
+}
+#show_job_list thead {
+	background-color: #555;
+	color: #FF0;
+}
+#show_job_list tbody tr:hover {
+	background-color: #DDD;
+}
 .supplier_contact thead{
 	background-color: #E0E0E0 !important;
 }
 .sold_to_contact tbody, .ship_to_contact tbody {
 	background-color: #FFF
 }
-.sold_to_contact tbody tr:hover, .ship_to_contact tbody tr:hover {
+.sold_to_contact tbody tr:hover, .ship_to_contact tbody tr:hover, .installed_by_contact tbody tr:hover{
 	background-color: #616183;
 }
 
@@ -18,13 +37,23 @@
 .input-group {
 	width: 90% !important;
 }
-table#sold_to_contact_details, table#ship_to_contact_details {
+table.contact {
 	margin-top: 10px;
 }
-table#sold_to_contact_details th, table#ship_to_contact_details th{
+table.contact th{
 	background-color: #83AD9E;
 }
-#ship_to_contact_list, #sold_to_contact_list, #items_list {
+.contact_box .sold_to_contact,.contact_box .ship_to_contact, .contact_box .installed_by_contact {
+	position: absolute;
+	width: 100%;
+	z-index: 1000;
+	border: 1px solid #000;
+}
+.sold_to_contact thead, .ship_to_contact thead, .installed_by_contact thead{
+	background-color: #555;
+	color: #FF0;
+}
+#ship_to_contact_list, #items_list {
 	position: absolute;
 	top: 42px;
 	left: 8px;
@@ -41,7 +70,7 @@ table#sold_to_contact_details th, table#ship_to_contact_details th{
 <section class="row" >
 	
 
-	<div class="col-md-8 col-md-offset-2" ng-controller="AddJobControlController">
+	<div class="col-md-10 col-md-offset-1" ng-controller="AddJobControlController">
 		<div class="panel panel-primary">
 			<div class="panel-heading">
 		    	<h4>Add Job Control</h4>
@@ -67,108 +96,156 @@ $(document).on("change", "input.decimal", function(e){
 });
 
 var scheduleApp = angular.module("scheduleApp", [], function ($interpolateProvider) {
-        $interpolateProvider.startSymbol("{[{");
-        $interpolateProvider.endSymbol("}]}");
+    $interpolateProvider.startSymbol("{[{");
+    $interpolateProvider.endSymbol("}]}");
 });
-scheduleApp.filter('googleSearchFilter', function(){
-    return function(items, token) {
+
+scheduleApp.controller('AddJobControlController', ['$scope', '$http', '$compile', function ($scope, $http, $compile) {
+	$scope.init = function (){
+		
+        // $("#show_job_list").hide()
+        $scope.show_job_list = false;
         
-        if(token != undefined && token != "") {
-            var output=[];
-            var filter_output = [];
-            output = items;
-            // console.log(output);
-            
-            var searchArr = token.split(" ");
+	};
 
-            for(var j=0; j<searchArr.length; j++) {
+	$scope.init();
 
-                for(var i=0; i<output.length; i++) {
-                    // console.log(output[i]);
-                    var search_str = output[i].search_string;
-                    // We can remove this if statement when all is updated.
-                    // console.log(search_str);
-                    if (search_str != null) {
-                        var n = search_str.search(new RegExp(searchArr[j], "i"));    
-                        // console.log('search_str is not null');
-                    }
-                    // console.log(n);
-                    if(n != -1) {
-                        filter_output.push(output[i]);
-                    }
-
+	$scope.searchJob = function(job_number) {
+		if (job_number.length > 1) {
+			var url = "/schedule/job-control/search/?q="+job_number+"/"
+			$http({method: 'GET', url: url}).
+            success(function(data, status, headers, config) {
+                $scope.jobs = data;
+                // Select deafult contacts
+                if(data.length > 0) {
+                	$scope.show_job_list = true;	
+                	$scope.add_new_job = false;
+                } else {
+                	$scope.show_job_list = false;
+                	$scope.add_new_job = true;
                 }
-                output = filter_output;
-                filter_output = [];  
-            }
+                
             
-            return output;
+        	});
+			
+		} else {
+			$scope.show_job_list = false;
+			$scope.add_new_job = false;
+		}
+		
+	}
 
-        } else {
-            return items;
-        }   
-    }
-});
+	$scope.selectJob = function (job) {
+		console.log(job);
+		$scope.show_job_list = false;
+		$scope.job_number = job.job_number;
+		$scope.job_name = job.job_name;
+		$scope.start_date = job.start_date;
+		$scope.number_of_cabs = job.number_of_cabs;
+		
+		$scope.sold_to = job.sold_to;
+		// $scope.sold_to_id = job.sold_to_id;
+		// $scope.sold_to_contacts = job.sold_to_contacts;
+		$scope.sold_to_contact_details = true;
+		
+		$scope.ship_to = job.ship_to;
+		// $scope.ship_to_id = job.ship_to_id;
+		$scope.ship_to_contact_details = true;
 
-	scheduleApp.controller('AddJobControlController', ['$scope', '$http', '$compile', function ($scope, $http, $compile) {
-		$scope.init = function (){
-			$http({method: 'GET', url: "/contacts/list/"}).
-	            success(function(data, status, headers, config) {
-	                // console.log(data);
-	                $scope.contacts = data;
-	                // Select deafult contacts
-	                $("#id_supplier").val($scope.contacts[0].id);
-	        });
-	        
-	        $("#ship_to_contact_list").hide();
-			$("#ship_to_contact_details").hide();
+		// $scope.installed_by_contact = job.installed_by_contact;
+		// $scope.installed_by_id = job.installed_by_id;
+		$scope.installed_by = job.installed_by;
+		$scope.installed_by_contact_details = true;
 
-			$("#sold_to_contact_list").hide();
-			$("#sold_to_contact_details").hide();
-		};
+		$scope.elevetor_type = job.elevetor_type;
+		$scope.number_of_floors = job.number_of_floors;
+		$scope.front = job.front;
+		$scope.rear = job.rear;
+		$scope.rgw = job.rgw;
+		$scope.capacity = job.capacity;
+		$scope.customer_po_number = job.customer_po_number;
+		$scope.delivery_date = job.delivery_date;
+		
+		$scope.estimated_price_for_job = job.estimated_price_for_job;
 
-		$scope.init();
+	}
 
-		// ship to google seach and select
-		$scope.$watch('search_ship_to', function (newValue, oldValue) {
-	        if(newValue != undefined) {
-	        	if(newValue.length > 1) {
-	        		$("#ship_to_contact_list").show();
-	        		console.log(newValue);
-	        	} else {
-	        		$("#ship_to_contact_list").hide();
-	        	}
-	        } 
-	    });
+	
+	// sold to google seach and select
+	$scope.searchSoldTo = function(con) {
 
-		$scope.selectShipTo = function(con) {
-			$("#ship_to_contact_list").hide();
-			$scope.search_ship_to = ""
-			$scope.ship_to_contact = con;
-			$("#id_ship_to").val(con.id);
-			$("#ship_to_contact_details").show();
-		};
-		// sold to google seach and select
-		$scope.$watch('search_sold_to', function (newValue, oldValue) {
-	        if(newValue != undefined) {
-	        	if(newValue.length > 1) {
-	        		$("#sold_to_contact_list").show();
-	        		console.log(newValue);
-	        	} else {
-	        		$("#sold_to_contact_list").hide();
-	        	}
-	        } 
-	    });
+		if (con.length > 1) {
+			var url = "/contacts/search/?q="+con+"/"
+			$http({method: 'GET', url: url}).
+            success(function(data, status, headers, config) {
+                console.log(data);
+                $scope.contacts = data;
+                // Select deafult contacts
+            
+        	});
+			$scope.show_sold_to_contact_list = true;
+		} else {
+			$scope.show_sold_to_contact_list = false;
+		}
 
-		$scope.selectSoldTo = function(con) {
-			$("#sold_to_contact_list").hide();
-			$scope.search_sold_to = ""
-			$scope.sold_to_contact = con;
-			$("#id_sold_to").val(con.id);
-			$("#sold_to_contact_details").show();
-		};
+	}
 
-	}])
+	$scope.selectSoldTo = function(con) {
+		$scope.show_sold_to_contact_list = false;
+		$scope.sold_to_contact_details = true;
+		$scope.search_sold_to = '';
+
+		$scope.sold_to = con;
+		console.log(con);
+	};
+
+	$scope.searchShipTo = function(con) {
+		if (con.length > 1) {
+			var url = "/contacts/search/?q="+con+"/"
+			$http({method: 'GET', url: url}).
+            success(function(data, status, headers, config) {
+                console.log(data);
+                $scope.contacts = data;
+                // Select deafult contacts
+            
+        	});
+			$scope.show_ship_to_contact_list = true;
+		} else {
+			$scope.show_ship_to_contact_list = false;
+		}
+	}
+
+	$scope.selectShipTo = function(con) {
+		$scope.show_ship_to_contact_list = false;
+		$scope.search_ship_to = ""
+		$scope.ship_to = con;
+		$scope.ship_to_contact_details = true;
+	};
+
+	$scope.searchInstalledBy = function(con) {
+		if (con.length > 1) {
+			var url = "/contacts/search/?q="+con+"/"
+			$http({method: 'GET', url: url}).
+            success(function(data, status, headers, config) {
+                console.log(data);
+                $scope.contacts = data;
+                // Select deafult contacts
+            
+        	});
+			$scope.show_installed_by_contact_list = true;
+		} else {
+			$scope.show_installed_by_contact_list = false;
+		}
+	}
+
+	$scope.selectInstalledBy = function(con) {
+		$scope.show_installed_by_contact_list = false;
+		$scope.search_installed_by = ""
+		$scope.installed_by = con;
+		$scope.installed_by_contact_details = true;
+	};
+
+}])
 })(jQuery)
 
 </script>

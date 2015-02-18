@@ -80,20 +80,21 @@ def search_contact(request):
     contact_list = []
     if contacts:
         for con in contacts:
-            contact_dict = {}
-            contact_dict['id'] = con.pk
-            contact_dict['contact_name'] = con.contact_name
-            contact_dict['address_1'] = con.address_1
-            contact_dict['attention_to'] = con.attention_to
-            contact_dict['city'] = con.city
-            contact_dict['province'] = con.province
-            contact_dict['country'] = con.country
-            contact_dict['postal_code'] = con.postal_code
-            # contact_dict['search_string'] = con.search_string
-            contact_dict['phones'] = con.phones
-            contact_dict['emails'] = con.emails
+            if con != None:
+                contact_dict = {}
+                contact_dict['id'] = con.pk
+                contact_dict['contact_name'] = con.contact_name
+                contact_dict['address_1'] = con.address_1
+                contact_dict['attention_to'] = con.attention_to
+                contact_dict['city'] = con.city
+                contact_dict['province'] = con.province
+                contact_dict['country'] = con.country
+                contact_dict['postal_code'] = con.postal_code
+                # contact_dict['search_string'] = con.search_string
+                contact_dict['phones'] = con.phones
+                contact_dict['emails'] = con.emails
 
-            contact_list.append(contact_dict)
+                contact_list.append(contact_dict)
     try:
         page = int(request.GET.get('page','1'))
     except ValueError:

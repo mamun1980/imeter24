@@ -215,7 +215,6 @@ LOGGING = {
         },
     }
 }
-
 HAYSTACK_CONNECTIONS = {
     'default': {
         # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
@@ -225,7 +224,7 @@ HAYSTACK_CONNECTIONS = {
         'INDEX_NAME': 'contact',
         "INDEX": "not_analyzed",
         'EXCLUDED_INDEXES': ['inventory.search_indexes.ItemIndex', 'schedule.search_indexes.JobIndex',
-                            'purchase.search_indexes.PurchaseOrderIndex', ],
+                            'purchase.search_indexes.PurchaseOrderIndex', 'schedule.search_indexes.JobControlIndex',],
     },
     'inventory': {
         # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
@@ -234,7 +233,7 @@ HAYSTACK_CONNECTIONS = {
         'INDEX_NAME': 'inventory',
         "INDEX": "not_analyzed",
         'EXCLUDED_INDEXES': ['contacts.search_indexes.ContactIndex', 'schedule.search_indexes.JobIndex',
-                            'purchase.search_indexes.PurchaseOrderIndex', ],
+                            'purchase.search_indexes.PurchaseOrderIndex', 'schedule.search_indexes.JobControlIndex',],
     },
     'job': {
         # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
@@ -242,7 +241,15 @@ HAYSTACK_CONNECTIONS = {
         'URL': 'http://10.221.0.42:9200/',
         'INDEX_NAME': 'job',
         'EXCLUDED_INDEXES': ['contacts.search_indexes.ContactIndex', 'inventory.search_indexes.ItemIndex',
-                            'purchase.search_indexes.PurchaseOrderIndex', ],
+                            'purchase.search_indexes.PurchaseOrderIndex','schedule.search_indexes.JobControlIndex', ],
+    },
+    'jobcontrol': {
+        # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+        'ENGINE': 'premierelevator.search_backend.ConfigurableElasticSearchEngine',
+        'URL': 'http://10.221.0.42:9200/',
+        'INDEX_NAME': 'jobcontrol',
+        'EXCLUDED_INDEXES': ['contacts.search_indexes.ContactIndex', 'inventory.search_indexes.ItemIndex',
+                            'purchase.search_indexes.PurchaseOrderIndex', 'schedule.search_indexes.JobIndex',],
     },
     'po': {
         # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
@@ -250,12 +257,13 @@ HAYSTACK_CONNECTIONS = {
         'URL': 'http://10.221.0.42:9200/',
         'INDEX_NAME': 'po',
         'EXCLUDED_INDEXES': ['contacts.search_indexes.ContactIndex', 'inventory.search_indexes.ItemIndex',
-                            'schedule.search_indexes.JobIndex', ],
+                            'schedule.search_indexes.JobIndex', 'schedule.search_indexes.JobControlIndex',],
     },
 }
+
 
 HAYSTACK_DEFAULT_OPERATOR = 'AND'
 ELASTICSEARCH_DEFAULT_ANALYZER = "whitespace"
 HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 
-HAYSTACK_ROUTERS = ['inventory.routers.MasterRouter', 'haystack.routers.DefaultRouter']
+HAYSTACK_ROUTERS = ['inventory.routers.MasterRouter', 'schedule.routers.MasterRouter', 'haystack.routers.DefaultRouter']

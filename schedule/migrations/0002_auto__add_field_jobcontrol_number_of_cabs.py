@@ -8,154 +8,15 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'Job'
-        db.create_table(u'schedule_job', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('job_number', self.gf('django.db.models.fields.CharField')(max_length=20)),
-            ('cab_designation', self.gf('django.db.models.fields.CharField')(max_length=50, null=True, blank=True)),
-            ('date_opened', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('date_required', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('status', self.gf('django.db.models.fields.CharField')(default=0, max_length=50)),
-            ('job_name', self.gf('django.db.models.fields.CharField')(max_length=150, null=True, blank=True)),
-            ('address_1', self.gf('django.db.models.fields.TextField')(max_length=500, null=True, blank=True)),
-            ('customer', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
-            ('customer_contact_name', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
-            ('customer_contact_phone_number', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
-            ('contact_email', self.gf('django.db.models.fields.CharField')(max_length=500, null=True, blank=True)),
-            ('number_of_cabs', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('description', self.gf('django.db.models.fields.TextField')(max_length=200, null=True, blank=True)),
-            ('po_number', self.gf('django.db.models.fields.CharField')(max_length=40, null=True, blank=True)),
-            ('status_notes', self.gf('django.db.models.fields.TextField')(max_length=500, null=True, blank=True)),
-            ('drawing_req_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('drawing_sent_to_customer_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('drawing_approved_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('eng_comment', self.gf('django.db.models.fields.TextField')(max_length=200, null=True, blank=True)),
-            ('search_string', self.gf('django.db.models.fields.TextField')(max_length=1000, null=True, blank=True)),
-        ))
-        db.send_create_signal(u'schedule', ['Job'])
-
-        # Adding model 'Comment'
-        db.create_table(u'schedule_comment', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('job_number', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('job_comment', self.gf('django.db.models.fields.TextField')(max_length=500, null=True, blank=True)),
-            ('comment_by', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
-            ('datetime', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, null=True, blank=True)),
-        ))
-        db.send_create_signal(u'schedule', ['Comment'])
-
-        # Adding model 'JobStatus'
-        db.create_table(u'schedule_jobstatus', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('job', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['schedule.Job'], unique=True)),
-            ('fixtures_req_by', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('fixtures_is_done', self.gf('django.db.models.fields.CharField')(default='none', max_length=20, null=True, blank=True)),
-            ('fixtures_comment', self.gf('django.db.models.fields.TextField')(max_length=200, null=True, blank=True)),
-            ('wood_shop_req_by', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('wood_shop_is_done', self.gf('django.db.models.fields.CharField')(default='none', max_length=20, null=True, blank=True)),
-            ('wood_shop_req_by_comment', self.gf('django.db.models.fields.TextField')(max_length=200, null=True, blank=True)),
-            ('machine_shop_req_by', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('machine_shop_is_done', self.gf('django.db.models.fields.CharField')(default='none', max_length=20, null=True, blank=True)),
-            ('machine_shop_req_by_comment', self.gf('django.db.models.fields.TextField')(max_length=200, null=True, blank=True)),
-            ('welding', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('welding_is_done', self.gf('django.db.models.fields.CharField')(default='none', max_length=20, null=True, blank=True)),
-            ('welding_comment', self.gf('django.db.models.fields.TextField')(max_length=200, null=True, blank=True)),
-            ('lacquer', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('lacquer_is_done', self.gf('django.db.models.fields.CharField')(default='none', max_length=20, null=True, blank=True)),
-            ('lacquer_comment', self.gf('django.db.models.fields.TextField')(max_length=200, null=True, blank=True)),
-            ('trim_shop_req_by', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('trim_shop_is_done', self.gf('django.db.models.fields.CharField')(default='none', max_length=20, null=True, blank=True)),
-            ('trim_shop_req_by_comment', self.gf('django.db.models.fields.TextField')(max_length=200, null=True, blank=True)),
-            ('cab_assemply_req_by', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('cab_assemply_is_done', self.gf('django.db.models.fields.CharField')(default='none', max_length=20, null=True, blank=True)),
-            ('cab_assemply_req_by_comment', self.gf('django.db.models.fields.TextField')(max_length=200, null=True, blank=True)),
-            ('install_date', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('install_is_done', self.gf('django.db.models.fields.CharField')(default='none', max_length=20, null=True, blank=True)),
-            ('install_date_comment', self.gf('django.db.models.fields.TextField')(max_length=200, null=True, blank=True)),
-            ('premier_glass', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('premier_glass_is_done', self.gf('django.db.models.fields.CharField')(default='none', max_length=20, null=True, blank=True)),
-            ('premier_glass_comment', self.gf('django.db.models.fields.TextField')(max_length=200, null=True, blank=True)),
-            ('tile_installer', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('tile_installer_is_done', self.gf('django.db.models.fields.CharField')(default='none', max_length=20, null=True, blank=True)),
-            ('tile_installer_comment', self.gf('django.db.models.fields.TextField')(max_length=200, null=True, blank=True)),
-            ('misc_del', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('misc_del_is_done', self.gf('django.db.models.fields.CharField')(default='none', max_length=20, null=True, blank=True)),
-            ('misc_del_comment', self.gf('django.db.models.fields.TextField')(max_length=200, null=True, blank=True)),
-            ('bill', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('bill_is_done', self.gf('django.db.models.fields.CharField')(default='none', max_length=20, null=True, blank=True)),
-            ('bill_comment', self.gf('django.db.models.fields.TextField')(max_length=200, null=True, blank=True)),
-            ('hayward', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('hayward_is_done', self.gf('django.db.models.fields.CharField')(default='none', max_length=20, null=True, blank=True)),
-            ('hayward_comment', self.gf('django.db.models.fields.TextField')(max_length=200, null=True, blank=True)),
-            ('glenn', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('glenn_is_done', self.gf('django.db.models.fields.CharField')(default='none', max_length=20, null=True, blank=True)),
-            ('glenn_comment', self.gf('django.db.models.fields.TextField')(max_length=200, null=True, blank=True)),
-            ('suren', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('suren_is_done', self.gf('django.db.models.fields.CharField')(default='none', max_length=20, null=True, blank=True)),
-            ('suren_comment', self.gf('django.db.models.fields.TextField')(max_length=200, null=True, blank=True)),
-            ('roger', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('roger_is_done', self.gf('django.db.models.fields.CharField')(default='none', max_length=20, null=True, blank=True)),
-            ('roger_comment', self.gf('django.db.models.fields.TextField')(max_length=200, null=True, blank=True)),
-            ('matt', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('matt_is_done', self.gf('django.db.models.fields.CharField')(default='none', max_length=20, null=True, blank=True)),
-            ('matt_comment', self.gf('django.db.models.fields.TextField')(max_length=200, null=True, blank=True)),
-            ('third_party_install', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('third_party_install_is_done', self.gf('django.db.models.fields.CharField')(default='none', max_length=20, null=True, blank=True)),
-            ('third_party_install_comment', self.gf('django.db.models.fields.TextField')(max_length=200, null=True, blank=True)),
-            ('tssa_submitted_date', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('tssa_submitted_date_is_done', self.gf('django.db.models.fields.CharField')(default='none', max_length=20, null=True, blank=True)),
-            ('tssa_submitted_date_comment', self.gf('django.db.models.fields.TextField')(max_length=200, null=True, blank=True)),
-            ('safety_test_schedule_date', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('who_will_test', self.gf('django.db.models.fields.CharField')(max_length=200, null=True, blank=True)),
-            ('test_comment', self.gf('django.db.models.fields.TextField')(max_length=200, null=True, blank=True)),
-        ))
-        db.send_create_signal(u'schedule', ['JobStatus'])
-
-        # Adding model 'ElevetorType'
-        db.create_table(u'schedule_elevetortype', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('elevetor_type', self.gf('django.db.models.fields.CharField')(max_length=50, null=True, blank=True)),
-            ('description', self.gf('django.db.models.fields.TextField')(max_length=200, null=True, blank=True)),
-        ))
-        db.send_create_signal(u'schedule', ['ElevetorType'])
-
-        # Adding model 'JobControl'
-        db.create_table(u'schedule_jobcontrol', (
-            ('job_number', self.gf('django.db.models.fields.CharField')(max_length=20, primary_key=True)),
-            ('sold_to', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='job-control-sold_to', null=True, to=orm['contacts.Contact'])),
-            ('ship_to', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='job-control-ship_to', null=True, to=orm['contacts.Contact'])),
-            ('elevetor_type', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='job-con-elevetor-type', null=True, to=orm['schedule.ElevetorType'])),
-            ('number_of_floors', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('front', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('rear', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('rgw', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('capacity', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('customer_po_number', self.gf('django.db.models.fields.CharField')(max_length=30, null=True, blank=True)),
-            ('delivery_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('start_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('installed_by', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['contacts.Contact'], null=True, blank=True)),
-            ('job_name', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('estimated_price_for_job', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=10, decimal_places=4, blank=True)),
-            ('search_string', self.gf('django.db.models.fields.TextField')(max_length=1000, null=True, blank=True)),
-        ))
-        db.send_create_signal(u'schedule', ['JobControl'])
+        # Adding field 'JobControl.number_of_cabs'
+        db.add_column(u'schedule_jobcontrol', 'number_of_cabs',
+                      self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True),
+                      keep_default=False)
 
 
     def backwards(self, orm):
-        # Deleting model 'Job'
-        db.delete_table(u'schedule_job')
-
-        # Deleting model 'Comment'
-        db.delete_table(u'schedule_comment')
-
-        # Deleting model 'JobStatus'
-        db.delete_table(u'schedule_jobstatus')
-
-        # Deleting model 'ElevetorType'
-        db.delete_table(u'schedule_elevetortype')
-
-        # Deleting model 'JobControl'
-        db.delete_table(u'schedule_jobcontrol')
+        # Deleting field 'JobControl.number_of_cabs'
+        db.delete_column(u'schedule_jobcontrol', 'number_of_cabs')
 
 
     models = {
@@ -222,6 +83,7 @@ class Migration(SchemaMigration):
             'installed_by': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contacts.Contact']", 'null': 'True', 'blank': 'True'}),
             'job_name': ('django.db.models.fields.CharField', [], {'max_length': '20', 'null': 'True', 'blank': 'True'}),
             'job_number': ('django.db.models.fields.CharField', [], {'max_length': '20', 'primary_key': 'True'}),
+            'number_of_cabs': ('django.db.models.fields.CharField', [], {'max_length': '20', 'null': 'True', 'blank': 'True'}),
             'number_of_floors': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'rear': ('django.db.models.fields.CharField', [], {'max_length': '20', 'null': 'True', 'blank': 'True'}),
             'rgw': ('django.db.models.fields.CharField', [], {'max_length': '20', 'null': 'True', 'blank': 'True'}),
