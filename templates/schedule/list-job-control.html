@@ -29,7 +29,6 @@
 		  		<table class="table table-bordered">
 		  		<thead>
 		  			<tr class="bg-info">
-		  				<th>ID</th>
 		  				<th>Job number</th>
 		  				<th width="200">Sold to</th>
 		  				<th width="200">Ship to</th>
@@ -45,7 +44,6 @@
 		  		</thead>
 		  		<tbody>
 		  			<tr ng-repeat="jc in job_controls | googleSearchFilter:search | filter:status">
-		  				<td>{[{jc.id}]}</td>
 		  				<td>{[{jc.job_number}]}</td>
 		  				<td>{[{jc.sold_to}]}</td>
 		  				<td>{[{jc.ship_to}]}</td>
@@ -57,7 +55,7 @@
 		  				<td>{[{jc.job_name}]}</td>
 		  				<td>{[{jc.estimated_price_for_job}]}</td>
 		  				<td>
-		  					<a href="/schedule/job-control/edit/{[{jc.id}]}/">EDIT</a>
+		  					<a href="/schedule/job-control/edit/{[{jc.job_number}]}/">EDIT</a>
 		  				</td>
 		  			</tr>
 		  			<tr ng-show="!job_controls.length">

@@ -887,4 +887,4 @@ def elevetor_type_delete(request):
     return HttpResponse(et_id)
 
 def job_control_edit(request, jobid):
-    pass
+    return HttpResponse("Hello world!")
