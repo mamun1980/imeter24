@@ -760,6 +760,42 @@ def job_control_add(request):
             {'form': jc_form,'elevetor_types': elevetor_types,})
 
 
+def search_job(request):
+    query = request.GET.get('q','')
+    if request.GET.get('q'):
+        jobs = SearchQuerySet().using('job').filter(content=AutoQuery(query)).load_all()[:10]
+    else:
+        jobs = SearchQuerySet().using('job').all().load_all()[:10]
+
+    job_list = []
+    if jobs:
+        for job in jobs:
+            if job != None:
+                job_dict = {}
+                job_dict['job_id'] = job.job_id
+                job_dict['job_number'] = job.job_number
+                job_dict['job_name'] = job.job_name
+                job_dict['cab_designation'] = job.cab_designation
+                job_dict['address_1'] = job.address_1
+                job_dict['customer_contact_name'] = job.customer_contact_name
+                job_dict['customer_contact_phone_number'] = job.customer_contact_phone_number
+                job_dict['po_number'] = job.po_number
+                job_list.append(job_dict)
+    try:
+        page = int(request.GET.get('page','1'))
+    except ValueError:
+        page = 1
+    paginator = Paginator(job_list, 10)
+    try:
+        pages = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        pages = paginator.page(paginator.num_pages)
+
+    results = pages.object_list
+
+    data = json.dumps(results)
+    return HttpResponse(data)
+
 def job_control_search(request):
     query = request.GET.get('q','')
     if request.GET.get('q'):

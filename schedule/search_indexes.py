@@ -6,6 +6,7 @@ from contacts.models import ContactPhone, ContactEmailAddress
 
 class JobIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.CharField(document=True, use_template=True)
+    job_id = indexes.CharField(model_attr='id')
     job_number = indexes.CharField(model_attr='job_number', boost=2)
     cab_designation = indexes.CharField(model_attr='cab_designation', indexed=False, null=True)
     job_name = indexes.CharField(model_attr='job_name', indexed=False, null=True)

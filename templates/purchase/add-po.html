@@ -42,8 +42,8 @@ table#supplier_contact_details th, table#ship_to_contact_details th{
 }
 #ship_to_contact_list, #supplier_contact_list, #items_list {
 	position: absolute;
-	top: 34px;
-	left: 0px;
+	top: 45px;
+	left: 5px;
 	background-color: #DDD;
 	z-index: 1000;
 	/*border: 1px solid #000;*/
@@ -324,7 +324,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 		$scope.total_amount = 0.0;
 		$scope.hst_tax_amount = 0.0;
 		$scope.pst_tax_amount = 0.0;
-		$scope.show_add_button = false;
+		$scope.show_add_button = true;
 		$scope.show_update_button = false;
 		
 		// intialize dateIssued value to current date

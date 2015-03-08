@@ -53,6 +53,9 @@ urlpatterns = patterns('',
 
 
     url(r'^add-pl/$', 'purchase.views.add_packing_list', name='add-packing-list'),
+    url(r'^pl/search/$', 'purchase.views.search_packing_list', name='search-packing-list'),
+    url(r'^get-pl/(?P<pl_number>\w+)/$', 'purchase.views.get_packing_list', name='get-packing-list'),
+    
     url(r'^view-pl/(?P<id>\d+)/$', 'purchase.views.view_packing_list', name=''),
     url(r'^edit-pl/(?P<id>\d+)/$', 'purchase.views.edit_packing_list', name='edit-packing-list'),
     url(r'^pl-delete/$', 'purchase.views.delete_packing_list', name='delete-packing-list'),
@@ -69,16 +72,18 @@ urlpatterns = patterns('',
     url(r'^delete-invoice/$', 'purchase.views.delete_invoice', name='delete-invoice'),
 
     url(r'^add-sl/$', 'purchase.views.add_shipping_list', name='add-shipping-list'),
-    url(r'^generate-sl/(?P<sl_id>\d+)/$', 'purchase.views.generate_sl', name='generate-sl'),
-    url(r'^preview-generate-sl/(?P<sl_id>\d+)/$', 'purchase.views.preview_generete_sl', name='preview-generate-sl'),
+
+    url(r'^sl/search/$', 'purchase.views.search_shiping_list', name='search-shiping-list'),
+    url(r'^generate-sl/(?P<sl_number>\w+)/$', 'purchase.views.generate_sl', name='generate-sl'),
+    url(r'^preview-generate-sl/(?P<sl_number>\w+)/$', 'purchase.views.preview_generete_sl', name='preview-generate-sl'),
     url(r'^generate-pl/(?P<pl_id>\d+)/$', 'purchase.views.generate_pl', name='generate-pl'),
     url(r'^preview-generate-pl/(?P<pl_id>\d+)/$', 'purchase.views.preview_generete_pl', name='preview-generate-pl'),
     url(r'^view-sl/(?P<sl_id>\d+)/$', 'purchase.views.view_shipping_list', name='view-shipping-list'),
     url(r'^edit-sl/(?P<sl_id>\d+)/$', 'purchase.views.edit_shipping_list', name='edit-shipping-list'),
     url(r'^shipping-list/$', 'purchase.views.shipping_list', name='shipping-list'),
     url(r'^sl-list-json/$', 'purchase.views.get_sl_json', name='sl-list-json'),
-    url(r'^sl/(?P<sl_id>\d+)/json/$', 'purchase.views.get_sl_json_by_id', name='sl-json'),
-    url(r'^sl-item-json/(?P<sl_id>\d+)/$', 'purchase.views.get_sl_item_json', name='sl-item-json'),
+    url(r'^sl/(?P<sl_id>\w+)/json/$', 'purchase.views.get_sl_json_by_id', name='sl-json'),
+    url(r'^sl-item-json/(?P<sl_number>\w+)/$', 'purchase.views.get_sl_item_json', name='sl-item-json'),
     url(r'^sl-item-json/$', 'purchase.views.get_sl_item_json', name='sl-item-json'),
     url(r'^sl-delete/$', 'purchase.views.sl_delete', name='sl-delete'),
 

@@ -6,22 +6,40 @@
 	<td>
 		<div style="position: relative;">
 		<input class="form-control" id="id_sl_number_search" name="sl_number_search" type="search" placeholder="Search for SL leave Blank for New SL" ng-model="search_sl" ng-change="searchSl(search_sl)" ng-disabled="sl_checked" autocomplete="off">
-		<div id="sl_list" ng-show="show_sl_list" >
 
-					<ul class="search">
-						<li ng-repeat="sl in sls | filter:search_sl">
-							<a href="#" class="list-group-item bg-info" ng-click="selectSl(sl)">{[{sl.sl_number}]}</a>
-						</li>
-					</ul>
-				</div>
+			<div id="sl_list" ng-show="sls.length && show_sl_list">
+				<table class="table">
+					<thead>
+						<tr>
+							<td>SL Number</td>
+							<td>Sold To</td>
+							<td>Ship To</td>
+							<td>Job Number</td>
+						</tr>
+						
+					</thead>
+					<tbody>
+						<tr ng-repeat="sl in sls" ng-click="selectSL(sl)">
+							<td>{[{sl.sl_number}]}</td>
+							<td>{[{sl.sold_to.contact_name}]}</td>
+							<td>{[{sl.ship_to.contact_name}]}</td>
+							<td>{[{sl.job_number}]}</td>
+						</tr>
+						
+					</tbody>
+					
+				</table>
+				
+			</div>
+			<div ng-show="!sls.length && show_sl_list">
+				No Shipping List Found!
+			</div>
 		</div>
-		<input id="id_sl_number" name="sl_number" type="hidden" value="{[{search_sl}]}">
-		<input id="id_sl_id" name="sl_id" type="hidden">
+		<input id="id_sl_number" name="sl_number" type="hidden" value="{[{search_sll}]}">
 	</td>
-	<td><label for="id_job_number">Job number:</label></td>
+	<td><label for="id_job_number">Next SL number:</label></td>
 	<td>
-		<input type='text' class='form-control item-job-number' name='item_job_number' placeholder='Start typing to search job' id="id_item_job_number">
-		<input type='hidden' name='job_number' id='id_job_number'>
+		<input type='text' class='form-control item-job-number' name='next_number' value="{{next_sl_number}}" readonly="">
 	</td>
 </tr>
 
@@ -161,7 +179,35 @@
 		{% endfor %}
 	</select>
 </td>
-<td colspan="2"></td>
+<td><label for="id_job_number">Job number:</label></td>
+	<td>
+		<div style="position: relative">		
+			<input type='text' class='form-control item-job-number' placeholder='Start typing to search job' ng-model="search_job" ng-change="searchJob(search_job)" autocomplete="off">
+			<input type='hidden' name='job_number' id='id_job_number'>
+			<div id="job_list" ng-show="jobs.length && show_job_list">
+				<table class="table">
+					<thead>
+						<tr>
+							<td>Job Number</td>
+							<td>Job Name</td>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="job in jobs" ng-click="selectJob(job)">
+							<td>{[{job.job_number}]}</td>
+							<td>{[{job.job_name}]}</td>
+						</tr>
+						
+					</tbody>
+					
+				</table>
+				
+			</div>
+			<div ng-show="!jobs.length && show_job_list">
+				No Job List Found!
+			</div>
+		</div>
+	</td>
 </tr>
 
 
@@ -211,7 +257,7 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr ng-repeat="item in items | googleSearchFilter:search_item" ng-click="selectItem(item)">
+							<tr ng-repeat="item in items" ng-click="selectItem(item)">
 								<td>{[{item.item_number}]}</td>
 								<td>{[{item.description}]}</td>
 								<td>{[{item.item_unit_measure}]}</td>

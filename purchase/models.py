@@ -264,8 +264,6 @@ class ShippingList(models.Model):
 	sl_status = models.CharField(max_length=2, blank=True, null=True)
 	search_string = models.TextField(null=True, blank=True, verbose_name='Search String')
 
-	def __unicode__(self):
-		return self.sl_number
 
 	def status_verbose(self):
 		return dict(SL_STATUS)[int(self.sl_status)]
@@ -347,7 +345,7 @@ class PackingList(models.Model):
 		)
 
 class PackingItem(models.Model):
-	shipping_item = models.ForeignKey(ShippingItem, blank=True, null=True)
+	shipping_item = models.ForeignKey(ShippingItem, blank=True, null=True, related_name='sl')
 	description = models.TextField(blank=True, null=True)
 	unit = models.CharField(max_length=20, blank=True, null=True)
 	qty_ordered = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
@@ -355,7 +353,7 @@ class PackingItem(models.Model):
 	qty_shipped = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)	
 	# price = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
 	status = models.BooleanField(default=0)
-	pl = models.ForeignKey(PackingList, blank=True, null=True)
+	pl = models.ForeignKey(PackingList, blank=True, null=True, related_name='pl_items')
 	search_string = models.TextField(null=True, blank=True, verbose_name='Search String')
 
 	def __unicode__(self):

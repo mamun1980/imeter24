@@ -27,8 +27,8 @@ table > tbody {
 }
 #ship_to_contact_list, #sold_to_contact_list, #items_list {
 	position: absolute;
-	top: 35px;
-	left: 0px;
+	top: 45px;
+	left: 5px;
 	background-color: #DDD;
 	z-index: 1000;
 	/*border: 1px solid #000;*/
@@ -56,7 +56,7 @@ p.item_desc {
 .glyphicon {
 	color: red;
 }
-#sl_list {
+#sl_list, #job_list {
     position: absolute;
     width: 450px;
     z-index: 100;
@@ -102,22 +102,7 @@ p.item_desc {
 		$(this).closest('table').hide();
 
 	});
-	$( "input[name='item_job_number']" ).autocomplete({
-	  source: "/schedule/list-filter/",
-	  _renderItem: function( ul, item ) {
-            console.log(ul)
-		  return $( "<li>" )
-		    .attr( "data-value", item.value )
-		    .append( $( "<a>" ).text( item.label ) )
-		    .appendTo( ul );
-		},
-		select: function( event, ui ) {
-			console.log(ui.item.id);
-			// $(this).attr("data-id", ui.id);
-			
-			$(event.target).siblings("input#id_job_number").val(ui.item.id);
-		}
-	});
+	
 
 })(jQuery)
 </script>
@@ -160,12 +145,35 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
 
         $("#items_list").hide();
 
-        $scope.show_sl_list = true;
+        $scope.show_sl_list = false;
+        $scope.show_job_list = false;
+        $scope.search_sll = 'new';
         
         // $("#ship-to-container").hide();
 	};
 
 	$scope.init();
+
+    $scope.searchJob = function(q) {
+        if(q.length > 1) {
+            url = "/schedule/job/search/?q=" + q
+            $http({method: 'GET', url: url}).
+                success(function(data, status, headers, config) {
+                    console.log(data);
+                    $scope.jobs = data;
+                });            
+            $scope.show_job_list = true;
+            
+        } else {
+            $scope.show_job_list = false;
+        }
+    }
+
+    $scope.selectJob = function(job) {
+        $("#id_job_number").val(job.job_id);
+        $scope.search_job = job.job_number;
+        $scope.show_job_list = false;
+    }
 
     $scope.searchShipTo  = function(q) {
         if(q.length > 1) {
@@ -345,10 +353,10 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
     $scope.searchSl = function(q) {
         if(q.length > 1) {
             // console.log(q);
-            $http({method: 'GET', url: "/purchase/sl-list-json/"}).
+            var url = "/purchase/sl/search/?q=" + q;
+            $http({method: 'GET', url: url}).
                 success(function(data, status, headers, config){
                 $scope.sls = data;
-                // console.log(data);
             });
             // $("#po_list").show();
             $scope.show_sl_list = true;
@@ -358,14 +366,13 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
         }
         
     }
-    $scope.selectSl = function(sl){
+    $scope.selectSL = function(sl){
         // console.log(sl.id);
         $scope.search_sl = sl.sl_number;
         $scope.sl_checked = true;
         $scope.show_sl_list = false;
         
         $("#id_sl_number").val(sl.sl_number);
-        $("#id_sl_id").val(sl.id);
         $("#id_item_job_number").val(sl.job_number);
         $("#id_job_number").val(sl.job_number_id);
 
@@ -410,15 +417,8 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
 
             $("tbody#add_item_list").prepend(element);
 
-        }
-        
-
-
-
-        
+        }   
     }
-
-
 
 }]);
 </script>

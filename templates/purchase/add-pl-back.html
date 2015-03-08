@@ -1,0 +1,478 @@
+{% extends "base.html" %}
+
+{% block angular %}
+	<script type="text/javascript" src="/statics/js/angular.min.js"></script>
+	<script type="text/javascript" src="/statics/js/angular-route.min.js"></script>	
+
+	<script type="text/javascript" src="/statics/js/bootstrap-multiselect.js"></script>
+	<link rel="stylesheet" href="/statics/css/bootstrap-multiselect.css" type="text/css"/>
+{% endblock angular %}
+
+{% block content %}
+<style>
+.contact_box, .item_box, .job_box {
+	position: relative;
+}
+table#sold_to_contact_details, table#ship_to_contact_details, table#customer_broker_contact_details {
+	margin-top: 10px;
+}
+table#sold_to_contact_details th, table#ship_to_contact_details th, table#customer_broker_contact_details th{
+	background-color: #83AD9E;
+}
+table > thead {
+	background-color: #83AD9E;
+}
+table > tbody {
+	background-color: #FFF;
+}
+#ship_to_contact_list, #sold_to_contact_list, #items_list, #customer_broker_contact_list, #job_list {
+	position: absolute;
+	top: 45px;
+	left: 5px;
+	background-color: #DDD;
+	z-index: 1000;
+	/*border: 1px solid #000;*/
+	-webkit-box-shadow: 0px 0px 10px 0px rgba(50, 50, 50, 0.75);
+	-moz-box-shadow:    0px 0px 10px 0px rgba(50, 50, 50, 0.75);
+	box-shadow:         0px 0px 10px 0px rgba(50, 50, 50, 0.75);
+}
+.sold_to_contact tbody tr:hover, .ship_to_contact tbody tr:hover, .customer_broker_contact tbody tr:hover {
+	background-color: #616183;
+}
+table#items_list {
+	width: 940px;
+}
+#items_list tbody tr:hover, #pl_list tbody tr:hover{
+	background-color: #CCC;
+}
+.bg-hello {
+	background-color: #777;
+}
+p.item_desc {
+	min-height: 34px;
+	margin-bottom: 0px;
+	padding: 5px;
+}
+.glyphicon {
+	color: red;
+}
+#job-details {
+	margin-top: 5px;
+	margin-bottom: 0px !important;
+}
+#sl_list, #pl_list {
+    position: absolute;
+    width: 450px;
+    z-index: 100;
+}
+#sl_list ul, #pl_list ul {
+    padding-left: 0px;
+    list-style: none;
+}
+#sl_items_list {
+    position: absolute;
+    width: 650px;
+}
+
+</style>
+<div class="container-fluid shadow4 main-body" ng-app="plApp">
+
+<section class="row " ng-controller="AddPLController">
+	
+	<form action="/purchase/add-pl/" method="POST" enctype="multipart/form-data">{% csrf_token %}
+	<div class="col-md-12">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Add / Update Packing List</h4>
+		  	</div>
+		  	<div class="panel-body">
+
+			  	{% include "purchase/partials/add-pl-form.html" %}			  		
+				
+			</div>
+		</div>
+	</div>
+	
+
+	</form>
+
+</section>
+
+</div>
+
+
+<script type="text/javascript">
+(function(){
+$(".datepicker").datepicker();
+$("a.close").on("click", function(){
+	$(this).closest('table').hide();
+});
+
+var plApp = angular.module("plApp", [], function ($interpolateProvider) {
+        $interpolateProvider.startSymbol("{[{");
+        $interpolateProvider.endSymbol("}]}");
+});
+
+plApp.controller('AddPLController',['$scope', '$http','$compile', function ($scope, $http, $compile) {
+	
+	$scope.init = function() {
+        $scope.search_sl_item = "";
+
+        $http({method: 'GET', url: "/inventory/unit-measure-list/json/"}).
+            success(function(data, status, headers, config){
+            $scope.item_unit_measures = data;
+        });
+
+
+
+        $("#sold_to_contact_list").hide();
+        $("#sold_to_contact_details").hide();
+
+        $("#ship_to_contact_list").hide();
+        $("#ship_to_contact_details").hide();
+
+        $("#customer_broker_contact_list").hide();
+        $("#customer_broker_contact_details").hide();
+
+        $("#job_list").hide();
+        $("#job-details").hide();
+
+        $("#items_list").hide();
+        
+        // $("#ship-to-container").hide();
+        $scope.show_pl_list = false;
+        $scope.show_sl_list = false;
+        $scope.show_sl_item_list = false;
+
+        $scope.show_add_button = false;
+        $scope.show_update_button = false;
+
+	};
+
+	$scope.init();
+
+    $scope.removeSLItem = function (event) {
+
+        var removed_item_id = event.currentTarget.attributes[1].value;
+        
+        if(removed_item_id){
+            var removed_item = "<input type='hidden' name='removed_item' value='"+removed_item_id+"'>";
+            $("#add_sl_item_list tr.removed_item").append(removed_item); 
+            $(event.target).closest('tr').remove();   
+        }
+    };
+
+	$scope.$watch('search_job', function (newValue, oldValue) {
+        if(newValue != undefined) {
+        	if(newValue.length > 1) {
+        		$("#job_list").show();
+        		console.log(newValue);
+        	} else {
+        		$("#job_list").hide();
+        	}
+        }
+    });
+
+    $scope.searchSoldTo  = function(q) {
+        if(q.length > 1) {
+            url = "/contacts/auto/?q=" + q
+            $http({method: 'GET', url: url}).
+                success(function(data, status, headers, config) {
+                    console.log(data.results);
+                    $scope.soldto = data.results;
+                });
+            $("#sold_to_contact_list").show();
+            
+            
+        } else {
+            $("#sold_to_contact_list").hide();
+        }
+    }
+
+    $scope.searchShipTo  = function(q) {
+        if(q.length > 1) {
+            url = "/contacts/auto/?q=" + q
+            $http({method: 'GET', url: url}).
+                success(function(data, status, headers, config) {
+                    console.log(data.results);
+                    $scope.shipto = data.results;
+                });
+            $("#ship_to_contact_list").show();
+            
+            
+        } else {
+            $("#ship_to_contact_list").hide();
+        }
+    }
+
+    $scope.searchCustomerBroker  = function(q) {
+        if(q.length > 1) {
+            url = "/contacts/auto/?q=" + q
+            $http({method: 'GET', url: url}).
+                success(function(data, status, headers, config) {
+                    console.log(data.results);
+                    $scope.customer_brokers = data.results;
+                });
+            $("#customer_broker_contact_list").show();
+            
+            
+        } else {
+            $("#customer_broker_contact_list").hide();
+        }
+    }
+
+	$scope.selectShipTo = function(con) {
+		$("#ship_to_contact_list").hide();
+		$scope.search_ship_to = ""
+		$scope.ship_to_contact = con;
+		$("#id_ship_to").val(con.id);
+		$("#ship_to_contact_details").show();
+
+
+	};
+    $scope.selectSoldTo = function(con) {
+		$("#sold_to_contact_list").hide();
+		$scope.search_ship_to = ""
+		$scope.sold_to_contact = con;
+		$("#id_sold_to").val(con.id);
+		$("#sold_to_contact_details").show();
+
+
+	};
+
+	$scope.selectCustomerBroker = function(con) {
+		$("#customer_broker_contact_list").hide();
+		$scope.search_customer_broker = ""
+		$scope.customer_broker_contact = con;
+		// console.log(con);
+		$("#id_customer_broker").val(con.id);
+		$("#customer_broker_contact_details").show();
+	}
+
+	$scope.selectJob = function(job){
+		$("#job_list").hide();
+		$scope.search_job = "";
+		$scope.schedule_job = job;
+        console.log(job);
+		$("#id_job_number").val(job.id);
+		$("#job-details").show();
+
+	};
+    $scope.searchSlItem = function(q) {
+        console.log(q);
+        var sl_id = $("#id_sl").val();
+        $scope.slid = sl_id;
+        if(sl_id) {
+            var url2 = "/purchase/sl-item-json/"+sl_id+"/";    
+        } else {
+            var url2 = "/inventory/items/";
+        }
+        
+        if(q.length > 1) {
+            
+            // console.log(q);
+            $http({method: 'GET', url: url2 }).
+                success(function(data, status, headers, config){
+                $scope.items = data;
+                // console.log(data);
+            });
+            $scope.show_sl_item_list = true;
+            
+        } else {
+            $scope.show_sl_item_list = false;
+        }     
+        
+        
+    };
+    $scope.selectSlItem = function(item){
+        $scope.show_sl_item_list = false;
+        var myitem = $("tbody#add_sl_item_list");
+        var item_number = item.item_number;
+        if(item.shipping_list){
+            var quantity_on_hand = item.quantity_on_hand;
+            var backordered = item.backordered;
+            var qty_constraint = quantity_on_hand < backordered ? quantity_on_hand:backordered;
+        
+        } else {
+            var qty_constraint = item.quantity_on_hand;
+        }
+        
+        console.log("Qty on hand: " + qty_constraint);
+
+        var item_description = item.description;
+        var item_unit = item.item_unit_measure_id;
+        var item_ordered = item.ordered;
+        var item_qtybo = item.backordered;
+        // var item_shipped = item.shipped;
+        var sl_item_id = item.id;
+        
+
+        var str = "<tr class='add_item'>";
+        str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+item_number+"' readonly><input type='hidden'  name='pl_item_id' value='new'><input type='hidden' name='sl_item_id' value='"+sl_item_id+"'></td>";
+        str += "<td><p class='bg-info item_desc'>"+item_description+"</p></td>";
+        
+        str += "<td><select class='form-control' name='unit'>";
+        str += "<option ng-repeat='um in item_unit_measures' value='{[{um.id}]}' ng-selected='{[{um.id}]} == "+item_unit+"'>{[{um.unit_name}]}</option>";
+        str += "</select></td>";
+
+        if($scope.slid){
+            str += "<td><input type='text' class='form-control' name='item_ordered' value='"+item_ordered+"' readonly></td>";    
+            str += "<td><input type='text' class='form-control decimal' name='item_qtybo' value='"+item_qtybo+"' readonly></td>";
+        } else {
+            str += "<td><input type='text' class='form-control' name='item_ordered'></td>";
+            str += "<td><input type='text' class='form-control decimal' name='item_qtybo' value='' readonly></td>";
+        }
+        
+        str += "<td><input type='number' name='item_shipped' class='form-control' value='' max='"+qty_constraint+"'></td>";
+        
+        str += "<td><a class='remove-item btn' ng-click='removeSLItem($event)'><span class='glyphicon glyphicon-remove'></span></a></td>";
+        str += "</tr>";
+        
+        var element = $compile(str)($scope);
+
+        $("tbody#add_sl_item_list").prepend(element);
+        
+    };
+
+    $scope.searchPl = function(q) {
+
+        if(q.length > 1) {
+            // console.log(q);
+            var url = "/purchase/pl/search/?q="+q
+            $http({method: 'GET', url: url}).
+                success(function(data, status, headers, config){
+                $scope.pls = data;
+                // console.log(data);
+            });
+            // $("#po_list").show();
+            $scope.show_pl_list = true;
+        } else {
+            // $("#po_list").hide();
+            $scope.show_pl_list = false;
+        }
+        
+    }
+    $scope.selectPl = function(pl){
+        $scope.show_add_button = false;
+        $scope.show_update_button = true;
+        $scope.search_pl = pl.pl_number;
+        $scope.pl_checked = true;
+        $scope.show_pl_list = false;
+        var url = "/purchase/get-pl/"+pl.pl_number+"/"
+        $http({method: 'GET', url: url}).
+                success(function(data, status, headers, config){
+                $scope.pl = data;
+                console.log(data);
+
+                $scope.sold_to_contact = pl.sold_to;
+                $("#sold_to_contact_details").show();
+                $("#id_sold_to").val(pl.sold_to.id);
+
+                $("#id_date_issued").val($scope.pl.date_issued);
+
+                $scope.schedule_job = $scope.pl.schedule_job;
+                $("#id_job_number").val($scope.pl.schedule_job.id);
+                $("#job-details").show();
+
+                $("#id_order_type").val($scope.pl.order_type);
+
+                if($scope.pl.hold_at_dept_for_pickup == true){
+                    $("#id_hold_at_dept_for_pickup").val(1);    
+                } else {
+                    $("#id_hold_at_dept_for_pickup").val(0);
+                }
+
+                if($scope.pl.customer_broker) {
+                    $scope.customer_broker_contact = $scope.pl.customer_broker;
+                    $("#customer_broker_contact_details").show();
+                    $("#id_customer_broker").val($scope.pl.customer_broker.id);    
+                }
+
+                $("#id_freight_charges").val($scope.pl.freight_charges);
+
+                $("#id_sl_number").val($scope.pl.sl_number_id);
+
+                $scope.search_sl = $scope.pl.sl_number;
+                $scope.sl_checked = true;
+
+                if($scope.pl.ship_to) {
+                    $scope.ship_to_contact = $scope.pl.ship_to;
+                    $("#ship_to_contact_details").show();
+                    $("#id_ship_to").val($scope.pl.ship_to.id);    
+                }
+                
+
+                $("#id_date_shipped").val($scope.pl.date_shipped);
+                $("#id_generated_by").val($scope.pl.generated_by_id);
+                $("#id_ship_via").val($scope.pl.ship_via_id);
+                if($scope.pl.nel_packing_slip == true){
+                    $("#id_nel_packing_slip").val(1);    
+                } else {
+                    $("#id_nel_packing_slip").val(0);
+                }
+
+                $("#id_customer_po_number").val($scope.pl.customer_po_number);
+                $("#id_invoiced_on").val($scope.pl.invoiced_on);
+
+
+            });
+
+
+        var pl_items = $scope.pl.items;
+
+        for(var i=0; i < pl_items.length; i++) {
+            var str = "<tr class='add_item'>";
+            str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+pl_items[i].id+"' readonly><input type='hidden'  name='sl_item_id' value='"+pl_items[i].id+"'></td>";
+            str += "<td><p class='bg-info item_desc'>"+pl_items[i].description+"</p></td>";
+            
+            str += "<td><select class='form-control' name='unit' disabled='true'>";
+            str += "<option ng-repeat='um in item_unit_measures' value='{[{um.id}]}' ng-selected='{[{um.id}]} == "+pl_items[i].unit+"'>{[{um.unit_name}]}</option>";
+            str += "</select></td>";
+
+            str += "<td><input type='text' class='form-control' name='item_ordered' value='"+pl_items[i].qty_ordered+"' readonly></td>";
+            str += "<td><input type='text' class='form-control decimal' name='item_qtybo' value='"+pl_items[i].qty_bo+"' readonly></td>";
+            str += "<td><input type='number' name='item_shipped' class='form-control' value='"+pl_items[i].qty_shipped+"' readonly></td>";
+            
+            str += "<td><a class='remove-item btn' data-item-id='"+pl_items[i].id+"'  ng-click='removeSLItem($event)'>X</a></td>";
+            str += "</tr>";
+            
+            var element = $compile(str)($scope);
+
+            $("tbody#add_sl_item_list").prepend(element);   
+        }
+        // $("#id_job_number").val(pl.job_number_id);
+        // $("#id_job_number").val(pl.job_number_id);
+
+    }
+
+    $scope.searchSl = function(q) {
+        if(q.length > 1) {
+            // console.log(q);
+            $http({method: 'GET', url: "/purchase/sl-list-json/"}).
+                success(function(data, status, headers, config){
+                $scope.sls = data;
+                console.log(data);
+            });
+            // $("#po_list").show();
+            $scope.show_sl_list = true;
+        } else {
+            // $("#po_list").hide();
+            $scope.show_sl_list = false;
+        }
+        
+    }
+    $scope.selectSl = function(sl){
+        console.log(sl.id);
+        $scope.search_sl = sl.sl_number;
+        $scope.sl_checked = true;
+        $scope.show_sl_list = false;
+        
+        $("#id_sl").val(sl.id);
+    }
+
+}]);
+
+})(jQuery)
+</script>
+{% endblock content %}
+	

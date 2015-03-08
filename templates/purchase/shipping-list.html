@@ -16,7 +16,7 @@
 <div class="container-fluid shadow4 main-body" ng-app="premierApp" ng-controller='SLListController'>
 <section class="row">
 	<div class="col-md-6">
-		<input type='text' class="form-control" ng-model="search" placeholder="Filter SL">
+		<input type='text' class="form-control" ng-model="search" placeholder="Filter SL" ng-change="searchSL(search)">
 	</div>
 </section>
 <section class="row list" >
@@ -42,14 +42,14 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr ng-repeat="sl in shipping_list | googleSearchFilter:search | filter:status">
+						<tr ng-repeat="sl in shipping_list | filter:status">
 							<td>{[{ sl.sl_number }]}</td>
 							<td>
 								<p><b>{[{ sl.sold_to.contact_name }]}</b></p>
-								<div class="bg-info">
+								<div class="bg-info" ng-show="sl.sold_to.phones.length">
 									<p ng-repeat="ph in sl.sold_to.phones">
 
-										({[{ ph.phone_type }]}): {[{ ph.phone }]}-{[{ ph.phone_ext }]}
+										({[{ ph.type }]}): {[{ ph.number }]}-{[{ ph.ext }]}
 									</p>
 								</div>
 								<div class="bg-warning">
@@ -63,7 +63,7 @@
 								<div class="bg-info">
 									<p ng-repeat="ph in sl.ship_to.phones">
 
-										({[{ ph.phone_type }]}): {[{ ph.phone }]}-{[{ ph.phone_ext }]}
+										({[{ ph.type }]}): {[{ ph.number }]}-{[{ ph.ext }]}
 									</p>
 								</div>
 								<div class="bg-warning">
@@ -79,11 +79,11 @@
 							
 							<td>
 							<div class="btn-group btn-group-sm">
-								<a class="btn btn-default" href="/purchase/view-sl/{[{sl.id}]}/">View</a> 
+								<a class="btn btn-default" href="/purchase/view-sl/{[{sl.sl_number}]}/">View</a> 
 								
-								<a class="sl-delete btn btn-default" data-slid="{[{sl.id}]}" href="">Delete</a>
+								<a class="sl-delete btn btn-default" data-slid="{[{sl.sl_number}]}" href="">Delete</a>
 
-								<a class="btn btn-default" data-pid="{[{sl.id}]}" href="/purchase/generate-sl/{[{sl.id}]}/" target="_blank">Gererate SL</a>
+								<a class="btn btn-default" data-pid="{[{sl.id}]}" href="/purchase/generate-sl/{[{sl.sl_number}]}/" target="_blank">Gererate SL</a>
 							</div>
 							</td>
 						</tr>
@@ -148,7 +148,8 @@
 	premierApp.controller('SLListController',['$scope', '$http', function ($scope, $http) {
 	
 		$scope.init = function() {
-			$http({method: 'GET', url: "/purchase/sl-list-json/"}).
+			url = "/purchase/sl/search/"
+			$http({method: 'GET', url: url}).
 	            success(function(data, status, headers, config) {
 	                console.log(data);
 	                $scope.shipping_list = data;
@@ -157,6 +158,24 @@
 		};
 
 		$scope.init();
+
+		$scope.searchSL = function(q) {
+			if(q.length > 1) {
+	            url = "/purchase/sl/search/?q=" + q
+	            $http({method: 'GET', url: url}).
+	                success(function(data, status, headers, config) {
+	                    console.log(data);
+	                    $scope.shipping_list = data;
+	                });            
+	        } else {
+	            url = "/purchase/sl/search/"
+	            $http({method: 'GET', url: url}).
+	                success(function(data, status, headers, config) {
+	                    console.log(data);
+	                    $scope.shipping_list = data;
+	                });  
+	        }
+		}
 	}]);
 </script>
 {% endblock content %}

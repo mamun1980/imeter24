@@ -156,7 +156,6 @@ def contact_list(request):
         contact_dict['permission']['can_change_contact'] = user.has_perm("contacts.change_contact")
         contact_dict['permission']['can_delete_contact'] = user.has_perm("contacts.delete_contact")
         cid = int(con.id)
-        
         contact_dict['phones'] = []
         cphones = ContactPhone.objects.filter(contact=con)
         for cphone in cphones:

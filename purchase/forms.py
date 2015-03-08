@@ -27,14 +27,10 @@ class InvoiceForm(forms.ModelForm):
         if self.action == 'new':
             # invoice.invoiced_by = self.request.user
             invoice.status = 0
-            invoice_number = re.sub(r"[A-Za-z]+","",self.request.POST['invoice_number_search'])
+            invoice_number = self.request.POST['next_number']
             invoice.invoice_number = 'IN-'+str(invoice_number)
             sv.next_po_number = int(invoice_number) + 1
-        elif self.action == 'update':
-            pass
-            # po_number = re.sub(r"[^\w]+","",po.po_number)
-            # po.po_number = 'P'+str(po_number)
-            # sv.next_po_number = int(po_number) + 1
+
         sv.save()
         invoice.save()
         return invoice
@@ -137,13 +133,13 @@ class POForm(forms.ModelForm):
 
     def save(self, commit=True):
         po = super(POForm, self).save(commit=False)
-        # sv = SystemVariable.objects.get(id=1)
+        sv = SystemVariable.objects.get(id=1)
         if self.action == 'new':
             po.po_created_by = self.request.user
             po.datetime = datetime.datetime.now()
-            po_number = re.sub(r"[ -]+","_",self.request.POST['po_number_search'])
-            po.po_number = po_number
-            # sv.next_po_number = int(po_number) + 1
+            po_number = self.request.POST['next_number']
+            po.po_number = 'PO' + str(po_number)
+            sv.next_po_number = int(po_number) + 1
         elif self.action == 'update':
             po.po_created_by = self.request.user
             po.datetime = datetime.datetime.now()
@@ -151,6 +147,7 @@ class POForm(forms.ModelForm):
             # po.po_number = 'P'+str(po_number)
             # sv.next_po_number = int(po_number) + 1
         po.save()
+        sv.save()
         return po
     
 
@@ -270,7 +267,8 @@ class PackingListForm(forms.ModelForm):
         sv = SystemVariable.objects.get(id=1)
         # pl.generated_by = self.request.user
         if self.action == 'new':
-            pl_number = re.sub(r"[A-Za-z]+","",self.request.POST['pl_number_search'])
+            # pl_number = re.sub(r"[A-Za-z]+","",self.request.POST['pl_number_search'])
+            pl_number = sv.next_pl_number
             pl.pl_number = 'PL'+str(pl_number)
             sv.next_pl_number = int(pl_number) + 1
             pl.status = 0
@@ -318,15 +316,15 @@ class ShippingListForm(forms.ModelForm):
 
     class Meta:
         model = ShippingList
-        exclude = ['search_string', 'sl_status']
+        exclude = ['sl_number', 'search_string', 'sl_status',]
 
     def save(self, commit=True):
         sl = super(ShippingListForm, self).save(commit=False)
         sv = SystemVariable.objects.get(id=1)
         if self.action == 'new':
-            sl_number = re.sub(r"[A-Za-z]+","",self.request.POST['sl_number_search'])
+            sl_number = sv.next_sl_number
             sl.sl_number = 'SL'+str(sl_number)
-            sv.next_sl_number = int(sl_number) + 1
+            sv.next_sl_number = int(sl_number) + 10
         elif self.action == 'update':
             pass
             # po_number = re.sub(r"[^\w]+","",po.po_number)
