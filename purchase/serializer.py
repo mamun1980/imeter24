@@ -32,7 +32,7 @@ class ReversePackingItemSerializer(HyperlinkedModelSerializer):
 
     class Meta:
         model = PackingItem
-        fields = ('id', 'description', 'unit', 'qty_ordered', 'qty_bo', 'qty_shipped',)
+        fields = ('id', 'shipping_item', 'description', 'unit', 'qty_ordered', 'qty_bo', 'qty_shipped',)
 
 class PackingListSerializer(ModelSerializer):
     sl = ShippingListSerializer()

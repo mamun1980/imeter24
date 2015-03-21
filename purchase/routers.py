@@ -1,9 +1,17 @@
 from haystack import routers
 
 
-class MasterRouter(routers.BaseRouter):
+class SLRouter(routers.BaseRouter):
     def for_write(self, **hints):
-        return 'purchase'
+        return 'sl'
 
     def for_read(self, **hints):
-        return 'purchase'
+        return 'sl'
+
+
+class PLRouter(routers.BaseRouter):
+    def for_write(self, **hints):
+        return 'pl'
+
+    def for_read(self, **hints):
+        return 'pl'

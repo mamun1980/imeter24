@@ -7,6 +7,8 @@ urlpatterns = patterns('',
     # Examples:
     url(r'^$', 'premierelevator.views.home', name='home'),
 
+    url(r'^generate-pdf/$', 'premierelevator.views.generate_pdf', name='generate-pdf'),
+
     url(r'^system-variable/$', 'premierelevator.views.sys_variable', name='sys-variable'),
     
     url(r'^dashboard/$', 'premierelevator.views.dashboard', name='user-dashboard'),

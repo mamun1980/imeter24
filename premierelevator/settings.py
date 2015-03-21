@@ -265,4 +265,5 @@ HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 # CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
 HAYSTACK_ROUTERS = ['inventory.routers.MasterRouter', 'schedule.routers.MasterRouter', 
-                    'haystack.routers.DefaultRouter',]
+                    'purchase.routers.SLRouter', 'purchase.routers.PLRouter',
+                    'haystack.routers.DefaultRouter']

@@ -324,7 +324,7 @@ class ShippingListForm(forms.ModelForm):
         if self.action == 'new':
             sl_number = sv.next_sl_number
             sl.sl_number = 'SL'+str(sl_number)
-            sv.next_sl_number = int(sl_number) + 10
+            sv.next_sl_number = int(sl_number) + 1
         elif self.action == 'update':
             pass
             # po_number = re.sub(r"[^\w]+","",po.po_number)

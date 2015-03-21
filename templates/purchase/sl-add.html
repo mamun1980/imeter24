@@ -227,17 +227,6 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
 
 	};
 
-
-    $scope.$watch('search_purchase_order', function (newValue, oldValue) {
-        if(newValue != undefined) {
-        	if(newValue.length > 1) {
-        		
-        		$("#po-list").show();
-        	} else {
-        		$("#po-list").hide();
-        	}
-        } 
-    });
     $scope.searchItem = function(q) {
 		if(q.length > 1) {
 			console.log(q);
@@ -253,7 +242,7 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
 	}
 	$scope.selectItem = function(item) {
     	$scope.search_item = '';
-
+        console.log(item);
     	$("#items_list").hide();
     	var myitem = $("tbody#add_item_list tr.add_item");
     	var item_number = item.item_number;
@@ -342,12 +331,19 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
         console.log(event.currentTarget.attributes[1].value);
         
 		$(event.target).closest('tr').remove();
+    };
+
+    $scope.deleteField = function (event) {
+        // $(event.target).closest('tr').remove();
+        var myitem = $("tbody#add_item_list tr.add_item");
+        var removed_item_id = event.currentTarget.attributes[1].value;
+        console.log(event.currentTarget.attributes[1].value);
+        
+        $(event.target).closest('tr').remove();
 
         var removed_item = "<input type='hidden' name='removed_item' value='"+removed_item_id+"'>";
         $("#add_item_list tr.removed_item").append(removed_item);
-		
-
-	
+        
     };
 
     $scope.searchSl = function(q) {
@@ -367,7 +363,8 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
         
     }
     $scope.selectSL = function(sl){
-        // console.log(sl.id);
+        console.log(sl);
+        /*
         $scope.search_sl = sl.sl_number;
         $scope.sl_checked = true;
         $scope.show_sl_list = false;
@@ -410,14 +407,15 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
 
             str += "<td><input type='text' class='form-control' placeholder='PL Number' readonly='readonly'></td>";
 
-            str += "<td><a class='remove-item btn' data-item-id='"+items[i].sl_item_id+"' ng-click='removeField($event)'><span class='glyphicon glyphicon-remove'></span></a></td>";
+            str += "<td><a class='remove-item btn' data-item-id='"+items[i].sl_item_id+"' ng-click='deleteField($event)'><span class='glyphicon glyphicon-remove'></span></a></td>";
             str += "</tr>";
             
             var element = $compile(str)($scope);
 
             $("tbody#add_item_list").prepend(element);
 
-        }   
+        }
+        */   
     }
 
 }]);

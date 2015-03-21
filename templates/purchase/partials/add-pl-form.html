@@ -100,7 +100,7 @@
 				</td>
 				<td>
 				<div class="job_box">
-					<input type='text' ng-model="search_job" class='form-control item-job-number' name='item_job_number' placeholder='Start typing to search job' autocomplete="off">
+					<input type='text' ng-model="search_job" class='form-control item-job-number' name='item_job_number' ng-change="searchJob(search_job)" placeholder='Start typing to search job' autocomplete="off">
 					<table class="table table-bordered" id="job-details">
 						<tr>
 							<th class="bg-info">job number</th>
@@ -391,12 +391,13 @@
 			<tbody id="add_pl_item_list">
 				<tr style="border-top: 2px dotted red;">
 				<td style="position: relative;">
-					<input type="text" class="form-control added_item_number" name="" value="" ng-model="search_sl_item" ng-change="searchSlItem(search_sl_item)" placeholder="search for sl item" autocomplete="off">
-					<input type="hidden" id='id_item_number' name="item_number" value="{[{search_sl_item}]}">
-					<table class="table" ng-show="show_sl_item_list" id="sl_items_list">
+					<input type="text" class="form-control added_item_number" name="" value="" ng-model="search_item" ng-change="searchSLItem(search_item)" placeholder="search for item" autocomplete="off">
+					<input type="hidden" id='id_item_number' name="item_number" value="{[{search_item}]}">
+					<table class="table" id="items_list">
 						<thead>
 							<tr>
 								<th width="150">Item Number</th>
+								<th width="150">SL Number</th>
 								<th width="250">Description</th>
 								<th width="120">Unit</th>
 								<th width="100">Ordered</th>
@@ -406,8 +407,9 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr ng-repeat="item in items" ng-click="selectSlItem(item)">
+							<tr ng-repeat="item in items" ng-click="selectSLItem(item)">
 								<td>{[{item.item_number}]}</td>
+								<td>{[{item.shipping_list}]}</td>
 								<td>{[{item.description}]}</td>
 								<td>{[{item.item_unit_measure}]}</td>
 								<td>{[{item.ordered}]}</td>

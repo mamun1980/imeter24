@@ -17,6 +17,23 @@ from report.models import Printer, Report
 
 from premierelevator.helper_functions import *
 
+
+def html_to_pdf_response(html):
+    result = StringIO.StringIO()
+    pdf = pisa.pisaDocument(
+            StringIO.StringIO(html.encode("UTF-8")),
+            result
+    )
+
+    if not pdf.err:
+        return HttpResponse(
+                result.getvalue(),
+                mimetype='application/pdf'
+        )
+    else:
+        return HttpResponse('We had some errors')
+
+
 def home(request):
     if request.user.is_authenticated():
         return HttpResponseRedirect("/dashboard/")
@@ -275,3 +292,16 @@ def dashboard(request):
 
         context_instance=RequestContext(request)
     )
+
+
+def generate_pdf(request):
+    report = request.GET['r']
+    report_id = request.GET['r_id']
+    if report == 'PL':
+        url = "/purchase/generate-pl/"+report_id+"/"
+    elif report == 'SL':
+        url = "/purchase/generate-sl/"+report_id+"/"
+    elif report == 'PO':
+        url = "/purchase/generate-po/"+report_id+"/"
+    
+    return HttpResponseRedirect(url)

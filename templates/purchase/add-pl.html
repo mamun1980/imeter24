@@ -155,7 +155,7 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
 
 	$scope.init();
 
-    $scope.removeSLItem = function (event) {
+    $scope.deleteSLItem = function (event) {
 
         var removed_item_id = event.currentTarget.attributes[1].value;
         console.log("removed item: "+ removed_item_id);
@@ -164,6 +164,12 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
             $("#add_pl_item_list tr.removed_item").append(removed_item); 
             $(event.target).closest('tr').remove();   
         }
+    };
+
+    $scope.removeSLItem = function (event) {
+
+        var removed_item_id = event.currentTarget.attributes[1].value;
+        $(event.target).closest('tr').remove();
     };
 
     $scope.searchPl = function(q) {
@@ -262,7 +268,7 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
             if ($scope.pl.pl_items.length > 0) {
                 for(var i=0; i < pl_items.length; i++) {
                     var str = "<tr class='add_item'>";
-                    str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+pl_items[i].id+"' readonly><input type='hidden'  name='sl_item_id' value='"+pl_items[i].id+"'></td>";
+                    str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+pl_items[i].id+"' readonly><input type='hidden'  name='pl_item_id' value='"+pl_items[i].id+"'></td>";
                     str += "<td><p class='bg-info item_desc'>"+pl_items[i].description+"</p></td>";
                     
                     str += "<td><select class='form-control' name='unit' disabled='true'>";
@@ -273,7 +279,7 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
                     str += "<td><input type='text' class='form-control decimal' name='item_qtybo' value='"+pl_items[i].qty_bo+"' readonly></td>";
                     str += "<td><input type='number' name='item_shipped' class='form-control' value='"+pl_items[i].qty_shipped+"' readonly></td>";
                     
-                    str += "<td><a class='remove-item btn' data-item-id='"+pl_items[i].id+"'  ng-click='removeSLItem($event)'>X</a></td>";
+                    str += "<td><a class='remove-item btn' data-item-id='"+pl_items[i].id+"'  ng-click='deleteSLItem($event)'>X</a></td>";
                     str += "</tr>";
                     
                     var element = $compile(str)($scope);
@@ -284,6 +290,31 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
         });
         
         
+    }
+
+    $scope.searchJob = function(q) {
+        if(q.length > 1) {
+            url = "/schedule/job/search/?q=" + q
+            $http({method: 'GET', url: url}).
+                success(function(data, status, headers, config) {
+                    console.log(data);
+                    $scope.schedule_jobs = data;
+                });
+            $("#job_list").show();
+            
+            
+        } else {
+            $("#job_list").hide();
+        }
+    }
+
+    $scope.selectJob = function (job) {
+        $scope.schedule_job = job;
+        $("#id_job_number").val(job.job_id)
+        $("#job_list").hide();
+        $("#job-details").show();
+        $scope.search_job = '';
+
     }
 
     $scope.searchSoldTo  = function(q) {
@@ -383,6 +414,53 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
         $scope.show_sl_list = false;
         
         $("#id_sl_number").val(sl.sl_number);
+    }
+
+    $scope.searchSLItem = function(q) {
+        if(q.length > 1) {
+            var sl_number = $("#id_sl_number").val();
+            console.log("SL NUMBER:"+sl_number);
+            if (sl_number) {
+                var url = "/purchase/sl-item-json/"+sl_number+"/";    
+            } else {
+                var url = "/purchase/sl-item-json/";
+            }
+            
+            $http({method: 'GET', url: url}).
+                success(function(data, status, headers, config){
+                console.log(data);
+                $scope.items = data;
+            });
+            $("#items_list").show();
+        } else {
+            $("#items_list").hide();
+        }
+    }
+
+    $scope.selectSLItem = function(item) {
+        $("#items_list").hide();
+        $scope.search_item = '';
+        console.log(item);
+        
+        var str = "<tr class='add_item'>";
+        str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+item.item_number+"' readonly><input type='hidden'  name='sl_item_id' value='"+item.id+"'></td>";
+        str += "<td><p class='bg-info item_desc'>"+item.description+"</p></td>";
+        
+        str += "<td><select class='form-control' name='unit'>";
+        str += "<option ng-repeat='um in item_unit_measures' value='{[{um.id}]}' ng-selected='{[{um.id}]} == "+item.item_unit_measure_id+"'>{[{um.unit_name}]}</option>";
+        str += "</select></td>";
+
+        str += "<td><input type='text' class='form-control' name='item_ordered' value='"+item.ordered+"' readonly></td>";
+        str += "<td><input type='text' class='form-control decimal' name='item_qtybo' value='"+item.backordered+"' readonly></td>";
+        str += "<td><input type='number' name='item_shipped' class='form-control' value='"+item.shipped+"' readonly></td>";
+        
+        str += "<td><a class='remove-item btn' data-item-id='"+item.id+"'  ng-click='removeSLItem($event)'>X</a></td>";
+        str += "</tr>";
+        
+        var element = $compile(str)($scope);
+
+        $("tbody#add_pl_item_list").prepend(element);
+
     }
 }]);
 

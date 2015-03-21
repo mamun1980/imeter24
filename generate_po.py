@@ -7,7 +7,7 @@ def main(argv):
    inputfile = ''
    outputfile = ''
    try:
-      import pdb; pdb.set_trace();
+      # import pdb; pdb.set_trace();
       opts, args = getopt.getopt(argv,"p:f:")
    except getopt.GetoptError:
       print 'test.py -i <inputfile> -o <outputfile>'
