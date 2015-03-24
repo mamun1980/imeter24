@@ -9,12 +9,13 @@
 	<div class="panel-body">
 	<form name='add-permission' action="/scomuser/permission/add/" method="post">{% csrf_token %}
 	<input type="hidden" value="{{ user_obj.id }}" name="user_id">
-	<table>
+	<table class="table">
 	<tr>
 		<td>
-			<select id='edit-permissions' multiple='multiple'>
+
+			<select id='edit-permissions' multiple='multiple' class="form-control">
 				{% for perm in all_permissions %}
-					<option data-model="{{ perm.content_type_id }}" value="{{ perm.codename }}" {% if perm in permissions %} selected {% endif %}>{{ perm.name }}</option>
+					<option data-model="{{ perm.content_type_id }}" value="{{ perm.codename }}" {% if perm in permissions %} selected {% endif %}>{{perm.content_type.app_label}}-> {{ perm.codename }}</option>
 				{% endfor %}
 
 			</select>
@@ -22,7 +23,7 @@
 	</tr>
 	<tr>
 		<td style="padding-top: 20px;">
-			<button type="submit" class="btn btn-lg">Update Permission</button>
+			<button type="submit" class="btn btn-primary btn-lg">Update Permission</button>
 		</td>
 	</tr>
 		
@@ -35,7 +36,7 @@
 </div>
 <script type="text/javascript">
 (function(){
-
+/*
 	$('#edit-permissions').multiSelect({
 		selectableHeader: "<input type='text' class='search-input form-control' autocomplete='off' placeholder='search permission'>",
 		selectionHeader: "<input type='text' class='search-input form-control' autocomplete='off' placeholder='search permission'>",
@@ -71,7 +72,7 @@
 		this.qs2.cache();
 		}
 	});
-
+*/
 	$("form[name='add-permission']").on('submit', function(e){
 		e.preventDefault();
 		options = $("select#edit-permissions").val();

@@ -155,7 +155,7 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
 
 	$scope.init();
 
-    $scope.deleteSLItem = function (event) {
+    $scope.deleteItem = function (event) {
 
         var removed_item_id = event.currentTarget.attributes[1].value;
         console.log("removed item: "+ removed_item_id);
@@ -166,7 +166,7 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
         }
     };
 
-    $scope.removeSLItem = function (event) {
+    $scope.removeItem = function (event) {
 
         var removed_item_id = event.currentTarget.attributes[1].value;
         $(event.target).closest('tr').remove();
@@ -264,11 +264,17 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
             $("#id_invoiced_on").val($scope.pl.invoiced_on);
 
             console.log($scope.pl.pl_items)
-            pl_items = $scope.pl.pl_items;
-            if ($scope.pl.pl_items.length > 0) {
+            // pl_items = $scope.pl.pl_items;
+
+        });
+        $http({method:'GET', url: '/purchase/get-pl-items/'+pl.pl_number+'/'}).
+            success(function(data, status, header, config) {
+            var pl_items = data;
+            console.log('pl data: '+data);
+            if (pl_items.length > 0) {
                 for(var i=0; i < pl_items.length; i++) {
                     var str = "<tr class='add_item'>";
-                    str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+pl_items[i].id+"' readonly><input type='hidden'  name='pl_item_id' value='"+pl_items[i].id+"'></td>";
+                    str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+pl_items[i].item_number+"' readonly><input type='hidden'  name='pl_item_id' value='"+pl_items[i].id+"'></td>";
                     str += "<td><p class='bg-info item_desc'>"+pl_items[i].description+"</p></td>";
                     
                     str += "<td><select class='form-control' name='unit' disabled='true'>";
@@ -279,7 +285,7 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
                     str += "<td><input type='text' class='form-control decimal' name='item_qtybo' value='"+pl_items[i].qty_bo+"' readonly></td>";
                     str += "<td><input type='number' name='item_shipped' class='form-control' value='"+pl_items[i].qty_shipped+"' readonly></td>";
                     
-                    str += "<td><a class='remove-item btn' data-item-id='"+pl_items[i].id+"'  ng-click='deleteSLItem($event)'>X</a></td>";
+                    str += "<td><a class='remove-item btn' data-item-id='"+pl_items[i].id+"'  ng-click='deleteItem($event)'>X</a></td>";
                     str += "</tr>";
                     
                     var element = $compile(str)($scope);
@@ -288,6 +294,7 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
                 }
             }
         });
+            
         
         
     }
@@ -416,7 +423,7 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
         $("#id_sl_number").val(sl.sl_number);
     }
 
-    $scope.searchSLItem = function(q) {
+    $scope.searchItem = function(q) {
         if(q.length > 1) {
             var sl_number = $("#id_sl_number").val();
             console.log("SL NUMBER:"+sl_number);
@@ -443,7 +450,7 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
         console.log(item);
         
         var str = "<tr class='add_item'>";
-        str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+item.item_number+"' readonly><input type='hidden'  name='sl_item_id' value='"+item.id+"'></td>";
+        str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+item.item_number+"' readonly><input type='hidden'  name='item_id' value='"+item.id+"'></td>";
         str += "<td><p class='bg-info item_desc'>"+item.description+"</p></td>";
         
         str += "<td><select class='form-control' name='unit'>";
@@ -452,9 +459,9 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
 
         str += "<td><input type='text' class='form-control' name='item_ordered' value='"+item.ordered+"' readonly></td>";
         str += "<td><input type='text' class='form-control decimal' name='item_qtybo' value='"+item.backordered+"' readonly></td>";
-        str += "<td><input type='number' name='item_shipped' class='form-control' value='"+item.shipped+"' readonly></td>";
+        str += "<td><input type='number' name='item_shipped' class='form-control' value='"+item.shipped+"'></td>";
         
-        str += "<td><a class='remove-item btn' data-item-id='"+item.id+"'  ng-click='removeSLItem($event)'>X</a></td>";
+        str += "<td><a class='remove-item btn' data-item-id='"+item.id+"'  ng-click='removeItem($event)'>X</a></td>";
         str += "</tr>";
         
         var element = $compile(str)($scope);

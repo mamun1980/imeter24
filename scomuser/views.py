@@ -537,6 +537,7 @@ def view_payroll(request, payroll_id):
 def scomuser_permission_add(request):
 
     if request.method == "POST":
+        # import pdb; pdb.set_trace();
         user_id = request.POST['user_id']
         perm_list = request.POST.getlist("selected_permissions[]")
         myuser = User.objects.get(id=user_id)

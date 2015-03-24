@@ -345,7 +345,7 @@ class PackingList(models.Model):
 		)
 
 class PackingItem(models.Model):
-	shipping_item = models.ForeignKey(ShippingItem, blank=True, null=True, related_name='sl')
+	item = models.ForeignKey(Item, blank=True, null=True, related_name='packing-item')
 	description = models.TextField(blank=True, null=True)
 	unit = models.CharField(max_length=20, blank=True, null=True)
 	qty_ordered = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)

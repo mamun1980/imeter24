@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container shadow4 main-body">
+<div class="container-fluid shadow4 main-body">
 	
 	<section class="row">
 		
@@ -94,8 +94,12 @@
             url: "/schedule/comment/add/",
             data: form_data,
             success: function(rdata) {
-                // alert(rdata);
-                $("#add-comment").prepend(rdata);
+                if(rdata != 'no_permission') {
+                	$("#add-comment").prepend(rdata);	
+                } else {
+                	alert('No permission');
+                }
+                
             }
         })
 	});

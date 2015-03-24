@@ -391,8 +391,8 @@
 			<tbody id="add_pl_item_list">
 				<tr style="border-top: 2px dotted red;">
 				<td style="position: relative;">
-					<input type="text" class="form-control added_item_number" name="" value="" ng-model="search_item" ng-change="searchSLItem(search_item)" placeholder="search for item" autocomplete="off">
-					<input type="hidden" id='id_item_number' name="item_number" value="{[{search_item}]}">
+					<input type="text" class="form-control added_item_number" name="" value="" ng-model="search_item" ng-change="searchItem(search_item)" placeholder="search for item" autocomplete="off">
+					
 					<table class="table" id="items_list">
 						<thead>
 							<tr>
@@ -407,7 +407,7 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr ng-repeat="item in items" ng-click="selectSLItem(item)">
+							<tr ng-repeat="item in items" ng-click="selectItem(item)">
 								<td>{[{item.item_number}]}</td>
 								<td>{[{item.shipping_list}]}</td>
 								<td>{[{item.description}]}</td>

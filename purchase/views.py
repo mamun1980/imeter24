@@ -1883,7 +1883,7 @@ def get_packing_list(request, pl_number):
 # return HttpResponse(data, content_type='application/json')
 
 def get_pl_items(request, pl_number=None):
-    if id:
+    if pl_number:
         try:
             pl = PackingList.objects.get(pl_number=pl_number)
             pl_items = PackingItem.objects.filter(pl=pl, status=0)
@@ -1899,12 +1899,15 @@ def get_pl_items(request, pl_number=None):
     plitems = []
     for item in pl_items:
         item_dict = {}
-        item_dict['item_number'] = item.shipping_item.item.item_number
+        item_dict['id'] = item.id
+        item_dict['item_number'] = item.item.item_number
         item_dict['description'] = item.description
         item_dict['unit'] = item.unit
-        item_dict['price'] = float(item.shipping_item.item.retail_price)
+        if item.item.retail_price:
+            item_dict['price'] = float(item.item.retail_price)
+            item_dict['sub_total'] = float(item.qty_shipped) * float(item.item.retail_price)
         item_dict['shipped'] = float(item.qty_shipped)
-        item_dict['sub_total'] = float(item.qty_shipped) * float(item.shipping_item.item.retail_price)
+            
         item_dict['pl'] = item.pl.pl_number
         item_dict['search_string'] = item.search_string
         

@@ -11,7 +11,7 @@ from haystack.forms import ModelSearchForm, SearchForm
 from haystack.query import SearchQuerySet, EmptySearchQuerySet
 from haystack.views import SearchView
 from haystack.inputs import Raw, Clean, AutoQuery
-
+from django.contrib import messages
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 # from premierelevator.models import SystemVariable
 # Create your views here.
@@ -22,7 +22,8 @@ def home(request):
     jobs = Job.objects.all()
 
     job_lookup_form = JobLookupForm()
-    return render(request, 'schedule/job-list.html', {'jobs': jobs, 'job_lookup_form': job_lookup_form, 'page_title': 'List Job'})
+    return render(request, 'schedule/job-list.html', 
+        {'jobs': jobs, 'job_lookup_form': job_lookup_form, 'page_title': 'List Job'})
 
 def get_job(request, job_id):
     job = Job.objects.get(id=job_id)
@@ -682,17 +683,22 @@ def total_pending_job(request):
 
 @csrf_exempt
 @login_required
-@permission_required("schedule.add_comment")
+# @permission_required("schedule.add_comment")
 def add_comment(request):
     if request.method == 'POST':
         # import pdb; pdb.set_trace();
-        comment_form = CommentForm(request.POST)
-        # comment = request.POST.get("commnet", "")
-        # job_number = request.POST.get("job_number", "")
-        # comment_by = request.POST.get("comment_by", "admin")
-        if comment_form.is_valid():
-            comment = comment_form.save()
-            return render(request, "schedule/add-comment-tpl.html", {'comment': comment})
+        user = request.user
+        if user.has_perm("schedule.add_comment"):
+            comment_form = CommentForm(request.POST)
+            # comment = request.POST.get("commnet", "")
+            # job_number = request.POST.get("job_number", "")
+            # comment_by = request.POST.get("comment_by", "admin")
+            if comment_form.is_valid():
+                comment = comment_form.save()
+                return render(request, "schedule/add-comment-tpl.html", {'comment': comment})
+        else:
+            messages.error(request, "No permission to add comment")
+            return HttpResponse('no_permission')
 
 
 

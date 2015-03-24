@@ -9,7 +9,7 @@
   	<div class="panel-body">
 		<form name='update-group' action="/group/update/" method="post">{% csrf_token %}
 			<input type="hidden" value="{{ user_obj.id }}" name="user_id">
-			<table>
+			<table class="table">
 				<tr>
 					<td>
 						<select id='edit-group' multiple='multiple' name="selected-groups">
@@ -22,7 +22,7 @@
 				</tr>
 				<tr>
 					<td style="padding-top: 20px;">
-						<button type="submit" class="btn btn-lg">Update Group</button>
+						<button type="submit" class="btn btn-primary btn-lg">Update Group</button>
 					</td>
 				</tr>
 				
