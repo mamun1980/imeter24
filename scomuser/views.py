@@ -537,17 +537,12 @@ def view_payroll(request, payroll_id):
 def scomuser_permission_add(request):
 
     if request.method == "POST":
-        # import pdb; pdb.set_trace();
         user_id = request.POST['user_id']
         perm_list = request.POST.getlist("selected_permissions[]")
         myuser = User.objects.get(id=user_id)
         myuser.user_permissions.clear()
         for perm in perm_list:
-            content_type_id = perm.split("-")[0]
-            codename = perm.split("-")[1]
-            model_name = perm.split("_")[-1]
-            ct = ContentType.objects.get(id=content_type_id)
-            permission = Permission.objects.get(codename=codename, content_type=ct)
+            permission = Permission.objects.get(id=perm)
             myuser.user_permissions.add(permission)
 
         messages.success(request, "Permissions updated successfully.")      

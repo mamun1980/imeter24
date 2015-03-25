@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container main-body">
+<div class="container-fluid main-body">
 	<div class="row"  style="margin-top: 20px;">
-	    <div class="col-md-5 col-md-offset-3">
+	    <div class="col-md-10 col-md-offset-1">
 	    	<div class="panel panel-primary">
 				<div class="panel-heading">
 			    	<h6>Edit Group</h6>
@@ -11,30 +11,43 @@
 			  	<form name="add-group" action="/group/edit/{{group.id}}/" method="POST">{% csrf_token %}
 			  	<div class="panel-body">
 			  		
-			    	<div class="input-group">
-					  	{% for field in group_form %}
-					  		{{ field }}
-					  	{% endfor %}
-					  	<div class="input-group-btn">
-							<button class="btn btn-primary" type="submit">Update Group</button>
-						</div>
-					</div>
+				  	{% for field in group_form %}
+<h5><p class="bg-info" style="padding:10px;">Update group {{field.label}}</p></h5>
+				  		{{ field }}
+				  		
+				  	{% endfor %}
+<h5><p class="bg-info" style="padding:10px;">Update group permissions</p></h5>
+	
+<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 
-				</div>
+{% for perms in all_permissions %}
+<div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="heading{{ perms.app_label }}">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#{{ perms.app_label }}" aria-expanded="true" aria-controls="{{ perms.app_label }}">
+          {{ perms.app_label }}
+        </a>
+      </h4>
+    </div>
+    <div id="{{ perms.app_label }}" class="panel-collapse collapse {% if forloop.first %} in {% endif %}" role="tabpanel" aria-labelledby="heading{{ perms.app_label }}">
+      <div class="panel-body">
+			
+				{% for content_type in perms.content_type %}
+					<li>{{content_type.name}}</li>
+					{% for permission in content_type.permissions %}
+						<input type="checkbox" class="permissions" name="permissions" value="{{permission.id}}" {% if permission in permissions %} checked="checked"{% endif %} class="form-control"> {{permission.codename}}
+					{% endfor %}
+				{% endfor %}
 
-				<table class="table">
-					<tr>
-						<td>
-							<select id='group-permissions' multiple='multiple'>
-								{% for perm in all_permissions %}
-									<option data-model="{{ perm.content_type_id }}" value="{{ perm.codename }}" {% if perm in permissions %} selected {% endif %}>{{ perm.name }}</option>
-								{% endfor %}
-
-							</select>
-						</td>
-					</tr>
+			
+			</div>
+	    </div>
+	</div>
+{% endfor %}
 						
-				</table>
+</div>
+<button type="submit" class="btn btn-primary">Update</button>
+</div>
 				</form>
 			</div>
 	    	
@@ -45,67 +58,26 @@
 <script type="text/javascript">
 (function(){
 
-	$('#group-permissions').multiSelect({
-		selectableHeader: "<input type='text' class='search-input form-control' autocomplete='off' placeholder='search permission'>",
-		selectionHeader: "<input type='text' class='search-input form-control' autocomplete='off' placeholder='search permission'>",
-		
-		afterInit: function(ms){
-		var that = this,
-		    $selectableSearch = that.$selectableUl.prev(),
-		    $selectionSearch = that.$selectionUl.prev(),
-		    selectableSearchString = '#'+that.$container.attr('id')+' .ms-elem-selectable:not(.ms-selected)',
-		    selectionSearchString = '#'+that.$container.attr('id')+' .ms-elem-selection.ms-selected';
-
-		that.qs1 = $selectableSearch.quicksearch(selectableSearchString)
-		.on('keydown', function(e){
-		  if (e.which === 40){
-		    that.$selectableUl.focus();
-		    return false;
-		  }
-		});
-
-		that.qs2 = $selectionSearch.quicksearch(selectionSearchString)
-		.on('keydown', function(e){
-		  if (e.which == 40){
-		    that.$selectionUl.focus();
-		    return false;
-		  }
-		});
-		},
-		
-		afterSelect: function(){
-			this.qs1.cache();
-			this.qs2.cache();
-		},
-		
-		afterDeselect: function(){
-			this.qs1.cache();
-			this.qs2.cache();
-		}
-	});
-
+	
 	$("form[name='add-group']").on('submit', function(e){
 		e.preventDefault();
-		options = $("select#group-permissions").val();
-		group_name = $("input[name='name']").val();
-		url = $(this).attr("action");
+		var permission_list = [];
+		var group_name = $("#id_name").val();
 
-		console.log(url)
-		my_perms = [];
-
-		if (options != null) {
-			for(i=0; i<options.length; i++) {
-				model = $("option[value='"+options[i]+"']").data("model");
-				my_perms.push(model+"-"+options[i]);			
+		$('input.permissions[type=checkbox]').each(function(){
+			if(this.checked){
+				permission_list.push($(this).val());	
 			}
-			console.log(my_perms);
-		}
-		
+			
+		});
+		url = $(this).attr("action");
+		console.log(group_name);
+		console.log(permission_list);
 		$.ajax({
 	    	type: "POST",
 	    	url: url,
 	    	data: {
-				'selected_permissions': my_perms,
+				'selected_permissions': permission_list,
 				'group_name': group_name,
 			},
 	    	success: function(data) {

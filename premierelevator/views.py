@@ -230,7 +230,7 @@ def edit_group(request, group_id):
     permissions = group.permissions.all()
 
     if request.method == "POST":
-        
+        # import pdb; pdb.set_trace();
         group_name = request.POST.get("group_name","")
         if group_name != "":
             group.name = group_name
@@ -240,11 +240,7 @@ def edit_group(request, group_id):
             group.permissions.clear()
             
             for perm in group_perms:
-                content_type_id = perm.split("-")[0]
-                codename = perm.split("-")[1]
-                model_name = perm.split("_")[-1]
-                ct = ContentType.objects.get(id=content_type_id)
-                permission = Permission.objects.get(codename=codename, content_type=ct)
+                permission = Permission.objects.get(id=perm)
                 group.permissions.add(permission)
 
             return HttpResponse('success')

@@ -12,14 +12,36 @@
 	<table class="table">
 	<tr>
 		<td>
+		<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 
-			<select id='edit-permissions' multiple='multiple' class="form-control">
-				{% for perm in all_permissions %}
-					<option data-model="{{ perm.content_type_id }}" value="{{ perm.codename }}" {% if perm in permissions %} selected {% endif %}>{{perm.content_type.app_label}}-> {{ perm.codename }}</option>
+{% for perms in all_permissions %}
+<div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="heading{{ perms.app_label }}">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#{{ perms.app_label }}" aria-expanded="true" aria-controls="{{ perms.app_label }}">
+          {{ perms.app_label }}
+        </a>
+      </h4>
+    </div>
+    <div id="{{ perms.app_label }}" class="panel-collapse collapse {% if forloop.first %} in {% endif %}" role="tabpanel" aria-labelledby="heading{{ perms.app_label }}">
+      <div class="panel-body">
+			
+				{% for content_type in perms.content_type %}
+					<li>{{content_type.name}}</li>
+					{% for permission in content_type.permissions %}
+						<input type="checkbox" class="permissions" name="permissions" value="{{permission.id}}" {% if permission in permissions %} checked="checked"{% endif %} class="form-control"> {{permission.codename}}
+					{% endfor %}
 				{% endfor %}
 
-			</select>
+			
+			</div>
+	    </div>
+	</div>
+{% endfor %}
+						
+</div>
 		</td>
+
 	</tr>
 	<tr>
 		<td style="padding-top: 20px;">
@@ -75,19 +97,26 @@
 */
 	$("form[name='add-permission']").on('submit', function(e){
 		e.preventDefault();
-		options = $("select#edit-permissions").val();
-		
-		console.log(options);
-		
-		my_perms = [];
+		var permission_list = [];
 
-		if (options != null) {
-			for(i=0; i<options.length; i++) {
-				model = $("option[value='"+options[i]+"']").data("model");
-				my_perms.push(model+"-"+options[i]);			
+		$('input.permissions[type=checkbox]').each(function(){
+			if(this.checked){
+				permission_list.push($(this).val());	
 			}
-			console.log(my_perms);
-		}
+			
+		});
+		console.log(permission_list);
+		// console.log(options);
+		
+		// my_perms = [];
+
+		// if (options != null) {
+		// 	for(i=0; i<options.length; i++) {
+		// 		model = $("option[value='"+options[i]+"']").data("model");
+		// 		my_perms.push(model+"-"+options[i]);			
+		// 	}
+		// 	console.log(my_perms);
+		// }
 		
 		
 		user_id = $("input[name='user_id']").val();
@@ -96,7 +125,7 @@
 	    	type: "POST",
 	    	url: "/scomuser/permission/add/",
 	    	data: {
-				'selected_permissions': my_perms,
+				'selected_permissions': permission_list,
 				'user_id': user_id
 			},
 	    	success: function(data) {
@@ -106,7 +135,8 @@
 	    	error: function(errors) {
 	    		console.log("errors");
 	    	}
-	    })
+	    });
+		
 	});
 
 })(jQuery)
