@@ -25,7 +25,7 @@
 			<div class="panel-heading">
 		    	<h4>Job Control list</h4>
 		  	</div>
-		  	<div class="panel-body">
+		  	
 		  		<table class="table table-bordered">
 		  		<thead>
 		  			<tr class="bg-info">
@@ -43,7 +43,7 @@
 		  			</tr>
 		  		</thead>
 		  		<tbody>
-		  			<tr ng-repeat="jc in job_controls | googleSearchFilter:search | filter:status">
+		  			<tr ng-repeat="jc in job_controls | filter:search">
 		  				<td>{[{jc.job_number}]}</td>
 		  				<td>{[{jc.sold_to}]}</td>
 		  				<td>{[{jc.ship_to}]}</td>
@@ -64,7 +64,7 @@
 		  		</tbody>
 		  			
 		  		</table>
-		  	</div>
+		  	
 		</div>
 	</div>
 	

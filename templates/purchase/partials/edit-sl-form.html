@@ -1,99 +1,182 @@
 <table class="table table-bordered add-sl-form">
-<tr class="bg-success">
+<tr>
 	<th width="150">
 		<label for="id_sl_number">SL Number:</label>
 	</th>
-	<td>
-		<input class="form-control" id="id_sl_number" name="sl_number" value="{{sl.id}}" type="text" readonly="">
+	<td colspan="3">
+		<div style="position: relative;">
+		<input class="form-control" id="id_sl_number_search" name="sl_number_search" type="search" placeholder="Search for SL by Customer Name, Phone Number, SL Number or Leave blank for new SL" ng-model="search_sl"  ng-disabled="sl_checked" autocomplete="off" >
+
+			<div id="sl_list" ng-show="sls.length && show_sl_list">
+				<table class="table">
+					<thead>
+						<tr>
+							<td>SL Number</td>
+							<td>Sold To</td>
+							<td>Ship To</td>
+							<td>Job Number</td>
+						</tr>
+						
+					</thead>
+					<tbody>
+						<tr ng-repeat="sl in sls" ng-click="selectSL(sl)">
+							<td>{[{sl.sl_number}]}</td>
+							<td>{[{sl.sold_to.contact_name}]}</td>
+							<td>{[{sl.ship_to.contact_name}]}</td>
+							<td>{[{sl.job_number}]}</td>
+						</tr>
+						
+					</tbody>
+					
+				</table>
+				
+			</div>
+			<div ng-show="!sls.length && show_sl_list">
+				No Shipping List Found!
+			</div>
+		</div>
+		<input id="id_sl_number" name="sl_number" type="hidden" value="{{sl.sl_number}}">
 	</td>
-	<td><label for="id_job_number">Job number:</label></td>
-	<td>
-		<input type='text' class='form-control item-job-number' name='item_job_number' value="{{sl.job_number.job_number}}"><input type='hidden' name='job_number' id='id_job_number' value="{{sl.job_number.job_number}}">
-	</td>
+	
 </tr>
 
-<tr>
+<tr class="bg-success">
 <td width="">
 	<label for="id_sold_to">Sold to:</label>
 </td>
-<td>
+<td colspan="3">
 	<div class="contact_box">
 		
 	
-		<input type="text" ng-model="search_sold_to" placeholder="start typing to search sold to contact" class="form-control">
+		<input type="text" ng-model="search_sold_to" placeholder="start typing to search sold to contact" class="form-control" ng-change="searchSoldTo(search_sold_to)">
 		<table class="table table-bordered" id="sold_to_contact_details">
 			<tr>
 				<th width="150">Contact Name</th>
 				<td>{[{ sold_to_contact.contact_name }]}</td>
 			</tr>
 			<tr>
+				<th>Address</th>
+				<td>
+					{[{ sold_to_contact.city }]} <br/>
+					{[{ sold_to_contact.address_1 }]} <br/>
+				</td>
+			</tr>
+			<tr>
 				<th>Phone</th>
-				<td>{[{ sold_to_contact.phone }]}</td>
+				<td>
+					<li ng-repeat="phone in sold_to_contact.phones" class="bg-info">
+						{[{phone.phone}]} ({[{phone.phone_ext}]})
+					</li>
+				</td>
 			</tr>
 			<tr>
 				<th>Email</th>
-				<td><span class='bg-info email' ng-repeat="em in sold_to_contact.emails">{[{ em.email_address}]}</span></td>
+				<td>
+					<li ng-repeat="em in sold_to_contact.emails">
+						<span class='bg-info email'>{[{ em.email_address}]} ({[{em.email_type}]})</span>
+					</li>
+				</td>
 			</tr>
 		</table>
 		<table class="table sold_to_contact" id="sold_to_contact_list">
 			<thead>
 				<tr>
-					<th>Contact Name</th><th> City <a href="" class="close">x</a></th>
+					<th>Contact Name</th>
+					<th> City</th>
+					<th> Address </th>
+					<th> Emails </th>
+					<th> Phones <a href="" class="close">x</a></th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr ng-repeat="con in contacts | googleSearchFilter:search_sold_to" ng-click="selectSoldTo(con)">
+				<tr ng-repeat="con in soldto" ng-click="selectSoldTo(con)">
 					
 					<td>{[{con.contact_name}]}</td>
 					<td>{[{con.city}]}</td>
+					<td>{[{con.address_1}]}</td>
+					<td>
+						<li ng-repeat="em in con.emails">{[{em.email_address}]} ({[{em.email_type}]})</li>
+					</td>
+					
+					<td>
+						<li ng-repeat="ph in con.phones">{[{ph.phone}]}-({[{ph.phone_ext}]})</li>
+						
+					</td>
 				</tr>
 			</tbody>
 		</table>
 
-		<select ng-model="sold_to" class="form-control" id="id_sold_to" name="sold_to" style="display:none;">
-			<option ng-repeat="contact in contacts" value="{[{contact.id}]}">{[{ contact.contact_name }]}</option>
-		</select>
+		<input type="hidden" id="id_sold_to" name="sold_to">
 	</div>
 </td>
-
+</tr>
+<tr>
 <td width="">
 	<label for="id_ship_to">Ship to:</label>
 </td>
-<td>
+<td colspan="3">
 	<div class="contact_box">
-		<input type="text" ng-model="search_ship_to" placeholder="start typing to search ship to contact" class="form-control">
+		<input type="text" ng-model="search_ship_to" placeholder="start typing to search ship to contact" class="form-control" ng-change="searchShipTo(search_ship_to)">
 		<table class="table table-bordered" id="ship_to_contact_details">
 			<tr>
 				<th width="150">Contact Name</th>
 				<td>{[{ ship_to_contact.contact_name }]}</td>
 			</tr>
 			<tr>
+				<th>Address</th>
+				<td>
+					{[{ ship_to_contact.city }]} <br/>
+					{[{ ship_to_contact.address_1 }]} <br/>
+				</td>
+			</tr>
+			<tr>
 				<th>Phone</th>
-				<td>{[{ ship_to_contact.phone }]}</td>
+				<td>
+					<li ng-repeat="phone in ship_to_contact.phones" class="bg-info">
+						{[{phone.phone}]} ({[{phone.phone_ext}]})
+					</li>
+				</td>
 			</tr>
 			<tr>
 				<th>Email</th>
-				<td><span class='bg-info email' ng-repeat="em in ship_to_contact.emails">{[{ em.email_address}]}</span></td>
+				<td>
+					<li ng-repeat="em in ship_to_contact.emails">
+						<span class='bg-info email'>{[{ em.email_address}]} ({[{em.email_type}]})</span>
+					</li>
+				</td>
 			</tr>
 		</table>
 		<table class="table ship_to_contact" id="ship_to_contact_list">
 			<thead>
 				<tr>
-					<th>Contact Name</th><th> City <a href="" class="close">x</a></th>
+					<th>Contact Name</th>
+					<th> City</th>
+					<th> Address </th>
+					<th> Emails </th>
+					<th> Phones <a href="" class="close">x</a></th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr ng-repeat="con in contacts | googleSearchFilter:search_ship_to" ng-click="selectShipTo(con)">
+				<tr ng-repeat="con in shipto" ng-click="selectShipTo(con)">
 					
 					<td>{[{con.contact_name}]}</td>
 					<td>{[{con.city}]}</td>
+					<td>{[{con.address_1}]}</td>
+					
+					<td>
+						<li ng-repeat="em in con.emails">{[{em.email_address}]} ({[{em.email_type}]})</li>
+					</td>
+					
+					<td>
+						<li ng-repeat="ph in con.phones">{[{ph.number}]}-({[{ph.ext}]})</li>
+						
+					</td>
 				</tr>
 			</tbody>
+			
 		</table>
 
-		<select ng-model="ship_to" class="form-control" id="id_ship_to" name="ship_to" style="display:none;">
-			<option ng-repeat="contact in contacts" value="{[{contact.id}]}">{[{ contact.contact_name }]}</option>
-		</select>
+		<input type="hidden" id="id_ship_to" name="ship_to">
 	</div>
 </td>
 			  			
@@ -104,27 +187,27 @@
 		<label for="id_ordered_date">Ordered Date:</label>
 	</th>
 	<td>
-		<input class="form-control datepicker" id="id_ordered_date" name="ordered_date" value="{{sl.ordered_date}}" type="text" >
+		<input class="form-control datepicker" id="id_ordered_date" name="ordered_date" placeholder="date issued" type="text" >
 	</td>
 	<th width="150">
 		<label for="id_date_required">Date required:</label>
 	</th>
 	<td>
 
-
-		<input class="form-control datepicker" id="id_date_required" name="date_required" value="{{sl.date_required}}" type="text">
+		<input class="form-control datepicker" id="id_date_required" name="date_required" placeholder="date expected" type="text">
 	</td>
 	
 </tr>
 
 <tr>		  			
-	<td ><label for="id_customer_po_number">Customer po number:</label></td>
+	<td >
+	<label for="id_customer_po_number">Customer po number:</label></td>
 	<td>
-		<input class="form-control" id="id_customer_po_number" maxlength="20" name="customer_po_number" value="{{sl.customer_po_number}}" type="text">
+		<input class="form-control" id="id_customer_po_number" maxlength="20" name="customer_po_number" placeholder="Customer PO Number" type="text">
 	</td>
 	<td width=""><label for="id_customer_job_number">Customer job number:</label></td>
 	<td>
-		<input class="form-control" id="id_customer_job_number" maxlength="20" name="customer_job_number" value="{{sl.customer_job_number}}" type="text">
+		<input class="form-control" id="id_customer_job_number" maxlength="20" name="customer_job_number" placeholder="Customer Job Number" type="text">
 	</td>
 </tr>
 <tr class="bg-success">
@@ -132,11 +215,39 @@
 	<td>
 	<select class="form-control" id="id_ship_via" name="ship_via">
 		{% for sv in ship_vias %}
-		<option value="{{sv.id}}" {% if sv.id == sl.ship_via.id %} selected='selected' {% endif %}>{{ sv.delivery_choice }}</option>
+		<option value="{{sv.id}}">{{ sv.delivery_choice }}</option>
 		{% endfor %}
 	</select>
 </td>
-<td colspan="2"></td>
+<td><label for="id_job_number">Job number:</label></td>
+	<td>
+		<div style="position: relative">		
+			<input type='text' class='form-control item-job-number' placeholder='Start typing to search job' ng-model="search_job" ng-change="searchJob(search_job)" autocomplete="off">
+			<input type='hidden' name='job_number' id='id_job_number'>
+			<div id="job_list" ng-show="jobs.length && show_job_list">
+				<table class="table">
+					<thead>
+						<tr>
+							<td>Job Number</td>
+							<td>Job Name</td>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="job in jobs" ng-click="selectJob(job)">
+							<td>{[{job.job_number}]}</td>
+							<td>{[{job.job_name}]}</td>
+						</tr>
+						
+					</tbody>
+					
+				</table>
+				
+			</div>
+			<div ng-show="!jobs.length && show_job_list">
+				No Job List Found!
+			</div>
+		</div>
+	</td>
 </tr>
 
 
@@ -186,19 +297,17 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr ng-repeat="item in items | googleSearchFilter:search_item" ng-click="selectItem(item)">
+							<tr ng-repeat="item in items" ng-click="selectItem(item)">
 								<td>{[{item.item_number}]}</td>
 								<td>{[{item.description}]}</td>
 								<td>{[{item.item_unit_measure}]}</td>
 								<td>{[{item.wholesale_cost}]}</td>
 								<td>{[{item.currency}]}</td>
-								<td>{[{item.primary_supplier}]}</td>
+								<td>{[{item.primary_supplier.contact_name}]}</td>
 								<td>{[{item.quantity_on_hand}]}</td>
 								<td>{[{item.quantity_on_order}]}</td>
 								<td>{[{item.last_ordered}]}</td>
-								<td></td>
-								
-								
+								<td></td>								
 							</tr>
 
 							<tr ng-show="!items.length">
@@ -215,7 +324,7 @@
 				</td>
 				
 				<td>
-					<input type='number' class='form-control demo_box' placeholder='Shipped today'>
+					<input type='number' class='form-control demo_box' placeholder='Shipped today' readonly>
 				</td>
 				<td>
 					<input type='number' class='form-control demo_box' placeholder='Shipped total to date' readonly>
@@ -233,7 +342,11 @@
 				<td></td>
 				
 				</tr>				
+				<tr class="removed_item">
+					
+				</tr>
 			</tbody>
+			
 							
 			</table>
 				

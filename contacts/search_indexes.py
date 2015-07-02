@@ -38,6 +38,17 @@ class ContactIndex(indexes.SearchIndex, indexes.Indexable):
             elist.append(email)
 
         self.prepared_data['emails'] = elist
+
+        
+        # if obj.contactprofile:
+        #     con_profile = obj.contactprofile
+        #     term = {}
+        #     if con_profile.terms:
+        #         term['id'] = con_profile.terms.id
+        #         term['term'] = con_profile.terms.term
+        #         self.prepared_data['term'] = term
+            
+
         return self.prepared_data
 
     def index_queryset(self, using=None):

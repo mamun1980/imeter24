@@ -10,8 +10,7 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding model 'Job'
         db.create_table(u'schedule_job', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('job_number', self.gf('django.db.models.fields.CharField')(max_length=20)),
+            ('job_number', self.gf('django.db.models.fields.CharField')(max_length=20, primary_key=True)),
             ('cab_designation', self.gf('django.db.models.fields.CharField')(max_length=50, null=True, blank=True)),
             ('date_opened', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
             ('date_required', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
@@ -202,9 +201,8 @@ class Migration(SchemaMigration):
             'drawing_req_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
             'drawing_sent_to_customer_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
             'eng_comment': ('django.db.models.fields.TextField', [], {'max_length': '200', 'null': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'job_name': ('django.db.models.fields.CharField', [], {'max_length': '150', 'null': 'True', 'blank': 'True'}),
-            'job_number': ('django.db.models.fields.CharField', [], {'max_length': '20'}),
+            'job_number': ('django.db.models.fields.CharField', [], {'max_length': '20', 'primary_key': 'True'}),
             'number_of_cabs': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'po_number': ('django.db.models.fields.CharField', [], {'max_length': '40', 'null': 'True', 'blank': 'True'}),
             'search_string': ('django.db.models.fields.TextField', [], {'max_length': '1000', 'null': 'True', 'blank': 'True'}),

@@ -147,6 +147,8 @@ class Item(models.Model):
 	def get_currency(self):
 		if self.currency:
 			pass
+	
+	@property	
 	def order_restriction(self):
 		if self.max_order_qty_remains and self.max_single_order_qty:
 			if self.max_order_qty_remains <= self.max_single_order_qty:
@@ -154,7 +156,7 @@ class Item(models.Model):
 			else:
 				return self.max_single_order_qty
 		else:
-			return -1
+			return self.max_single_order_qty
 
 	class Meta:
 		verbose_name = "Item"
@@ -171,7 +173,7 @@ class ItemComment(models.Model):
 	comment_by = models.ForeignKey(User, blank=True, null=True)
 
 	def __unicode__(self):
-		return self.item_number
+		return self.item.item_number
 
 	class Meta:
 		verbose_name = "ItemComment"

@@ -1,35 +1,38 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container shadow4 main-body">
+<div class="container shadow4 main-body" ng-app="contactApp">
 <section class="row ">
 	
 	<div class="col-md-6 col-md-offset-3">
-		<div class="panel panel-primary">
+		<div class="panel panel-primary" ng-controller="ContactController">
 			<div class="panel-heading">
 		    	<h4>ADD CONTACT</h4>
 		  	</div>
 		  	<div class="panel-body">
-			  	<form action="/contacts/add/" method="POST" enctype="multipart/form-data">{% csrf_token %}
-			  	<table class="add-user-table">
-			  		{% for fl in cform %}
-			  			<tr>
-			  				<td>{{ fl.label_tag }}</td>
-			  				<td>{{ fl.errors }}{{ fl }}</td>
-			  			</tr>
-			  		{% endfor %}
-			  		
-				<tr>
-					<td colspan="2">
-						<button type="submit" class="btn btn-primary btn-lg form-control login-btn">Add Contact</button>
-					</td>
-				</tr>
-				</table>
+			  	<form name="contact" action="/contacts/add/" method="POST" enctype="multipart/form-data">{% csrf_token %}
+			  	
+			  	{% include "contacts/partials/add-contact-form.html" %}
 				</form>
 			</div>
 		</div>
 	</div>
 </section>
 </div>
+
+<script type="text/javascript">
+var contactApp = angular.module("contactApp", [], function ($interpolateProvider) {
+        $interpolateProvider.startSymbol("{[{");
+        $interpolateProvider.endSymbol("}]}");
+});
+contactApp.controller('ContactController',['$scope', '$http', function ($scope, $http) {
+	$scope.init = function(){
+        
+    }
+    $scope.init();
+
+}]);
+
+</script>
 {% endblock content %}
 	

@@ -48,27 +48,47 @@ table#supplier_contact_details th, table#ship_to_contact_details th, table#sold_
 #pl_list, #invoice_list {
 	position: absolute;
 	z-index: 1000;
-	width: 400px;
+	width: 100%;
 
 }
-#pl_list ul, #invoice_list ul {
-	list-style: none;
-	padding-left: 2px;
-	margin-bottom: 1px;
+#pl_list table {
+    border:1px solid #333;
 }
-#pl_list ul li a,  #invoice_list ul li a{
-	background-color: #ADABA9;
-	cursor: hand;
+#pl_list thead tr {
+    background-color: #333;
+    color: #FF2;
+    font-size: 14px;
+
+}
+#pl_list tbody tr:hover {
+    background-color: #DDD;
+    border-top: 1px solid #EEE;
+}
+#pl_list tbody tr {
+    border-top: 1px solid #777;
 }
 #ship_to_contact_list, #sold_to_contact_list, #broker_contact_list, #items_list {
 	position: absolute;
 	z-index: 1000;
+    top: 34px;
 	border: 2px solid #333;
 }
 #ship_to_contact_list thead, #sold_to_contact_list thead, #broker_contact_list thead{
-	background-color: #000;
+	background-color: #ed791a;
 	color: #FFF;
 	font-style: bold;
+    font-size: 14px;
+}
+#ship_to_contact_list tbody, #sold_to_contact_list tbody, #broker_contact_list tbody{
+    background-color: #333;
+    color: #FFF;
+    font-size: 12px;
+}
+#ship_to_contact_list tbody tr:hover, #sold_to_contact_list tbody tr:hover, 
+#broker_contact_list tbody tr:hover{
+    background-color: #FECA40;
+    color: #000;
+    font-size: 12px;
 }
 #items_list {
 	width: 500px;
@@ -171,7 +191,7 @@ input.ng-invalid-max {
 			  	</div>
 				<div class="panel-body">
 
-					<form name='invoice-add-form' action="/purchase/add-invoice/" method="POST" enctype="multipart/form-data">	
+					<form name='invoice_add_form' action="/purchase/add-invoice/" method="POST" enctype="multipart/form-data">	
 					{% include "purchase/invoice/invoice-form.html" %}
 					</form>
 				</div>
@@ -264,7 +284,7 @@ invoiceApp.controller('InvoiceController', ['$scope', '$http', '$compile', funct
 		$scope.total_amount = 0.0;
 		$scope.hst_tax_amount = 0.0;
 		$scope.pst_tax_amount = 0.0;
-		$scope.show_add_button = false;
+		$scope.show_add_button = true;
 		$scope.show_update_button = false;
 
 		$scope.discount = 0.0;
@@ -274,13 +294,6 @@ invoiceApp.controller('InvoiceController', ['$scope', '$http', '$compile', funct
 		// intialize dateIssued value to current date
 		var now = new Date();
 		// $scope.dateIssued = now.dateFormat("m/d/Y");
-
-
-        $http({method: 'GET', url: "/purchase/get-pl-items/"}).
-        	success(function(data, status, headers, config){
-        	$scope.items = data;
-        });
-
         
         $http({method: 'GET', url: "/inventory/unit-measure-list/json/"}).
         	success(function(data, status, headers, config){
@@ -288,117 +301,137 @@ invoiceApp.controller('InvoiceController', ['$scope', '$http', '$compile', funct
         });
 
 		// Sold To
-		$("#sold_to_contact_list").hide();
+		// $("#sold_to_contact_list").hide();
 		$("#sold_to_contact_details").hide();
 		// ship to
-		$("#ship_to_contact_list").hide();
+		// $("#ship_to_contact_list").hide();
 		$("#ship_to_contact_details").hide();
 		// Broker
-		$("#broker_contact_list").hide();
+		// $("#broker_contact_list").hide();
 		$("#broker_contact_details").hide();
 
 		// Items
 		$("#items_list").hide();
 		// $("#po_list").hide();
 		$scope.show_po_list = false;
+
+        var items_count = $("input.added_item_number").length;
+        if(items_count < 2) {
+            $scope.item_added = false;
+        } else {
+            $scope.item_added = true;
+        }
 		
 	}
 
 	$scope.init();
 
 	$scope.searchPl = function(q) {
+        if(q != undefined){
 
-        if(q.length > 1) {
-            // console.log(q);
-            $http({method: 'GET', url: "/purchase/pl-list/"}).
-                success(function(data, status, headers, config){
-                $scope.pls = data;
-                // console.log(data);
-            });
-            // $("#po_list").show();
-            $scope.show_pl_list = true;
-        } else {
-            // $("#po_list").hide();
-            $scope.show_pl_list = false;
+
+            if(q.length > 1) {
+                // console.log(q);
+                $http({method: 'GET', url: "/purchase/pl-list/"}).
+                    success(function(data, status, headers, config){
+                    $scope.pls = data;
+                    // console.log(data);
+                });
+                // $("#po_list").show();
+                $scope.show_pl_list = true;
+            } else {
+                // $("#po_list").hide();
+                $scope.show_pl_list = false;
+            }
         }
         
     }
 
     $scope.selectPl = function(pl) {
-    	var plid = pl.id;
+    	var plid = pl.pl_number;
     	$("#id_pl").val(plid);
     	$scope.show_pl_list = false;
     	$scope.search_pl = pl.pl_number;
+        console.log(pl);
     }
 
     $scope.searchSoldTo  = function(q) {
-        if(q.length > 1) {
-            url = "/contacts/auto/?q=" + q
-            $http({method: 'GET', url: url}).
-                success(function(data, status, headers, config) {
-                    console.log(data.results);
-                    $scope.soldto = data.results;
-                });
-            $("#sold_to_contact_list").show();
-            
-            
-        } else {
-            $("#sold_to_contact_list").hide();
+        if(q != undefined) {
+            if(q.length > 1) {
+                url = "/contacts/auto/?q=" + q
+                $http({method: 'GET', url: url}).
+                    success(function(data, status, headers, config) {
+                        console.log(data.results);
+                        $scope.soldto = data.results;
+                        $scope.show_sold_to_contact_list = true;
+                    });
+                
+                
+                
+                
+            } else {
+                $scope.show_sold_to_contact_list = false;
+            }
         }
     }
 
     $scope.searchShipTo  = function(q) {
-        if(q.length > 1) {
-            url = "/contacts/auto/?q=" + q
-            $http({method: 'GET', url: url}).
-                success(function(data, status, headers, config) {
-                    console.log(data.results);
-                    $scope.shipto = data.results;
+        if(q != undefined) {
+            if(q.length > 1) {
+                url = "/contacts/auto/?q=" + q
+                $http({method: 'GET', url: url}).
+                    success(function(data, status, headers, config) {
+                        console.log(data.results);
+                        $scope.shipto = data.results;
+                        $scope.show_ship_to_contact_list = true;
                 });
-            $("#ship_to_contact_list").show();
-            
-            
-        } else {
-            $("#ship_to_contact_list").hide();
+                
+            } else {
+                $scope.show_ship_to_contact_list = false;
+            }
         }
     }
 
     $scope.searchCustomerBroker  = function(q) {
-        if(q.length > 1) {
-            url = "/contacts/auto/?q=" + q
-            $http({method: 'GET', url: url}).
-                success(function(data, status, headers, config) {
-                    console.log(data.results);
-                    $scope.customer_brokers = data.results;
-                });
-            $("#broker_contact_list").show();
-        } else {
-            $("#broker_contact_list").hide();
+        if(q != undefined) {
+            if(q.length > 1) {
+                url = "/contacts/auto/?q=" + q
+                $http({method: 'GET', url: url}).
+                    success(function(data, status, headers, config) {
+                        console.log(data.results);
+                        $scope.customer_brokers = data.results;
+                    });
+                $scope.show_broker_contact_list = true;
+            } else {
+                $scope.show_broker_contact_list = false;
+            }
         }
     }
 
     $scope.setSoldto = function(sold_con) {
-    	$scope.sold_to = sold_con;
+        $scope.search_sold_to = sold_con.contact_name;
+        $scope.sold_to = sold_con;
+        $("#id_sold_to").val(sold_con.id);
     	$("#sold_to_contact_details").show();
-    	$("#sold_to_contact_list").hide();
-    	$("#id_sold_to").val(sold_con.id);
-    	$scope.search_sold_to = '';
+        $scope.show_sold_to_contact_list = false;
+    	 	
+    	
     }
 
     $scope.selectShipTo = function(ship_con) {
     	$scope.ship_to = ship_con;
     	$("#ship_to_contact_details").show();
-    	$("#ship_to_contact_list").hide();
     	$("#id_ship_to").val(ship_con.id);
-    	$scope.search_ship_to = '';
+    	$scope.search_ship_to = ship_con.contact_name;
+        $scope.show_ship_to_contact_list = false;
     }
 
     $scope.setBroker = function(broker_con) {
     	$scope.broker = broker_con;
     	$("#broker_contact_details").show();
-    	$("#broker_contact_list").hide();
     	$("#id_broker").val(broker_con.id);
-    	$scope.search_broker = '';
+    	$scope.search_broker = broker_con.contact_name;
+        $scope.show_broker_contact_list = false;
     }
 
     $scope.searchInvoice = function(q) {
@@ -588,23 +621,39 @@ invoiceApp.controller('InvoiceController', ['$scope', '$http', '$compile', funct
             var removed_item = "<input type='hidden' name='removed_item' value='"+removed_item_id+"'>";
             $("#add_item_list tr.footer").append(removed_item); 
         }
-		
+
+        var items_count = $("input.added_item_number").length;
+        if(items_count < 2) {
+            $scope.item_added = false;
+        } else {
+            $scope.item_added = true;
+        }	
 		
 
     }
 
     $scope.searchItem = function(q) {
     	
-        if(q.length > 1) {
-            $("#items_list").show();
-        } else {
-            $("#items_list").hide();
+        if(q != undefined){
+
+            if(q.length > 1) {
+                // console.log(q);
+                $http({method: 'GET', url: "/purchase/get-pl-items/"}).
+                    success(function(data, status, headers, config){
+                    $scope.items = data;
+                });
+                // $("#po_list").show();
+                $("#items_list").show();
+            } else {
+                // $("#po_list").hide();
+                $("#items_list").hide();
+            }
         }
     }
 
     $scope.selectItem = function(item) {
     	$("#items_list").hide();
-
+        $scope.search_item = '';
     	var item_number = item.item_number;
     	var item_description = item.description;
     	var unit = item.unit;
@@ -634,42 +683,18 @@ invoiceApp.controller('InvoiceController', ['$scope', '$http', '$compile', funct
 
     	calculate_total_price();
 
+        var items_count = $("input.added_item_number").length;
+        if(items_count < 2) {
+            $scope.item_added = false;
+        } else {
+            $scope.item_added = true;
+        }
+        console.log(items_count);
+        console.log($scope.item_added);
+
     }
 
 	// suppplier google search and select
-
-	$scope.$watch('search_sold_to', function (newValue, oldValue) {
-        if(newValue != undefined) {
-        	if(newValue.length > 1) {
-        		$("#sold_to_contact_list").show();
-        		// console.log(newValue);
-        	} else {
-        		$("#sold_to_contact_list").hide();
-        	}
-        } 
-    });
-
-    $scope.$watch('search_ship_to', function (newValue, oldValue) {
-        if(newValue != undefined) {
-        	if(newValue.length > 1) {
-        		$("#ship_to_contact_list").show();
-        		// console.log(newValue);
-        	} else {
-        		$("#ship_to_contact_list").hide();
-        	}
-        } 
-    });
-
-    $scope.$watch('search_broker', function (newValue, oldValue) {
-        if(newValue != undefined) {
-        	if(newValue.length > 1) {
-        		$("#broker_contact_list").show();
-        		// console.log(newValue);
-        	} else {
-        		$("#broker_contact_list").hide();
-        	}
-        } 
-    });
 
 	$scope.addPstAmount = function() {
 		// console.log(e.currentTarget.defaultValue);

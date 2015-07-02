@@ -15,3 +15,11 @@ class PLRouter(routers.BaseRouter):
 
     def for_read(self, **hints):
         return 'pl'
+
+
+class PORouter(routers.BaseRouter):
+    def for_write(self, **hints):
+        return 'po'
+
+    def for_read(self, **hints):
+        return 'po'

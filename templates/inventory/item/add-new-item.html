@@ -70,18 +70,24 @@
 	width: 90% !important;
 }
 a.close {
-	color: red;
+	color: red !important;
+	opacity: 1 !important;
 }
 .bg-info {
 	padding: 5px 10px;
 	margin-top: 10px;
+}
+input.ng-dirty.ng-invalid, textarea.ng-dirty.ng-invalid {
+	border: 1px solid red;
 }
 </style>
 
 <div class="container-fluid shadow4 main-body" ng-app="inventoryApp">
 <section class="row">
 	<div class='col-md-12'>
-
+		{% for message in messages %}
+	      <p {% if message.tags %} class="col-md-6 col-md-offset-3 bg-warning login-{{ message.tags }}"{% endif %}>{{ message }}</p>
+	    {% endfor %}
 		
 	</div>
 </section>
@@ -95,11 +101,13 @@ a.close {
 		    	<h4>Add / Update Inventory Item</h4>
 		  	</div>
 		  	<div class="panel-body">
-		  	<form action="/inventory/item/add/" enctype="multipart/form-data" name="inventory-item-form" method="POST">{% csrf_token %}
+
+		  	<form action="/inventory/item/add/" enctype="multipart/form-data" name="inventory_item_form" method="POST" novalidate>{% csrf_token %}
 		  		
 		  		{% include "inventory/item/add-new-item-form.html" %}
     		  	<div class="btn btn-lg">
-					<button class="btn btn-primary btn-lg" type="submit">Update Inventory Item</button>
+					<button class="btn btn-primary btn-lg" type="submit" ng-hide="show_update_button" ng-disabled="!(inventory_item_form.$valid && inventory_item_form.$dirty)">Add Inventory Item</button>
+					<button class="btn btn-primary btn-lg" type="submit" ng-show="show_update_button">Update Inventory Item</button>
 				</div>
 					
 		  	</form>
@@ -158,9 +166,9 @@ a.close {
 <script type="text/javascript">
 (function(){
 $("select#id_producer_of_item").hide();
-$("a.close").on("click", function(){
-	$(this).closest('div').hide();
-});
+// $("a.close").on("click", function(){
+// 	$(this).closest('div').hide();
+// });
 /*
 $(document).on("click", "#producer input[type='radio']", function(e){
 	var id = $(this).val();
@@ -195,10 +203,16 @@ inventoryApp.controller('AddItemController',['$scope', '$http', function ($scope
         $scope.show_item_list = false;
         $scope.item_checked = false;
         $scope.show_producer = false;
+        $scope.show_update_button = false;
 
 	};
 
 	$scope.init();
+
+	$scope.addInventoryItem = function() {
+		return false;
+	}
+
 
 	$scope.searchContact = function (q) {
 		// console.log(q);
@@ -222,7 +236,7 @@ inventoryApp.controller('AddItemController',['$scope', '$http', function ($scope
     	$("#id_primary_supplier").val(con.id);
     	$scope.supplier = con;
     	$scope.show_supplier = true;
-    	$scope.search_supplier = '';
+    	$scope.search_supplier = con.contact_name;
     	
 
     }
@@ -274,9 +288,13 @@ inventoryApp.controller('AddItemController',['$scope', '$http', function ($scope
 	$scope.uncheck = function() {
 		console.log("hello...")
 	}
+	$scope.closeMe = function() {
+		$scope.show_item_list = false;
+	}
 
 	$scope.selectItem = function(item) {
 		$("#item-list").hide();
+		$scope.show_update_button = true;
 		var item_number = item.item_number
 		var item_url = "/inventory/get-item/"+item_number+"/"
 		$scope.hello = false;
@@ -298,6 +316,7 @@ inventoryApp.controller('AddItemController',['$scope', '$http', function ($scope
         	if(data.primary_supplier){
         		console.log(data.primary_supplier);
         		$scope.supplier = data.primary_supplier;
+        		$scope.search_supplier = data.primary_supplier.contact_name;
         		$scope.show_supplier = true;
         		$("#id_primary_supplier").val(data.primary_supplier.id);
         	}

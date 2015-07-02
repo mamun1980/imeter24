@@ -1,24 +1,30 @@
-<form name="PRA" action="/purchase/approve-pr/{{pr_id}}/" method="POST" enctype="multipart/form-data">{% csrf_token %}
+<form name="PRA" action="/purchase/approve-pr/{{pr.id}}/" method="POST" enctype="multipart/form-data" >{% csrf_token %}
+<input type="hidden" name="max_limit" ng-model="max_limit" value="{{ pr.order_qty }}">
 <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
     <h4 class="modal-title" id="myModalLabel">Approve</h4>
 </div>
 
 
-<div class="modal-body">
+<div class="modal-body" ng-controller="ApprovePRFormController">
 	<table class="add-user-table">
-	{% for fl in pr_approve_form %}
-		<tr>
-			<td>{{ fl.label_tag }}</td>
-			<td>{{ fl.errors }}{{ fl }}</td>
-		</tr>
-	{% endfor %}
-	{% for fl in pr_com_form %}
-		<tr>
-			<td>{{ fl.label_tag }}</td>
-			<td>{{ fl.errors }}{{ fl }}</td>
-		</tr>
-	{% endfor %}
+	
+		<tbody>
+			<tr>
+				<td><label for="id_approved_qty">Approved qty:</label></td>
+				<td><input class="form-control decimal" id="id_approved_qty" name="approved_qty" placeholder="qty" type="number" max="{{ pr.order_qty }}" required="true">
+
+					
+				</td>
+			</tr>
+		
+		
+			<tr>
+				<td><label for="id_comment">Comment:</label></td>
+				<td><textarea class="form-control" cols="40" id="id_comment" name="comment" rows="3"></textarea></td>
+			</tr>
+	
+		</tbody>
 	</table>
 </div>
 
@@ -50,5 +56,6 @@
 
 	})
 })(jQuery)
+
 </script>
     

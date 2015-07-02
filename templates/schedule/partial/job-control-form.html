@@ -2,7 +2,7 @@
 <tr class="bg-info">
 	<th colspan="1"><label for="id_job_number">Job Number:</label></th>
 	<td id="job" colspan="3">
-		<input class="form-control" id="id_job_number" name="job_number" ng-model="job_number" type="text" ng-change="searchJob(job_number)"  placeholder="start typing to search jobs or leave blank for new" value="{[{job_number}]}" autocomplete="off">
+		<input class="form-control" id="id_job_number" name="job_number" ng-model="job_number" type="text" ng-change="searchJob(job_number)"  placeholder="start typing to search jobs or leave blank for new" value="{[{job_number}]}" autocomplete="off" autofocus>
 		<span ng-show="add_new_job">
 				Creating new job with job_number = {[{job_number}]}
 		</span>
@@ -62,7 +62,7 @@
 			<table class="table sold_to_contact" ng-show="show_sold_to_contact_list">
 				<thead>
 					<tr>
-						<th>Contact Name</th><th> City <a href="" class="close">x</a></th>
+						<th>Contact Name</th><th> City <a href="" class="close" ng-click="hideSoldToContact()">x</a></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -107,7 +107,7 @@
 		<table class="table ship_to_contact" ng-show="show_ship_to_contact_list">
 			<thead>
 				<tr>
-					<th>Contact Name</th><th> City <a href="" class="close">x</a></th>
+					<th>Contact Name</th><th> City <a href="" class="close" ng-click="hideShipToContact()">x</a></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -191,7 +191,7 @@
 			<table class="table installed_by_contact" ng-show="show_installed_by_contact_list">
 				<thead>
 					<tr>
-						<th>Contact Name</th><th> City <a href="" class="close">x</a></th>
+						<th>Contact Name</th><th> City <a href="" class="close" ng-click="hideInstalledByContact()">x</a></th>
 					</tr>
 				</thead>
 				<tbody>

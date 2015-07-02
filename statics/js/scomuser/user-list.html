@@ -14,7 +14,7 @@
 	</thead>
 	<tbody>
 		
-		<tr ng-repeat="usr in users | googleSearchFilter:search">
+		<tr ng-repeat="usr in users | filter:search">
 			<td>{[{ usr.username }]}</td>
 			<td>{[{ usr.first_name }]}</td>
 			<td>{[{ usr.last_name }]}</td>

@@ -80,7 +80,7 @@ class PurchaseOrder(models.Model):
 	po_number = models.CharField(verbose_name='PO Number', max_length=20, primary_key=True)
 	next_number = models.CharField(verbose_name='Next Number', max_length=20, blank=True, null= True)
 	date_issued = models.DateField(blank=True, null=True)
-	po_status = models.CharField(max_length=20, blank=True, null=True, default='New')
+	po_status = models.CharField(max_length=20, blank=True, null=True, default='0')
 	date_expected = models.DateField(blank=True, null=True)
 	supplier = models.ForeignKey(Contact, blank=True, null=True, related_name='po_item_supplier')
 	ship_to = models.ForeignKey(Contact, blank=True, null=True, related_name='po_ship_to')
@@ -114,8 +114,12 @@ class PurchaseOrder(models.Model):
 	def __unicode__(self):
 		return self.po_number
 
+	@property
 	def status_verbose(self):
-		return dict(PO_STATUS)[int(self.po_status)]
+		if self.po_status:
+			return dict(PO_STATUS)[int(self.po_status)]
+		else:
+			return "Unknown"
 
 	def que_verbose(self):
 		if self.po_que == '':
@@ -345,7 +349,7 @@ class PackingList(models.Model):
 		)
 
 class PackingItem(models.Model):
-	item = models.ForeignKey(Item, blank=True, null=True, related_name='packing-item')
+	sl_item = models.ForeignKey(ShippingItem, blank=True, null=True)
 	description = models.TextField(blank=True, null=True)
 	unit = models.CharField(max_length=20, blank=True, null=True)
 	qty_ordered = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
@@ -401,6 +405,13 @@ class Invoice(models.Model):
 
 	def __unicode__(self):
 		return str(self.id)
+
+	@property
+	def status_verbose(self):
+		if self.status:
+			return dict(INVOICE_STATUS)[int(self.status)]
+		else:
+			return "Unknown"
 
 	class Meta:
 		verbose_name = u"Invoice"

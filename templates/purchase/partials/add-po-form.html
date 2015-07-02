@@ -3,11 +3,11 @@
 	<th width="150">
 		<label for="id_po_number">PO Number:</label>
 	</th>
-	<td>
+	<td colspan="3">
 		<div style="position: relative;">
-			<input class="form-control" ng-model='search_po' maxlength="25" id="id_po_number_search"  type="search" name="po_number_search" ng-change="searchPo(search_po)" placeholder="Search for purchase Order leave Blank for New Purchase Order" autocomplete="off" ng-disabled="po_checked">
+			<input class="form-control" ng-model='search_po' maxlength="25" id="id_po_number_search"  type="search" name="po_number_search" ng-change="searchPo(search_po)" placeholder="Search for PO by Customer Name, Address, Phone Number, Item Description, PO Number or leave Blank for New PO" autocomplete="off" ng-disabled="po_checked">
 			
-			<div id="po_list" ng-show="pos.length">
+			<div id="po_list" ng-show="show_po_list">
 				<table class="table">
 					<thead>
 						<tr>
@@ -16,8 +16,8 @@
 							<td>Supplier</td>
 							<td>Terms</td>
 							<td>Shipping Inst</td>	
+							<th><a class="close" ng-click="closeMe()">X</a></th>
 						</tr>
-						
 					</thead>
 					<tbody>
 						<tr ng-repeat="po in pos" ng-click="selectPo(po)">
@@ -26,6 +26,7 @@
 							<td>{[{po.supplier}]}</td>
 							<td>{[{po.terms}]}</td>
 							<td>{[{po.shipping_inst}]}</td>
+							<td></td>
 						</tr>
 						
 					</tbody>
@@ -38,14 +39,8 @@
 			</div>
 		</div>
 		<input id="id_po_number" name="po_number" type="hidden">
-		<input id="id_po_id" name="po_id" type="hidden">
 		
-	</td>
-	<th width="150">
-		<label for="id_next_number">Next Number:</label>
-	</th>
-	<td>
-		<input class="form-control" id="id_next_number" name="next_number" type="text" value="{{next_po_number}}" readonly="readonly">
+		<input class="form-control" id="id_next_number" name="next_number" type="hidden" value="{{next_po_number}}">
 	</td>
 </tr>
 <tr class="bg-info">
@@ -67,12 +62,13 @@
 </tr>
 
 <tr class="bg-success">
-	<th width="150">
+	<th width="150" ng-class="{'ng-pristine': purchase_add_form.search_supplier.$pristine || purchase_add_form.search_supplier.$invalid}">
 		<label for="id_supplier">Supplier:</label>
 	</th>
-	<td>
+	<td colspan="3">
 	<div class="contact_box">
-		<input type="text" ng-model="search_supplier" placeholder="start typing to search supplier" class="form-control" ng-change="searchSupplier(search_supplier)">
+		<input type="text" ng-model="search_supplier" placeholder="start typing to search supplier" class="form-control" name="search_supplier" ng-required='true' ng-change="searchSupplier(search_supplier)" >
+		<span ng-show="purchase_add_form.search_supplier.$dirty && purchase_add_form.search_supplier.$error.required">*This field is required.</span>
 
 		<table class="table" id="supplier_contact_details" ng-show="supplier_contact">
 			<tr>
@@ -113,22 +109,31 @@
 			
 		</table>
 
-		<table class="table supplier_contact" id="supplier_contact_list">
+		<table class="table selectable" class="ui-autocomplete ui-widget-content-custom ui-corner-all" id="supplier_contact_list">
 			<thead>
 				<tr>
-					<th>ID</th><th>Contact Name</th><th>Address 1</th><th> City <a href="" class="close">x</a></th>
+					<th>#</th><th>ID</th><th>Contact Name</th><th>Address 1</th><th> City </th>
+					<th><a href="" class="close" ng-click="hideSupplierContact()">x</a></th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr ng-repeat="con in suppliers" ng-click="setSupplier(con)">
-					<td>{[{con.id}]}</td>
-					<td>{[{con.contact_name}]}</td>
-					<td>{[{con.address_1}]}</td>
-					<td>{[{con.city}]}</td>
-				</tr>
-				<tr ng-show="!suppliers.length">
-					<td colspan="4">No contacts</td>
-				</tr>
+			<tr class="ui-menu-item" ng-repeat="contact in suppliers" ng-click="setSupplier(contact)">
+				<td>
+					<input type="radio" name="contact" value="{[{contact.id}]}">
+					<div class='phone' ng-repeat="phon in contact.phones">
+					<input type="hidden" data-phone-number="{[{phon.number}]}" data-ext="{[{phon.phone_ext}]}" data-phone-type="{[{phon.type}]}">
+					</div>
+				</td>
+				<td class="sid">{[{contact.id}]}</td>
+				<td class="contact_name">{[{contact.contact_name}]}</td>
+				<td class="address_1">{[{contact.address_1}]}</td>
+				<td class="city">{[{contact.city}]}</td>
+				
+				<td>
+					
+				</td>
+				
+			</tr>
 			</tbody>
 		</table>
 
@@ -137,10 +142,12 @@
 
 
 	</td>
+</tr>
+<tr>
 	<th width="150">
 		<label for="id_ship_to">Ship to:</label>
 	</th>
-	<td>
+	<td colspan="3">
 	<div class="contact_box">
 		
 	
@@ -167,20 +174,34 @@
 				</td>
 			</tr>
 		</table>
-		<table class="table ship_to_contact" id="ship_to_contact_list">
+		<table class="table selectable" class="ui-autocomplete ui-widget-content-custom ui-corner-all" id="ship_to_contact_list">
 			<thead>
 				<tr>
-					<th>Contact Name</th><th> City <a href="" class="close">x</a></th>
+					<th>#</th><th>ID</th><th>Contact Name</th><th>Address 1</th><th> City </th>
+					<th><a href="" class="close" ng-click="hideShiptoContact()">x</a></th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr ng-repeat="con in shipto" ng-click="selectShipTo(con)">
+			<tr class="ui-menu-item" ng-repeat="contact in shipto" ng-click="selectShipTo(contact)">
+				<td>
+					<input type="radio" name="contact" value="{[{contact.id}]}">
+					<div class='phone' ng-repeat="phon in contact.phones">
+					<input type="hidden" data-phone-number="{[{phon.number}]}" data-ext="{[{phon.phone_ext}]}" data-phone-type="{[{phon.type}]}">
+					</div>
+				</td>
+				<td class="sid">{[{contact.id}]}</td>
+				<td class="contact_name">{[{contact.contact_name}]}</td>
+				<td class="address_1">{[{contact.address_1}]}</td>
+				<td class="city">{[{contact.city}]}</td>
+				
+				<td>
 					
-					<td>{[{con.contact_name}]}</td>
-					<td>{[{con.city}]}</td>
-				</tr>
+				</td>
+				
+			</tr>
 			</tbody>
 		</table>
+		
 
 		<input id="id_ship_to" name="ship_to" type="hidden">
 	</div>
@@ -200,37 +221,15 @@
 	</td>
 
 	<th width="150">
-		<label for="id_po_status">Po status:</label>
+		<label for="id_deliver_internal">Department deliver internal:</label>
 	</th>
 	<td>
-		<select class="form-control" id="id_po_status" name="po_status">
-			<option value="0">New</option>
-			<option value="1">Printed / Emailed</option>
-			<option value="2">Partial Received</option>
-			<option value="3">Received / Completed</option>
-			<option value="4">Accounting Confirmed</option>
-			<option value="5">Closed</option>
-			<option value="6">Canceled</option>		
-		</select>
-	</td>
-</tr>
-<tr class="bg-info">
-	<th width="150">
-		<label for="id_fob">Fob:</label>
-	</th>
-	<td>
-		<input class="form-control" id="id_fob" maxlength="200" name="fob" placeholder="FOB" type="text" value="1400 Phillip Murray Avenue, Oshawa, Ontario - L1J7E8">
-	</td>
-	<th>
-		<label for="id_po_overwridden_by">Po overwridden by:</label>
-	</th>
-	<td>
-		<select class="form-control" id="id_po_overwridden_by" name="po_overwridden_by">
-		{% for user in adminusers %}
-			<option value="{{user.id}}">
-				{{ user.first_name }} {{ user.last_name }}
+		<select class="form-control" id="id_deliver_internal" name="deliver_internal">
+			{% for di in deliver_internals %}
+			<option value="{{di.id}}">
+				{{di.department}}
 			</option>
-		{% endfor %}
+			{% endfor %}
 		</select>
 	</td>
 </tr>
@@ -243,26 +242,7 @@
 		<textarea class="form-control" cols="40" id="id_shipping_inst" name="shipping_inst" placeholder="Shipping Inst" rows="3"></textarea>
 	</td>
 </tr>
-<tr class="bg-info">
-	<th width="150">
-		<label for="id_deliver_internal">Department deliver internal:</label>
-	</th>
-	<td>
-		<select class="form-control" id="id_deliver_internal" name="deliver_internal">
-			{% for di in deliver_internals %}
-			<option value="{{di.id}}">
-				{{di.department}}
-			</option>
-			{% endfor %}
-		</select>
-	</td>
-	<th width="150">
-		<label for="id_date_confirmed">Date confirmed:</label>
-	</th>
-	<td>
-		<input class="form-control datepicker" id="id_date_confirmed" name="date_confirmed" placeholder="Date Confirmed" type="text">
-	</td>
-</tr>
+
 <tr class="bg-success">
 	<th width="150">
 		<label for="id_blanket_po">Blanket po:</label>
@@ -280,7 +260,7 @@
 	<td colspan="3">
 		<select class="form-control" id="id_terms" name="terms">
 			{% for pt in terms %}
-				<option value="{{pt.id}}">{{pt.term}}</option>
+				<option value="{{pt.id}}" {% if pt.id = 2 %} selected="selected" {% endif %}>{{pt.term}}</option>
 			{% endfor %}
 		</select>
 	</td>
@@ -315,16 +295,14 @@
 		</select>
 	</td>
 </tr>
-<tr class="bg-success">
-	<th width="150">
-		<label for="id_items_total">Items:</label>
-	</th>
-	<td colspan="3">
-		<a href="/inventory/item/add/" class="btn btn-primary" target="_blank">Add New Item To Inventory</a>
+<tr>
+	<td colspan="4" align="center" ng-class="{'item_error ng-pristine': !item_added, 'bg-primary': item_added }">
+		<span style="font-size: 14px; font-style: bold;">Add Items here for this purchase order</h4>
+		<a href="/inventory/item/add/" class="btn btn-default" target="_blank">Add New Item To Inventory</a>
 	</td>
 </tr>
-<tr class="bg-info">
-	<td colspan="4">
+<tr>
+	<td colspan="4" ng-class="{'item_error ng-pristine': !item_added, 'bg-info': item_added }">
 		<div class="item_box">
 						
 			<table class="table item">
@@ -360,7 +338,7 @@
 								<th>QTY on hand</th>
 								<th>Qty on Order</th>
 								<th>Last Ordered</th>
-								<th><a href="" class="close">x</a></th>
+								<th><a href="" class="close" ng-click="hideItemList()">x</a></th>
 							</tr>
 						</thead>
 						<tbody>
@@ -451,7 +429,7 @@
 		<label for="id_hst_taxable">Hst taxable:</label>
 	</th>
 	<td>
-		<select class="form-control tax" ng-model="hst_tax" id="id_hst_taxable" name="hst_taxable" placeholder="Blanket PO">
+		<select class="form-control tax" ng-model="hst_tax" id="id_hst_taxable" name="hst_taxable" ng-change="updateHST({[{hst_tax}]})">
 		<option value="0">NO</option>
 		<option value="1">YES</option>
 		</select>
@@ -462,7 +440,7 @@
 		<label for="id_pst_taxable">Pst taxable:</label>
 	</th>
 	<td>
-		<select class="form-control tax" ng-model="pst_tax" id="id_pst_taxable" name="pst_taxable" placeholder="Blanket PO">
+		<select class="form-control tax" ng-model="pst_tax" id="id_pst_taxable" name="pst_taxable" ng-change="updatePST(pst_tax)">
 		<option value="0">NO</option>
 		<option value="1">YES</option>
 		</select>
@@ -477,7 +455,7 @@
 	<td>
 		<select class="form-control" id="id_po_currency" name="po_currency">
 		{% for currency in currencies %}
-		<option data-currency-icon="{{ currency.get_currency_icon }}" value="{{currency.id}}">
+		<option data-currency-icon="{{ currency.get_currency_icon }}" value="{{currency.id}}" {% if currency.id == 1 %} selected="selected" {% endif %}>
 				{{ currency.currency }} ({{ currency.get_currency_icon }})
 			</option>
 		{% endfor %}
@@ -492,11 +470,19 @@
 </tr>
 
 <tr>
-	<td colspan="2">
-		<button type="submit" ng-show="show_update_button" class="btn btn-primary btn-large form-control">Update PO</button>
+	<td>
+		
+		
 	</td>
 	<td colspan="2">
-		<button type="submit" ng-show="show_add_button" class="btn btn-primary btn-large form-control">Add PO</button>
+		<label>PDF PO </label> <input type="checkbox" data-toggle="toggle" data-on="Yes" data-off="No" name="pdf_po" style="margin-left: 10px; margin-right: 20px;">
+		<label>Print PO</label><input type="checkbox" data-toggle="toggle" data-on="Yes" data-off="No"  name="print_po" style="margin-left: 10px; margin-right: 20px;">
+		<label>Email PO</label><input type="checkbox" data-toggle="toggle" data-on="Yes" data-off="No" name="email_po" style="margin-left: 10px; margin-right: 20px;">
+		<label>Fax PO</label><input type="checkbox" data-toggle="toggle" data-on="Yes" data-off="No" name="fax_po" style="margin-left: 10px; margin-right: 20px;">
+	</td>
+	<td>
+		<button type="submit" ng-show="show_update_button" class="btn btn-primary btn-large form-control" ng-disabled="!(purchase_add_form.$valid && purchase_add_form.$dirty && item_added)">Update PO</button>
+		<button type="submit" ng-show="show_add_button" class="btn btn-primary btn-large form-control" ng-disabled="!(purchase_add_form.$valid && purchase_add_form.$dirty && item_added)">Create PO</button>
 	</td>
 </tr>
 </table>

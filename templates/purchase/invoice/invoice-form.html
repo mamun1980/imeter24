@@ -7,25 +7,82 @@
 		<div style="position: relative;">
 			<input class="form-control" ng-model='search_invoice' maxlength="25" id="id_invoice_number_search"  type="search" name="invoice_number_search" ng-change="searchInvoice(search_invoice)" placeholder="Search for invoice leave Blank for New invoice" autocomplete="off" ng-disabled="invoice_checked">
 			
-			<div id="invoice_list" ng-show="show_invoice_list">
-
-				<ul class="search">
-					<li ng-repeat="invoice in invoices | filter:search_invoice">
-						<a href="#" class="list-group-item bg-info" ng-click="selectInvoice(invoice)"> {[{invoice.invoice_number}]} ({[{invoice.invoice_currency}]})</a>
-					</li>
-				</ul>
-			</div>
+			
+				<div id="invoice_list" ng-show="invoices.length && show_invoice_list">
+					<table class="table">
+						<thead>
+							<tr>
+								<td>Invoice Number</td>
+								<td>PO</td>
+								<td>Date shipped</td>
+								<td>Status</td>
+							</tr>
+							
+						</thead>
+						<tbody>
+							<tr ng-repeat="invoice in invoices" ng-click="selectInvoice(invoice)">
+								<td>{[{invoice.invoice_number}]}</td>
+								<td>{[{invoice.job_number}]}</td>
+								<td>{[{invoice.date}]}</td>
+								<td>{[{invoice.status_verbose}]}</td>
+								<td>{[{ invoice.total_amount }]}</td>
+							</tr>
+							
+						</tbody>
+						
+					</table>
+					
+				</div>
+				<div ng-show="!invoices.length && show_invoice_list">
+					No Packing List Found!
+				</div>
+				
+			
 		</div>
 		<input id="id_invoice_number" name="invoice_number" type="hidden" value="{[{search_invoice}]}">
 		<input id="id_invoice" name="invoice_id" type="hidden">
 		
 	</td>
-	<th width="150">
-		<label for="id_next_invoice_number">Next Invoice Number:</label>
+	<th width="150" ng-class="{'ng-pristine': invoice_add_form.pl_number_search.$pristine || invoice_add_form.pl_number_search.$invalid}">
+		<label for="id_pl_number">PL Number:</label>
 	</th>
 	<td>
-		<input class="form-control" id="id_next_invoice_number" name="next_invoice_number" placeholder="Next Iinvoice nvoice Number" type="text" value="{{next_invoice_number}}" readonly="readonly">
+		<div style="position: relative;">
+			<input class="form-control" ng-model='search_pl' maxlength="25" id="id_pl_number_search"  type="search" name="pl_number_search" ng-change="searchPl(search_pl)" placeholder="Search for PL" autocomplete="off" ng-disabled="pl_checked" required>
+			<span ng-show="invoice_add_form.pl_number_search.$dirty && invoice_add_form.pl_number_search.$error.required">*This field is required.</span>
+				
+					<div id="pl_list" ng-show="pls.length && show_pl_list">
+						<table class="table">
+							<thead>
+								<tr>
+									<td>PL Number</td>
+									<td>Job Number</td>
+									<td>Date shipped</td>
+									<td>Status</td>
+								</tr>
+								
+							</thead>
+							<tbody>
+								<tr ng-repeat="pl in pls" ng-click="selectPl(pl)">
+									<td>{[{pl.pl_number}]}</td>
+									<td>{[{pl.job_number}]}</td>
+									<td>{[{pl.date_shipped}]}</td>
+									<td>{[{pl.status}]}</td>
+								</tr>
+								
+							</tbody>
+							
+						</table>
+						
+					</div>
+					<div ng-show="!pls.length && show_pl_list">
+						No Packing List Found!
+					</div>
+				
+		</div>
+		<input id="id_pl" name="pl" type="hidden" value="">
 	</td>
+	
 </tr>
 <tr class="bg-info">
 	<th width="150">
@@ -34,34 +91,24 @@
 	<td>
 		<input ng-model="dateInvoice" class="form-control datepicker" id="id_invoice_date" name="date" value="{[{dateInvoice}]}" placeholder="Invoice date" type="text" >
 	</td>
-	<th width="150">
-		<label for="id_pl_number">PL Number:</label>
-	</th>
+	
+	<td><label for="id_job">Job / Contract:</label></td>
 	<td>
-		<div style="position: relative;">
-			<input class="form-control" ng-model='search_pl' maxlength="25" id="id_pl_number_search"  type="search" name="pl_number_search" ng-change="searchPl(search_pl)" placeholder="Search for PL" autocomplete="off" ng-disabled="pl_checked" required>
-			
-				<div id="pl_list" ng-show="show_pl_list">
-
-					<ul class="search">
-						<li ng-repeat="pl in pls | filter:search_pl">
-							<a class="list-group-item bg-info" ng-click="selectPl(pl)"> {[{pl.pl_number}]}</a>
-						</li>
-					</ul>
-				</div>
-		</div>
-		<input id="id_pl" name="pl" type="hidden" value="">
+		<input type='text' class='form-control item-job-number' name='job_search' placeholder='Start typing to search job' id="id_job_search">
+		<input type='hidden' name='job' id='id_job'>
 	</td>
 		
 </tr>
 
 <tr class="bg-success">
-	<th width="150">
+	<th width="150" ng-class="{'ng-pristine': invoice_add_form.search_sold_to.$pristine || invoice_add_form.search_sold_to.$invalid}">
 		<label for="id_sold_to">Sold To:</label>
 	</th>
 	<td>
 	<div class="contact_box">
-		<input type="text" ng-model="search_sold_to" placeholder="start typing to search" class="form-control" ng-change="searchSoldTo(search_sold_to)">
+		<input type="text" ng-model="search_sold_to" name="search_sold_to" placeholder="start typing to search" class="form-control" ng-change="searchSoldTo(search_sold_to)" ng-required="true">
+
+		<span ng-show="invoice_add_form.search_sold_to.$dirty && invoice_add_form.search_sold_to.$error.required">*This field is required.</span>
 
 		<table class="table" id="sold_to_contact_details">
 			<tr>
@@ -87,7 +134,7 @@
 			
 		</table>
 
-		<table class="table sold_to_contact" id="sold_to_contact_list">
+		<table class="table sold_to_contact" id="sold_to_contact_list" ng-show="show_sold_to_contact_list">
 			<thead>
 				<tr>
 					<th>Contact Name</th><th>Address 1</th><th> City <a href="" class="close">x</a></th>
@@ -116,7 +163,10 @@
 	<div class="contact_box">
 		
 	
-		<input type="text" ng-model="search_ship_to" placeholder="start typing to search ship to contact" class="form-control" ng-change="searchShipTo(search_ship_to)">
+		<input type="text" ng-model="search_ship_to" name="search_ship_to" placeholder="start typing to search ship to contact" class="form-control" ng-change="searchShipTo(search_ship_to)">
+
+		
+
 		<table class="table" id="ship_to_contact_details">
 			<tr>
 				<th width="150">Contact Name</th>
@@ -131,7 +181,7 @@
 				<td><span class='bg-info email' ng-repeat="em in ship_to.emails">{[{ em.email_address}]}</span></td>
 			</tr>
 		</table>
-		<table class="table ship_to_contact" id="ship_to_contact_list">
+		<table class="table ship_to_contact" id="ship_to_contact_list" ng-show="show_ship_to_contact_list">
 			<thead>
 				<tr>
 					<th>Contact Name</th><th> City <a href="" class="close">x</a></th>
@@ -153,12 +203,14 @@
 </tr>
 <tr class="bg-success">	
 	
-	<th width="150">
+	<th width="150"  ng-class="{'ng-pristine': invoice_add_form.search_broker.$pristine || invoice_add_form.search_broker.$invalid}">
 		<label for="id_broker">Broker:</label>
 	</th>
-	<td>
+	<td colspan="3">
 	<div class="contact_box">
-		<input type="text" ng-model="search_broker" placeholder="start typing to search" class="form-control" ng-change="searchCustomerBroker(search_broker)">
+		<input type="text" ng-model="search_broker" name="search_broker" placeholder="start typing to search" class="form-control" ng-change="searchCustomerBroker(search_broker)" ng-required="true">
+
+		<span ng-show="invoice_add_form.search_broker.$dirty && invoice_add_form.search_broker.$error.required">*This field is required.</span>
 
 		<table class="table" id="broker_contact_details">
 			<tr>
@@ -184,7 +236,7 @@
 			
 		</table>
 
-		<table class="table broker_contact" id="broker_contact_list">
+		<table class="table broker_contact" id="broker_contact_list" ng-show="show_broker_contact_list">
 			<thead>
 				<tr>
 					<th>ID</th><th>Contact Name</th><th>Address 1</th><th> City <a href="" class="close">x</a></th>
@@ -207,11 +259,7 @@
 	</div>
 
 	</td>
-	<td><label for="id_job">Job / Contract:</label></td>
-	<td>
-		<input type='text' class='form-control item-job-number' name='job_search' placeholder='Start typing to search job' id="id_job_search">
-		<input type='hidden' name='job' id='id_job'>
-	</td>
+	
 </tr>
 
 <tr class="bg-info">
@@ -254,9 +302,9 @@
 	</td>
 </tr>
 
-<tr class="bg-primary">
-	<td colspan="4" align="center">
-		<b>Add Items to Invoice</b>		
+<tr>
+	<td colspan="4" ng-class="{'item_error ng-pristine': !item_added, 'bg-primary': item_added }" align="center">
+		<h4>Add Items to Invoice</h4>		
 	</td>
 </tr>
 
@@ -296,7 +344,7 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr ng-repeat="item in items | googleSearchFilter:search_item" ng-click="selectItem(item)">
+							<tr ng-repeat="item in items" ng-click="selectItem(item)">
 								<td>{[{item.item_number}]}</td>
 								<td>{[{item.description}]}</td>
 								<td>{[{item.unit}]}</td>
@@ -450,10 +498,10 @@
 
 <tr>
 	<td colspan="2">
-		<button type="submit" ng-show="show_update_button" class="btn btn-primary btn-large form-control">Update Invoice</button>
+		<button type="submit" ng-show="show_update_button" class="btn btn-primary btn-large form-control" ng-disabled="!(invoice_add_form.$valid && invoice_add_form.$dirty && item_added)">Update Invoice</button>
 	</td>
 	<td colspan="2">
-		<button type="submit" ng-show="show_add_button" class="btn btn-primary btn-large form-control">Create Invoice</button>
+		<button type="submit" ng-show="show_add_button" class="btn btn-primary btn-large form-control" ng-disabled="!(invoice_add_form.$valid && invoice_add_form.$dirty && item_added)">Create Invoice</button>
 	</td>
 </tr>
 </table>

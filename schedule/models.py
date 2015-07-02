@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 
 
 class Job(models.Model):
-	job_number = models.CharField(max_length=20)
+	job_number = models.CharField(max_length=20, primary_key=True)
 	cab_designation = models.CharField(max_length=50, blank=True, null=True)
 	date_opened = models.DateField(null=True, blank=True)
 	date_required = models.DateField(null=True, blank=True)
@@ -29,7 +29,7 @@ class Job(models.Model):
 	search_string = models.TextField(max_length=1000, blank=True, null=True)
 
 	def __unicode__(self):
-		return str(self.id)
+		return str(self.job_number)
 
 	class Meta:
 		verbose_name = "Job"

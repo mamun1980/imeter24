@@ -11,16 +11,16 @@ URL_PREFIX = ""
 PROJECT_PREFIX = 'premierelevator' 
 
 #Project name base (for cache etc must be unique to the server)
-PROJECT_NAME = 'scomtest'
+PROJECT_NAME = 'premier'
 
 #Project base home directory to server (ie /usr/home/www/(project start)/ ) - Needs the trailing slash
-PROJECT_BASE_DIR = '/usr/home/www/test.premierelevator.com/'
+PROJECT_BASE_DIR = '/usr/home/www/ol.premierelevator.com/'
 
 #Project HTTP (WWW Link include the '/')
-PROJECT_HTTP = 'http://test.premierelevator.com/'
+PROJECT_HTTP = 'http://ol.premierelevator.com/'
 
 #Project Link (without http) - Used for cache setup etc
-PROJECT_LINK = 'test.premierelevator.com'
+PROJECT_LINK = 'ol.premierelevator.com'
 
 
 
@@ -111,10 +111,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'premier',                      # Or path to database file if using sqlite3.
-        'USER': 'scom_test',                      # Not used with sqlite3.
-        'PASSWORD': 'Testxxyy',                  # Not used with sqlite3.
+        'USER': 'pgsql',                      # Not used with sqlite3.
+        'PASSWORD': 'Scom411400',                  # Not used with sqlite3.
         'HOST': '10.221.0.41',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '5432',                      # Set to empty string for default. Not used with sqlite3.
+        'PORT': '5442',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
 
@@ -137,8 +137,9 @@ LOGIN_URL = "/contacts/login/"
 LOGOUT_URL = "/contacts/logout/"
 
 #Media Files
-MEDIA_ROOT = "/usr/home/www/test.premierelevator.com/media/"
-MEDIA_URL = "/media/"
+MEDIA_ROOT = "/usr/home/www/ol.premierelevator.com/media/"
+#MEDIA_URL = "%smedia/" %PROJECT_HTTP
+MEDIA_URL = "/media/" 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
@@ -162,13 +163,12 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'premierelevator.context_processors.site_name',
 )
+
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
 #     'django.template.loaders.eggs.Loader',
 )
-
-#TEMPLATE_DIRS = ( '%stemplates/' %PROJECT_BASE_DIR )
 
 TEMPLATE_DIRS = ( PROJECT_BASE_DIR+'templates/', )
 
@@ -206,11 +206,6 @@ LOGGING = {
         'django.request': {
             'handlers': ['mail_admins'],
             'level': 'ERROR',
-            'propagate': True,
-        },
-        'elasticsearch': {
-            'handlers': ['mail_admins'],
-            'level': 'DEBUG',
             'propagate': True,
         },
     }
@@ -313,4 +308,5 @@ HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 
 HAYSTACK_ROUTERS = ['inventory.routers.MasterRouter', 
                 'schedule.routers.MasterRouter', 
-                'haystack.routers.DefaultRouter']
+                'purchase.routers.PORouter','purchase.routers.SLRouter','purchase.routers.PLRouter',
+                'haystack.routers.DefaultRouter',]

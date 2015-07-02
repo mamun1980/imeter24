@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from scomuser.choices import *
 import decimal
 from django.utils import timezone
+from report.models import *
 
 
 class ScomUserProfile(models.Model):
@@ -44,6 +45,20 @@ class Department(models.Model):
 		permissions = (
     		('view_department', 'Can View Department'),
     	)
+
+class UserReport(models.Model):
+	user = models.ForeignKey(User, blank=True, null=True)
+	report_type = models.CharField(max_length=50, choices=(('email', 'Email'), ('fax', 'Fax'), ('print', 'Print'), ('pdf', 'PDF')))
+	report_printer = models.ForeignKey(Printer, blank=True, null=True)
+	report_fax = models.CharField(max_length=50, blank=True, null=True)
+	report_email = models.CharField(max_length=100, blank=True, null=True)
+
+	def __unicode__(self):
+		return self.report_type
+	
+		
+
+
 
 
 class PayType(models.Model):

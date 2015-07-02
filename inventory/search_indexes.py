@@ -24,6 +24,32 @@ class ItemIndex(indexes.SearchIndex, indexes.Indexable):
     def get_model(self):
         return Item
 
+
+    def prepare(self, obj):
+        self.prepared_data = super(ItemIndex, self).prepare(obj)
+        currency = obj.currency
+        terms = obj.terms
+        if currency:
+            self.prepared_data['currency'] = currency.currency
+            self.prepared_data['currency_id'] = currency.id
+        else:
+            self.prepared_data['currency'] = None
+            self.prepared_data['currency_id'] = None
+
+        if terms:
+            self.prepared_data['terms'] = terms.term
+            self.prepared_data['terms_id'] = terms.id
+        else:
+            self.prepared_data['terms'] = None
+            self.prepared_data['terms_id'] = None
+
+        self.prepared_data['order_restriction'] = obj.order_restriction
+        self.prepared_data['quantity_on_order'] = obj.quantity_on_order
+        self.prepared_data['qty_on_request'] = obj.qty_on_request
+
+        return self.prepared_data
+
+
     def index_queryset(self, using=None):
         """Used when the entire index for model is updated."""
         return self.get_model().objects.all()

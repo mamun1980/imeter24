@@ -24,6 +24,10 @@ urlpatterns = patterns('',
     url(r'^edituser/(?P<pk>\d+)/$', "scomuser.views.UserEdit", name='edituser'),
     url(r'^deleteuser/$', "scomuser.views.DeleteUser", name='deleteuser'),
 
+    url(r'^user/report/add/$', "scomuser.views.user_report_add", name='user_report_add'),
+    url(r'^user/report/delete/$', "scomuser.views.user_report_delete", name='user_report_delete'),
+
+
     url(r'^pay-types/$', "scomuser.views.list_paytype", name='list-pay-type'),
     url(r'^pay-type/add/$', "scomuser.views.add_paytype", name='add-pay-type'),
     url(r'^pay-type/edit/(?P<pay_type_id>\d+)/$', "scomuser.views.edit_paytype", name='edit-pay-type'),

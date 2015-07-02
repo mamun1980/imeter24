@@ -202,11 +202,12 @@ def sc_contact_add(request):
         if CForm.is_valid():
             try:
                 contact = CForm.save()
-                messages.error(request, "Contact added successfully.")
+                messages.info(request, "Contact added successfully.")
                 return HttpResponseRedirect("/contacts/edit/%d/" % contact.id)
-            except:
+            except Exception, e:
                 messages.error(request, "An error occured. Please check log.")
-                return HttpResponseRedirect("/contacts/add/")
+                return render_to_response("contacts/add-contact.html", {'cform': CForm, 'page_title': 'Add Contact'},
+        context_instance=RequestContext(request))
         else:
             CPForm = ContactProfileFrom(request.POST)
 

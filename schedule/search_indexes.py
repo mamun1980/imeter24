@@ -6,7 +6,6 @@ from contacts.models import ContactPhone, ContactEmailAddress
 
 class JobIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.CharField(document=True, use_template=True)
-    job_id = indexes.CharField(model_attr='id')
     job_number = indexes.CharField(model_attr='job_number', boost=2)
     cab_designation = indexes.CharField(model_attr='cab_designation', indexed=False, null=True)
     job_name = indexes.CharField(model_attr='job_name', indexed=False, null=True)
@@ -28,8 +27,6 @@ class JobControlIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.CharField(document=True, use_template=True)
     job_number = indexes.CharField(model_attr='job_number', boost=2)
     job_name = indexes.CharField(model_attr='job_name', boost=2)
-    # sold_to = indexes.CharField(model_attr='sold_to__contact_name', indexed=False, null=True)
-    # ship_to = indexes.CharField(model_attr='ship_to__contact_name', indexed=False, null=True)
     elevetor_type = indexes.CharField(model_attr='elevetor_type__elevetor_type', indexed=False, null=True)
     number_of_cabs = indexes.IntegerField(model_attr='number_of_cabs', indexed=False, null=True)
     number_of_floors = indexes.IntegerField(model_attr='number_of_floors', indexed=False, null=True)
@@ -40,7 +37,6 @@ class JobControlIndex(indexes.SearchIndex, indexes.Indexable):
     customer_po_number = indexes.CharField(model_attr='customer_po_number', indexed=False, null=True)
     delivery_date = indexes.CharField(model_attr='delivery_date', indexed=False, null=True)
     start_date = indexes.CharField(model_attr='start_date', indexed=False, null=True)
-    # installed_by = indexes.CharField(model_attr='installed_by__contact_name', indexed=False, null=True)
     estimated_price_for_job = indexes.CharField(model_attr='estimated_price_for_job', indexed=False, null=True)
     
 

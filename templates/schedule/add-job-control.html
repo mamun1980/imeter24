@@ -24,8 +24,10 @@
 .supplier_contact thead{
 	background-color: #E0E0E0 !important;
 }
-.sold_to_contact tbody, .ship_to_contact tbody {
-	background-color: #FFF
+.sold_to_contact tbody, .ship_to_contact tbody, .installed_by_contact tbody {
+	background-color: #333;
+	font-size: 14px;
+	color: #FFF;
 }
 .sold_to_contact tbody tr:hover, .ship_to_contact tbody tr:hover, .installed_by_contact tbody tr:hover{
 	background-color: #616183;
@@ -50,9 +52,12 @@ table.contact th{
 	border: 1px solid #000;
 }
 .sold_to_contact thead, .ship_to_contact thead, .installed_by_contact thead{
-	background-color: #555;
-	color: #FF0;
+	background-color: #ed791a;
+	color: #FFF;
+	height: 35px;
+	font-size: 16px;
 }
+
 #ship_to_contact_list, #items_list {
 	position: absolute;
 	top: 42px;
@@ -64,13 +69,17 @@ table.contact th{
 	-moz-box-shadow:    0px 0px 10px 0px rgba(50, 50, 50, 0.75);
 	box-shadow:         0px 0px 10px 0px rgba(50, 50, 50, 0.75);
 }
+a.close {
+	color: red !important;
+	opacity: 1 !important;
+}
 </style>
-<div class="container shadow4 main-body" ng-app="scheduleApp">
+<div class="container-fluid shadow4 main-body" ng-app="scheduleApp">
 
 <section class="row" >
 	
 
-	<div class="col-md-10 col-md-offset-1" ng-controller="AddJobControlController">
+	<div class="col-md-12" ng-controller="AddJobControlController">
 		<div class="panel panel-primary">
 			<div class="panel-heading">
 		    	<h4>Add Job Control</h4>
@@ -109,6 +118,17 @@ scheduleApp.controller('AddJobControlController', ['$scope', '$http', '$compile'
 	};
 
 	$scope.init();
+	$scope.hideSoldToContact = function() {
+		$scope.show_sold_to_contact_list = false;
+	}
+
+	$scope.hideShipToContact = function() {
+		$scope.show_ship_to_contact_list = false;
+	}
+
+	$scope.hideInstalledByContact = function() {
+		$scope.show_installed_by_contact_list = false;
+	}
 
 	$scope.searchJob = function(job_number) {
 		if (job_number.length > 1) {

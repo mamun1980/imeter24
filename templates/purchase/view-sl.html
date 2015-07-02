@@ -39,17 +39,13 @@ tr.thead {
 					
 					<tbody>
 						<tr>
-							<th width="25%">SL ID</th>
-							<td>{{sl.id}}</td>
-						</tr>
-						<tr>
 							<th width="25%">SL Number</th>
 							<td>{{sl.sl_number}}</td>
 						</tr>
 						<tr>
 							<th width="25%">Sold To</th>
 							<td>
-								{% if sl.ship_to %}
+								{% if sl.sold_to %}
 								<div class="sold-contact">
 									<p><b>{{sl.sold_to}}</b> </p>
 									<span>{{sl.sold_to.city}}</span>

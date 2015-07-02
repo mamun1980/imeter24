@@ -20,21 +20,44 @@ table#sold_to_contact_details th, table#ship_to_contact_details th{
 	background-color: #83AD9E;
 }
 table > thead {
-	background-color: #83AD9E;
+	background-color: #333;
+    color: #FF2;
+    
 }
 table > tbody {
 	background-color: #FFF;
 }
-#ship_to_contact_list, #sold_to_contact_list, #items_list {
+#ship_to_contact_list thead, #sold_to_contact_list thead {
+    color: #FFF;
+    background-color: #ed791a;
+    font-size: 16px;
+}
+#ship_to_contact_list tbody, #sold_to_contact_list tbody {
+    color: #FFF;
+    background-color: #333;
+    font-size: 14px;
+}
+#ship_to_contact_list, #sold_to_contact_list {
+    position: absolute;
+    top: 34px;
+    left: 0px;
+    /*background-color: #ed791a;*/
+    z-index: 1000;
+}
+#items_list{
 	position: absolute;
 	top: 45px;
 	left: 5px;
-	background-color: #DDD;
+	
 	z-index: 1000;
 	/*border: 1px solid #000;*/
 	-webkit-box-shadow: 0px 0px 10px 0px rgba(50, 50, 50, 0.75);
 	-moz-box-shadow:    0px 0px 10px 0px rgba(50, 50, 50, 0.75);
 	box-shadow:         0px 0px 10px 0px rgba(50, 50, 50, 0.75);
+}
+#items_list thead {
+    background-color: #000;
+    color: #FF0;
 }
 .sold_to_contact tbody tr:hover, .ship_to_contact tbody tr:hover {
 	background-color: #616183;
@@ -58,18 +81,34 @@ p.item_desc {
 }
 #sl_list, #job_list {
     position: absolute;
-    width: 450px;
+    width: 100%;
     z-index: 100;
+}
+#sl_list table {
+    border: 1px solid #000;
+}
+#sl_list tbody tr:hover {
+    background-color: #CCC;
+}
+#sl_list thead {
+    background-color: #ed791a;
+    color: #FFF;
+    font-size: 16px;
+    font-style: bold;
 }
 #sl_list ul {
     padding-left: 0px;
     list-style: none;
 }
+a.close {
+    opacity: 1!important;
+    color: red !important;
+}
 </style>
 <div class="container-fluid shadow4 main-body" ng-app="slApp">
 
 <section class="row " ng-controller="AddSLController">
-	<form action="/purchase/add-sl/" method="POST" enctype="multipart/form-data">{% csrf_token %}
+	<form action="/purchase/add-sl/" name="add_sl_form" method="POST" enctype="multipart/form-data">{% csrf_token %}
 	
 	<div class="col-md-12">
 		
@@ -77,16 +116,16 @@ p.item_desc {
 			<div class="panel-heading">
 		    	<h4>Add Shipping List</h4>
 		  	</div>
-		  	<div class="panel-body">
+		  	
 
 				{% include "purchase/partials/add-sl-form.html" %}
 				
-			</div>
+			
 		</div>
 		
 	</div>
 	<div class="col-md-6 col-md-offset-3">
-		<button type="submit" class="btn btn-primary form-control">Add Shipping List</button>	
+		<button type="submit" class="btn btn-primary form-control" ng-disabled="!(add_sl_form.$valid && add_sl_form.$dirty && item_added)">Add Shipping List</button>	
 	</div>
 	</form>
 	
@@ -147,7 +186,13 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
 
         $scope.show_sl_list = false;
         $scope.show_job_list = false;
-        $scope.search_sll = 'new';
+        var items_count = $("input.added_item_number").length;
+        if(items_count < 2) {
+            $scope.item_added = false;
+        } else {
+            $scope.item_added = true;
+        }
+        // $scope.search_sl = 'new';
         
         // $("#ship-to-container").hide();
 	};
@@ -219,7 +264,7 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
 
     $scope.selectSoldTo = function(con) {
 		$("#sold_to_contact_list").hide();
-		$scope.search_sold_to = '';
+		$scope.search_sold_to = con.contact_name;
 		$scope.sold_to_contact = con;
 		$("#id_sold_to").val(con.id);
 		$("#sold_to_contact_details").show();
@@ -249,6 +294,7 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
     	var item_description = item.description;
     	var item_id = item.id;
     	var currency_id = item.currency_id;
+        $scope.item_added = true;
     	// console.log(unit_measure_id);
     	// var item_qty_received = parseFloat(item.qty_received).toFixed(4);
     	// var last_received_date = item.qty_received_date;
@@ -297,7 +343,7 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
     	str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+item_number+"' readonly></td>";
     	str += "<td><p class='bg-info item_desc'>"+item_description+"</p></td>";
     	
-    	str += "<td><input type='number' name='item_ordered' class='form-control demo_box' placeholder='Ordered'></td>";
+    	str += "<td><input type='number' name='item_ordered' class='form-control demo_box' placeholder='Ordered' required></td>";
 
     	str += "<td><input type='number' name='item_shipped' class='form-control demo_box' placeholder='Shipped today' readonly></td>";
 
@@ -331,6 +377,11 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
         console.log(event.currentTarget.attributes[1].value);
         
 		$(event.target).closest('tr').remove();
+
+        var items_count = $("input.added_item_number").length;
+        if(items_count < 2) {
+            $scope.item_added = false;
+        }
     };
 
     $scope.deleteField = function (event) {
@@ -343,6 +394,11 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
 
         var removed_item = "<input type='hidden' name='removed_item' value='"+removed_item_id+"'>";
         $("#add_item_list tr.removed_item").append(removed_item);
+
+        var items_count = $("input.added_item_number").length;
+        if(items_count < 2) {
+            $scope.item_added = false;
+        }
         
     };
 
@@ -364,7 +420,7 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
     }
     $scope.selectSL = function(sl){
         console.log(sl);
-        /*
+        
         $scope.search_sl = sl.sl_number;
         $scope.sl_checked = true;
         $scope.show_sl_list = false;
@@ -373,13 +429,22 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
         $("#id_item_job_number").val(sl.job_number);
         $("#id_job_number").val(sl.job_number_id);
 
-        $("#sold_to_contact_details").show();
-        $scope.sold_to_contact = sl.sold_to;
-        $("#id_sold_to").val(sl.sold_to.id);
-
-        $("#ship_to_contact_details").show();
-        $scope.ship_to_contact = sl.ship_to;
-        $("#id_ship_to").val(sl.ship_to.id);
+        if(sl.sold_to){
+            $("#sold_to_contact_details").show();
+            $scope.sold_to_contact = sl.sold_to;
+            $scope.search_sold_to = sl.sold_to.contact_name;
+            $("#id_sold_to").val(sl.sold_to.id);  
+            console.log("sold to "+ sl.sold_to.id);
+            console.log(sl.sold_to);
+        }
+        
+        if(sl.ship_to){
+            $("#ship_to_contact_details").show();
+            $scope.ship_to_contact = sl.ship_to;
+            $scope.search_ship_to = sl.ship_to.contact_name;
+            $("#id_ship_to").val(sl.ship_to.id);    
+        }
+        
 
         $("#id_ordered_date").val(sl.ordered_date);
         $("#id_date_required").val(sl.date_required);
@@ -392,7 +457,7 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
         var myitem = $("tbody#add_item_list tr.add_item");
         for(i=0; i< items.length ; i++) {
             var str = "<tr class='add_item'>";
-            str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+items[i].item+"' readonly></td>";
+            str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+items[i].item_number+"' readonly></td>";
             str += "<td><p class='bg-info item_desc'>"+items[i].description+"</p></td>";
             
             str += "<td><input type='number' name='item_ordered' class='form-control demo_box' placeholder='Ordered' value='"+items[i].ordered+"'></td>";
@@ -415,7 +480,7 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
             $("tbody#add_item_list").prepend(element);
 
         }
-        */   
+        
     }
 
 }]);

@@ -10,6 +10,8 @@ from django.utils.safestring import mark_safe
 from premierelevator.models import SystemVariable
 from django.forms import Widget, TextInput
 import re
+import datetime
+
 
 class PremierTextInput(TextInput):
 	"""docstring for PremierTextInput"""
@@ -162,14 +164,14 @@ class ItemForm(forms.ModelForm):
 	def save(self, commit=True):
 		item = super(ItemForm, self).save(commit=False)
 		if self.action == 'new':
-			# sv = SystemVariable.objects.get(id=1) // This is for next item number
-			# item_number = re.sub(r"[A-Za-z]+","",item.item_number)
-			# item.item_number = int(item_number)
 			item.max_order_qty_remains = item.max_order_qty
+			item.quantity_on_hand = 0.0;
+			item.quantity_on_order = 0.0;
+			item.qty_received = 0.0;
+			item.qty_on_request = 0.0;
+			item.date_added = datetime.datetime.now();
+			item.stock_status_type = 'no-stock';
 		
-		item.search_string = item.item_number + " " + item.description
-		if item.primary_supplier:
-			item.search_string += " " + item.primary_supplier.contact_name
 		item.save()
 		return item
 

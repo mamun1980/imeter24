@@ -1,24 +1,24 @@
 <table class="table" ng-show="jobs">
+	<thead>
 	<tr>
-		<td> ID </td>
-		<td>Report Type</td>
-		<td>Script Name</td>
-		<td>Que Type</td>
-		<td>Current job status</td>
-		<td>Date submitted</td>
-		<td> Comments </td>
+		<th> ID </th>
+		<th>Report Type</th>
+		<th>Script Name</th>
+		<th>Que Type</th>
+		<th>Current job status</th>
+		<th>Date submitted</th>
+		<th> Comments </th>
 
-		<td>Search start date</td>
-		<td>Search end date</td>
-		<td>Search stringe</td>
-		<td>Search status type</td>
+		<th>Search start date</th>
+		<th>Search end date</th>
+		<th>Search stringe</th>
+		<th>Search status type</th>
 		
-		
-		
-		<td>Action</td>
+		<th>Action</th>
 		
 	</tr>
-	
+	</thead>
+	<tbody>
 		<tr ng-repeat="job in jobs | googleSearchFilter:search">
 			<td> {[{ job.id }]} </td>
 			<td> {[{ job.report.report_type }]} </td>
@@ -48,6 +48,7 @@
 			</td>
 			
 		</tr>
+	</tbody>
 </table>
 
 <h2 ng-hide="jobs">There's no recuring job</h2>

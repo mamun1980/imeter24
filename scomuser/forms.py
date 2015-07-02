@@ -4,6 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 from scomuser.models import *
 from scomuser.lookups import UserLookup
 import selectable
+from report.models import Printer
 
 
 class ChangePasswordForm(forms.Form):
@@ -187,7 +188,21 @@ class MassMailForm(forms.ModelForm):
 
 
 
+class UserReportForm(forms.ModelForm):
+    report_type = forms.ChoiceField(required=True,  label="Report Type",
+        choices=(('email', 'Email'), ('fax', 'Fax'), ('print', 'Print'), ('pdf', 'PDF')),        
+        widget=forms.Select(attrs={"class": "form-control"}))
+    report_printer = forms.ModelChoiceField( required=True, label="Report Printer", queryset=Printer.objects.all(),
+        widget=forms.Select(attrs={"class": "form-control"}))
+    report_fax = forms.CharField(max_length=50, required=True, label="Report Fax",
+        widget=forms.TextInput(attrs={"class": "form-control", 'placeholder': 'Fax Number'}))
+    report_email = forms.CharField(max_length=100, required=True, label="Report Email",
+        widget=forms.EmailInput(attrs={"class": "form-control", 'placeholder': 'email address'}))
 
+
+    class Meta:
+        model = UserReport
+        exclude = ['user', ]
 
 
 

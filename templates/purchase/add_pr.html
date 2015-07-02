@@ -24,14 +24,25 @@
 }
 #supplier-container .ui-widget-content-custom, #item-container .ui-widget-content-custom {
 	background-color: #333 !important;
-	color: #FFF;
+	color: #FF0;
 }
 
-table#item-list {
+table#items_list {
 	width: 100%;
-	margin-top: 10px;
+	margin-top: 2px;
 	/*display: none;*/
-	/*border: 2px solid #333;*/
+	border: 2px solid #333;
+}
+
+table#items_list > thead {
+	background-color: #333 !important;
+	color: #FF0 !important;
+}
+table#items_list > tbody > tr:hover {
+	background-color: #EEE;
+}
+table#items_list > thead > tr > th > a.close {
+	color: red !important;
 }
 .glyphicon {
 	color: blue !important;
@@ -49,6 +60,9 @@ table#item-list {
 .item-desc {
 	margin: 5px 1px 2px;
 }
+input.ng-dirty.ng-invalid {
+	border:1px solid red;
+}
 </style>
 
 <div class="container shadow4 main-body" ng-app="premierApp">
@@ -61,22 +75,11 @@ table#item-list {
 		    	<h4>Add Purchase Request</h4>
 		  	</div>
 		  	<div class="panel-body">
-		  	<form action="/purchase/add-pr/" name="pr-add-form" method="POST">{% csrf_token %}
+		  	<form action="/purchase/add-pr/" name="pr_add_form" method="POST">{% csrf_token %}
 		  		
-		  		{% for field in pr_add_form %}
-		  		
-		            <div class="col-md-4 topmargin">
-		            {{ field.label_tag }} 
-		            </div>
-		            <div class="col-sm-8 topmargin">
-		            	{{ field.errors }}
-		                {{ field }}
-		            </div>
-		        
-
-		        {% endfor %}
+		  		{% include "purchase/partials/add-pr-form.html" %}
 	    		  	<div class="col-md-4">
-						<button class="btn btn-primary btn-lg" type="submit">Add PR</button>
+						<button class="btn btn-primary btn-lg" type="submit" ng-disabled="!(pr_add_form.$valid && pr_add_form.$dirty)">Add PR</button>
 					</div>
 					
 		  	</form>
@@ -93,7 +96,7 @@ table#item-list {
 				</tr>
 			</thead>
 			<tbody>
-				<tr class="ui-menu-item" ng-repeat="item in items | googleSearchFilter:search_item">
+				<tr class="ui-menu-item" ng-repeat="item in items">
 					
 					<td class="select-item">
 						<input type='radio' name='item' value="{[{item.item_number}]}" data-order-restriction="{[{item.order_restriction}]}">
@@ -130,7 +133,7 @@ $("select#id_item").closest("div").append(str1+str2);
 
 $(document).on("click", "a.close", function(e){
 	$("#item-selectable").hide();
-})
+});
 // Item select ========
 
 $(document).on('change', 'input[type="radio"]', function(){
@@ -141,9 +144,16 @@ $(document).on('change', 'input[type="radio"]', function(){
 	$("#item-selectable").hide();
 
 	$("#id_order_qty").attr("max", max_value);
-	console.log("max_value"+ max_value);
+	
 
-})
+});
+
+UpdateRequestedUser =  function(){
+		var ru = $("select#id_user_req").val();
+		$("#id_user_requested").val(ru);
+		console.log(ru);
+	};
+
 
 })(jQuery)
 
@@ -162,30 +172,66 @@ premierApp.controller('AddPRController',['$scope', '$http', function ($scope, $h
 
         // $("#selectable").hide();
         $("#item-selectable").hide();
+        $("#items_list").hide();
 	};
 
 	$scope.init();
 
-    $scope.$watch('search_item', function (newValue, oldValue) {
-        if(newValue != undefined) {
-        	if(newValue.length > 1) {
-        		$( "#item-container" ).css('width', function(){
-        			var wid = $(this).innerWidth();
-        			console.log(wid);
-        			return wid;
-        		}).position({
-					my: "left top-1",
-					at: "left bottom",
-					of: "#id_item_demo",
-					collision: "fit"
-				});
+	// $scope.UpdateRequestedUser =  function(){
+	// 	var ru = $("select#id_user_req").val();
+	// 	// $("#id_user_requested").val(ru);
+	// 	console.log(ru);
+	// };
+    $scope.searchItem = function(q) {
+		if(q) {
+			if(q.length > 1) {
+				console.log(q);
+				var url = "/inventory/search/?q=" + q;
+	            $http({method: 'GET', url: url}).
+		            success(function(data, status, headers, config){
+		            $scope.items = data;
+		            
+		        });
+				$("#items_list").show();
+			} else {
+				$("#items_list").hide();
+			}
+		}
+		
+	}
 
-        		$("#item-selectable").show();
-        	} else {
-        		$("#item-selectable").hide();
-        	}
-        } 
-    });
+	$scope.selectItem =function(item) {
+		
+    	
+    	$("#items_list").hide();
+    	
+    	var item_number = item.item_number;
+    	$("#id_item").val(item_number);
+    	$scope.search_item = item_number;
+
+    	// var max_value = $(this).data("order-restriction");
+    	var max_value = item.order_restriction;
+    	// console.log(max_value);
+		// $("#id_order_qty").attr("max", max_value);
+		$scope.order_limit = max_value;
+
+    	
+	}
+	$scope.$watch("order_qty", function(a,b) {
+		// console.log(a);
+		console.log($scope.order_limit);
+		
+		if ($scope.order_limit == undefined) {
+			$scope.pr_add_form.order_qty.$setValidity("limitnotdefined", false)
+			
+		} else if(a > $scope.order_limit) {
+			$scope.pr_add_form.order_qty.$setValidity("maxlimit", false)
+			$scope.pr_add_form.order_qty.$setValidity("limitnotdefined", true)
+		} else {
+			$scope.pr_add_form.order_qty.$setValidity("maxlimit", true)
+			$scope.pr_add_form.order_qty.$setValidity("limitnotdefined", true)
+		}
+	});
 
 }]);
 </script>

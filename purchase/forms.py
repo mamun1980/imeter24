@@ -20,18 +20,18 @@ class InvoiceForm(forms.ModelForm):
 
     class Meta:
         model = Invoice
+        exclude = ["invoice_number",]
 
     def save(self, commit=True):
         invoice = super(InvoiceForm, self).save(commit=False)
-        sv = SystemVariable.objects.get(id=1)
+
         if self.action == 'new':
+            sv = SystemVariable.objects.get(id=1)
+            next_invoice_number = sv.get_next_invoice_number
             # invoice.invoiced_by = self.request.user
             invoice.status = 0
-            invoice_number = self.request.POST['next_number']
-            invoice.invoice_number = 'IN-'+str(invoice_number)
-            sv.next_po_number = int(invoice_number) + 1
-
-        sv.save()
+            invoice.invoice_number = next_invoice_number
+            sv.save()
         invoice.save()
         return invoice
 
@@ -133,13 +133,13 @@ class POForm(forms.ModelForm):
 
     def save(self, commit=True):
         po = super(POForm, self).save(commit=False)
-        sv = SystemVariable.objects.get(id=1)
+        # sv = SystemVariable.objects.get(id=1)
+        # import pdb; pdb.set_trace();
         if self.action == 'new':
             po.po_created_by = self.request.user
             po.datetime = datetime.datetime.now()
             po_number = self.request.POST['next_number']
-            po.po_number = 'PO' + str(po_number)
-            sv.next_po_number = int(po_number) + 1
+            po.po_number = po_number
         elif self.action == 'update':
             po.po_created_by = self.request.user
             po.datetime = datetime.datetime.now()
@@ -147,7 +147,7 @@ class POForm(forms.ModelForm):
             # po.po_number = 'P'+str(po_number)
             # sv.next_po_number = int(po_number) + 1
         po.save()
-        sv.save()
+        # sv.save()
         return po
     
 
@@ -251,7 +251,7 @@ class PackingListForm(forms.ModelForm):
         widget=forms.Select(attrs={"class": "form-control"}))
     hold_at_dept_for_pickup = forms.ChoiceField(required=False, choices=((1, 'YES'),(0, 'NO')),
         widget=forms.Select(attrs={"class": "form-control"}))
-    freight_charges = forms.DecimalField( max_digits=10, required=False, decimal_places=2,
+    freight_charges = forms.DecimalField( max_digits=10, required=False, decimal_places=4,
         widget=forms.NumberInput(attrs={"class": "form-control", 'placeholder': "freight charges"}))
     invoiced_on = forms.DateField(required=False,
         widget=forms.DateInput(attrs={"class": "form-control datepicker", 'placeholder': 'Invoiced On'}))
@@ -319,18 +319,10 @@ class ShippingListForm(forms.ModelForm):
         exclude = ['sl_number', 'search_string', 'sl_status',]
 
     def save(self, commit=True):
+        # import pdb; pdb.set_trace();
         sl = super(ShippingListForm, self).save(commit=False)
-        sv = SystemVariable.objects.get(id=1)
         if self.action == 'new':
-            sl_number = sv.next_sl_number
-            sl.sl_number = 'SL'+str(sl_number)
-            sv.next_sl_number = int(sl_number) + 1
-        elif self.action == 'update':
-            pass
-            # po_number = re.sub(r"[^\w]+","",po.po_number)
-            # po.po_number = 'P'+str(po_number)
-            # sv.next_po_number = int(po_number) + 1
-        sv.save()
+            sl.sl_number = self.request.POST.get('sl_number')
         sl.save()
         return sl
 

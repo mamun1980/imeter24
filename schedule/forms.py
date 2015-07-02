@@ -327,6 +327,7 @@ class JobControlForm(forms.ModelForm):
     def save(self, commit=True):
         job_control = super(JobControlForm, self).save(commit=False)
         if self.action == 'new':
+            # import pdb; pdb.set_trace();
             sv = SystemVariable.objects.get(id=1)
             job_control.job_number = 'JC'+str(sv.next_job_number)
             job_control.save()
@@ -344,4 +345,4 @@ class ElevetorTypeForm(forms.ModelForm):
         widget=forms.Textarea(attrs={"class": "form-control", 'rows':2,'placeholder':"Description"}))
     class Meta:
         model = ElevetorType
-        exclude = ['id',]
+        exclude = ['id', ]

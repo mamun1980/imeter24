@@ -18,7 +18,7 @@
 }
 
 </style>
-<div class="container shadow4 main-body" ng-app="premierApp" ng-controller='PLListController'>
+<div class="container-fluid shadow4 main-body" ng-app="premierApp" ng-controller='PLListController'>
 <section class="row">
 	<div class="col-md-6">
 		<input type='text' class="form-control" ng-model="search" placeholder="Filter PO">
@@ -31,7 +31,7 @@
 			<div class="panel-heading">
 		    	<h4>Packing List</h4>
 		  	</div>
-		  	<div class="panel-body">
+		  	
 				<table class='table table-bordered table-striped'>
 					<thead>
 						<tr class='info'>
@@ -57,11 +57,11 @@
 							<td width="220">
 								
 								<div class="btn-group btn-group-sm">
-								<a class="btn btn-default" href="/purchase/view-pl/{[{pl.id}]}/">View</a> 
+								<a class="btn btn-default" href="/purchase/view-pl/{[{pl.pl_number}]}/">View</a> 
 								
-								<a class="pl-delete btn btn-default" data-pid="{[{pl.id}]}" href="">Archive</a>
+								<a class="pl-delete btn btn-default" data-pid="{[{pl.pl_number}]}" href="">Archive</a>
 
-								<a class="btn btn-default" data-pid="{[{pl.id}]}" href="/purchase/generate-pl/{[{pl.pl_number}]}/" target="_blank">Gererate PL</a>
+								<a class="btn btn-default" data-pid="{[{pl.pl_number}]}" href="/purchase/generate-pl/{[{pl.pl_number}]}/" target="_blank">Gererate PL</a>
 							</div>
 							</td>
 						</tr>
@@ -71,7 +71,7 @@
 						
 					</tbody>
 				</table>
-			</div>
+			
 		</div>
 	</div>
 

@@ -16,15 +16,17 @@ urlpatterns = patterns('',
     url(r'^add-po2/$', 'purchase.views.add_purchase_order', name='add-purchase-order'),
     
     url(r'^generate-po/(?P<po_id>\w+)/$', 'purchase.views.generate_po', name='generate-po'),
-    url(r'^preview-generate-po/(?P<po_id>\d+)/$', 'purchase.views.preview_generete_po', name='preview-generate-po'),
+    url(r'^preview-generate-po/(?P<po_id>\w+)/$', 'purchase.views.preview_generete_po', name='preview-generate-po'),
 
     # url(r'^add-po/$', 'purchase.views.add_po', name='add-po'),
     url(r'^po/search/$', 'purchase.views.search_po', name='search-po'),
     url(r'^add-po/$', 'purchase.views.add_new_po', name='add-new-po'),
+    url(r'^add-po-email/$', 'purchase.views.add_new_po_and_email', name='add-new-po-email'),
+    # url(r'^add-po/$', 'purchase.views.add_new_po', name='add-new-po'),
     url(r'^save-po/$', 'purchase.views.save_po', name='save-po'),
     url(r'^show-draft-po/$', 'purchase.views.show_draft_po', name='draft-po'),
     url(r'^list/$', 'purchase.views.po_list', name='po-list'),
-    url(r'^get-po-by-id/(?P<pk>[0-9]+)/$', 'purchase.views.get_po_by_id', name='get-po-by-id'),
+    url(r'^get-po-by-id/(?P<pk>\w+)/$', 'purchase.views.get_po_by_id', name='get-po-by-id'),
 
 
     url(r'^list-purchase-orders/$', 'purchase.views.list_purchase_orders', name='list-purchase-orders'),
@@ -68,7 +70,7 @@ urlpatterns = patterns('',
     url(r'^get-invoices/$', 'purchase.views.get_invoices', name='get-invoices'),
     url(r'^get-invoice-items/$', 'purchase.views.get_invoice_items', name='get-invoice-items'),
     url(r'^invoice-list/$', 'purchase.views.invoice_list', name='invoice-list'),
-    url(r'^invoice-view/(?P<invoice_id>\d+)/$', 'purchase.views.invoice_view', name='invoice-list'),
+    url(r'^invoice-view/(?P<invoice_id>\w+)/$', 'purchase.views.invoice_view', name='invoice-list'),
     url(r'^delete-invoice/$', 'purchase.views.delete_invoice', name='delete-invoice'),
 
     url(r'^add-sl/$', 'purchase.views.add_shipping_list', name='add-shipping-list'),

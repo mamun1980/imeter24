@@ -8,7 +8,7 @@
 				</th>
 				<td>
 					<div style="position: relative;">
-						<input class="form-control" ng-model='search_pl' maxlength="25" id="id_pl_number_search"  type="search" name="pl_number_search" ng-change="searchPl(search_pl)" placeholder="Search for PL leave Blank for New PL" autocomplete="off" ng-disabled="pl_checked">
+						<input class="form-control" ng-model='search_pl' maxlength="25" id="id_pl_number_search"  type="search" name="pl_number_search" ng-change="searchPl(search_pl)" placeholder="Search for PL by Customer Name, Address, Phone Number, Item Description, PL Number or leave Blank for New PL" autocomplete="off" ng-disabled="pl_checked" autofocus>
 						
 						<div id="pl_list" ng-show="pls.length && show_pl_list">
 							<table class="table">
@@ -38,13 +38,14 @@
 				</td>		
 			</tr>
 			<tr>
-				<td width="">
+				<td width="" ng-class="{'ng-pristine': add_pl_form.search_sold_to.$pristine || add_pl_form.search_sold_to.$invalid}">
 					<label for="id_sold_to">Sold to:</label>
 				</td>
 				<td>
 					<div class="contact_box">						
 					
-						<input type="text" ng-model="search_sold_to" placeholder="start typing to search sold to contact" class="form-control" ng-change="searchSoldTo(search_sold_to)">
+						<input type="text" ng-model="search_sold_to" name="search_sold_to" placeholder="start typing to search sold to contact" class="form-control" ng-change="searchSoldTo(search_sold_to)" ng-required="true">
+						<span ng-show="add_pl_form.search_sold_to.$dirty && add_pl_form.search_sold_to.$error.required">*This field is required.</span>
 						<table class="table table-bordered" id="sold_to_contact_details">
 							<tr>
 								<th width="150">Contact Name</th>
@@ -219,17 +220,11 @@
 	</td>
 	<td class="bg-info">
 		<table class="table table-bordered">
-			<tr>
-				<th width="150">
-					<label for="id_pl_number">Next PL Number:</label>
-				</th>
-				<td>
-					<input type="text" value="{{next_pl_number}}" class="form-control" readonly="">
-				</td>
-			</tr>
+				
 			<tr>
 				<th width="150">
 					<label for="id_sl_number">SL Number:</label>
+					<input type="hidden" value="{{next_pl_number}}" class="form-control">
 				</th>
 				<td>
 					<div style="position: relative;">
@@ -374,9 +369,15 @@
 	</td>
 </tr>
 <tr>
+	<td colspan="2"  ng-class="{'item_error ng-pristine': !item_added, 'bg-primary': item_added }" align="center">
+		<h4>Add items here for this packing list </h4>
+	</td>
+</tr>
+<tr>
 	<td colspan="2">
 	<div class="item_box">
-		<table class="table item">
+
+		<table class="table item ">
 			<thead>
 				<tr>
 					<th width="180">Item Number</th>
@@ -407,7 +408,7 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr ng-repeat="item in items" ng-click="selectItem(item)">
+							<tr ng-repeat="item in items" ng-click="selectSLItem(item)">
 								<td>{[{item.item_number}]}</td>
 								<td>{[{item.shipping_list}]}</td>
 								<td>{[{item.description}]}</td>
@@ -454,11 +455,11 @@
 </tr>
 <tr>
 	<td>
-		<input type="submit" ng-show="show_add_button" class="form-control btn btn-primary" value="Add PL">
+		<input type="submit" ng-show="show_add_button" class="form-control btn btn-primary" value="Add PL" ng-disabled="!(add_pl_form.$valid && add_pl_form.$dirty && item_added)">
 	</td>
 	<td>
 		
-		<input type="submit" ng-show="show_update_button" class="form-control btn btn-primary" value="Update PL">
+		<input type="submit" ng-show="show_update_button" class="form-control btn btn-primary" value="Update PL" ng-disabled="!(add_pl_form.$valid && add_pl_form.$dirty && item_added)">
 	</td>
 </tr>
 </table>

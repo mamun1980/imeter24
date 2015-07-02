@@ -82,7 +82,7 @@ class ContactTypeForm(forms.ModelForm):
 
 class ContactForm(forms.ModelForm):    
     contact_name = forms.CharField( max_length=64, required=False,
-        widget=forms.TextInput(attrs={"class": "form-control", 'placeholder':"Contact Name"}))
+        widget=forms.TextInput(attrs={"class": "form-control", 'placeholder':"Contact Name", "autofocus":"autofocus"}))
     attention_to = forms.CharField( max_length=64, required=False,
         widget=forms.TextInput(attrs={"class": "form-control", 'placeholder':"Attention to"}))
     address_1 = forms.CharField(max_length=64, required=False,
@@ -106,6 +106,7 @@ class ContactForm(forms.ModelForm):
         exclude = ("search_string",)
 
     def save(self, commit=True):
+        
         contact = super(ContactForm, self).save(commit=False)
         try:
             contact.save()    

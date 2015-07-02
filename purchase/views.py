@@ -48,6 +48,7 @@ def html_to_pdf_response(html):
     else:
         return HttpResponse('We had some errors')
 def generate_po(request, po_id):
+    
     resource_directory = os.path.dirname(os.path.dirname(__file__))
     po = PurchaseOrder.objects.get(po_number=po_id)
     purchase_items = PurchaseItem.objects.filter(po=po)
@@ -59,7 +60,8 @@ def generate_po(request, po_id):
     #     'po' : po})
     
 def preview_generete_po(request, po_id):
-    po = PurchaseOrder.objects.get(id=po_id)
+    # import pdb; pdb.set_trace();
+    po = PurchaseOrder.objects.get(po_number=po_id)
     purchase_items = PurchaseItem.objects.filter(po=po)
     return render(request, "purchase/po-report.html", 
         {'po': po, 'items': purchase_items})
@@ -101,34 +103,35 @@ def preview_generete_pl(request, pl_id):
 @permission_required("purchase.add_purchaserequest")
 @csrf_exempt
 def add_purchase_request(request):
+
     if request.method == 'POST':
-        # import pdb; pdb.set_trace();
         pr_add_form = PRAddForm(request.POST)
+        
         if pr_add_form.is_valid():
             pr = pr_add_form.save()
-            pr.status = 0
-            if not request.user.is_superuser:
-                pr.user_requested = request.user
-                
-            if not pr.requeste_created_at:
-                pr.requeste_created_at = datetime.datetime.now()
+            pr.status = 0           
+            pr.requeste_created_at = datetime.now()
+            pr.approved_qty = 0.0
             pr.save()
 
+            #  Update Inventory Item ========
             item = pr.item
-            item.qty_on_request = pr.order_qty
+            item.qty_on_request = item.qty_on_request + pr.order_qty
             item.save()
             
             return HttpResponseRedirect("/purchase/list-purchase-requests/")
 
     else:
-        form_init = {
-            'user_requested' : request.user.id,
-        }
-        pr_add_form = PRAddForm(initial=form_init)
+ 
+        users = User.objects.all().exclude(id=-1)
+        
         if not request.user.is_superuser:
-            pr_add_form.fields['user_requested'].widget.attrs['disabled'] = 'disabled'
+            lock_requested_user = True
+        else:
+            lock_requested_user = False
 
-        return render(request, "purchase/add_pr.html", {'pr_add_form': pr_add_form})
+        return render(request, "purchase/add_pr.html", 
+            {'users': users, 'lock_requested_user': lock_requested_user})
 
 
 @login_required
@@ -158,6 +161,7 @@ def view_purchase_request(request, pk):
 def approve_purchase_request(request, pk):
     pr = PurchaseRequest.objects.get(pk=pk)
     if request.method == 'POST':
+        # import pdb; pdb.set_trace();
         if pr.approved_qty:
             approved_qty = pr.approved_qty
         else:
@@ -168,10 +172,12 @@ def approve_purchase_request(request, pk):
         prc = PurchaseRequestComment(
             purchase_request = pr,
             comment = comment,
-            commnet_date = datetime.datetime.now(),
+            commnet_date = datetime.now(),
             user_commented = request.user
         )
         if pr_approve_form.is_valid():
+            pr = pr_approve_form.save()
+
             if approved_qty:
                 total_approved_qty = approved_qty + pr.approved_qty
             else:
@@ -183,34 +189,38 @@ def approve_purchase_request(request, pk):
             elif total_approved_qty < pr.order_qty:
                 pr.approved_qty = total_approved_qty
                 pr.status = 2
-            pr.approved_date = datetime.datetime.now()
+            pr.approved_date = datetime.now()
             
             pr.save()
             prc.save()
+
             # Add request item
             ri = RequestItem(pr=pr, item=pr.item)
             ri.approved_qty = new_approved_qty
             ri.approved_date = pr.approved_date
             ri.status = 0
             ri.save()
-            sv = SystemVariable.objects.get(id=1)
+            
 
             # Create PO 
             # import pdb; pdb.set_trace();
-            new_po_number = 'P'+str(sv.next_po_number)
-            po = PurchaseOrder(po_number=new_po_number)
-            po.date_issued = datetime.datetime.now()
+            sv = SystemVariable.objects.get(id=1)
+            new_po_number = sv.get_next_po_number
+            po = PurchaseOrder.objects.create(po_number=new_po_number)
+            po.date_issued = datetime.now()
             po.po_created_by = request.user
             po.fob = 'Oshawa, Ontario, Canada'
             po.po_status = 0
             po.save_final_draft = 1
             po.supplier = pr.item.primary_supplier
             po.save()
-            pi = PurchaseItem(po=po)
+
+            # import pdb; pdb.set_trace();
+            pi = PurchaseItem.objects.create(po=po)
             pi.item = pr.item
-            pi.qty = pr.approved_qty
+            pi.qty = new_approved_qty
             pi.cost = pr.item.wholesale_cost
-            pi.sub_total = pr.item.wholesale_cost * pr.approved_qty
+            pi.sub_total = pr.item.wholesale_cost * Decimal(new_approved_qty)
             po.total_po_amount = pi.sub_total
             po.save()
             pi.comment = pr.description
@@ -223,7 +233,7 @@ def approve_purchase_request(request, pk):
             if item.qty_on_request:
                 item.qty_on_request = item.qty_on_request - Decimal(new_approved_qty)
             else:
-                item.qty_on_request = Decimal(new_approved_qty)
+                item.qty_on_request = 0.0
             if item.quantity_on_order:
                 item.quantity_on_order = item.quantity_on_order + Decimal(new_approved_qty)
             else:
@@ -233,16 +243,14 @@ def approve_purchase_request(request, pk):
 
             item.save()
 
-            sv.next_po_number = sv.next_po_number + 1
-            sv.save()
-        
+                  
 
         return HttpResponse(pk)
     else:
         pr_approve_form = PRApproveForm(instance=pr)
         pr_com_form = PRCAddForm()
         return render(request, "purchase/pr-approve.html", 
-            {'pr_approve_form': pr_approve_form, 'pr_com_form': pr_com_form, 'pr_id': pk})
+            {'pr_approve_form': pr_approve_form, 'pr_com_form': pr_com_form, 'pr': pr})
 
 @csrf_exempt
 def declien_purchase_request(request):
@@ -384,7 +392,7 @@ def add_purchase_order(request):
         if po_form.is_valid():
             po = po_form.save()
             po.po_created_by = request.user
-            po.datetime = datetime.datetime.now()
+            po.datetime = datetime.now()
             po.search_string = po.po_number + " "
             if po.supplier:
                 po.search_string += po.supplier.contact_name + " "
@@ -424,7 +432,7 @@ def add_purchase_order(request):
             return HttpResponse("Error")        
 
     else:
-        now = datetime.datetime.now()
+        now = datetime.now()
         try:
             po = PurchaseOrder.objects.latest('id')
             po_number = 'P' + po.next_number
@@ -461,7 +469,7 @@ def add_new_po(request):
     # import pdb; pdb.set_trace()
     try:
         sv = SystemVariable.objects.get(id=1)
-        next_po_number = sv.next_po_number
+        next_po_number = sv.get_next_po_number
         if not next_po_number:
             messages.warning(request, "System varible is not set for PO. Please ask your admin to update System variable.")
             return HttpResponseRedirect("/")
@@ -470,22 +478,29 @@ def add_new_po(request):
         return HttpResponseRedirect("/")
 
     if request.method == 'POST':
-        po_id = request.POST.get("po_id","")
-        if po_id != "":
-            po = PurchaseOrder.objects.get(id=po_id)
+        # import pdb; pdb.set_trace()
+        po_number = request.POST.get("po_number","")
+        email_po = request.POST.get("email_po")
+        fax_po = request.POST.get("fax_po")
+        print_po = request.POST.get("print_po")
+        pdf_po = request.POST.get("pdf_po")
+
+        if po_number != "":
+            po = PurchaseOrder.objects.get(po_number=po_number)
             po_form = POForm(request.POST, instance=po, request=request, action='update')
         else:
             po_form = POForm(request.POST, request=request, action='new')
 
         if po_form.is_valid():
             po = po_form.save()
-            # import pdb; pdb.set_trace()
-            # po.po_created_by = request.user
+            
+            po.po_created_by = request.user
             # po.datetime = datetime.datetime.now()
-            po.save_final_draft = 0
-            po.search_string = po.po_number + " "
-            if po.supplier:
-                po.search_string += po.supplier.contact_name + " "
+            po.save_final_draft = 1
+            po.po_status = 0
+            # po.search_string = po.po_number + " "
+            # if po.supplier:
+            #     po.search_string += po.supplier.contact_name + " "
         
             items = []
             item_list = request.POST.getlist('added_item_number')
@@ -516,10 +531,10 @@ def add_new_po(request):
                     count = count + 1
                 for item in items:
                     itemobj = Item.objects.get(item_number=item['item_number'])
-                    po.search_string += item['item_number'] + " "
+                    # po.search_string += item['item_number'] + " "
                     try:
                         job = Job.objects.get(id=item['job_id'])
-                        po.search_string += job.job_number + " "
+                        # po.search_string += job.job_number + " "
 
                     except:
                         job = None
@@ -544,7 +559,7 @@ def add_new_po(request):
                         raise e
                     # Update inventory item for Last PO info
                     if created:
-                        if itemobj.quantity_on_order:
+                        if itemobj.quantity_on_order and pi.qty:
                             itemobj.quantity_on_order = itemobj.quantity_on_order + Decimal(pi.qty)
                         else:
                             itemobj.quantity_on_order = pi.qty
@@ -554,14 +569,42 @@ def add_new_po(request):
                         itemobj.last_cost_paid = pi.cost
                         itemobj.last_PO_ordered_by = po.po_created_by
                         itemobj.last_PO_supplier = po.supplier
-                        itemobj.max_order_qty_remains = itemobj.max_order_qty_remains - Decimal(pi.qty)
+                        if pi.qty:
+                            itemobj.max_order_qty_remains = itemobj.max_order_qty_remains - Decimal(pi.qty)
+
                     itemobj.save()
             
             po.save()
             
             po_extra_contacts = POContact.objects.filter(purchase_order=po.po_number)
             po_items = PurchaseItem.objects.filter(po=po)
-            return render(request, "purchase/show_draft_po.html", {'po': po, 'extra_contacts': po_extra_contacts, 'po_items': po_items})
+
+            # import pdb; pdb.set_trace()
+            if email_po:
+                try:
+                    report = Report.objects.get(report_type__icontains='PO Email')    
+                except Exception, e:
+                    report = Report.objects.get(id=1)    
+                
+                single_report = SingleReport.objects.create(report=report)
+                single_report.que_type = 'email'
+                single_report.search_string = "="+str(po.po_number)
+                single_report.search_status_type = 'PO'
+                single_report.script_name = report.python_script
+                single_report.save()
+
+            if pdf_po:
+                print pdf_po
+
+            if print_po:
+                print print_po
+
+            if fax_po:
+                print fax_po
+
+            return HttpResponseRedirect("/purchase/list-purchase-orders/")
+
+            # return render(request, "purchase/show_draft_po.html", {'po': po, 'extra_contacts': po_extra_contacts, 'po_items': po_items})
         else:
             
             return HttpResponseRedirect("/purchase/add-po/")
@@ -585,6 +628,153 @@ def add_new_po(request):
 
 
 @csrf_exempt
+def add_new_po_and_email(request):
+    if request.method == 'POST':
+        # import pdb; pdb.set_trace();
+        po_number = request.POST.get("po_number")
+        if po_number:
+            po = PurchaseOrder.objects.get(po_number=po_number)
+        else:
+            sv = SystemVariable.objects.get(id=1)
+            next_po_number = sv.get_next_po_number
+            po = PurchaseOrder.objects.create(po_number=next_po_number)
+
+        date_issued = request.POST.get("date_issued")
+        po.date_issued = date_issued
+
+        date_expected = request.POST.get("date_expected")
+        po.date_expected = date_expected
+
+        supplier = request.POST.get("supplier")
+        try:
+            contact = Contact.objects.get(id=supplier)
+            po.supplier = contact
+        except Exception, e:
+            pass       
+
+        ship_to_id = request.POST.get("ship_to")
+        try:
+            ship_to = Contact.objects.get(id=ship_to_id)
+            po.ship_to = ship_to
+        except Exception, e:
+            pass        
+
+        ship_via_id = request.POST.get("ship_via")
+        try:
+            ship_via = DeliveryChoice.objects.get(id=ship_via_id)
+            po.ship_via = ship_via    
+        except Exception, e:
+            pass
+        
+
+        deliver_internal_id = request.POST.get("deliver_internal")
+        try:
+            deliver_internal = DeliverInternal.objects.get(id=deliver_internal_id)
+            po.deliver_internal = deliver_internal
+        except Exception, e:
+            pass
+        
+
+        shipping_inst = request.POST.get("shipping_inst")
+        po.shipping_inst = shipping_inst
+
+        blanket_po = request.POST.get("blanket_po")
+        po.blanket_po = blanket_po
+
+        terms_id = request.POST.get("terms")
+        try:
+            terms = PaymentTerm.objects.get(id=terms_id)
+            po.terms = terms
+        except Exception, e:
+            pass        
+
+        purchasing_agent_id = request.POST.get("purchasing_agent")
+        try:
+            purchasing_agent = User.objects.get(id=purchasing_agent_id)
+            po.purchasing_agent = purchasing_agent
+        except Exception, e:
+            pass
+        
+
+        returned_type = request.POST.get("returned_type")
+        po.returned_type = returned_type
+
+        items_total = request.POST.get("items_total")
+        po.items_total = items_total
+
+        hst_taxable = request.POST.get("hst_taxable")
+        po.hst_taxable = hst_taxable
+
+        hst_taxable_amount = request.POST.get("hst_taxable_amount")
+        po.hst_taxable_amount = hst_taxable_amount
+
+        pst_taxable = request.POST.get("pst_taxable")
+        po.pst_taxable = pst_taxable
+
+        pst_taxable_amount = request.POST.get("pst_taxable_amount")
+        po.pst_taxable_amount = pst_taxable_amount
+
+        po_currency_id = request.POST.get("po_currency")
+        try:
+            po_currency = Currency.objects.get(id=po_currency_id)
+            po.po_currency = po_currency
+        except Exception, e:
+            pass
+        
+
+        total_po_amount = request.POST.get("total_po_amount")
+        po.total_amount = total_amount
+
+        po.save_final_draft = 1
+        po.po_status = 0
+
+        po.save()
+
+        added_item_numbers = request.POST.getlist("added_item_number")
+        unit = request.POST.getlist("unit")
+        item_cost = request.POST.getlist("item_cost")
+        item_qty = request.POST.getlist("item_qty")
+        item_sub_total = request.POST.getlist("item_sub_total")
+        item_job_number = request.POST.getlist("item_job_number")
+        item_job_id = request.POST.getlist("item_job_id")
+        item_comment = request.POST.getlist("item_comment")
+        
+
+        for i, item_number in enumerate(added_item_numbers):
+            try:
+                item = Item.objects.get(item_number=item_number)
+                po_item, created = PurchaseItem.objects.get_or_create(po=po, item=item)
+                po_item.unit = unit[i]
+                po_item.cost = item_cost[i]
+                po_item.qty = item_qty[i]
+                po_item.sub_total = item_sub_total[i]
+                po_item.job_number = item_job_id[i]
+                po_item.item_comment = item_comment[i]
+                po_item.purchase_status = 0
+
+                po_item.save()
+
+                if created:
+                    if item.quantity_on_order and po_item.qty:
+                        item.quantity_on_order = item.quantity_on_order + Decimal(po_item.qty)
+                    else:
+                        item.quantity_on_order = po_item.qty
+                    item.last_PO = po.po_number
+                    item.last_PO_date_ordered = po.date_issued
+                    item.last_PO_date_expected = po.date_expected
+                    item.last_cost_paid = po_item.cost
+                    item.last_PO_ordered_by = po.po_created_by
+                    item.last_PO_supplier = po.supplier
+                    if po_item.qty:
+                        item.max_order_qty_remains = item.max_order_qty_remains - Decimal(po_item.qty)
+
+                item.save()
+
+            except Item.DoesNotExist:
+                pass
+        
+
+@csrf_exempt
 def save_po(request):
     po_number = request.POST.get("po_number","")
     action = request.POST.get("action","")
@@ -592,6 +782,7 @@ def save_po(request):
     if action == 'save':
         po.save_final_draft = 1
         po.save()
+
     else:
         po_extra_contacts = POContact.objects.filter(purchase_order=po.po_number)
         po_items = PurchaseItem.objects.filter(po=po)
@@ -609,18 +800,17 @@ def search_po(request):
     else:
         purchase_orders = SearchQuerySet().using('po').all().load_all()[:30]
 
-    # import pdb; pdb.set_trace();
     po_list = []
     for po in purchase_orders:
-        po_dict = {}
-        po_dict['id'] = po.pk
-        po_dict['po_number'] = po.po_number
-        po_dict['po_status'] = po.po_status
-        po_dict['supplier'] = po.supplier
-        po_dict['terms'] = po.terms
-        po_dict['shipping_inst'] = po.shipping_inst
+        if po != None:
+            po_dict = {}
+            po_dict['po_number'] = po.po_number
+            po_dict['po_status'] = po.po_status
+            po_dict['supplier'] = po.supplier
+            po_dict['terms'] = po.terms
+            po_dict['shipping_inst'] = po.shipping_inst
 
-        po_list.append(po_dict)
+            po_list.append(po_dict)
 
     try:
         page = int(request.GET.get('page','1'))
@@ -684,12 +874,11 @@ def po_list(request):
 
 def get_po_by_id(request,pk):
     # import pdb; pdb.set_trace()
-    po = PurchaseOrder.objects.get(pk=pk)
+    po = PurchaseOrder.objects.get(po_number=pk)
     po_items = po.purchaseitem_set.all()
     # po_contact = POContact.objects.filter(purchase_order=po.po_number)
 
     po_dict = {}
-    po_dict['po_id'] = po.id
     po_dict['po_number'] = po.po_number
     po_dict['next_number'] = po.next_number
     if po.date_issued:
@@ -703,7 +892,7 @@ def get_po_by_id(request,pk):
     if po.po_status:
         po_status = {}
         po_status['id'] = po.po_status
-        po_status['label'] = po.status_verbose()
+        po_status['label'] = po.status_verbose
         po_dict['po_status'] = po_status
     if po.supplier:
         supplier = {}
@@ -919,7 +1108,7 @@ def get_purchase_orders(request):
             po_dict['date_expected'] = None
 
         po_dict['po_number'] = po.po_number
-        po_dict['status'] = po.status_verbose()
+        po_dict['status'] = po.status_verbose
         if po.purchasing_agent:
             po_dict['purchasing_agent'] = po.purchasing_agent.username
         else:
@@ -938,9 +1127,9 @@ def get_purchase_orders(request):
             if po_item.item:
                 item['item_number'] = po_item.item.item_number
                 item['description'] = po_item.item.description
-            if po_item.item.currency:
-                item['currency'] = po_item.item.currency.currency
-                item['currency_icon'] = po_item.item.currency.get_currency_icon()
+                if po_item.item.currency:
+                    item['currency'] = po_item.item.currency.currency
+                    item['currency_icon'] = po_item.item.currency.get_currency_icon()
 
             if po_item.job_number:
                 item['job_number'] = po_item.job_number.job_number
@@ -986,7 +1175,7 @@ def cancel_po_status(request, pk):
         po_status.status_by = request.user
         po = PurchaseOrder.objects.get(po_number=po_number)
         po_status.po = po
-        po_status.datetime = datetime.datetime.now()
+        po_status.datetime = datetime.now()
         po_status.status = 6
         po_status.save()
 
@@ -1011,7 +1200,7 @@ def change_po(request):
         if po_status_form.is_valid():
             try:
                 po_status = po_status_form.save()
-                po_status.datetime = datetime.datetime.now()
+                po_status.datetime = datetime.now()
                 # po_status.status = 'canceled'
                 po_status.save()
                 po = PurchaseOrder.objects.get(po_number=po_status.po.po_number)
@@ -1049,7 +1238,7 @@ def edit_purchase_order(request, pk):
         if po_form.is_valid():
             po = po_form.save()
             po.save_final_draft = 1
-            po.datetime = datetime.datetime.now()
+            po.datetime = datetime.now()
             po.search_string = po.po_number + " "
             if po.supplier:
                 po.search_string += po.supplier.contact_name + " "
@@ -1295,7 +1484,7 @@ def receive_item(request, item_id):
             rcv_item.purchase_item = purchase_item
             rcv_item.item_po = po
             rcv_item.sub_total = purchase_item.cost * rcv_item.qty_received
-            rcv_item.item_received_date = datetime.datetime.now()
+            rcv_item.item_received_date = datetime.now()
             rcv_item.reveived_by = request.user
             rcv_item.search_string = purchase_item.item.item_number + " " + rcv_item.item_po.po_number
             rcv_item.save()
@@ -1306,7 +1495,7 @@ def receive_item(request, item_id):
             '''
             
             purchase_item.item_recv += rcv_item.qty_received
-            purchase_item.item_recv_date = datetime.datetime.now()
+            purchase_item.item_recv_date = datetime.now()
             if purchase_item.item_recv >= purchase_item.qty:
                 purchase_item.purchase_status = 2
             else:
@@ -1332,7 +1521,7 @@ def receive_item(request, item_id):
                 item.qty_received = item.qty_received + rcv_item.qty_received
             else:
                 item.qty_received = rcv_item.qty_received
-            item.qty_received_date = datetime.datetime.now()
+            item.qty_received_date = datetime.now()
             item.save()
 
             return HttpResponse(rcv_item.id)
@@ -1420,6 +1609,7 @@ def search_shiping_list(request):
                 for item in sl_items:
                     item_dict = {}
                     item_dict['item_number'] = item.item.item_number
+                    item_dict['sl_item_id'] = item.id
                     item_dict['description'] = item.description
 
                     if item.ordered:
@@ -1478,52 +1668,96 @@ def add_packing_list(request):
     users = User.objects.all().exclude(id__in=[-1]).order_by("username")
     dcs = DeliveryChoice.objects.all()
     if request.method == 'POST':
-        
-        pl_number = request.POST.get("pl_number","")
+        # import pdb; pdb.set_trace();
+        pl_number = request.POST.get("pl_number", "")
+        sl_number = request.POST.get("sl_number", "")
         if pl_number != "":
-            deleted_items = request.POST.getlist("removed_item")
-            pl_item_ids = request.POST.getlist("pl_item_id","")
-
             pl = PackingList.objects.get(pl_number=pl_number)
             pl_form = PackingListForm(request.POST, instance=pl, request=request, action='update')
         else:
             pl_form = PackingListForm(request.POST, request=request, action='new')
-        
-        
-            # item_qtybo = request.POST.getlist('item_qtybo')
-            # item_ordered = request.POST.getlist('item_ordered')
-        items = request.POST.getlist('added_item_number',"")
-            # sl_number = request.POST.get("sl_number","")
-        sl_item_ids = request.POST.getlist("sl_item_id","")
-        item_unit = request.POST.getlist('unit',"")
-        item_ordered = request.POST.getlist('item_ordered')
-        item_shipped = request.POST.getlist('item_shipped',"")
-        # item_qtybo = request.POST.getlist('item_qtybo')
-        # import pdb; pdb.set_trace()
+
+        sl_item_ids = request.POST.getlist("sl_item_ids","")
+        sl_item_unit = request.POST.getlist('sl_item_unit',"")
+        sl_item_ordered = request.POST.getlist('sl_item_ordered')
+        sl_item_shipped = request.POST.getlist('sl_item_shipped',"")
+
+        pl_item_ids = request.POST.getlist("pl_item_ids","")
+        pl_item_unit = request.POST.getlist('pl_item_unit',"")
+        pl_item_ordered = request.POST.getlist('pl_item_ordered')
+        pl_item_shipped = request.POST.getlist('pl_item_shipped',"")
+        deleted_items = request.POST.getlist("removed_item")
+
         if pl_form.is_valid():
-            pl = pl_form.save()
+            try:
+                pl = pl_form.save()
+                if sl_number:
+                    sl = ShippingList.objects.get(sl_number=sl_number)
+                    pl.sl = sl
+            except Exception, e:
+                messages.warning(request, "Packing list cant saved.")
+                return HttpResponseRedirect("/purchase/add-pl/")
+            
 
             if deleted_items:
                 for deleted_item in deleted_items:
                     di = PackingItem.objects.get(id=deleted_item)
+                    sli = di.sl_item
+                    sli.shipped = sli.shipped - di.qty_shipped
+                    sli.backordered = sli.backordered + di.qty_shipped
+                    sli.shipped_total_to_date = sli.shipped
+                    sli.save()
                     di.delete()
             
-            if items:
-                for i, item in enumerate(items):
+            if sl_item_ids:
+                for i, item in enumerate(sl_item_ids):
                     ship_item = ShippingItem.objects.get(id=sl_item_ids[i])
-                    packing_item, created = PackingItem.objects.get_or_create(shipping_item=ship_item)
-                    packing_item.unit = item_unit[i]
-                    if packing_item.qty_shipped:
-                        packing_item.qty_shipped = Decimal(item_shipped[i]) + packing_item.qty_shipped
-                    else:
-                        packing_item.qty_shipped = Decimal(item_shipped[i])
+                    try:
+                        packing_item = PackingItem.objects.create(pl=pl)
+                        packing_item.sl_item = ship_item
+                    except Exception, e:
+                        raise e
+                    
+                    packing_item.unit = sl_item_unit[i]
+                    # if packing_item.qty_shipped:
+                    #     packing_item.qty_shipped = Decimal(sl_item_shipped[i]) + packing_item.qty_shipped
+                    # else:
+                    packing_item.qty_shipped = Decimal(sl_item_shipped[i])
 
-                    packing_item.qty_ordered = Decimal(item_ordered[i])
-                    packing_item.qty_bo = packing_item.qty_ordered - packing_item.qty_shipped
-
-                    packing_item.pl = pl
-
+                    packing_item.qty_ordered = ship_item.ordered
+                    packing_item.qty_bo = ship_item.backordered - packing_item.qty_shipped
                     packing_item.save()
+
+                    ship_item.backordered = ship_item.backordered - packing_item.qty_shipped
+                    ship_item.shipped = ship_item.shipped_total_to_date + packing_item.qty_shipped
+                    ship_item.shipped_total_to_date = ship_item.shipped
+                    ship_item.save()
+
+
+            if pl_item_ids:
+                for i, item in enumerate(pl_item_ids):
+                    try:
+                        packing_item = PackingItem.objects.get(id=item)
+                        packing_item.pl = pl
+                        ship_item = packing_item.sl_item
+                    except Exception, e:
+                        pass
+
+                    packing_item.unit = pl_item_unit[i]
+                    ship_item.backordered = ship_item.backordered + packing_item.qty_shipped
+                    ship_item.shipped_total_to_date = ship_item.shipped_total_to_date - packing_item.qty_shipped
+                    # ship_item.shipped = ship_item.shipped_total_to_date
+
+                    packing_item.qty_shipped = Decimal(pl_item_shipped[i])
+                    packing_item.qty_ordered = ship_item.ordered
+                    packing_item.qty_bo = ship_item.backordered - packing_item.qty_shipped
+                    packing_item.save()
+
+                    ship_item.backordered = ship_item.backordered - packing_item.qty_shipped
+                    ship_item.shipped = ship_item.shipped_total_to_date + packing_item.qty_shipped
+                    ship_item.shipped_total_to_date = ship_item.shipped
+                    ship_item.save()
+
 
 
 
@@ -1607,9 +1841,7 @@ def add_packing_list(request):
                         sl.sl_status = 2
                     sl.save()
             '''
-            pl.search_string = pl.pl_number + ' '
-            if pl.sold_to:
-                pl.search_string += pl.sold_to.contact_name + ' '
+            
 
             pl.save()
             return HttpResponseRedirect("/purchase/packing-list/")
@@ -1765,7 +1997,7 @@ def pl_list(request):
 
         pack['hold_at_dept_for_pickup'] = pl.hold_at_dept_for_pickup
         
-        pack['status'] = pl.status
+        pack['status'] = pl.status_verbose()
         if pl.invoiced_on:
             pack['invoiced_on'] = pl.invoiced_on.isoformat()
         else:
@@ -1781,9 +2013,11 @@ def pl_list(request):
         pl_items = PackingItem.objects.filter(pl=pl)
         items=[]
         for it in pl_items:
+            # import pdb; pdb.set_trace()
             item = {}
-            item['shipping_item'] = it.shipping_item.id
-            item['item_number'] = it.shipping_item.item.item_number
+            if it.sl_item:
+                item['sl_item_id'] = it.sl_item.id
+                item['item_number'] = it.sl_item.item.item_number
             item['description'] = it.description
             item['unit'] = it.unit
             if it.qty_ordered:
@@ -1900,16 +2134,28 @@ def get_pl_items(request, pl_number=None):
     for item in pl_items:
         item_dict = {}
         item_dict['id'] = item.id
-        item_dict['item_number'] = item.item.item_number
+        item_dict['item_number'] = item.sl_item.item.item_number
+        item_dict['sl_item_id'] = item.sl_item.id
+        item_dict['item_number'] = item.sl_item.item.item_number
         item_dict['description'] = item.description
         item_dict['unit'] = item.unit
-        if item.item.retail_price:
-            item_dict['price'] = float(item.item.retail_price)
-            item_dict['sub_total'] = float(item.qty_shipped) * float(item.item.retail_price)
+        if item.qty_ordered:
+            item_dict['qty_ordered'] = float(item.qty_ordered)
+
+        if item.qty_bo:
+            item_dict['qty_bo'] = float(item.qty_bo)
+        else:
+            item_dict['qty_bo'] = 0.0
+
+        if item.qty_shipped:
+            item_dict['qty_shipped'] = float(item.qty_shipped)
+        if item.sl_item.item.retail_price:
+            item_dict['price'] = float(item.sl_item.item.retail_price)
+            item_dict['sub_total'] = float(item.qty_shipped) * float(item.sl_item.item.retail_price)
         item_dict['shipped'] = float(item.qty_shipped)
             
         item_dict['pl'] = item.pl.pl_number
-        item_dict['search_string'] = item.search_string
+
         
         
         plitems.append(item_dict)
@@ -1932,8 +2178,8 @@ def delete_packing_list(request):
 
 def view_packing_list(request, id):
     # import pdb; pdb.set_trace()
-    pl = PackingList.objects.get(id=id)
-    pl_items = PackingItem.objects.filter(pl=pl)
+    pl = PackingList.objects.get(pl_number=id)
+    pl_items = pl.pl_items.all()
     return render(request, 'purchase/view-pl.html', {'pl': pl, 'pl_items': pl_items})
 
 def packing_list(request):
@@ -1946,23 +2192,38 @@ def add_shipping_list(request):
     sv = SystemVariable.objects.get(id=1)
     next_sl_number = sv.next_sl_number
     if request.method == 'POST':
-        import pdb; pdb.set_trace();        
+        # import pdb; pdb.set_trace();
         user = request.user 
         sl_number = request.POST.get("sl_number","")
-        if not sl_number == 'new':
-            sl = ShippingList.objects.get(sl_number=sl_number)
-            sl_form = ShippingListForm(request.POST, instance=sl, action='update')
-        else:    
-            sl_form = ShippingListForm(request.POST, action='new')
+        
+        if sl_number:
+            try:
+                sl = ShippingList.objects.get(sl_number=sl_number)
+                sl_form = ShippingListForm(request.POST, request=request, instance=sl, action='update')    
+            except ShippingList.DoesNotExist:
+                sl_form = ShippingListForm(request.POST, request=request, action='new')
+        else:
+            try:
+                sv = SystemVariable.objects.get(id=1)
+                request.POST['sl_number'] = sv.get_next_sl_number
+                sl_form = ShippingListForm(request.POST, request=request, action='new')    
+            except Exception, e:
+                raise e
+            
+            
+
 
         item_ordered = request.POST.getlist('item_ordered')
         # item_shipped = request.POST.getlist('item_shipped')
         # item_backordered = request.POST.getlist('item_backordered')
         # shipped_total_to_date = request.POST.getlist('shipped_total_to_date')
-
+        # import pdb; pdb.set_trace();
         if sl_form.is_valid():
+            try:
+                sl = sl_form.save()    
+            except Exception, e:
+                raise e
             
-            sl = sl_form.save()
             items = []
             items = request.POST.getlist('added_item_number')
             deleted_items = request.POST.getlist("removed_item")
@@ -1995,7 +2256,6 @@ def add_shipping_list(request):
                 # item_ship_status value will only be changed in PL after actual shipment.
                 shipping_item.item_ship_status = 0
                 shipping_item.shipped_by = user
-                shipping_item.search_string = item + " " + sl.sl_number + " "
                 shipping_item.save()
             
             # sl.search_string = sl.sl_number + " " + sl.customer_po_number + sl.customer_job_number
@@ -2175,15 +2435,33 @@ def get_sl_json(request):
     return HttpResponse(json_posts, mimetype='application/json')
 
 def get_sl_json_by_id(request, sl_id):
-    sl = ShippingList.objects.get(id=sl_id)
+    sl = ShippingList.objects.get(sl_number=sl_id)
     sl_dict = {}
-    sl_dict['id'] = sl.id
+    
     sl_dict['sl_number'] = sl.sl_number
     if sl.sold_to:
         sl_dict['sold_to'] = {}
         sl_dict['sold_to']['id'] = sl.sold_to.id
         sl_dict['sold_to']['contact_name'] = sl.sold_to.contact_name
         sl_dict['sold_to']['city'] = sl.sold_to.city
+        # sl_dict['sold_to']['phones'] = sl.sold_to.contact_phone.all()
+        sl_dict['sold_to']['phones'] = []
+        for em in sl.sold_to.contact_phone.all():
+            email = {}
+            email['phone'] = em.phone
+            email['phone_ext'] = em.phone_ext
+            sl_dict['sold_to']['phones'].append(email)
+        # sl_dict['sold_to']['emails'] = sl.sold_to.contact_emails.all()
+
+        sl_dict['sold_to']['emails'] = []
+        for em in sl.sold_to.contact_emails.all():
+            email = {}
+            if em.email_address_type:
+                email['email_type'] = em.email_address_type.email_type
+            else:
+                email['email_type'] = "Personal"
+            email['email_address'] = em.email_address
+            sl_dict['sold_to']['emails'].append(email)
     else:
         sl_dict['sold_to'] = None
 
@@ -2192,11 +2470,32 @@ def get_sl_json_by_id(request, sl_id):
         sl_dict['ship_to']['id'] = sl.ship_to.id
         sl_dict['ship_to']['contact_name'] = sl.ship_to.contact_name
         sl_dict['ship_to']['city'] = sl.ship_to.city
+        # sl_dict['ship_to']['phones'] = sl.ship_to.contact_phone.all()
+        sl_dict['ship_to']['phones'] = []
+        for em in sl.ship_to.contact_phone.all():
+            email = {}
+            email['phone'] = em.phone
+            email['phone_ext'] = em.phone_ext
+            sl_dict['ship_to']['phones'].append(email)
+
+        sl_dict['ship_to']['emails'] = []
+        # import pdb; pdb.set_trace();
+        for em in sl.ship_to.contact_emails.all():
+            email = {}
+            if em.email_address_type:
+                email['email_type'] = em.email_address_type.email_type
+            else:
+                email['email_type'] = "Personal"
+            email['email_address'] = em.email_address
+            sl_dict['ship_to']['emails'].append(email)
+
     else:
         sl_dict['ship_to'] = None
 
-    sl_dict['ordered_date'] = sl.ordered_date.isoformat()
-    sl_dict['date_required'] = sl.date_required.isoformat()
+    if sl.ordered_date:
+        sl_dict['ordered_date'] = sl.ordered_date.isoformat()
+    if sl.date_required:
+        sl_dict['date_required'] = sl.date_required.isoformat()
     if sl.job_number:
         sl_dict['job_number'] = sl.job_number.job_number
     sl_dict['customer_po_number'] = sl.customer_po_number
@@ -2206,8 +2505,50 @@ def get_sl_json_by_id(request, sl_id):
     else:
         sl_dict['ship_via'] = None
     sl_dict['sl_status'] = sl.sl_status
-    sl_dict['search_string'] = sl.search_string
+    
+    sl_items = ShippingItem.objects.filter(item_ship_status__lt = 2, shipping_list__sl_number=sl.sl_number)
 
+    sl_item_list = []
+    for sl_item in sl_items:
+        sl_item_dict = {}
+        sl_item_dict['sl_item_id'] = sl_item.id
+        sl_item_dict['item_number'] = sl_item.item.item_number
+        if sl_item.item.quantity_on_hand:
+            sl_item_dict['quantity_on_hand'] = float(sl_item.item.quantity_on_hand)
+        else:
+            sl_item_dict['quantity_on_hand'] = None
+        sl_item_dict['description'] = sl_item.description
+        if sl_item.ordered:
+            sl_item_dict['ordered'] = float(sl_item.ordered)
+        else:
+            sl_item_dict['ordered'] = None
+
+        if sl_item.item.item_unit_measure:
+            sl_item_dict['item_unit_measure'] = sl_item.item.item_unit_measure.unit_name
+            sl_item_dict['item_unit_measure_id'] = sl_item.item.item_unit_measure.id
+        else:
+            sl_item_dict['item_unit_measure'] = None
+        if sl_item.shipped:
+            sl_item_dict['shipped'] = float(sl_item.shipped)
+        else:
+            sl_item_dict['shipped'] = None
+        if sl_item.shipped_total_to_date:
+            sl_item_dict['total_shipped'] = float(sl_item.shipped_total_to_date)
+        else:
+            sl_item_dict['total_shipped'] = None
+
+        if sl_item.filled:
+            sl_item_dict['filled'] = float(sl_item.filled)
+        else:
+            sl_item_dict['filled'] = None
+        if sl_item.backordered:
+            sl_item_dict['backordered'] = float(sl_item.backordered)
+        else:
+            sl_item_dict['backordered'] = None
+        sl_item_dict['shipping_list'] = sl_item.shipping_list.sl_number
+        sl_item_list.append(sl_item_dict)
+
+    sl_dict['items'] = sl_item_list
     sl_json = json.dumps(sl_dict)
 
     return HttpResponse(sl_json, mimetype="application/json")
@@ -2223,7 +2564,7 @@ def get_sl_item_json(request, sl_number=None):
     sl_item_list = []
     for sl_item in sl_items:
         sl_item_dict = {}
-        sl_item_dict['id'] = sl_item.id
+        sl_item_dict['sl_item_id'] = sl_item.id
         sl_item_dict['item_number'] = sl_item.item.item_number
         if sl_item.item.quantity_on_hand:
             sl_item_dict['quantity_on_hand'] = float(sl_item.item.quantity_on_hand)
@@ -2274,13 +2615,14 @@ def sl_delete(request):
 
 
 def view_shipping_list(request, sl_id):
+    # import pdb; pdb.set_trace();
     sl = ShippingList.objects.get(sl_number=sl_id)
     sl_items = ShippingItem.objects.filter(shipping_list=sl)
     return render(request, "purchase/view-sl.html", {'sl': sl, 'sl_items': sl_items})
 
 
 def edit_shipping_list(request, sl_id):
-    slobj = ShippingList.objects.get(id=sl_id)
+    slobj = ShippingList.objects.get(sl_number=sl_id)
     sl_items = ShippingItem.objects.filter(shipping_list=slobj)
     ship_vias = DeliveryChoice.objects.filter(is_active=True)
     if request.method == 'POST':
@@ -2298,13 +2640,7 @@ def edit_shipping_list(request, sl_id):
         if sl_form.is_valid():
             try:
                 sl = sl_form.save()
-                sl.search_string = sl.sl_number + " " + sl.customer_po_number + sl.customer_job_number
-                if sl.job_number:
-                    sl.search_string += sl.job_number.job_number
-                if sl.sold_to:
-                    sl.search_string += sl.sold_to.contact_name
-                if sl.ship_via:
-                    sl.search_string += sl.ship_via.delivery_choice
+                
                 sl.save()
 
             except:
@@ -2335,7 +2671,7 @@ def edit_shipping_list(request, sl_id):
                         shipping_item.filled = item_filled[i]
                     shipping_item.item_ship_status = 0
                     shipping_item.shipping_list = sl
-                    shipping_item.search_string = item + " " + sl.sl_number
+                    
                     shipping_item.save()
             for rmitem in removed_items:
                 remove_item = ShippingItem.objects.get(id=rmitem)
@@ -2676,17 +3012,15 @@ def get_invoice_items(request):
 @csrf_exempt
 def add_invoice(request):
     # import pdb; pdb.set_trace()
-    sv = SystemVariable.objects.get(id=1)
+    
     users = User.objects.all().exclude(id__in=[-1]).order_by("username")
     terms = PaymentTerm.objects.all()
     delivery_choices = DeliveryChoice.objects.all()
     currencies = Currency.objects.all()
-    if sv.next_invoice_number:
-        next_invoice_number = sv.next_invoice_number
-    else:
-        next_invoice_number = 0
+
 
     if request.method == 'POST':
+        # import pdb; pdb.set_trace()
         invoice_id = request.POST.get("invoice_id","")
         if invoice_id != "":
             invoice = Invoice.objects.get(id=invoice_id)
@@ -2702,6 +3036,10 @@ def add_invoice(request):
         
         if invoice_form.is_valid():
             invoice = invoice_form.save()
+            # update PL status=='invoicing'
+            pl = invoice.pl
+            pl.status = 3
+            pl.save()
             if invoice_id != "":
                 deleted_items = request.POST.getlist("removed_item")
                 if deleted_items:
@@ -2720,12 +3058,19 @@ def add_invoice(request):
                     invoice_item.price = prices[i]
                     invoice_item.sub_total = sub_totals[i]
                     invoice_item.save()
+                # TODO: Need to update packing item status=='invoiced' and also remove from
+                # search result
 
             return HttpResponseRedirect("/purchase/invoice-list/")
+        else:
+            form = InvoiceForm(request.POST)
+            return render(request, 'purchase/invoice/invoice.html', 
+            {'form': form, 'currencies': currencies,
+            'adminusers': users, 'terms': terms, 'delivery_choices': delivery_choices})
     else:
         form = InvoiceForm(request.POST)
         return render(request, 'purchase/invoice/invoice.html', 
-            {'form': form, 'next_invoice_number': next_invoice_number, 'currencies': currencies,
+            {'form': form, 'currencies': currencies,
             'adminusers': users, 'terms': terms, 'delivery_choices': delivery_choices})
 
 
@@ -2736,13 +3081,13 @@ def invoice_list(request):
 
 
 def invoice_view(request, invoice_id):
-    invoice = Invoice.objects.get(id=invoice_id)
+    invoice = Invoice.objects.get(invoice_number=invoice_id)
     return render(request, 'purchase/invoice/invoice-view.html', 
         {'invoice': invoice})
 
 @csrf_exempt
 def delete_invoice(request):
-    import pdb; pdb.set_trace()
+    # import pdb; pdb.set_trace()
     id = request.POST.get("invoice_id","")
     if id:
         invoice = Invoice.objects.get(id=id)

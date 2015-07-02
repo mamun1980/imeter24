@@ -26,7 +26,7 @@
 			<div class="panel-heading">
 		    	<h4>Shipping List</h4>
 		  	</div>
-		  	<div class="panel-body">
+		  	
 				<table class='table table-bordered table-striped'>
 					<thead>
 						<tr class='info'>
@@ -77,13 +77,13 @@
 							<td>{[{ sl.customer_po_number }]}</td>
 							<td>{[{ sl.customer_job_number }]}</td>
 							
-							<td>
+							<td width="320">
 							<div class="btn-group btn-group-sm">
 								<a class="btn btn-default" href="/purchase/view-sl/{[{sl.sl_number}]}/">View</a> 
-								
+								<a class="sl-edit btn btn-default" data-slid="{[{sl.sl_number}]}" href="/purchase/edit-sl/{[{sl.sl_number}]}/">Edit</a>
 								<a class="sl-delete btn btn-default" data-slid="{[{sl.sl_number}]}" href="">Delete</a>
 
-								<a class="btn btn-default" data-pid="{[{sl.id}]}" href="/purchase/generate-sl/{[{sl.sl_number}]}/" target="_blank">Gererate SL</a>
+								<a class="btn btn-default" data-pid="{[{sl.id}]}" href="/purchase/generate-sl/{[{sl.sl_number}]}/" target="_blank">Generate SL(create pdf)</a>
 							</div>
 							</td>
 						</tr>
@@ -93,7 +93,7 @@
 						
 					</tbody>
 				</table>
-			</div>
+			
 		</div>
 	</div>
 

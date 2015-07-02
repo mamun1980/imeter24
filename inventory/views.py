@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import permission_required
 import json
 
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
-
+from django.contrib import messages, auth
 from contacts.models import *
 from haystack.forms import ModelSearchForm, SearchForm
 from haystack.query import SearchQuerySet, EmptySearchQuerySet
@@ -89,7 +89,7 @@ def add_new_item(request):
     terms = PaymentTerm.objects.all()
     designations = CustomsDesignation.objects.all()
     if request.method == "POST":
-        
+        # import pdb; pdb.set_trace();
         item_number = request.POST.get("item_number","")
         if item_number:
             try:
@@ -100,11 +100,17 @@ def add_new_item(request):
                 item_form = ItemForm(request.POST, request.FILES, request=request, action='new')
                 pass
         else:
-            return HttpResponseRedirect("/inventory/item/add/")
+            sv = SystemVariable.objects.get(id=1)
+            request.POST['item_number'] = sv.get_next_item_number
+            
+
+            item_form = ItemForm(request.POST, request.FILES, request=request, action='new')
+            # return HttpResponseRedirect("/inventory/list/")
             
         if item_form.is_valid():
             try:
                 item = item_form.save()
+                                
                 return HttpResponseRedirect("/inventory/list/")
             except Exception, e:
                 raise e           
@@ -235,7 +241,7 @@ def list_item(request):
         item_dict['item_number'] = item.item_number
         item_dict['label'] = item.item_number
         item_dict['description'] = item.description
-        item_dict['order_restriction'] = float(item.order_restriction())
+        item_dict['order_restriction'] = float(item.order_restriction)
         if item.qty_received:
             item_dict['qty_received'] = float(item.qty_received)
         else:
@@ -571,6 +577,7 @@ def inventory_items(request):
 
 
 def search_item(request):
+    # import pdb; pdb.set_trace()
     query = request.GET.get('q','')
     if request.GET.get('q'):
         items = SearchQuerySet().using('inventory').filter(content=AutoQuery(query)).load_all()[:20]
@@ -585,14 +592,21 @@ def search_item(request):
         item_dict['description'] = item.description
         item_dict['primary_supplier'] = item.primary_supplier
         item_dict['last_PO'] = item.last_PO
-        item_dict['terms'] = item.terms
+        if item.terms:
+            item_dict['terms'] = item.terms
+            item_dict['terms_id'] = item.terms_id
         item_dict['cost'] = item.wholesale_cost
         item_dict['quantity_on_hand'] = item.quantity_on_hand
-        item_dict['max_single_order_qty'] = item.quantity_on_hand
-        item_dict['max_order_qty_remains'] = item.quantity_on_hand
+        item_dict['quantity_on_order'] = item.quantity_on_order
+        item_dict['qty_on_request'] = item.qty_on_request
+        item_dict['max_single_order_qty'] = item.max_single_order_qty
+        item_dict['max_order_qty_remains'] = item.max_order_qty_remains
         item_dict['max_order_qty'] = item.max_order_qty
         item_dict['production_type'] = item.production_type
-        item_dict['currency'] = item.currency
+        item_dict['order_restriction'] = item.order_restriction
+        if item.currency:
+            item_dict['currency'] = item.currency
+            item_dict['currency_id'] = item.currency_id
         item_dict['department'] = item.department
         item_dict['item_unit_measure'] = item.item_unit_measure
         item_dict['item_unit_measure_id'] = item.item_unit_measure_id

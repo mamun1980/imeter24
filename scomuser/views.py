@@ -100,6 +100,8 @@ def UserEdit(request, pk):
     permissions = Permission.objects.filter(user=user)
     groups = Group.objects.all()
     user_groups = user.groups.all()
+    user_report_form = UserReportForm()
+    user_reports = UserReport.objects.all()
     try:
         payroll = Payroll.objects.get(user=user)
     except Payroll.DoesNotExist:
@@ -124,7 +126,7 @@ def UserEdit(request, pk):
             return HttpResponseRedirect("/scomuser/list/#/userlist")
         else:
             return render_to_response("scomuser/edit_user.html", 
-                {'usereditform': UserEditForm, 'user_obj': user, 'page_title': 'Edit User', 'groups': groups, 'user_groups': user_groups,
+                {'user_report_form':user_report_form, 'user_reports':user_reports, 'usereditform': UserEditForm, 'user_obj': user, 'page_title': 'Edit User', 'groups': groups, 'user_groups': user_groups,
         'supform': UserProfileForm, 'all_permissions': all_permissions, 'permissions': permissions}, 
         context_instance=RequestContext(request))
 
@@ -135,7 +137,7 @@ def UserEdit(request, pk):
         
 
     return render_to_response("scomuser/edit_user.html", 
-        {'usereditform': UserEditForm, 'user_obj': user, 'payroll': payroll, 'page_title': 'Edit User', 'groups': groups, 'user_groups': user_groups,
+        {'user_report_form':user_report_form, 'user_reports':user_reports, 'usereditform': UserEditForm, 'user_obj': user, 'payroll': payroll, 'page_title': 'Edit User', 'groups': groups, 'user_groups': user_groups,
         'supform': UserProfileForm, 'all_permissions': all_permissions, 'permissions': permissions, 'payroll_form': payroll_form,
         }, context_instance=RequestContext(request))
 
@@ -155,8 +157,33 @@ def DeleteUser(request):
         except:
             pass
 
+def user_report_add(request):
+    if request.method == 'POST':
+        uid = request.POST.get('user_id')
+        try:
+            user = User.objects.get(id=uid)
+            user_report = UserReport.objects.create(user=user)
+            user_report.report_type = request.POST.get("report_type")
+            printer_id = request.POST.get("report_printer")
+            if printer_id:
+                printer = Printer.objects.get(id=printer_id)
+                user_report.report_printer = printer
+            user_report.report_fax = request.POST.get("report_fax")
+            user_report.report_email = request.POST.get("report_email")
+            user_report.save()
+            return render(request, "scomuser/partials/user_report_partial.html", {"user_report": user_report})
+        except Exception, e:
+            raise e
 
 
+
+@csrf_exempt
+def user_report_delete(request):
+    if request.method == "POST":
+        report_id = request.POST.get("report_id")
+        report = UserReport.objects.get(id=report_id)
+        report.delete()
+        return HttpResponse(report_id)
 # class UserListView(ListView):
 #   context_object_name = 'user_list'
 #   queryset = User.objects.filter()

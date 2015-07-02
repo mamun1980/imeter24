@@ -29,6 +29,7 @@ ul.dropdown-menu {
 .topmargin {
 	margin-top: 5px;
 	margin-bottom: 5px;
+	min-height: 50px;
 }
 .filter {
 	margin-top: 10px;
@@ -430,7 +431,7 @@ tr.job-status-purple {
 	padding: 10px;
 }
 b.left-info {
-	width: 115px;
+	width: 100%;
 	display: inline-block;
 }
 ul.phone-list-ul {
@@ -488,4 +489,35 @@ ul.phone-list-ul {
 }
 #item-list ul.search li{
 	list-style: none;
+}
+
+
+input::-webkit-input-placeholder { /* WebKit browsers */
+    color:    #F00;
+}
+input:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+   color:    #F00;
+   opacity:  1;
+}
+input::-moz-placeholder { /* Mozilla Firefox 19+ */
+   color:    #F00;
+   opacity:  1;
+}
+input:-ms-input-placeholder { /* Internet Explorer 10+ */
+   color:    #F00;
+}
+
+input.ng-dirty.ng-invalid, textarea.ng-dirty.ng-invalid {
+	background-color: #FAA;
+	border: 1px solid red;
+}
+input.ng-dirty.ng-valid, textarea.ng-dirty.ng-valid {
+	background-color: #AFA;
+}
+th.ng-pristine, td.ng-pristine, div.ng-pristine{
+	color: red !important;
+}
+td.item_error {
+	background-color: #FAA;
+	color: red;
 }

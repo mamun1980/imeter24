@@ -47,9 +47,9 @@
 							<td>{{invoice.total_amount}}</td>
 							<td>
 								<div class="btn-group btn-group-sm">
-									<a class="btn btn-default" href="/purchase/invoice-view/{{invoice.id}}/">View</a>
-									<a class="btn btn-default invoice-delete" data-invoiceid="{{invoice.id}}">Delete</a>
-									<a class="btn btn-default" data-invoiceid="{{invoice.id}}" href="/purchase/invoice-pdf/{{invoice.id}}/" target="_blank">PDF Invoice</a>
+									<a class="btn btn-default" href="/purchase/invoice-view/{{invoice.invoice_number}}/">View</a>
+									<a class="btn btn-default invoice-delete" data-invoiceid="{{invoice.invoice_number}}">Delete</a>
+									<a class="btn btn-default" data-invoiceid="{{invoice.invoice_number}}" href="/purchase/invoice-pdf/{{invoice.invoice_number}}/" target="_blank">PDF Invoice</a>
 								</div>
 							</td>
 						</tr>

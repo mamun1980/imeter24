@@ -229,7 +229,7 @@ def job_list(request):
 
     for job in jobs:
         job_dict = {}
-        job_dict['id'] = job.id
+        
         job_dict['job_number'] = job.job_number
         job_dict['cab_designation'] = job.cab_designation
         job_dict['date_opened'] = job.date_opened
@@ -744,22 +744,27 @@ def job_reindex(request):
 
 
 def job_control_add(request):
+    # import pdb; pdb.set_trace();
     elevetor_types = ElevetorType.objects.all()
     # contacts = Contact.objects.all()
     if request.method == 'POST':
+        # import pdb; pdb.set_trace();
         job_number = request.POST.get("job_number", '')
         if job_number:
-            job = JobControl.objects.get(job_number=job_number)
-            jc_form = JobControlForm(request.POST, instance=job, action='update')
+            try:
+                job = JobControl.objects.get(job_number=job_number)
+                jc_form = JobControlForm(request.POST, instance=job, action='update')
+            except Exception, e:
+                pass
         else:
             jc_form = JobControlForm(request.POST, action='new')
+            
         if jc_form.is_valid():
             jc = jc_form.save()
-            
             return HttpResponseRedirect("/schedule/job-control/list/")
         else:
             return render(request, "schedule/add-job-control.html", 
-                {'form': jc_form,'elevetor_types': elevetor_types,})
+                {'form': jc_form, 'elevetor_types': elevetor_types,})
     else:
         jc_form = JobControlForm()
         return render(request, "schedule/add-job-control.html", 
@@ -774,6 +779,7 @@ def search_job(request):
         jobs = SearchQuerySet().using('job').all().load_all()[:10]
 
     job_list = []
+    # import pdb; pdb.set_trace();
     if jobs:
         for job in jobs:
             if job != None:

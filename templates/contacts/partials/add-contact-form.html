@@ -1,0 +1,65 @@
+<table class="add-user-table">
+			  		
+	<tbody>
+	<tr >
+		<td ng-class="{'ng-pristine': contact.contact_name.$pristine || contact.contact_name.$invalid}"><label for="id_contact_name">Contact name:</label></td>
+		<td>
+		<input class="form-control" ng-model='contact_name' id="id_contact_name" maxlength="64" name="contact_name" placeholder="Contact Name" type="text" ng-required='true' autofocus autocomplate="off">
+			<span ng-show="contact.contact_name.$dirty && contact.contact_name.$error.required">
+				*This field is required.
+			</span>
+		</td>
+	</tr>
+
+	<tr >
+		<td><label for="id_attention_to">Attention to:</label></td>
+		<td><input class="form-control" id="id_attention_to" maxlength="64" name="attention_to" placeholder="Attention to" ng-model="attention_to" type="text">
+			
+		</td>
+	</tr>
+
+	<tr >
+		<td><label for="id_address_1">Address 1:</label></td>
+		<td><input class="form-control" id="id_address_1" maxlength="64" name="address_1" placeholder="Address 1" ng-model="address_1" type="text">
+			
+		</td>
+	</tr>
+
+	<tr>
+		<td><label for="id_address_2">Address 2:</label></td>
+		<td><input class="form-control" id="id_address_2" maxlength="64" name="address_2" placeholder="Address 2" type="text"></td>
+	</tr>
+
+	<tr>
+		<td><label for="id_city">City:</label></td>
+		<td><input class="form-control" id="id_city" maxlength="64" name="city" placeholder="City" type="text"></td>
+	</tr>
+
+	<tr>
+		<td><label for="id_province">Province:</label></td>
+		<td><input class="form-control" id="id_province" maxlength="64" name="province" placeholder="Province" type="text" value="Ontario"></td>
+	</tr>
+
+	<tr>
+		<td><label for="id_country">Country:</label></td>
+		<td><input class="form-control" id="id_country" maxlength="40" name="country" placeholder="Country" type="text" value="Canada"></td>
+	</tr>
+
+	<tr>
+		<td><label for="id_postal_code">Postal code:</label></td>
+		<td><input class="form-control" id="id_postal_code" maxlength="15" name="postal_code" placeholder="Postal Code" type="text"></td>
+	</tr>
+
+	<tr>
+		<td><label for="id_webpage">Webpage:</label></td>
+		<td><input class="form-control" id="id_webpage" maxlength="200" name="webpage" placeholder="Webpage URL" type="url"></td>
+	</tr>
+  		
+  		
+	<tr>
+		<td colspan="2">
+			<button type="submit" class="btn btn-primary btn-lg form-control login-btn" ng-disabled="!(contact.$valid && contact.$dirty)">Add Contact</button>
+		</td>
+	</tr>
+	</tbody>
+</table>

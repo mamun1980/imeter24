@@ -70,10 +70,155 @@
 		{% endif %}
 		
 	</div>
+	<div class="col-md-6">
+		<div class="panel panel-primary">
+			<div class="panel-heading">User Report Settings</div>
+			<div class="panel-body">
+				{% if perms.contacts.add_contactphone %}
+				<form name="user-report" action="/contacts/phone/add/" method="post">{% csrf_token %}
+				<input type="hidden" name="user_id" value="{{ user_obj.id }}">
+					<table>
+						
+						<tr>
+
+						{% for ufield in user_report_form %}
+							<td>
+							{{ ufield }}
+							</td>
+						{% endfor %}
+							<td>
+							
+					        	<button class="btn btn-primary" type="submit">Add</button>
+					      	
+					      	</td>
+						</tr>
+						</table>
+						
+					</form>
+				{% endif %}
+				
+					<table class="table table-hover table-bordered" style="margin-top:10px;">
+						<thead>
+							<tr class="danger">
+								<th>Report Type</th>
+								<th>Report Details</th>
+								<th>Action</th>
+							</tr>
+						</thead>
+						<tbody id='user-report-list'>
+							{% for user_report in user_reports %}
+							<tr class="{{ user_report.id }}">
+								<td>{{ user_report.report_type }}</td>
+								{%  if user_report.report_type == 'email' %}
+									<td>{{ user_report.report_email }}</td>
+								{%  elif user_report.report_type == 'fax' %}
+									<td>{{ user_report.report_fax }}</td>
+								{%  elif user_report.report_type == 'print' %}
+									<td>{{ user_report.report_printer }}</td>
+								{%  elif user_report.report_type == 'pdf' %}
+									<td>{{ user_report.report_pdf }}</td>
+								{% endif %}
+								<td>						
+									<a class="user_report_delete" href="#" data-id="{{ user_report.id }}">delete</a>
+								
+								</td>
+							</tr>
+							{% empty %}
+								<tr class="warning">
+									<td colspan="4"> No report availabe
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+			</div>
+		</div>
+	</div>
 
 
 
 </section>
 </div>
-{% endblock content %}
+
+
+</div>
+<script type="text/javascript">
+(function(){
+	$("#id_report_email").show();
+	$("#id_report_fax").hide();
+	$("#id_report_printer").hide();
+	$(".Report.Printer").hide()
+	$(".Report.Fax").hide()
+	$(".Report.Email").show()
+	// $("#id_pdf").hide();
+	$("#id_report_type").on("change", function(){
+		var rt = $(this).val();
+		if (rt == 'email') {
+			$("#id_report_email").show();
+			$(".Report.Email").show()
+
+			$("#id_report_fax").hide();
+			$("#id_report_printer").hide();
+			$(".Report.Printer").hide()
+			$(".Report.Fax").hide()
+
+		} else if (rt=='fax') {
+			$("#id_report_fax").show();
+			$(".Report.Fax").show()
+
+			$("#id_report_printer").hide()
+			$(".Report.Printer").hide()
+			$("#id_report_email").hide();
+			$(".Report.Email").hide()
+		} else if (rt == 'print') {
+			$("#id_report_printer").show();
+			$(".Report.Printer").show()
+
+			$("#id_report_email").hide();
+			$("#id_report_fax").hide();
+			$(".Report.Fax").hide()
+			$(".Report.Email").hide()
+			
+
+		}
+	});
+
+	$("form[name='user-report']").on("submit", function(e){
+		e.preventDefault();
+
+		form_data = $(this).serialize()
+		
+		// console.log(phone_type + " "+ phone + " "+ phone_ext);
+		$.ajax({
+			type: "post",
+			url: "/scomuser/user/report/add/",
+			data: form_data,
+			success: function(data){
+				$("tbody#user-report-list tr.warning").remove()
+				$("tbody#user-report-list").append(data)
+				console.log(data);
+			}
+		});
+	});
+	$("a.user_report_delete").on("click", function(e){
+		report_id = $(this).data("id");
+		$.ajax({
+			type: 'post',
+			url: "/scomuser/user/report/delete/",
+			data: {
+				'report_id': report_id,
+			},
+
+			success: function(data){
+				console.log(data);
+				$("a[data-id='"+data+"'").closest("tr").remove();
+			},
+			errors: function(data){
+				alert("Report is not deleted.");
+			}
+		})
+	});
 	
+})(jQuery)
+</script>
+{% endblock content %}

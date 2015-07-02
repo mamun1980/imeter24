@@ -57,10 +57,6 @@ tbody th {
 			</thead>
 			<tbody>
 				<tr>
-					<th width='250'>PL ID</th>
-					<td>{{ pl.id }}</td>
-				</tr>
-				<tr>
 					<th width='250'>PL Number</th>
 					<td>
 						{{ pl.pl_number }}						
@@ -69,7 +65,7 @@ tbody th {
 				<tr>
 					<th width='250'>SL Number</th>
 					<td>
-						{{ pl.sl_number }}						
+						{{ pl.sl.sl_number }}						
 					</td>
 				</tr>
 				<tr>
@@ -134,7 +130,7 @@ tbody th {
 				</tr>
 				<tr>
 					<th width='250'>Status</th>
-					<td>{{ pl.status }}</td>
+					<td>{{ pl.status_verbose }}</td>
 				</tr>
 				<tr>
 					<th width='250'>Invoiced On</th>
@@ -162,8 +158,8 @@ tbody th {
 							<tr>
 								<td>{{item.id}}</td>
 								<td>{{item.pl.pl_number}}</td>
-								<td>{{item.shipping_item.shipping_list}}</td>
-								<td>{{item.shipping_item.item}}</td>
+								<td>{{item.shipping_list}}</td>
+								<td>{{item.sl_item.item.item_number}}</td>
 								<td>{{item.unit}}</td>
 								<td>{{item.qty_ordered}}</td>
 								<td>{{item.qty_bo}}</td>
