@@ -51,20 +51,20 @@ table#supplier_contact_details th, table#ship_to_contact_details th, table#sold_
 	width: 100%;
 
 }
-#pl_list table {
+#pl_list table, #invoice_list table {
     border:1px solid #333;
 }
-#pl_list thead tr {
+#pl_list thead tr, #invoice_list thead tr {
     background-color: #333;
     color: #FF2;
     font-size: 14px;
 
 }
-#pl_list tbody tr:hover {
+#pl_list tbody tr:hover, #invoice_list tbody tr:hover {
     background-color: #DDD;
     border-top: 1px solid #EEE;
 }
-#pl_list tbody tr {
+#pl_list tbody tr, #invoice_list tbody tr {
     border-top: 1px solid #777;
 }
 #ship_to_contact_list, #sold_to_contact_list, #broker_contact_list, #items_list {
@@ -138,7 +138,7 @@ tr.add_item {
 }
 a.close {
 	text-shadow: none !important;
-	color: red !important;
+	color: black !important;
 	opacity: 1 !important;
 }
 .rcv_date_label {
@@ -209,9 +209,9 @@ input.ng-invalid-max {
 		var myval = parseFloat($(this).val())
 		$(this).val(myval.toFixed(2));
 	})
-	$("a.close").on("click", function(){
-		$(this).closest('table').hide();
-	});
+	// $("a.close").on("click", function(){
+	// 	$(this).closest('table').hide();
+	// });
 
 	$( "input[name='job']" ).autocomplete({
 	  source: "/schedule/list-filter/",
@@ -228,45 +228,6 @@ input.ng-invalid-max {
 			$(event.target).siblings("input.job").val(ui.item.id);
 		}
 	});
-
-	// $(document).on("change", "input[type='radio']", function(e){
-	// 	var dt = $(this).val();
-	// 	console.log(dt);
-	// });
-
-	// item search
-
-	hello = function(v){
-		var sub_total = parseFloat($("#id_sub_total").val());
-		var discount = parseFloat($("#id_discount").val());
-		
-		if(v=='fixed') {
-			var dst = sub_total - discount;
-		} else if (v=='parcent') {
-			var dst = sub_total * ((100-discount)/100);
-		}
-		$("#id_discounted_sub_total").val(dst);
-
-		var pst = $("#id_pst_taxable").val();
-		var hst = $("#id_hst_taxable").val();
-
-		var total_amount = dst;
-
-		if(pst=='1') {
-			var pst_amount = parseFloat($("#id_pst_taxable_amount").val());
-			console.log("pst amount :" + pst_amount);
-			total_amount = total_amount + pst_amount;
-			console.log("total_amount :" + total_amount);
-		}
-
-		if(hst=='1') {
-			var hst_amount = parseFloat($("#id_hst_taxable_amount").val());
-			console.log("hst amount :"+hst_amount);
-			total_amount = total_amount + hst_amount;
-		}
-
-		$("#id_total_amount").val(total_amount);
-	}
 
 
 var invoiceApp = angular.module("invoiceApp", [], function ($interpolateProvider) {
@@ -290,6 +251,7 @@ invoiceApp.controller('InvoiceController', ['$scope', '$http', '$compile', funct
 		$scope.discount = 0.0;
 		$scope.sub_total = 0.0;
 		$scope.discounted_sub_total = 0.0;
+        $scope.discount_type = 'fixed';
 
 		// intialize dateIssued value to current date
 		var now = new Date();
@@ -326,18 +288,38 @@ invoiceApp.controller('InvoiceController', ['$scope', '$http', '$compile', funct
 
 	$scope.init();
 
+    $scope.closeMe = function(v) {
+        console.log(v);
+        if(v == 'show_pl_list') {
+            $scope.show_pl_list = false;
+        } else if(v == 'show_invoice_list') {
+            $scope.show_invoice_list = false;
+        } else if (v == 'show_item_list') {
+            $("#items_list").hide()
+        } else if (v == 'show_sold_to_contact_list') {
+            $scope.show_sold_to_contact_list = false;
+            $scope.search_sold_to = '';
+        }
+        
+    }
+
 	$scope.searchPl = function(q) {
         if(q != undefined){
 
 
             if(q.length > 1) {
-                // console.log(q);
-                $http({method: 'GET', url: "/purchase/pl-list/"}).
+                var url = "/purchase/pl/search/?q=" + q;
+                $http({method: 'GET', url: url}).
                     success(function(data, status, headers, config){
+                    
+                    console.log(data);
+                    // var mydata = data.filter(function(el){
+                    //     return el.status == 'All Shipped';
+                    // });
                     $scope.pls = data;
-                    // console.log(data);
                 });
                 // $("#po_list").show();
+                $(this).closest('table').show();
                 $scope.show_pl_list = true;
             } else {
                 // $("#po_list").hide();
@@ -435,50 +417,66 @@ invoiceApp.controller('InvoiceController', ['$scope', '$http', '$compile', funct
     }
 
     $scope.searchInvoice = function(q) {
-    	$scope.show_add_button = true;
-    	$("#show_invoice_list").show();
+        if(q != undefined && q != null ){
+            $scope.show_add_button = true;
+            $("#show_invoice_list").show();
 
-        if(q.length > 1) {
-            // console.log(q);
-            $http({method: 'GET', url: "/purchase/get-invoices/"}).
-                success(function(data, status, headers, config){
-                $scope.invoices = data;
-                // console.log(data);
-            });
-            // $("#po_list").show();
-            $scope.show_invoice_list = true;
-        } else {
-            // $("#po_list").hide();
-            $scope.show_invoice_list = false;
+            if(q.length > 1) {
+                // console.log(q);
+                $http({method: 'GET', url: "/purchase/get-invoices/"}).
+                    success(function(data, status, headers, config){
+                    $scope.invoices = data;
+                    // console.log(data);
+                });
+                // $("#po_list").show();
+                $scope.show_invoice_list = true;
+            } else {
+                // $("#po_list").hide();
+                $scope.show_invoice_list = false;
+            }    
         }
+    	
     }
 
     $scope.selectInvoice = function(invoice) {
+        console.log(invoice);
+
         $scope.show_add_button = false;
         $scope.show_update_button = true;
         
         $scope.show_invoice_list = false;
         $scope.invoice_checked = true;
         $scope.search_invoice = invoice.invoice_number;
-        $("#id_invoice").val(invoice.id);
+        
         if(invoice.invoice_date) {
             $("#id_invoice_date").val(invoice.invoice_date);
         }
         if(invoice.pl_number) {
             $scope.search_pl = invoice.pl_number;
-            $("#id_pl").val(invoice.pl_id);
+            $("#id_pl").val(invoice.pl_number);
+            $scope.invoice_add_form.pl_number_search.$setViewValue($scope.invoice_add_form.pl_number_search.$viewValue);
         }
         if(invoice.sold_to){
             $scope.sold_to = invoice.sold_to;
+            $scope.search_sold_to = invoice.sold_to.contact_name;
             $("#sold_to_contact_details").show();
+            $("#id_sold_to").val(invoice.sold_to.id);
+            $scope.invoice_add_form.search_sold_to.$setViewValue($scope.invoice_add_form.search_sold_to.$viewValue);
+            
         }
         if(invoice.ship_to){
             $scope.ship_to = invoice.ship_to;
             $("#ship_to_contact_details").show();
+            $("#id_ship_to").val(invoice.ship_to.id);
+            $scope.search_ship_to = invoice.ship_to.contact_name;
+            $scope.invoice_add_form.search_ship_to.$setViewValue($scope.invoice_add_form.search_ship_to.$viewValue);
         }
         if(invoice.broker){
             $scope.broker = invoice.broker;
             $("#broker_contact_details").show();
+            $("#id_broker").val(invoice.broker.id);
+            $scope.search_broker = invoice.broker.contact_name;
+            $scope.invoice_add_form.search_broker.$setViewValue($scope.invoice_add_form.search_broker.$viewValue);
         }
         if(invoice.term) {
             $("#id_terms").val(invoice.term_id);
@@ -492,95 +490,99 @@ invoiceApp.controller('InvoiceController', ['$scope', '$http', '$compile', funct
         $("#id_po").val(invoice.po);
 
         var items = invoice.invoice_items
+        if(items){
+            for(var i=0; i < items.length; i++) {
 
-        for(var i=0; i < items.length; i++) {
+                var str = "<tr class='add_item'>";
+                str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+items[i].item_number+"' readonly></td>";
+                str += "<td><p class='bg-info form-control'>"+items[i].description+"</p></td>";
+                
+                str += "<td><input type='text' class='form-control' name='unit' value='"+items[i].unit+"' readonly></td>";
 
-            var str = "<tr class='add_item'>";
-            str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+items[i].item_number+"' readonly></td>";
-            str += "<td><p class='bg-info form-control'>"+items[i].description+"</p></td>";
-            
-            str += "<td><input type='text' class='form-control' name='unit' value='"+items[i].unit+"' readonly></td>";
+                str += "<td><input type='number' class='form-control' name='qty' value='"+items[i].qty+"' readonly></td>";
+                str += "<td><input type='number' class='form-control' name='price' value='"+items[i].price+"' readonly></td>";
+                str += "<td><input type='currency' name='sub_total' class='form-control' value='"+items[i].sub_total+"' readonly></td>";
+                str += "<td><input type='text' name='pl_number' class='form-control' value='"+items[i].pl+"' readonly></td>";
 
-            str += "<td><input type='number' class='form-control' name='qty' value='"+items[i].qty+"' readonly></td>";
-            str += "<td><input type='number' class='form-control' name='price' value='"+items[i].price+"' readonly></td>";
-            str += "<td><input type='currency' name='sub_total' class='form-control' value='"+items[i].sub_total+"' readonly></td>";
-            str += "<td><input type='text' name='pl_number' class='form-control' value='"+items[i].pl+"' readonly></td>";
+                str += "<td><input type='hidden' name='item' value='"+items[i].packingitem_id+"'><a class='remove-item btn' ng-click='removeField($event)'><span class='glyphicon glyphicon-remove'></span></a></td>";
+                str += "</tr>";
 
-            str += "<td><input type='hidden' name='item' value='"+items[i].packingitem_id+"'><a class='remove-item btn' ng-click='removeField($event)'><span class='glyphicon glyphicon-remove'></span></a></td>";
-            str += "</tr>";
+                var element = $compile(str)($scope);
+                $("tbody#add_item_list").prepend(element);
 
-            var element = $compile(str)($scope);
-            $("tbody#add_item_list").prepend(element);
-
+            }
         }
+        
 
 
         if(invoice.sub_total) {
 
-            $scope.sub_total = invoice.sub_total
+            $scope.sub_total = invoice.sub_total;
+            $("#calculated_total_amount .amount").text(invoice.sub_total)
         }else{
             $scope.sub_total = 0.0
         }
 
         if (invoice.discount){
             $scope.discount = invoice.discount
+            $scope.discount_type = invoice.discount_type;
+            $("input[name='discount_type']").val($scope.discount_type);
         } else {
             $scope.discount = 0.0
         }
+        
+        console.log("invoice.hst_taxable_amount :"+ invoice.hst_taxable_amount);
 
-        $("#id_discount_type input[name='discount_type']").filter('[value="'+invoice.discount_type+'"]').attr('checked', true);
-        $("#id_discount_type input[name='discount_type']").filter('[value="'+invoice.discount_type+'"]').click();
-        console.log("discount type: "+ invoice.discount_type);
 
         $("#id_comment").html(invoice.comment);
 
         if (invoice.hst_taxable == '1'){
-            if (invoice.hst_tax_amount){
-                $scope.hst_tax_amount = invoice.hst_tax_amount
-            } else {
-                $scope.hst_tax_amount = 0.0
-            }
+            $scope.hst_tax = '1';
+            $scope.hst_tax_amount = invoice.hst_taxable_amount;
+            
         }
 
         if(invoice.pst_taxable == '1') {
-            if (invoice.pst_tax_amount) {
-                $scope.pst_tax_amount = invoice.pst_tax_amount
-            } else {
-                $scope.pst_tax_amount = 0.0
-            }
+            $scope.pst_tax = '1';
+            $scope.pst_tax_amount = invoice.pst_taxable_amount;
         }
 
         $("#id_invoice_currency").val(invoice.invoice_currency_id);
-
         $scope.total_amount = invoice.total_amount;
 
-        console.log(invoice);
-
+        var items_count = $("input.added_item_number").length;
+        if(items_count < 2) {
+            $scope.item_added = false;
+        } else {
+            $scope.item_added = true;
+        }
+        
     }
 
-    calculate_total_price = function() {
+    $scope.calculate_total_price = function() {
     	var items_sub_total = 0;
     	var discounted_sub_total = 0;
     	var total = 0;
 		$("tbody#add_item_list tr input[name='sub_total']").each(function(index){
 			var subtotal = $(this).val();
 			items_sub_total = items_sub_total + parseFloat(subtotal);
+
 		});
 		$("#calculated_total_amount span.amount").text(items_sub_total);
 
 		$scope.sub_total = items_sub_total;
 
 		var newValue = parseFloat($("#id_discount").val());
-
-		var dt = $("#id_discount_type input[type='radio']:checked").val();
+        
+		// var dt = $("#id_discount_type input[type='radio']:checked").val();
     	// console.log(dt);
-    	if(dt=='fixed') {
+    	if($scope.discount_type=='fixed') {
     		$scope.discounted_sub_total = $scope.sub_total - newValue;
-    	} else if (dt=='parcent') {
+            
+    	} else if ($scope.discount_type=='parcent') {
     		// console.log(newValue / 100.00);
     		$scope.discounted_sub_total = $scope.sub_total * ((100-newValue) / 100.00);
     	}
-    	
 
     	$scope.total_tax = 0;
     	// console.log(angular.isString($scope.pst_tax_amount));
@@ -594,7 +596,9 @@ invoiceApp.controller('InvoiceController', ['$scope', '$http', '$compile', funct
     		$scope.total_tax = parseFloat($scope.hst_tax_amount) + parseFloat($scope.total_tax);
     	}
     	
+        
     	$scope.total_amount = $scope.total_tax + $scope.discounted_sub_total;
+        
 
     }
 
@@ -635,19 +639,25 @@ invoiceApp.controller('InvoiceController', ['$scope', '$http', '$compile', funct
     $scope.searchItem = function(q) {
     	
         if(q != undefined){
-
-            if(q.length > 1) {
-                // console.log(q);
-                $http({method: 'GET', url: "/purchase/get-pl-items/"}).
-                    success(function(data, status, headers, config){
-                    $scope.items = data;
-                });
-                // $("#po_list").show();
-                $("#items_list").show();
+            var pl = $("#id_pl").val();
+            if(pl){
+                var url = "/purchase/get-pl-items/"+pl+"/";
+                if(q.length > 1) {
+                    // console.log(q);
+                    $http({method: 'GET', url: url}).
+                        success(function(data, status, headers, config){
+                        $scope.items = data;
+                    });
+                    // $("#po_list").show();
+                    $("#items_list").show();
+                } else {
+                    // $("#po_list").hide();
+                    $("#items_list").hide();
+                }    
             } else {
-                // $("#po_list").hide();
-                $("#items_list").hide();
+                alert("Please select PL first.")
             }
+            
         }
     }
 
@@ -681,7 +691,7 @@ invoiceApp.controller('InvoiceController', ['$scope', '$http', '$compile', funct
     	var element = $compile(str)($scope);
     	$("tbody#add_item_list").prepend(element);
 
-    	calculate_total_price();
+    	$scope.calculate_total_price();
 
         var items_count = $("input.added_item_number").length;
         if(items_count < 2) {
@@ -689,8 +699,8 @@ invoiceApp.controller('InvoiceController', ['$scope', '$http', '$compile', funct
         } else {
             $scope.item_added = true;
         }
-        console.log(items_count);
-        console.log($scope.item_added);
+        
+        $("#items_total_qty").text(qty);
 
     }
 
@@ -727,9 +737,87 @@ invoiceApp.controller('InvoiceController', ['$scope', '$http', '$compile', funct
 
 	}	
 
+    $scope.updateHST = function(hst) {
+        
+        if($scope.hst_tax=='1') {
+
+            var hst_tax_amount = $scope.hst_tax_amount;
+            // var pst_tax_amount = $scope.pst_tax_amount;
+
+            $scope.total_amount = parseFloat($scope.total_amount) + parseFloat(hst_tax_amount);
+
+        } else if($scope.hst_tax=='0') {
+            var hst_tax_amount = parseFloat($scope.hst_tax_amount).toFixed(4);
+            
+            $scope.total_amount = parseFloat($scope.total_amount).toFixed(4) - hst_tax_amount;
+            $scope.hst_tax_amount = 0.0;
+        }
+        
+    }
+
+    $scope.updatePST = function(pst) {
+
+
+        if($scope.pst_tax=='1') {
+
+            var pst_tax_amount = $scope.pst_tax_amount;
+            // var pst_tax_amount = $scope.pst_tax_amount;
+
+            $scope.total_amount = parseFloat($scope.total_amount) + parseFloat(pst_tax_amount);
+
+
+        } else if($scope.pst_tax=='0') {
+            var pst_tax_amount = parseFloat($scope.pst_tax_amount);
+
+            $scope.total_amount = parseFloat($scope.total_amount) - pst_tax_amount;
+
+            $scope.pst_tax_amount = 0.0;
+        }
+    }
+
+    // $(document).on("change", "input[name='discount_type']", function(e){
+    //     $scope.discount_type = $(this).val();
+    //     console.log("discount type: "+$scope.discount_type);
+    //     $scope.$apply();
+    //     $scope.hello();
+        
+    // });
+    
+    $scope.hello = function() {
+        var sub_total = parseFloat($scope.sub_total);
+        var discount = parseFloat($scope.discount);
+
+        if($scope.discount_type == 'fixed') {
+            
+            var dst = sub_total - discount;
+            
+
+        } else if ($scope.discount_type == 'parcent') {
+            
+            var dst = sub_total * ((100-discount)/100);
+            
+
+        }
+        $scope.discounted_sub_total = dst;
+
+        var total_amount = dst;
+
+        if($scope.pst_tax=='1') {
+            var pst_amount = parseFloat($scope.pst_tax_amount);
+            total_amount = total_amount + pst_amount;
+            
+        }
+
+        if($scope.hst_tax=='1') {
+            var hst_amount = parseFloat($scope.hst_tax_amount);
+            
+            total_amount = total_amount + hst_amount;
+        }
+        $scope.total_amount = total_amount;
+    }
 
     $scope.$watch("discount", function(newValue, oldValue){
-    	var dt = $("#id_discount_type input[type='radio']:checked").val();
+    	var dt = $scope.discount_type; //$("#id_discount_type input[type='radio']:checked").val();
     	// console.log(dt);
     	if(dt=='fixed') {
     		$scope.discounted_sub_total = $scope.sub_total - newValue;
@@ -737,7 +825,6 @@ invoiceApp.controller('InvoiceController', ['$scope', '$http', '$compile', funct
     		// console.log(newValue / 100.00);
     		$scope.discounted_sub_total = $scope.sub_total * ((100-newValue) / 100.00);
     	}
-    	
 
     	$scope.total_tax = 0;
     	// console.log(angular.isString($scope.pst_tax_amount));
@@ -752,6 +839,7 @@ invoiceApp.controller('InvoiceController', ['$scope', '$http', '$compile', funct
     	}
 
     	$scope.total_amount = $scope.total_tax + $scope.discounted_sub_total;
+        // console.log("Total amount from discount: "+$scope.total_amount);
     });
     
 }])

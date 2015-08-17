@@ -67,6 +67,7 @@ urlpatterns = patterns('',
     url(r'^get-pl-items/$', 'purchase.views.get_pl_items', name='get-pl-items'),
 
     url(r'^add-invoice/$', 'purchase.views.add_invoice', name='add-invoice'),
+    url(r'^invoice-pdf/(?P<invoice_number>\w+)/$', 'purchase.views.generate_invoice_pdf'),
     url(r'^get-invoices/$', 'purchase.views.get_invoices', name='get-invoices'),
     url(r'^get-invoice-items/$', 'purchase.views.get_invoice_items', name='get-invoice-items'),
     url(r'^invoice-list/$', 'purchase.views.invoice_list', name='invoice-list'),

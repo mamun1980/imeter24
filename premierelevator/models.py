@@ -54,11 +54,11 @@ class SystemVariable(models.Model):
 		if self.next_po_number:
 			while not got_value:
 				try:
-					next_po_number = 'P'+str(self.next_po_number)
+					next_po_number = 'PO'+str(self.next_po_number)
 					po = PurchaseOrder.objects.get(po_number=next_po_number)
 				except PurchaseOrder.DoesNotExist:
 					got_value = True
-					next_po_number = 'P' + str(self.next_po_number)
+					next_po_number = 'PO' + str(self.next_po_number)
 
 				self.next_po_number = self.next_po_number + 1
 				self.save()

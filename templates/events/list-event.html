@@ -9,7 +9,7 @@
 {% endblock angular %}
 
 {% block content %}
-<div class="container shadow4 main-body" ng-app="premierApp">
+<div class="container-fluid shadow4 main-body" ng-app="premierApp" ng-controller="EventController">
 
 <section class="row">
 	<div class="col-md-6">
@@ -28,7 +28,7 @@
 		    	
 		  	</div>
 			<div class="panel-body">
-				<div ng-view></div>
+				{% include "events/partials/event-list.html" %}
 			</div>
 		</div>
 		
@@ -39,8 +39,36 @@
 
 <script type="text/javascript">
 
-premierApp.controller('EventController', ['$scope', '$http', 'EventService', 'events',  function ($scope, $http, EventService, events) {
-	$scope.events = events;
+premierApp.controller('EventController', ['$scope', '$http',  function ($scope, $http) {
+	
+	$scope.init = function() {
+		url = "/events/search/";
+		console.log(url);
+		$http({method: 'GET', url: url}).
+        	success(function(data, status, headers, config){
+        	$scope.events = data;
+        	console.log(data);
+        });
+	}
+
+	$scope.init();
+
+	$scope.searchProducer = function (q) {
+		console.log(q);
+    	if(q.length > 1) {
+    		url = "/events/search/?q=" + q
+    		$http({method: 'GET', url: url}).
+	            success(function(data, status, headers, config) {
+	                console.log(data.results);
+	                $scope.events = data.results;
+	            });
+	        
+	        
+    		
+    	} else {
+    		
+    	}
+    };
 
     
 }]);

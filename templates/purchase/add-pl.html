@@ -215,7 +215,7 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
             $http({method: 'GET', url: url}).
                 success(function(data, status, headers, config){
                 $scope.pls = data;
-                // console.log(data);
+                console.log(data);
             });
             // $("#po_list").show();
             $scope.show_pl_list = true;
@@ -248,6 +248,7 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
                 $scope.sold_to_contact = $scope.pl.sold_to; 
                 $("#id_sold_to").val($scope.pl.sold_to.id); 
                 $scope.search_sold_to = $scope.pl.sold_to.contact_name;
+                $scope.add_pl_form.search_sold_to.$setViewValue($scope.add_pl_form.search_sold_to.$viewValue);    
                 
             }
 
@@ -314,8 +315,9 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
         $http({method:'GET', url: '/purchase/get-pl-items/'+pl.pl_number+'/'}).
             success(function(data, status, header, config) {
             var pl_items = data;
-            console.log(data);
-            
+            if(pl_items.length > 0){
+                $scope.item_added = true;
+            }   
             if (pl_items.length > 0) {
                 for(var i=0; i < pl_items.length; i++) {
                     var str = "<tr class='add_item'>";

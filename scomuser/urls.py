@@ -4,6 +4,7 @@ from django.conf.urls import patterns, include, url
 urlpatterns = patterns('',
     # Examples:
     url(r'^$', 'scomuser.views.sc_home', name='scomuser-home'),
+    url(r'^search/$', 'scomuser.views.search_user', name='search-user'),
     url(r'^profile/(?P<pk>\d+)/$', 'scomuser.views.UserDetails', name='scuser-profile'),
     # url(r'^edit/(?P<user_id>\d+)/$', 'scomuser.views.edit_user', name='edit-user'),
     # url(r'^profile/edit/(?P<profile_id>\d+)/$', 'scomuser.views.edit_profile', name='edit-profile'),

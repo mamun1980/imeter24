@@ -20,13 +20,18 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr ng-repeat="po in pos" ng-click="selectPo(po)">
+						<tr ng-repeat="po in pos | filter:search_po" ng-click="selectPo(po)">
 							<td>{[{po.po_number}]}</td>
 							<td>{[{po.po_status}]}</td>
 							<td>{[{po.supplier}]}</td>
 							<td>{[{po.terms}]}</td>
 							<td>{[{po.shipping_inst}]}</td>
 							<td></td>
+						</tr>
+						<tr ng-show="!pos.length">
+							<td colspan="6">
+								No PO found!
+							</td>
 						</tr>
 						
 					</tbody>
@@ -112,22 +117,25 @@
 		<table class="table selectable" class="ui-autocomplete ui-widget-content-custom ui-corner-all" id="supplier_contact_list">
 			<thead>
 				<tr>
-					<th>#</th><th>ID</th><th>Contact Name</th><th>Address 1</th><th> City </th>
+					<th>ID</th><th>Contact Name</th><th>Address 1</th><th> Country </th>
+					<th> Province </th><th> City </th><th> Primary Cont No.</th>
 					<th><a href="" class="close" ng-click="hideSupplierContact()">x</a></th>
 				</tr>
 			</thead>
 			<tbody>
 			<tr class="ui-menu-item" ng-repeat="contact in suppliers" ng-click="setSupplier(contact)">
-				<td>
-					<input type="radio" name="contact" value="{[{contact.id}]}">
-					<div class='phone' ng-repeat="phon in contact.phones">
-					<input type="hidden" data-phone-number="{[{phon.number}]}" data-ext="{[{phon.phone_ext}]}" data-phone-type="{[{phon.type}]}">
-					</div>
-				</td>
+				
 				<td class="sid">{[{contact.id}]}</td>
 				<td class="contact_name">{[{contact.contact_name}]}</td>
 				<td class="address_1">{[{contact.address_1}]}</td>
+				<td class="city">{[{contact.country}]}</td>
+				<td class="city">{[{contact.province}]}</td>
 				<td class="city">{[{contact.city}]}</td>
+				<td class="city">
+					<div class='phone' ng-repeat="phon in contact.phones" ng-if="$first">
+						<span>{[{phon.number}]} (ext: {[{phon.phone_ext}]})</span>
+					</div>
+				</td>
 				
 				<td>
 					
@@ -177,22 +185,25 @@
 		<table class="table selectable" class="ui-autocomplete ui-widget-content-custom ui-corner-all" id="ship_to_contact_list">
 			<thead>
 				<tr>
-					<th>#</th><th>ID</th><th>Contact Name</th><th>Address 1</th><th> City </th>
+					<th>ID</th><th>Contact Name</th><th>Address 1</th><th> Country </th>
+					<th> Province </th><th> City </th><th> Primary Cont No.</th>
 					<th><a href="" class="close" ng-click="hideShiptoContact()">x</a></th>
 				</tr>
 			</thead>
 			<tbody>
 			<tr class="ui-menu-item" ng-repeat="contact in shipto" ng-click="selectShipTo(contact)">
-				<td>
-					<input type="radio" name="contact" value="{[{contact.id}]}">
-					<div class='phone' ng-repeat="phon in contact.phones">
-					<input type="hidden" data-phone-number="{[{phon.number}]}" data-ext="{[{phon.phone_ext}]}" data-phone-type="{[{phon.type}]}">
-					</div>
-				</td>
+				
 				<td class="sid">{[{contact.id}]}</td>
 				<td class="contact_name">{[{contact.contact_name}]}</td>
 				<td class="address_1">{[{contact.address_1}]}</td>
+				<td class="city">{[{contact.country}]}</td>
+				<td class="city">{[{contact.province}]}</td>
 				<td class="city">{[{contact.city}]}</td>
+				<td class="city">
+					<div class='phone' ng-repeat="phon in contact.phones" ng-if="$first">
+						<span>{[{phon.number}]} (ext: {[{phon.phone_ext}]})</span>
+					</div>
+				</td>
 				
 				<td>
 					

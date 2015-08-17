@@ -5,25 +5,25 @@
 
 </style>
 
-<div class="container-fluid shadow4 main-body" ng-app="premierApp">
+<div class="container-fluid shadow4 main-body" ng-app="userApp" ng-controller="UserController">
 
 <section class="row">
 	<div class="col-md-6">
-		<input type='text' class="form-control" ng-model="search" placeholder="Filter By Name">
+		<input type='text' class="form-control" ng-model="search" ng-change="searchUser(search)" placeholder="Filter By Name">
 	</div>
 	
 	
 </section>
 
-	<section class="row" id="user-list">
+	<section class="row" id="user-list" >
 		
-		<div class="col-md-11">
+		<div class="col-md-12">
 		<div class="panel panel-primary">
 			<div class="panel-heading">
 		    	<h4>USER LIST</h4>
 		  	</div>
 		  	<div class="panel-body">
-		  		<div ng-view></div>
+		  		{% include "scomuser/partials/user-list.html" %}
 			</div>
 		</div>
 
@@ -36,10 +36,41 @@
 {% include "modals/change-password-modal.html" %}
 
 <script type="text/javascript">
-premierApp.controller('UserController',['$scope', '$http', 'UserService', 'users', function ($scope, $http, UserService, users) {
-    console.log(users);
-    $scope.users = users;
-}]);
+(function(){
+var userApp = angular.module("userApp", [], function ($interpolateProvider) {
+        $interpolateProvider.startSymbol("{[{");
+        $interpolateProvider.endSymbol("}]}");
+});
+	userApp.controller('UserController',['$scope', '$http', function ($scope, $http) {
+	    $scope.init = function(){
+	    	var url = "/scomuser/search/";
+	    	$http({method: 'GET', url: url}).
+	            success(function(data, status, headers, config){
+	            	
+	            $scope.allusers = data;
+	            $scope.users = $scope.allusers;
+	        });
+	        
+	        
+	    }
+	    $scope.init();
+	    $scope.searchUser = function(q) {
+	    	console.log(q);
+	        if(q.length > 1) {
+	            var url = "/scomuser/search/?q=" + q;
+	            $http({method: 'GET', url: url}).
+		            success(function(data, status, headers, config){
+		            	console.log(data);
+		            	$scope.users = data;
+		        });
+	            
+	        } else {
+	        	$scope.users = $scope.allusers;
+	        }
+	        
+	    }
+	}]);
+})(jQuery)
 
 </script>
 

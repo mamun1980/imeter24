@@ -7,6 +7,14 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import permission_required
 
+import json
+from haystack.forms import ModelSearchForm, SearchForm
+from haystack.query import SearchQuerySet, EmptySearchQuerySet
+from haystack.views import SearchView
+from haystack.inputs import Raw, Clean, AutoQuery
+import re
+
+from django.core.paginator import Paginator, EmptyPage, InvalidPage
 
 @login_required
 @permission_required("events.add_events")
@@ -28,6 +36,44 @@ def add_event(request):
 def list_event(request):
 	events = Events.objects.all().order_by("-eventdate")[:200]
 	return render(request, "events/list-event.html", {'events': events,  'page_title': 'list event'})
+
+@csrf_exempt
+def search_events(request):
+    query = request.GET.get('q',"")
+    if request.GET.get('q'):
+        events = SearchQuerySet().using('events').filter(content=AutoQuery(query)).load_all()[:30]
+    else:
+        events = SearchQuerySet().using('events').all().load_all()[:30]
+
+    event_list = []
+    if events:
+        for event in events:
+            if event != None:
+                event_dict = {}
+                event_dict['eventid'] = event.eventid
+                event_dict['name'] = event.name
+                event_dict['doorname'] = event.doorname
+                event_dict['cardnumber'] = event.cardnumber
+                event_dict['zonename'] = event.zonename
+
+                event_list.append(event_dict)
+    try:
+        page = int(request.GET.get('page','1'))
+    except ValueError:
+        page = 1
+    paginator = Paginator(event_list, 20)
+    try:
+        pages = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        pages = paginator.page(paginator.num_pages)
+
+    results = pages.object_list
+
+    data = json.dumps(results)
+    return HttpResponse(data)
+
+
+
 
 @login_required
 @permission_required("events.view_events")

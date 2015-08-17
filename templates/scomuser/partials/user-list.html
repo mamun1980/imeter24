@@ -23,19 +23,19 @@
 			
 			<td>{[{ usr.last_login }]}</td>
 			<td>
-				<span ng-show="{{ perms.user.can_view_user }}">
+				<span ng-show="{{ perms.auth.can_view_user|lower }}">
 				<a href="/scomuser/viewuser/{[{ usr.id }]}/"> view</a>
 				</span>
 				
-				<span ng-show="{{ perms.user.can_change_user}}"> /
+				<span ng-show="{{ perms.auth.change_user|lower }}"> /
 				<a href="/scomuser/edituser/{[{ usr.id }]}/"> Edit</a>
 				</span>
 				
-				<span ng-show="{{ perms.user.can_delete_user }}"> /
+				<span ng-show="{{ perms.auth.delete_user|lower }}"> /
 				<a class="deleteuser" data-uid="{[{ usr.id }]}" href="/scomuser/deleteuser/">delete</a>
 				</span>
-
-				<span ng-show="{{ perms.user.can_change_user_password }}"> /
+				
+				<span ng-show="{{ perms.auth.can_change_password|lower }}"> /
 				<a data-toggle="modal" data-target="#changePasswordModal" class="changepassword" data-uid="{[{ usr.id }]}" href="">Change Password</a>
 				</span>
 				
@@ -45,7 +45,7 @@
 	</tbody>
 </table>
 
-<h2 ng-hide="users">There is no jobs</h2>
+<h2 ng-hide="users">There is no users</h2>
 
 
 <div id="delete-job-confirm" style="display:none;" title="Do you want to delete?">

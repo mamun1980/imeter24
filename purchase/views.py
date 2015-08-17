@@ -97,7 +97,13 @@ def preview_generete_pl(request, pl_id):
     return render(request, "purchase/pl-report.html", 
         {'pl': pl, 'packing_items': packing_items})
 
-
+def generate_invoice_pdf(request, invoice_number):
+    resource_directory = os.path.dirname(os.path.dirname(__file__))
+    invoice = Invoice.objects.get(invoice_number=invoice_number)
+    invoice_items = InvoicedItem.objects.filter(invoice=invoice)
+    # return render_to_response("purchase/invoice/invoice-report.html", {"invoice": invoice, 'invoice_items': invoice_items})
+    rendered_html = render_to_string("purchase/invoice/invoice-report.html", locals())
+    return html_to_pdf_response(rendered_html)
 
 @login_required
 @permission_required("purchase.add_purchaserequest")
@@ -504,6 +510,7 @@ def add_new_po(request):
         
             items = []
             item_list = request.POST.getlist('added_item_number')
+            po_items_seq = request.POST.getlist('po_item_seq')
             deleted_items = request.POST.getlist("removed_item")
             if deleted_items:
                 for deleted_item in deleted_items:
@@ -513,6 +520,8 @@ def add_new_po(request):
                 count = 0
                 for item in item_list:
                     item_dict = {}
+                    item_seq = request.POST.getlist('po_item_seq')[count]
+
                     item_dict['item_number'] = item
                     qty = request.POST.getlist('item_qty')[count]
 
@@ -525,7 +534,9 @@ def add_new_po(request):
                     item_dict['cost'] = float(cost) if cost != '' else cost
                     sub_total = request.POST.getlist('item_sub_total')[count]
                     item_dict['sub_total'] = float(sub_total) if sub_total != '' else sub_total
-                    # item_dict['item_recv'] = request.POST.getlist('item_recv')[count]
+                    
+                    item_dict['item_custom_detail'] = request.POST.get('custom_detail_'+item_seq, '')
+                    item_dict['item_custom_comment'] = request.POST.get('custom_comment_'+item_seq, '')
 
                     items.append(item_dict)
                     count = count + 1
@@ -794,11 +805,11 @@ def save_po(request):
 
 
 def search_po(request):
-    query = request.GET.get('q','')
-    if request.GET.get('q'):
-        purchase_orders = SearchQuerySet().using('po').filter(content=AutoQuery(query)).load_all()[:30]
-    else:
-        purchase_orders = SearchQuerySet().using('po').all().load_all()[:30]
+    # query = request.GET.get('q','')
+    # if request.GET.get('q'):
+    #     purchase_orders = SearchQuerySet().using('po').filter(content=AutoQuery(query)).load_all()[:30]
+    # else:
+    purchase_orders = SearchQuerySet().using('po').all().load_all()[:30]
 
     po_list = []
     for po in purchase_orders:
@@ -1534,7 +1545,8 @@ def receive_item(request, item_id):
 
 def search_packing_list(request):
     query = request.GET.get('q','')
-    if request.GET.get('q'):
+    # status = request.GET.get('status','')
+    if query:
         pls = SearchQuerySet().using('pl').filter(content=AutoQuery(query)).load_all()[:10]
     else:
         pls = SearchQuerySet().using('pl').all().load_all()[:10]
@@ -1548,6 +1560,11 @@ def search_packing_list(request):
                 pl_dict['job_number'] = pl.job_number
                 pl_dict['sold_to'] = pl.sold_to
                 pl_dict['ship_to'] = pl.ship_to
+                pl_dict['status'] = pl.status
+                if pl.date_shipped:
+                    pl_dict['date_shipped'] = pl.date_shipped.isoformat()
+                else:
+                    pl_dict['date_shipped'] = None
 
                 pl_list.append(pl_dict)
     try:
@@ -2806,10 +2823,8 @@ def get_invoices(request):
             for inv_item in inv_items:
                 item = {}
                 item['id'] = inv_item.id
-                item['invoice_number'] = inv_item.invoice.invoice_number
                 item['packingitem_id'] = inv_item.item.id
-                item['item_number'] = inv_item.item.shipping_item.item.item_number
-                item['description'] = inv_item.item.description
+                item['item_number'] = inv_item.item.sl_item.item.item_number
                 item['unit'] = inv_item.unit
                 item['qty'] = float(inv_item.qty)
                 item['price'] = float(inv_item.price)
@@ -2819,13 +2834,11 @@ def get_invoices(request):
         else:
             invoice['invoice_items'] = None
 
-        invoice['id'] = inv.id
         invoice['invoice_number'] = inv.invoice_number
         if inv.date:
             invoice['invoice_date'] = inv.date.isoformat()
         if inv.pl:
             invoice['pl_number'] = inv.pl.pl_number
-            invoice['pl_id'] = inv.pl.id
 
         if inv.sold_to:
             sold_to = {}
@@ -2835,7 +2848,7 @@ def get_invoices(request):
             sold_to['province'] = inv.sold_to.province
             sold_to['country'] = inv.sold_to.country
 
-            phone_list = inv.sold_to.contactphone_set.all()
+            phone_list = ContactPhone.objects.filter(contact=inv.sold_to)
             if phone_list:
                 sold_to['phones'] = []
                 for ph in phone_list:                    
@@ -2847,7 +2860,7 @@ def get_invoices(request):
             else:
                 sold_to['phones'] = None
             
-            email_list = inv.sold_to.contactemailaddress_set.all()
+            email_list = ContactEmailAddress.objects.filter(contact=inv.sold_to)
             if email_list:
                 sold_to['emails'] = []
                 for em in emails:
@@ -2869,7 +2882,7 @@ def get_invoices(request):
             ship_to['province'] = inv.ship_to.province
             ship_to['country'] = inv.ship_to.country
 
-            phone_list = inv.ship_to.contactphone_set.all()
+            phone_list = ContactPhone.objects.filter(contact=inv.ship_to)
             if phone_list:
                 ship_to['phones'] = []
                 for ph in phone_list:                    
@@ -2881,7 +2894,7 @@ def get_invoices(request):
             else:
                 ship_to['phones'] = None
             
-            email_list = inv.ship_to.contactemailaddress_set.all()
+            email_list = ContactEmailAddress.objects.filter(contact=inv.ship_to)
             if email_list:
                 ship_to['emails'] = []
                 for em in emails:
@@ -2903,7 +2916,7 @@ def get_invoices(request):
             broker['province'] = inv.broker.province
             broker['country'] = inv.broker.country
 
-            phone_list = inv.broker.contactphone_set.all()
+            phone_list = ContactPhone.objects.filter(contact=inv.broker)
             if phone_list:
                 broker['phones'] = []
                 for ph in phone_list:                    
@@ -2915,7 +2928,7 @@ def get_invoices(request):
             else:
                 broker['phones'] = None
             
-            email_list = inv.broker.contactemailaddress_set.all()
+            email_list = ContactEmailAddress.objects.filter(contact=inv.broker)
             if email_list:
                 broker['emails'] = []
                 for em in emails:
@@ -3021,9 +3034,9 @@ def add_invoice(request):
 
     if request.method == 'POST':
         # import pdb; pdb.set_trace()
-        invoice_id = request.POST.get("invoice_id","")
+        invoice_id = request.POST.get("invoice_number","")
         if invoice_id != "":
-            invoice = Invoice.objects.get(id=invoice_id)
+            invoice = Invoice.objects.get(invoice_number=invoice_id)
             invoice_form = InvoiceForm(request.POST, instance=invoice, request=request, action='update')
         else:
             invoice_form = InvoiceForm(request.POST, request=request, action='new')
@@ -3088,11 +3101,11 @@ def invoice_view(request, invoice_id):
 @csrf_exempt
 def delete_invoice(request):
     # import pdb; pdb.set_trace()
-    id = request.POST.get("invoice_id","")
-    if id:
-        invoice = Invoice.objects.get(id=id)
+    invoice_number = request.POST.get("invoice_id","")
+    if invoice_number:
+        invoice = Invoice.objects.get(invoice_number=invoice_number)
         invoice.delete()
-        return HttpResponse(id)
+        return HttpResponse(invoice_number)
 
 
 def pl_reindex(request):

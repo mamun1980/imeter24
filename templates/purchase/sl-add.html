@@ -287,7 +287,6 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
 	}
 	$scope.selectItem = function(item) {
     	$scope.search_item = '';
-        console.log(item);
     	$("#items_list").hide();
     	var myitem = $("tbody#add_item_list tr.add_item");
     	var item_number = item.item_number;
@@ -419,7 +418,6 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
         
     }
     $scope.selectSL = function(sl){
-        console.log(sl);
         
         $scope.search_sl = sl.sl_number;
         $scope.sl_checked = true;
@@ -434,8 +432,7 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
             $scope.sold_to_contact = sl.sold_to;
             $scope.search_sold_to = sl.sold_to.contact_name;
             $("#id_sold_to").val(sl.sold_to.id);  
-            console.log("sold to "+ sl.sold_to.id);
-            console.log(sl.sold_to);
+            $scope.add_sl_form.search_sold_to.$setViewValue($scope.add_sl_form.search_sold_to.$viewValue);    
         }
         
         if(sl.ship_to){
@@ -453,7 +450,9 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
         $("#id_ship_via").val(sl.ship_via_id);
 
         var items = sl.items;
-        console.log(items);
+        if(items.length > 0){
+            $scope.item_added = true;
+        };
         var myitem = $("tbody#add_item_list tr.add_item");
         for(i=0; i< items.length ; i++) {
             var str = "<tr class='add_item'>";

@@ -162,7 +162,7 @@ class PurchaseItem(models.Model):
 	search_string = models.TextField(null=True, blank=True, verbose_name='Search String')
 	item_recv = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
 	item_recv_date = models.DateField(blank=True, null=True)
-	
+
 
 	def __unicode__(self):
 		return "%d -(%s)" % (self.id, str(self.po.po_number))

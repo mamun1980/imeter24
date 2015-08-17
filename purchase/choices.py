@@ -67,7 +67,7 @@ PL_STATUS = (
 	(0, 'New'),
 	(1, 'Partial Shipped'),
 	(2, 'All Shipped'),
-	(3, 'Invoicing'),
+	(3, 'Invoiced'),
 	(4, 'Archived'),
 )
 SL_STATUS = (

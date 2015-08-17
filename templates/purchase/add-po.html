@@ -85,7 +85,8 @@ table#supplier_contact_details th, table#ship_to_contact_details th{
 }
 
 #items_list {
-	width: 980px;
+	width: 1120px !important;
+	max-width: 1120px !important;
 	position: absolute;
 	top: 42px;
 	left: 5px;
@@ -133,6 +134,9 @@ span.amount {
 }
 tr.add_item {
 	border-top: 2px solid #333;
+}
+tr.item_custom_detail {
+	background-color: #777;
 }
 a.close {
 	color: red !important;
@@ -203,22 +207,23 @@ label {
 </section>
 {% endif %}
 
-<section class="row " ng-controller="AddPOController">
-<article class="col-md-12">
-	<div class="panel panel-primary">
-		<div class="panel-heading">
-	    	<h4>Add Purchase Order</h4>
-	  	</div>
-		<div class="panel-body">
+	<section class="row " ng-controller="AddPOController">
+	<article class="col-md-12">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Add Purchase Order</h4>
+		  	</div>
+			<div class="panel-body">
 
-			<form name='purchase_add_form' action="/purchase/add-po/" method="POST" enctype="multipart/form-data">	
-			{% include "purchase/partials/add-po-form.html" %}
-			</form>
+				<form name='purchase_add_form' action="/purchase/add-po/" method="POST" enctype="multipart/form-data">	
+				{% include "purchase/partials/add-po-form.html" %}
+				</form>
+			</div>
 		</div>
-	</div>
-</article>
-</section>
+	</article>
+	</section>
 </div>
+{% include "modals/item-details-modal.html" %}
 <link href="/statics/css/bootstrap-toggle.min.css" rel="stylesheet">
 <script src="/statics/js/bootstrap-toggle.min.js"></script>
 {% include "modals/add-modal.html" %}
@@ -411,6 +416,8 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
         } else {
             $scope.item_added = true;
         }
+
+        $scope.add_item_seq_no = 0;
 		
 	}
 
@@ -514,7 +521,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 	$scope.searchPo = function(q) {
 		if(q.length > 1) {
 			$scope.show_add_button = true;
-			url = "/purchase/po/search/?q=" + q
+			url = "/purchase/po/search/";
 			$http({method: 'GET', url: url}).
 	        	success(function(data, status, headers, config){
 	        	$scope.pos = data;
@@ -542,15 +549,15 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 		$scope.search_po = '';
 		$("#po_list").hide();
 
-		console.log(po.id);
+		
 		var po_id = po.po_number;
 		var po_url = '/purchase/get-po-by-id/'+po_id+'/'
-		console.log(po_url);
+		
 
 		$http({method: 'GET', url: po_url}).
 			success(function(data, status, headers, config){
 			$scope.po_checked = true;
-			console.log(data);
+			
 			$("#id_po_number_search").val(data.po_number);
 			$("#id_po_number").val(data.po_number);
 			$("#id_po_id").val(po_id);
@@ -558,14 +565,18 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 			$("#id_date_expected").val(data.date_expected);
 			$("#id_date_issued").val(data.date_issued);
 
-			$scope.supplier_contact = data.supplier;
+			
 			if(data.supplier){
-				$("#id_supplier").val(data.supplier.id);	
+				$scope.supplier_contact = data.supplier;
+				$scope.search_supplier = data.supplier.contact_name;
+				$("#id_supplier").val(data.supplier.id);
+				$scope.purchase_add_form.search_supplier.$setViewValue($scope.purchase_add_form.search_supplier.$viewValue);	
 			}
 			$("#supplier_contact_details").show();
 
 			$scope.ship_to_contact = data.ship_to;
 			if(data.ship_to) {
+				$scope.search_ship_to = data.ship_to.contact_name;
 				$("#id_ship_to").val(data.ship_to.id);	
 			}
 			$("#ship_to_contact_details").show();
@@ -634,35 +645,32 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 			$("#items_total_qty").val(data.items_total);
 			$("#calculated_total_amount span.amount").text(po_amount.toFixed(4));
 
-			var po_items = data.items;
-			console.log("po_amount....");
-			$scope.po_items = po_items;
-			console.log(po_amount);
-			// Load items for this po
-			
+			$scope.po_items = data.items;
+			if(data.items.length > 0){
+				$scope.item_added = true;
+			}
+
 			var myitem = $("tbody#add_item_list tr.add_item");
-			for (var i = 0; i < po_items.length; i++) {
+			for (var i = 0; i < $scope.po_items.length; i++) {
 
-				var p_item_id = po_items[i].p_item_id;
-		    	var item_number = po_items[i].item_number;
-		    	var item_description = po_items[i].description;
-		    	var unit_measure_id = po_items[i].unit;
-		    	console.log("unit measure:"+unit_measure_id);
-
-		    	var item_comment = po_items[i].comment;
-		    	var wholesale_cost = po_items[i].cost;
-		    	var item_qty = po_items[i].qty;
-		    	var item_sub_total = po_items[i].sub_total;
-		    	var item_job_number = po_items[i].job_number;
-		    	var item_job_number_id = po_items[i].job_number_id;
-		    	var item_qty_received = po_items[i].item_received;
-		    	var last_received_date = po_items[i].item_recv_date;
+				var p_item_id = $scope.po_items[i].p_item_id;
+		    	var item_number = $scope.po_items[i].item_number;
+		    	var item_description = $scope.po_items[i].description;
+		    	var unit_measure_id = $scope.po_items[i].unit;
+		    	var item_comment = $scope.po_items[i].comment;
+		    	var wholesale_cost = $scope.po_items[i].cost;
+		    	var item_qty = $scope.po_items[i].qty;
+		    	var item_sub_total = $scope.po_items[i].sub_total;
+		    	var item_job_number = $scope.po_items[i].job_number;
+		    	var item_job_number_id = $scope.po_items[i].job_number_id;
+		    	var item_qty_received = $scope.po_items[i].item_received;
+		    	var last_received_date = $scope.po_items[i].item_recv_date;
 		 //    	// console.log(item.qty_received_date);
 		    	
 		    	
 		    	var str = "<tr class='add_item'>";
 		    	str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+item_number+"' readonly></td>";
-		    	str += "<td><p class='bg-info item_desc'>"+item_description+"</p></td>";
+		    	str += "<td><textarea class='form-control' rows='1'>"+item_description+"</textarea></td>";
 		    	
 		    	str += "<td><select class='form-control' name='unit'>";
 		    	str += "<option ng-repeat='um in item_unit_measures' value='{[{um.id}]}' ng-selected='{[{um.id}]} == "+unit_measure_id+"'>{[{um.unit_name}]}</option>";
@@ -701,10 +709,10 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 						$(event.target).siblings("input.item_job_id").val(ui.item.id);
 					}
 			    });
-			}
-			
-        });
 
+			}
+
+        });
 		
 	}
 
@@ -724,7 +732,8 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 	}
     $scope.selectItem = function(item) {
     	console.log(item);
-
+    	$scope.add_item_seq_no++;
+    	console.log("seq: "+$scope.add_item_seq_no);
     	$scope.search_item = '';
     	$scope.mixed_currency = false;
     	$("#items_list").hide();
@@ -801,16 +810,11 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 	    	}
 			
     	} 
-    // else {
-    		
-    // 		if($scope.supplier_contact == undefined) {
-				// $("#id_terms").val(item_term);
-    // 		}
-    // 	}
+
     	
     	var str = "<tr class='add_item'>";
-    	str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+item_number+"' readonly></td>";
-    	str += "<td><p class='bg-info item_desc'>"+item_description+"</p></td>";
+    	str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+item_number+"' readonly><input type='hidden' name='po_item_seq' value='"+$scope.add_item_seq_no+"'></td>";
+    	str += "<td><textarea class='form-control' rows='1'>"+item_description+"</textarea></td>";
     	
     	str += "<td><select class='form-control' name='unit'>";
     	str += "<option ng-repeat='um in item_unit_measures' value='{[{um.id}]}' ng-selected='{[{um.id}]} == "+unit_measure_id+"'>{[{um.unit_name}]}</option>";
@@ -825,7 +829,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
     	str += "<td><input type='text' name='last_received_date' class='form-control' value='"+last_received_date+"' readonly></td>";
 
 
-    	str += "<td><a class='remove-item btn' ng-click='removeField($event)'><span class='glyphicon glyphicon-remove'></span></a></td>";
+    	str += "<td><a class='unit-measure-edit' data-toggle='modal' data-seq='"+$scope.add_item_seq_no+"' data-target='#itemDetailsModal'><i class='glyphicon glyphicon-pencil'></i></a><a class='remove-item btn' ng-click='removeField($event)'><span class='glyphicon glyphicon-remove'></span></a></td>";
     	str += "</tr>";
     	
 
@@ -858,6 +862,10 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 
         $scope.item_added = true;
         
+    }
+
+    $scope.addDetails = function() {
+    	console.log("Adding details...");
     }
 
     $scope.removeField = function (event) {
@@ -1051,6 +1059,15 @@ $(document).on("click", "button#email_po", function(e){
 	});
 	return false;
 	
+});
+
+$('#itemDetailsModal').on('show.bs.modal', function(e) {
+
+    //get data-id attribute of the clicked element
+    var bookId = $(e.relatedTarget).data('seq');
+
+    //populate the textbox
+    $(e.currentTarget).find('#item_seq').val(bookId);
 });
 
 })(jQuery);

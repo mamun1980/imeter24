@@ -20,7 +20,7 @@
 									
 								</thead>
 								<tbody>
-									<tr ng-repeat="pl in pls" ng-click="selectPl(pl)">
+									<tr ng-repeat="pl in pls | filter:search_pl" ng-click="selectPl(pl)">
 										<td>{[{pl.pl_number}]}</td>
 										<td>{[{pl.job_number}]}</td>
 									</tr>
@@ -71,14 +71,23 @@
 						<table class="table sold_to_contact" id="sold_to_contact_list">
 							<thead>
 								<tr>
-									<th>Contact Name</th><th> City <a href="" class="close">x</a></th>
+									<th>Contact Name</th>
+									<th>Country</th>
+									<th> City </th>
+									<th>Cont No. <a href="" class="close">x</a></th>
 								</tr>
 							</thead>
 							<tbody>
 								<tr ng-repeat="con in soldto" ng-click="selectSoldTo(con)">
 									
 									<td>{[{con.contact_name}]}</td>
+									<td>{[{con.country}]}</td>
 									<td>{[{con.city}]}</td>
+									<td>
+										<div class='phone' ng-repeat="phon in con.phones" ng-if="$first">
+											<span>{[{phon.number}]}</span>
+										</div>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -191,14 +200,23 @@
 						<table class="table customer_broker_contact" id="customer_broker_contact_list">
 							<thead>
 								<tr>
-									<th>Contact Name</th><th> City <a href="" class="close">x</a></th>
+									<th>Contact Name</th>
+									<th>Country</th>
+									<th> City </th>
+									<th>Cont No. <a href="" class="close">x</a></th>
 								</tr>
 							</thead>
 							<tbody>
 								<tr ng-repeat="con in customer_brokers" ng-click="selectCustomerBroker(con)">
 									
 									<td>{[{con.contact_name}]}</td>
+									<td>{[{con.country}]}</td>
 									<td>{[{con.city}]}</td>
+									<td>
+										<div class='phone' ng-repeat="phon in con.phones" ng-if="$first">
+											<span>{[{phon.number}]}</span>
+										</div>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -289,14 +307,23 @@
 						<table class="table ship_to_contact" id="ship_to_contact_list">
 							<thead>
 								<tr>
-									<th>Contact Name</th><th> City <a href="" class="close">x</a></th>
+									<th>Contact Name</th>
+									<th>Country</th>
+									<th> City </th>
+									<th>Cont No. <a href="" class="close">x</a></th>
 								</tr>
 							</thead>
 							<tbody>
 								<tr ng-repeat="con in shipto" ng-click="selectShipTo(con)">
 									
 									<td>{[{con.contact_name}]}</td>
+									<td>{[{con.country}]}</td>
 									<td>{[{con.city}]}</td>
+									<td>
+										<div class='phone' ng-repeat="phon in con.phones" ng-if="$first">
+											<span>{[{phon.number}]}</span>
+										</div>
+									</td>
 								</tr>
 							</tbody>
 						</table>

@@ -15,6 +15,15 @@ from premierelevator.helper_functions import *
 from scomuser.forms import *
 from scomuser.models import *
 
+import json
+from haystack.forms import ModelSearchForm, SearchForm
+from haystack.query import SearchQuerySet, EmptySearchQuerySet
+from haystack.views import SearchView
+from haystack.inputs import Raw, Clean, AutoQuery
+import re
+
+from django.core.paginator import Paginator, EmptyPage, InvalidPage
+
 
 @login_required
 def sc_home(request):
@@ -194,6 +203,43 @@ def user_report_delete(request):
 #         context['userlookupform'] = UserLookupForm()
 #         return context
 
+@csrf_exempt
+def search_user(request):
+    query = request.GET.get('q',"")
+    if request.GET.get('q'):
+        users = SearchQuerySet().using('user').filter(content=AutoQuery(query)).load_all()[:30]
+    else:
+        users = SearchQuerySet().using('user').all().load_all()[:30]
+
+    user_list = []
+    if users:
+        for user in users:
+            if user != None:
+                user_dict = {}
+                user_dict['id'] = user.uid
+                user_dict['username'] = user.username
+                user_dict['first_name'] = user.first_name
+                user_dict['last_name'] = user.last_name
+                user_dict['email'] = user.email
+                user_dict['is_superuser'] = user.is_superuser
+                user_dict['last_login'] = user.last_login
+
+                user_list.append(user_dict)
+    try:
+        page = int(request.GET.get('page','1'))
+    except ValueError:
+        page = 1
+    paginator = Paginator(user_list, 20)
+    try:
+        pages = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        pages = paginator.page(paginator.num_pages)
+
+    results = pages.object_list
+
+    data = json.dumps(results)
+    return HttpResponse(data)
+
 
 @login_required
 @permission_required("auth.view_user")
@@ -210,7 +256,7 @@ def UserList(request):
 
 def scomuser_list(request):
     user = request.user
-    return render(request, "scomuser/user_list.html", {'user': user})
+    return render(request, "scomuser/user_list.html")
 
 @login_required
 def UserListApi(request):
@@ -239,14 +285,13 @@ def UserListApi(request):
             user_dict['current_user'] = False
 
         try:
-            user_dict['search_string'] = scuser.scomuserprofile.search_string
             user_dict['profile'] = {}
             user_dict['profile']['city'] = scuser.scomuserprofile.city
             user_dict['profile']['province'] = scuser.scomuserprofile.province
             user_dict['profile']['address_1'] = scuser.scomuserprofile.address_1
             user_dict['profile']['cell_phone'] = scuser.scomuserprofile.cell_phone
         except:
-            user_dict['search_string'] = ""
+            
             user_dict['profile'] = {}
 
 

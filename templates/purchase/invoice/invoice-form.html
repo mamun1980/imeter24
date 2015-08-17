@@ -12,20 +12,25 @@
 					<table class="table">
 						<thead>
 							<tr>
-								<td>Invoice Number</td>
-								<td>PO</td>
-								<td>Date shipped</td>
-								<td>Status</td>
+								<th>Invoice Number</th>
+								<th>PO</th>
+								<th>Date shipped</th>
+								<th>Status</th>
+								<th>Total Amount</th>
+								<th>
+									<a href="" class="close" ng-click="closeMe('show_invoice_list')">x</a>
+								</th>
 							</tr>
 							
 						</thead>
 						<tbody>
-							<tr ng-repeat="invoice in invoices" ng-click="selectInvoice(invoice)">
+							<tr ng-repeat="invoice in invoices | filter:search_invoice" ng-click="selectInvoice(invoice)">
 								<td>{[{invoice.invoice_number}]}</td>
 								<td>{[{invoice.job_number}]}</td>
 								<td>{[{invoice.date}]}</td>
 								<td>{[{invoice.status_verbose}]}</td>
 								<td>{[{ invoice.total_amount }]}</td>
+								<td></td>
 							</tr>
 							
 						</tbody>
@@ -40,7 +45,7 @@
 			
 		</div>
 		<input id="id_invoice_number" name="invoice_number" type="hidden" value="{[{search_invoice}]}">
-		<input id="id_invoice" name="invoice_id" type="hidden">
+		
 		
 	</td>
 	<th width="150" ng-class="{'ng-pristine': invoice_add_form.pl_number_search.$pristine || invoice_add_form.pl_number_search.$invalid}">
@@ -59,15 +64,17 @@
 									<td>Job Number</td>
 									<td>Date shipped</td>
 									<td>Status</td>
+									<th><a href="" class="close" ng-click="closeMe('show_pl_list')">x</a></th>
 								</tr>
 								
 							</thead>
 							<tbody>
-								<tr ng-repeat="pl in pls" ng-click="selectPl(pl)">
+								<tr ng-repeat="pl in pls | filter:search_pl" ng-click="selectPl(pl)">
 									<td>{[{pl.pl_number}]}</td>
 									<td>{[{pl.job_number}]}</td>
 									<td>{[{pl.date_shipped}]}</td>
 									<td>{[{pl.status}]}</td>
+									<td></td>
 								</tr>
 								
 							</tbody>
@@ -104,7 +111,7 @@
 	<th width="150" ng-class="{'ng-pristine': invoice_add_form.search_sold_to.$pristine || invoice_add_form.search_sold_to.$invalid}">
 		<label for="id_sold_to">Sold To:</label>
 	</th>
-	<td>
+	<td colspan="3">
 	<div class="contact_box">
 		<input type="text" ng-model="search_sold_to" name="search_sold_to" placeholder="start typing to search" class="form-control" ng-change="searchSoldTo(search_sold_to)" ng-required="true">
 
@@ -130,21 +137,39 @@
 			<tr>
 				<th>Emails</th>
 				<td colspan="2"><span class='bg-info email' ng-repeat="em in sold_to.emails">{[{ em.email_address}]}</span></td>
-			</tr>			
+			</tr>
+			<tr>
+				<th>Phones</th>
+				<td>
+					<div class='phone' ng-repeat="phon in sold_to.phones">
+							<span>{[{phon.number}]} (ext: {[{phon.phone_ext}]})</span>
+					</div>
+				</td>
+			</tr>		
 			
 		</table>
 
 		<table class="table sold_to_contact" id="sold_to_contact_list" ng-show="show_sold_to_contact_list">
 			<thead>
 				<tr>
-					<th>Contact Name</th><th>Address 1</th><th> City <a href="" class="close">x</a></th>
+					<th>Contact Name</th><th>Address 1</th><th> Country </th>
+					<th> Province </th><th> City </th><th> Primary Cont No. <a href="" class="close" ng-click="closeMe('show_sold_to_contact_list')">x</a></th>
+					
 				</tr>
 			</thead>
 			<tbody>
 				<tr ng-repeat="con in soldto" ng-click="setSoldto(con)">
 					<td>{[{con.contact_name}]}</td>
 					<td>{[{con.address_1}]}</td>
-					<td>{[{con.city}]}</td>
+					<td class="city">{[{con.country}]}</td>
+					<td class="city">{[{con.province}]}</td>
+					<td class="city">{[{con.city}]}</td>
+					<td class="city">
+						<div class='phone' ng-repeat="phon in con.phones" ng-if="$first">
+							<span>{[{phon.number}]} (ext: {[{phon.phone_ext}]})</span>
+						</div>
+					</td>
+
 				</tr>
 				<tr ng-show="!soldto.length">
 					<td colspan="4">No contacts</td>
@@ -156,6 +181,9 @@
 	</div>
 
 	</td>
+	
+</tr>
+<tr class="bg-success">	
 	<th width="150">
 		<label for="id_ship_to">Ship to:</label>
 	</th>
@@ -184,14 +212,23 @@
 		<table class="table ship_to_contact" id="ship_to_contact_list" ng-show="show_ship_to_contact_list">
 			<thead>
 				<tr>
-					<th>Contact Name</th><th> City <a href="" class="close">x</a></th>
+					<th>Contact Name</th>
+					<th>Country</th>
+					<th> City </th>
+					<th> Cont No. <a href="" class="close">x</a></th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr ng-repeat="con in shipto" ng-click="selectShipTo(con)">
 					
 					<td>{[{con.contact_name}]}</td>
+					<td>{[{con.country}]}</td>
 					<td>{[{con.city}]}</td>
+					<td>
+						<div class='phone' ng-repeat="phon in con.phones" ng-if="$first">
+							<span>{[{phon.number}]}</span>
+						</div>
+					</td>
 				</tr>
 			</tbody>
 		</table>
@@ -200,13 +237,10 @@
 	</div>
 
 	</td>
-</tr>
-<tr class="bg-success">	
-	
 	<th width="150"  ng-class="{'ng-pristine': invoice_add_form.search_broker.$pristine || invoice_add_form.search_broker.$invalid}">
 		<label for="id_broker">Broker:</label>
 	</th>
-	<td colspan="3">
+	<td>
 	<div class="contact_box">
 		<input type="text" ng-model="search_broker" name="search_broker" placeholder="start typing to search" class="form-control" ng-change="searchCustomerBroker(search_broker)" ng-required="true">
 
@@ -239,15 +273,22 @@
 		<table class="table broker_contact" id="broker_contact_list" ng-show="show_broker_contact_list">
 			<thead>
 				<tr>
-					<th>ID</th><th>Contact Name</th><th>Address 1</th><th> City <a href="" class="close">x</a></th>
+					<th>Contact Name</th>
+					<th>Country</th>
+					<th> City </th>
+					<th> Cont No. <a href="" class="close">x</a></th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr ng-repeat="con in customer_brokers" ng-click="setBroker(con)">
-					<td>{[{con.id}]}</td>
 					<td>{[{con.contact_name}]}</td>
-					<td>{[{con.address_1}]}</td>
+					<td>{[{con.country}]}</td>
 					<td>{[{con.city}]}</td>
+					<td>
+						<div class='phone' ng-repeat="phon in con.phones" ng-if="$first">
+							<span>{[{phon.number}]}</span>
+						</div>
+					</td>
 				</tr>
 				<tr ng-show="!contacts.length">
 					<td colspan="4">No contacts</td>
@@ -340,7 +381,9 @@
 								<th>Price</th>
 								<th>Subtotal</th>
 								<th width="100">PL Number</th>
-								<th><a href="" class="close">x</a></th>
+								<th>
+									<a href="" class="close" ng-click="closeMe('show_item_list')">x</a>
+								</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -422,23 +465,16 @@
 	<td width="40%">
 		<div class="input-group">
 			<input type="number" ng-model='discount' class="form-control" name="discount" id="id_discount" value="0">
-			<div class="input-group-btn">
-				<div class="btn-group" data-toggle="buttons" id='id_discount_type'>
-					<label class="btn btn-default active">
-					<input type="radio" name="discount_type" onchange="hello('fixed')" value="fixed" checked="checked">Fixed
-					</label>
-					<label class="btn btn-default">
-					<input type="radio" name="discount_type" onchange="hello('parcent')" value="parcent" >Parcent (%)
-					</label>
-				</div>
-			</div><!-- /btn-group -->
+			<span class="btn">
+				<input type="radio" name="discount_type" ng-model="discount_type" value="fixed" ng-change="hello()" style="margin-right: 5px;">Fixed <input type="radio" name="discount_type" ng-model="discount_type" value="parcent" ng-change="hello()" >Parcent (%)
+			</span><!-- /btn-group -->
 		</div><!-- /input-group -->
 	</td>
 </tr>
 <tr>
 	<td colspan="2"></td>
 	<th>
-		<label for="id_discount"> Comment:</label>
+		<label for="id_discount">Comment:</label>
 	</th>
 	<td>
 		<textarea name="comment" class="form-control" id="id_comment"></textarea>
@@ -448,7 +484,7 @@
 	<td colspan="2"></td>
 	<th><label for="id_discounted_sub_total">Discounted Sub Total:</label></th>
 	<td>
-		<input type="number" ng-model='discounted_sub_total' class="form-control" name="discounted_sub_total" id="id_discounted_sub_total" readonly="readonly">
+		<input type="text" ng-model='discounted_sub_total' class="form-control" name="discounted_sub_total" id="id_discounted_sub_total" readonly="readonly">
 	</td>
 </tr>
 <tr class="bg-success">
@@ -456,7 +492,7 @@
 		<label for="id_hst_taxable">Hst taxable:</label>
 	</th>
 	<td>
-		<select class="form-control tax" ng-model="hst_tax" id="id_hst_taxable" name="hst_taxable" placeholder="Blanket PO">
+		<select class="form-control tax" ng-model="hst_tax" id="id_hst_taxable" name="hst_taxable" placeholder="Blanket PO" ng-change="updateHST({[{hst_tax}]})">
 		<option value="0">NO</option>
 		<option value="1">YES</option>
 		</select>
@@ -467,7 +503,7 @@
 		<label for="id_pst_taxable">Pst taxable:</label>
 	</th>
 	<td>
-		<select class="form-control tax" ng-model="pst_tax" id="id_pst_taxable" name="pst_taxable" placeholder="Blanket PO">
+		<select class="form-control tax" ng-model="pst_tax" id="id_pst_taxable" name="pst_taxable" placeholder="Blanket PO" ng-change="updatePST(pst_tax)">
 		<option value="0">NO</option>
 		<option value="1">YES</option>
 		</select>
@@ -492,7 +528,7 @@
 		<label for="id_total_po_amount">Total Invoice amount:</label>
 	</th>
 	<td>
-		<input class="form-control" ng-model="total_amount" id="id_total_amount" name="total_amount" value="0.0" readonly="readonly" type="number">
+		<input class="form-control" ng-model="total_amount" id="id_total_amount" name="total_amount" readonly="readonly" type="text">
 	</td>
 </tr>
 

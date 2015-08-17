@@ -60,13 +60,13 @@
 						
 					{% endif %}
 
-					{% if user.is_staff and perms.auth.view_user %}
+					{% if user.is_staff and perms.auth.can_view_user %}
 						<li class="divider"></li>
 						{% if perms.auth.add_user %}
 							<li><a href="/scomuser/adduser/">Add User</a></li>
 						{% endif %}
 
-							<li><a href="/scomuser/list/#/userlist">User List</a></li>
+							<li><a href="/scomuser/list/">User List</a></li>
 						
 					{% endif %}
 						<li><a class="change-password" href="#">Change Password</a></li>

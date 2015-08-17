@@ -19,7 +19,7 @@
 						
 					</thead>
 					<tbody>
-						<tr ng-repeat="sl in sls" ng-click="selectSL(sl)">
+						<tr ng-repeat="sl in sls | filter:search_sl" ng-click="selectSL(sl)">
 							<td>{[{sl.sl_number}]}</td>
 							<td>{[{sl.sold_to.contact_name}]}</td>
 							<td>{[{sl.ship_to.contact_name}]}</td>
@@ -83,9 +83,11 @@
 			<thead>
 				<tr>
 					<th>Contact Name</th>
+					<th> Country </th>
+					<th> Province </th>
 					<th> City</th>
 					<th> Address </th>
-					<th> Emails </th>
+					
 					<th> Phones <a href="" class="close">x</a></th>
 				</tr>
 			</thead>
@@ -93,15 +95,15 @@
 				<tr ng-repeat="con in soldto" ng-click="selectSoldTo(con)">
 					
 					<td>{[{con.contact_name}]}</td>
+					<td class="city">{[{con.country}]}</td>
+					<td class="city">{[{con.province}]}</td>
 					<td>{[{con.city}]}</td>
 					<td>{[{con.address_1}]}</td>
-					<td>
-						<li ng-repeat="em in con.emails">{[{em.email_address}]} ({[{em.email_type}]})</li>
-					</td>
-					
-					<td>
-						<li ng-repeat="ph in con.phones">{[{ph.number}]}-({[{ph.ext}]})</li>
-						
+										
+					<td class="city">
+						<div class='phone' ng-repeat="phon in con.phones" ng-if="$first">
+							<span>{[{phon.number}]} (ext: {[{phon.phone_ext}]})</span>
+						</div>
 					</td>
 				</tr>
 			</tbody>
@@ -151,9 +153,10 @@
 			<thead>
 				<tr>
 					<th>Contact Name</th>
+					<th> Country </th>
+					<th> Province </th>
 					<th> City</th>
 					<th> Address </th>
-					<th> Emails </th>
 					<th> Phones <a href="" class="close">x</a></th>
 				</tr>
 			</thead>
@@ -161,16 +164,15 @@
 				<tr ng-repeat="con in shipto" ng-click="selectShipTo(con)">
 					
 					<td>{[{con.contact_name}]}</td>
+					<td class="city">{[{con.country}]}</td>
+					<td class="city">{[{con.province}]}</td>
 					<td>{[{con.city}]}</td>
 					<td>{[{con.address_1}]}</td>
-					
-					<td>
-						<li ng-repeat="em in con.emails">{[{em.email_address}]} ({[{em.email_type}]})</li>
-					</td>
-					
-					<td>
-						<li ng-repeat="ph in con.phones">{[{ph.number}]}-({[{ph.ext}]})</li>
-						
+										
+					<td class="city">
+						<div class='phone' ng-repeat="phon in con.phones" ng-if="$first">
+							<span>{[{phon.number}]} (ext: {[{phon.phone_ext}]})</span>
+						</div>
 					</td>
 				</tr>
 			</tbody>

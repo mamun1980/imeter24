@@ -74,7 +74,7 @@ WSGI_APPLICATION = 'premierelevator.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'premier_test',                      # Or path to database file if using sqlite3.
+        'NAME': 'premier_live',                      # Or path to database file if using sqlite3.
         'USER': 'postgres',                      # Not used with sqlite3.
         'PASSWORD': 'qweqwe',                  # Not used with sqlite3.
         'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -176,7 +176,9 @@ HAYSTACK_CONNECTIONS = {
                             'purchase.search_indexes.PurchaseOrderIndex', 
                             'schedule.search_indexes.JobControlIndex',
                             'purchase.search_indexes.ShippingListIndex', 
-                            'purchase.search_indexes.PackingListIndex',],
+                            'purchase.search_indexes.PackingListIndex',
+                            'scomuser.search_indexes.UserIndex',
+                            'events.search_indexes.EventsIndex',],
     },
     'inventory': {
         # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
@@ -189,7 +191,9 @@ HAYSTACK_CONNECTIONS = {
                             'purchase.search_indexes.PurchaseOrderIndex', 
                             'purchase.search_indexes.ShippingListIndex', 
                             'purchase.search_indexes.PackingListIndex', 
-                            'schedule.search_indexes.JobControlIndex',],
+                            'schedule.search_indexes.JobControlIndex',
+                            'scomuser.search_indexes.UserIndex',
+                            'events.search_indexes.EventsIndex',],
     },
     'job': {
         # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
@@ -201,7 +205,9 @@ HAYSTACK_CONNECTIONS = {
                             'purchase.search_indexes.PurchaseOrderIndex',
                             'purchase.search_indexes.ShippingListIndex', 
                             'purchase.search_indexes.PackingListIndex',
-                            'schedule.search_indexes.JobControlIndex', ],
+                            'schedule.search_indexes.JobControlIndex', 
+                            'scomuser.search_indexes.UserIndex',
+                            'events.search_indexes.EventsIndex',],
     },
     'jobcontrol': {
         # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
@@ -213,7 +219,9 @@ HAYSTACK_CONNECTIONS = {
                             'purchase.search_indexes.PurchaseOrderIndex',
                             'purchase.search_indexes.ShippingListIndex', 
                             'purchase.search_indexes.PackingListIndex', 
-                            'schedule.search_indexes.JobIndex',],
+                            'schedule.search_indexes.JobIndex',
+                            'scomuser.search_indexes.UserIndex',
+                            'events.search_indexes.EventsIndex',],
     },
     'po': {
         # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
@@ -225,31 +233,65 @@ HAYSTACK_CONNECTIONS = {
                             'schedule.search_indexes.JobIndex', 
                             'schedule.search_indexes.JobControlIndex',
                             'purchase.search_indexes.ShippingListIndex', 
-                            'purchase.search_indexes.PackingListIndex',],
+                            'purchase.search_indexes.PackingListIndex',
+                            'scomuser.search_indexes.UserIndex',
+                            'events.search_indexes.EventsIndex',],
     },
     'pl': {
         # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
         'ENGINE': 'premierelevator.search_backend.ConfigurableElasticSearchEngine',
         'URL': 'http://127.0.0.1:9200/',
-        'INDEX_NAME': 'po',
+        'INDEX_NAME': 'pl',
         'EXCLUDED_INDEXES': ['contacts.search_indexes.ContactIndex', 
                             'inventory.search_indexes.ItemIndex',
                             'schedule.search_indexes.JobIndex', 
                             'schedule.search_indexes.JobControlIndex',
                             'purchase.search_indexes.ShippingListIndex',
-                            'purchase.search_indexes.PurchaseOrderIndex',],
+                            'purchase.search_indexes.PurchaseOrderIndex',
+                            'scomuser.search_indexes.UserIndex',
+                            'events.search_indexes.EventsIndex',],
     },
     'sl': {
         # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
         'ENGINE': 'premierelevator.search_backend.ConfigurableElasticSearchEngine',
         'URL': 'http://127.0.0.1:9200/',
-        'INDEX_NAME': 'po',
+        'INDEX_NAME': 'sl',
         'EXCLUDED_INDEXES': ['contacts.search_indexes.ContactIndex', 
                             'inventory.search_indexes.ItemIndex',
                             'schedule.search_indexes.JobIndex', 
                             'schedule.search_indexes.JobControlIndex', 
                             'purchase.search_indexes.PackingListIndex',
-                            'purchase.search_indexes.PurchaseOrderIndex',],
+                            'purchase.search_indexes.PurchaseOrderIndex',
+                            'scomuser.search_indexes.UserIndex',
+                            'events.search_indexes.EventsIndex',],
+    },
+    'user': {
+        # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+        'ENGINE': 'premierelevator.search_backend.ConfigurableElasticSearchEngine',
+        'URL': 'http://127.0.0.1:9200/',
+        'INDEX_NAME': 'user',
+        'EXCLUDED_INDEXES': ['contacts.search_indexes.ContactIndex', 
+                            'inventory.search_indexes.ItemIndex',
+                            'schedule.search_indexes.JobIndex', 
+                            'schedule.search_indexes.JobControlIndex',
+                            'purchase.search_indexes.ShippingListIndex', 
+                            'purchase.search_indexes.PackingListIndex',
+                            'purchase.search_indexes.PurchaseOrderIndex',
+                            'events.search_indexes.EventsIndex',],
+    },
+    'events': {
+        # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+        'ENGINE': 'premierelevator.search_backend.ConfigurableElasticSearchEngine',
+        'URL': 'http://127.0.0.1:9200/',
+        'INDEX_NAME': 'events',
+        'EXCLUDED_INDEXES': ['contacts.search_indexes.ContactIndex', 
+                            'inventory.search_indexes.ItemIndex',
+                            'schedule.search_indexes.JobIndex', 
+                            'schedule.search_indexes.JobControlIndex',
+                            'purchase.search_indexes.ShippingListIndex', 
+                            'purchase.search_indexes.PackingListIndex',
+                            'purchase.search_indexes.PurchaseOrderIndex',
+                            'scomuser.search_indexes.UserIndex',],
     },
 }
 
@@ -272,4 +314,4 @@ HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 HAYSTACK_ROUTERS = ['inventory.routers.MasterRouter', 
                 'schedule.routers.MasterRouter', 
                 'purchase.routers.PORouter','purchase.routers.SLRouter','purchase.routers.PLRouter',
-                'haystack.routers.DefaultRouter',]
+                'scomuser.routers.UserRouter', 'events.routers.EventsRouter', 'haystack.routers.DefaultRouter',]

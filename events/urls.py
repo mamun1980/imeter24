@@ -3,6 +3,7 @@ from django.conf.urls import patterns, include, url
 urlpatterns = patterns('',
     # Examples:
     url(r'^$', 'events.views.list_event', name='event-list'),
+    url(r'^search/$', 'events.views.search_events', name='events-list'),
     url(r'^list/$', 'events.views.list_event_api', name='event-list-api'),
     url(r'^add/$', 'events.views.add_event', name='add-event'),
     url(r'^edit/(?P<id>\w+)/$', 'events.views.edit_event', name='edit-events'),
