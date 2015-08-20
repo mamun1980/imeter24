@@ -372,8 +372,12 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 		$scope.pst_tax = 0;
 		$scope.hst_tax = 0;
 		$scope.total_amount = 0.0;
-		$scope.hst_tax_amount = 0.0;
-		$scope.pst_tax_amount = 0.0;
+		
+		var hst = $("#hst_default_amount").val();
+		$scope.hst_tax_amount = hst;
+		var pst = $("#pst_default_amount").val();
+		$scope.pst_tax_amount = pst;
+		
 		$scope.show_add_button = true;
 		$scope.show_update_button = false;
 		
@@ -733,7 +737,6 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
     $scope.selectItem = function(item) {
     	console.log(item);
     	$scope.add_item_seq_no++;
-    	console.log("seq: "+$scope.add_item_seq_no);
     	$scope.search_item = '';
     	$scope.mixed_currency = false;
     	$("#items_list").hide();
@@ -978,12 +981,13 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
     	}
     };
 
-    $scope.updateHST = function(hst) {
+    $scope.updatePST = function(hst) {
     	console.log(hst);
     	if(hst==1) {
 
-    		var pst_tax_amount = parseFloat($("#id_pst_taxable_amount").val());
-    		// console.log(pst_tax_amount);
+    		// var pst_tax_amount = parseFloat($("#id_pst_taxable_amount").val());
+    		var pst_tax_amount = $scope.pst_tax_amount;
+    		console.log(pst_tax_amount);
     		var item_total = 0;
 			$("tbody#add_item_list tr input[name='item_sub_total']").each(function(index){
 				var subtotal = $(this).val();
@@ -997,7 +1001,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
     	}
     }
 
-    $scope.updatePST = function(pst) {
+    $scope.updateHST = function(pst) {
 
 
 		var hst_tax_amount = parseFloat($("#id_hst_taxable_amount").val());

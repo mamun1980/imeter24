@@ -163,6 +163,9 @@ class PurchaseItem(models.Model):
 	item_recv = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
 	item_recv_date = models.DateField(blank=True, null=True)
 
+	custom_comment = models.TextField(null=True, blank=True)
+	custom_detail = models.TextField(null=True, blank=True)
+
 
 	def __unicode__(self):
 		return "%d -(%s)" % (self.id, str(self.po.po_number))

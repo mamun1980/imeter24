@@ -107,7 +107,7 @@
 		<select class="form-control" id="id_default_report_for_invoice" name="default_report_for_invoice">
 		<option value="">None selected</option>
 		{% for report in reports %}
-			<option value="{{report.id}}" {% if sv.default_report_for_invoice.id == report.id %} selected {% endif %}>{{report.report_type}}</option>
+			<option value="{{report.id}}" {% if sv.default_report_for_invoice.id == report.id %} selected {% endif %} >{{report.report_type}}</option>
 		{% endfor %}
 		</select>
 	</td>
@@ -173,6 +173,21 @@
 	<td>
 		{{ form.email_auth_password.errors }}
 		<input class="form-control" id="id_email_auth_password" name="email_auth_password" placeholder="Email Auth Password" type="password" value="{{sv.email_auth_password}}">
+	</td>
+</tr>
+<tr class="bg-primary">
+	<td colspan="4" align="center"><b>Default Tax Settings</b></td>
+</tr>
+<tr>
+	<th><label for="id_default_hst_tax_amount">HST Tax Amount:</label></th>
+	<td>
+		{{ form.default_hst_tax_amount.errors }}
+		<input class="form-control" id="id_default_hst_tax_amount" name="default_hst_tax_amount" placeholder="default hst tax amount" type="text" value="{{sv.default_hst_tax_amount}}">
+	</td>
+	<th><label for="id_default_pst_tax_amount">PST Tax Amount:</label></th>
+	<td>
+		{{ form.default_pst_tax_amount.errors }}
+		<input class="form-control" id="id_default_pst_tax_amount" name="default_pst_tax_amount" placeholder="default_pst_tax_amount" type="text" value="{{sv.default_pst_tax_amount}}">
 	</td>
 </tr>
 </table>

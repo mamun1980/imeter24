@@ -564,6 +564,10 @@ def add_new_po(request):
                                 pi.sub_total = item['sub_total']
                             pi.comment = item['comment']
 
+                            pi.custom_detail = item['item_custom_detail']
+                            pi.custom_comment = item['item_custom_comment']
+
+
                             pi.purchase_status = 0
                             pi.save()
                     except Exception, e:
@@ -635,7 +639,7 @@ def add_new_po(request):
             {"po_number":'NEW' , 'po_contact_form': po_contact_form, 'currencies': currencies,
             'delivery_choices': delivery_choices, 'terms': terms, 'next_po_number':next_po_number,
             'deliver_internals': deliver_internals, 'users': users, 'item_unit_measures':item_unit_measures,
-            'adminusers': adminusers})
+            'adminusers': adminusers, 'sv': sv})
 
 
 @csrf_exempt

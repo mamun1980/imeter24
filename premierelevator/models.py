@@ -16,6 +16,10 @@ class SystemVariable(models.Model):
 	email_server_ip_address = models.IntegerField(null=True, blank=False)
 	email_auth_username = models.CharField(max_length=20, null=True, blank=False)
 	email_auth_password = models.CharField(max_length=20, null=True, blank=False)
+	
+	default_hst_tax_amount = models.CharField(max_length=20, null=True, blank=False)
+	default_pst_tax_amount = models.CharField(max_length=20, null=True, blank=False)
+	
 	default_printer_for_po = models.ForeignKey(Printer,null=True, blank=True, related_name="default_printer_for_po")
 	default_printer_for_sl = models.ForeignKey(Printer,null=True, blank=True, related_name="default_printer_for_sl")
 	default_printer_for_pl = models.ForeignKey(Printer,null=True, blank=True, related_name="default_printer_for_pl")
