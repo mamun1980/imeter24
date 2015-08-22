@@ -232,7 +232,6 @@ def item_details_filtered(request):
 
 
 def list_item(request):
-    # import pdb; pdb.set_trace();
     user = request.user
     items = Item.objects.all() #. 'production_type', 'search_string')
     inventory_dict_list = []
@@ -241,7 +240,10 @@ def list_item(request):
         item_dict['item_number'] = item.item_number
         item_dict['label'] = item.item_number
         item_dict['description'] = item.description
-        item_dict['order_restriction'] = float(item.order_restriction)
+        if item.order_restriction:
+            item_dict['order_restriction'] = float(item.order_restriction)
+        else:
+            item_dict['order_restriction'] = -1
         if item.qty_received:
             item_dict['qty_received'] = float(item.qty_received)
         else:

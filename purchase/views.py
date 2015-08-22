@@ -1082,6 +1082,16 @@ def get_po_by_id(request,pk):
             item['job_number'] = None
             item['job_number_id'] = None
 
+        if po_item.custom_comment != '':
+            item['custom_comment'] = po_item.custom_comment
+        else:
+            item['custom_comment'] = ''
+
+        if po_item.custom_detail != '':
+            item['custom_detail'] = po_item.custom_detail
+        else:
+            item['custom_detail'] = ''
+
 
         po_items.append(item)
 

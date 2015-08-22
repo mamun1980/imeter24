@@ -445,7 +445,7 @@
 		<option value="1">YES</option>
 		</select>
 		
-		<input class="form-control decimal tax" ng-if="hst_tax" ng-model="hst_tax_amount" ng-blur="addHstAmount($event)" id="id_hst_taxable_amount" name="hst_taxable_amount" type="text">
+		<input class="form-control decimal tax" ng-if="hst_tax" ng-model="hst_tax_amount" ng-change="addHstAmount(hst_tax_amount)" id="id_hst_taxable_amount" name="hst_taxable_amount" type="text">
 		<input type="hidden" id="hst_default_amount" value="{{ sv.default_hst_tax_amount}}">
 	</td>
 	<th width="150">
@@ -456,7 +456,7 @@
 		<option value="0">NO</option>
 		<option value="1">YES</option>
 		</select>
-		<input class="form-control decimal tax" ng-if="pst_tax" ng-model="pst_tax_amount" id="id_pst_taxable_amount" name="pst_taxable_amount" ng-blur="addPstAmount($event)" placeholder="PST Taxable Amount" value="0.0" type="text">
+		<input class="form-control decimal tax" ng-if="pst_tax" ng-model="pst_tax_amount" id="id_pst_taxable_amount" name="pst_taxable_amount" ng-change="addPstAmount(pst_tax_amount)" placeholder="PST Taxable Amount" value="0.0" type="text">
 		<input type="hidden" id="pst_default_amount" value="{{ sv.default_pst_tax_amount}}">
 	</td>
 </tr>
