@@ -123,17 +123,16 @@
 				<td colspan="2">{[{ sold_to.contact_name }]}</td>
 			</tr>
 			<tr>
-				<th>City</th>
-				<td colspan="2">{[{ sold_to.city }]}</td>
+				<th>Address</th>
+				<td class="address_1">
+					<p>{[{sold_to.address_1}]}</p>
+					<p>City / Province: {[{sold_to.city}]}<span ng-show="{[{sold_to.province}]}">, {[{sold_to.province}]}</span></p>
+					<p>Post code: {[{ sold_to.postal_code }]}<span ng-show="{[{sold_to.country}]}"> , country: {[{sold_to.country}]}</span></p>
+					
+					
+				</td>
 			</tr>
-			<tr>
-				<th>Province</th>
-				<td colspan="2">{[{ sold_to.province }]}</td>
-			</tr>
-			<tr>
-				<th>Country</th>
-				<td colspan="2">{[{ sold_to.country }]}</td>
-			</tr>
+			
 			<tr>
 				<th>Emails</th>
 				<td colspan="2"><span class='bg-info email' ng-repeat="em in sold_to.emails">{[{ em.email_address}]}</span></td>
@@ -152,18 +151,19 @@
 		<table class="table sold_to_contact" id="sold_to_contact_list" ng-show="show_sold_to_contact_list">
 			<thead>
 				<tr>
-					<th>Contact Name</th><th>Address 1</th><th> Country </th>
-					<th> Province </th><th> City </th><th> Primary Cont No. <a href="" class="close" ng-click="closeMe('show_sold_to_contact_list')">x</a></th>
+					<th>Contact Name</th><th>Address 1</th><th> Primary Cont No. <a href="" class="close" ng-click="closeMe('show_sold_to_contact_list')">x</a></th>
 					
 				</tr>
 			</thead>
 			<tbody>
 				<tr ng-repeat="con in soldto" ng-click="setSoldto(con)">
 					<td>{[{con.contact_name}]}</td>
-					<td>{[{con.address_1}]}</td>
-					<td class="city">{[{con.country}]}</td>
-					<td class="city">{[{con.province}]}</td>
-					<td class="city">{[{con.city}]}</td>
+					<td>
+						<p>{[{con.address_1}]}</p>
+						<p>City / Province: {[{con.city}]}<span ng-show="{[{contact.province}]}">, {[{con.province}]}</span></p>
+						<p>Post code: {[{ con.postal_code }]}<span ng-show="{[{con.country}]}"> , country: {[{con.country}]}</span></p>
+					</td>
+					
 					<td class="city">
 						<div class='phone' ng-repeat="phon in con.phones" ng-if="$first">
 							<span>{[{phon.number}]} (ext: {[{phon.phone_ext}]})</span>
@@ -201,6 +201,16 @@
 				<td>{[{ ship_to.contact_name }]}</td>
 			</tr>
 			<tr>
+				<th>Address </th>
+				<td class="address_1">
+					<p>{[{ship_to.address_1}]}</p>
+					<p>City / Province: {[{ship_to.city}]}<span ng-show="{[{ship_to.province}]}">, {[{ship_to.province}]}</span></p>
+					<p>Post code: {[{ ship_to.postal_code }]}<span ng-show="{[{ship_to.country}]}"> , country: {[{ship_to.country}]}</span></p>
+					
+					
+				</td>
+			</tr>
+			<tr>
 				<th>Phone</th>
 				<td>{[{ ship_to.phone }]}</td>
 			</tr>
@@ -213,8 +223,8 @@
 			<thead>
 				<tr>
 					<th>Contact Name</th>
-					<th>Country</th>
-					<th> City </th>
+					<th>Address</th>
+					
 					<th> Cont No. <a href="" class="close">x</a></th>
 				</tr>
 			</thead>
@@ -222,8 +232,11 @@
 				<tr ng-repeat="con in shipto" ng-click="selectShipTo(con)">
 					
 					<td>{[{con.contact_name}]}</td>
-					<td>{[{con.country}]}</td>
-					<td>{[{con.city}]}</td>
+					<td>
+						<p>{[{con.address_1}]}</p>
+						<p>City / Province: {[{con.city}]}<span ng-show="{[{contact.province}]}">, {[{con.province}]}</span></p>
+						<p>Post code: {[{ con.postal_code }]}<span ng-show="{[{con.country}]}"> , country: {[{con.country}]}</span></p>
+					</td>
 					<td>
 						<div class='phone' ng-repeat="phon in con.phones" ng-if="$first">
 							<span>{[{phon.number}]}</span>
@@ -252,17 +265,16 @@
 				<td colspan="2">{[{ broker.contact_name }]}</td>
 			</tr>
 			<tr>
-				<th>City</th>
-				<td colspan="2">{[{ broker.city }]}</td>
+				<th>Address </th>
+				<td class="address_1">
+					<p>{[{broker.address_1}]}</p>
+					<p>City / Province: {[{broker.city}]}<span ng-show="{[{broker.province}]}">, {[{broker.province}]}</span></p>
+					<p>Post code: {[{ broker.postal_code }]}<span ng-show="{[{broker.country}]}"> , country: {[{broker.country}]}</span></p>
+					
+					
+				</td>
 			</tr>
-			<tr>
-				<th>Province</th>
-				<td colspan="2">{[{ broker.province }]}</td>
-			</tr>
-			<tr>
-				<th>Country</th>
-				<td colspan="2">{[{ broker.country }]}</td>
-			</tr>
+			
 			<tr>
 				<th>Emails</th>
 				<td colspan="2"><span class='bg-info email' ng-repeat="em in broker.emails">{[{ em.email_address}]}</span></td>
@@ -274,16 +286,19 @@
 			<thead>
 				<tr>
 					<th>Contact Name</th>
-					<th>Country</th>
-					<th> City </th>
+					<th>Address</th>
+					
 					<th> Cont No. <a href="" class="close">x</a></th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr ng-repeat="con in customer_brokers" ng-click="setBroker(con)">
 					<td>{[{con.contact_name}]}</td>
-					<td>{[{con.country}]}</td>
-					<td>{[{con.city}]}</td>
+					<td>
+						<p>{[{con.address_1}]}</p>
+						<p>City / Province: {[{con.city}]}<span ng-show="{[{contact.province}]}">, {[{con.province}]}</span></p>
+						<p>Post code: {[{ con.postal_code }]}<span ng-show="{[{con.country}]}"> , country: {[{con.country}]}</span></p>
+					</td>
 					<td>
 						<div class='phone' ng-repeat="phon in con.phones" ng-if="$first">
 							<span>{[{phon.number}]}</span>

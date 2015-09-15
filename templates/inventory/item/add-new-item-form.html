@@ -92,12 +92,14 @@
 				</tr>
 				<tr class="bg-info">
 					<th><b>ADDRESS</b> :</th>
-					<td>{[{supplier.address_1}]}</td>
+					<td>
+					<p>{[{supplier.address_1}]}</p>
+					<p><b>city / province</b>: {[{supplier.city}]}<span ng-show="{[{supplier.province}]}">, {[{supplier.province}]}</span></p>
+					<p><b>Post code</b>: {[{ supplier.postal_code }]}</p>
+					<p><b>country</b>: {[{supplier.country}]}</p>
+					</td>
 				</tr>
-				<tr class="bg-success">
-					<th><b>CITY</b> :</th>
-					<td>{[{supplier.city}]}</td>
-				</tr>
+				
 
 				<tr class="bg-info">
 					<td><b>CONTACT NUMBER</b> :</td>
@@ -114,20 +116,22 @@
 			<table class="table selectable" class="ui-autocomplete ui-widget-content-custom ui-corner-all">
 				<thead>
 					<tr>
-						<th>ID</th><th>Contact Name</th><th>Address 1</th><th> Country </th>
-						<th> Province </th><th> City </th><th> Primary Cont No.</th>
+						<th>Contact Name</th><th>Address</th><th> Primary Cont No.</th>
 						<th><a href="" class="close">x</a></th>
 					</tr>
 				</thead>
 				<tbody>
 				<tr class="ui-menu-item" ng-repeat="contact in suppliers" ng-click="selectPriSupplier(contact)">
 					
-					<td class="sid">{[{contact.id}]}</td>
+					
 					<td class="contact_name">{[{contact.contact_name}]}</td>
-					<td class="address_1">{[{contact.address_1}]}</td>
-					<td class="city">{[{contact.country}]}</td>
-					<td class="city">{[{contact.province}]}</td>
-					<td class="city">{[{contact.city}]}</td>
+					<td class="address_1">
+					<p>{[{contact.address_1}]}</p>
+					<p>City / Province: {[{contact.city}]}<span ng-show="{[{contact.province}]}">, {[{contact.province}]}</span></p>
+					<p>Post code: {[{ contact.postal_code }]}<span ng-show="{[{contact.country}]}"> , country: {[{contact.country}]}</span></p>
+					
+					
+					</td>
 					<td class="city">
 						<div class='phone' ng-repeat="phon in contact.phones" ng-if="$first">
 							<span>{[{phon.number}]} (ext: {[{phon.phone_ext}]})</span>

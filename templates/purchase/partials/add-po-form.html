@@ -81,17 +81,15 @@
 				<td colspan="2">{[{ supplier_contact.contact_name }]}</td>
 			</tr>
 			<tr>
-				<th>City</th>
-				<td colspan="2">{[{ supplier_contact.city }]}</td>
+				<th>Address</th>
+				<td colspan="2">
+					<p>{[{supplier_contact.address_1}]}</p>
+					<p><b>city / province</b>: {[{supplier_contact.city}]}<span ng-show="{[{supplier_contact.province}]}">, {[{supplier_contact.province}]}</span></p>
+					<p><b>Post code</b>: {[{ supplier_contact.postal_code }]}</p>
+					<p><b>country</b>: {[{supplier_contact.country}]}</p>
+				</td>
 			</tr>
-			<tr>
-				<th>Province</th>
-				<td colspan="2">{[{ supplier_contact.province }]}</td>
-			</tr>
-			<tr>
-				<th>Country</th>
-				<td colspan="2">{[{ supplier_contact.country }]}</td>
-			</tr>
+			
 			<tr>
 				<th>Emails</th>
 				<td colspan="2">
@@ -117,20 +115,21 @@
 		<table class="table selectable" class="ui-autocomplete ui-widget-content-custom ui-corner-all" id="supplier_contact_list">
 			<thead>
 				<tr>
-					<th>ID</th><th>Contact Name</th><th>Address 1</th><th> Country </th>
-					<th> Province </th><th> City </th><th> Primary Cont No.</th>
+					<th>Contact Name</th><th>Address 1</th><th> Primary Cont No.</th>
 					<th><a href="" class="close" ng-click="hideSupplierContact()">x</a></th>
 				</tr>
 			</thead>
 			<tbody>
 			<tr class="ui-menu-item" ng-repeat="contact in suppliers" ng-click="setSupplier(contact)">
 				
-				<td class="sid">{[{contact.id}]}</td>
+				
 				<td class="contact_name">{[{contact.contact_name}]}</td>
-				<td class="address_1">{[{contact.address_1}]}</td>
-				<td class="city">{[{contact.country}]}</td>
-				<td class="city">{[{contact.province}]}</td>
-				<td class="city">{[{contact.city}]}</td>
+				<td class="address_1">
+					<p>{[{contact.address_1}]}</p>
+					<p>City / Province: {[{contact.city}]}<span ng-show="{[{contact.province}]}">, {[{contact.province}]}</span></p>
+					<p>Post code: {[{ contact.postal_code }]}<span ng-show="{[{contact.country}]}"> , country: {[{contact.country}]}</span></p>
+				</td>
+				
 				<td class="city">
 					<div class='phone' ng-repeat="phon in contact.phones" ng-if="$first">
 						<span>{[{phon.number}]} (ext: {[{phon.phone_ext}]})</span>
@@ -166,6 +165,15 @@
 				<td>{[{ ship_to_contact.contact_name }]}</td>
 			</tr>
 			<tr>
+				<th>Address</th>
+				<td colspan="2">
+					<p>{[{ship_to_contact.address_1}]}</p>
+					<p><b>city / province</b>: {[{ship_to_contact.city}]}<span ng-show="{[{ship_to_contact.province}]}">, {[{ship_to_contact.province}]}</span></p>
+					<p><b>Post code</b>: {[{ ship_to_contact.postal_code }]}</p>
+					<p><b>country</b>: {[{ship_to_contact.country}]}</p>
+				</td>
+			</tr>
+			<tr>
 				<th>Phone</th>
 				<td>
 					<li ng-repeat='phone in ship_to_contact.phones'>
@@ -185,20 +193,20 @@
 		<table class="table selectable" class="ui-autocomplete ui-widget-content-custom ui-corner-all" id="ship_to_contact_list">
 			<thead>
 				<tr>
-					<th>ID</th><th>Contact Name</th><th>Address 1</th><th> Country </th>
-					<th> Province </th><th> City </th><th> Primary Cont No.</th>
+					<th>Contact Name</th><th>Address 1</th><th> Primary Cont No.</th>
 					<th><a href="" class="close" ng-click="hideShiptoContact()">x</a></th>
 				</tr>
 			</thead>
 			<tbody>
 			<tr class="ui-menu-item" ng-repeat="contact in shipto" ng-click="selectShipTo(contact)">
 				
-				<td class="sid">{[{contact.id}]}</td>
+				
 				<td class="contact_name">{[{contact.contact_name}]}</td>
-				<td class="address_1">{[{contact.address_1}]}</td>
-				<td class="city">{[{contact.country}]}</td>
-				<td class="city">{[{contact.province}]}</td>
-				<td class="city">{[{contact.city}]}</td>
+				<td class="address_1">
+					<p>{[{contact.address_1}]}</p>
+					<p>City / Province: {[{contact.city}]}<span ng-show="{[{contact.province}]}">, {[{contact.province}]}</span></p>
+					<p>Post code: {[{ contact.postal_code }]}<span ng-show="{[{contact.country}]}"> , country: {[{contact.country}]}</span></p>
+				</td>
 				<td class="city">
 					<div class='phone' ng-repeat="phon in contact.phones" ng-if="$first">
 						<span>{[{phon.number}]} (ext: {[{phon.phone_ext}]})</span>
