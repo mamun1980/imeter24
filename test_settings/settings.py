@@ -110,7 +110,7 @@ WSGI_APPLICATION = '%sdjango.wsgi' %PROJECT_BASE_DIR
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'premier',                      # Or path to database file if using sqlite3.
+        'NAME': 'premier_test',                      # Or path to database file if using sqlite3.
         'USER': 'scom_test',                      # Not used with sqlite3.
         'PASSWORD': 'Testxxyy',                  # Not used with sqlite3.
         'HOST': '10.221.0.41',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -353,7 +353,13 @@ HAYSTACK_DEFAULT_OPERATOR = 'AND'
 ELASTICSEARCH_DEFAULT_ANALYZER = "whitespace"
 HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 
+
 HAYSTACK_ROUTERS = ['inventory.routers.MasterRouter', 
-                'schedule.routers.MasterRouter', 
-                'purchase.routers.PORouter','purchase.routers.SLRouter','purchase.routers.PLRouter',
-                'scomuser.routers.UserRouter','events.routers.EventsRouter','haystack.routers.DefaultRouter',]
+                'schedule.routers.JobRouter', 
+                'schedule.routers.JobControlRouter',
+                'purchase.routers.PORouter',
+                'purchase.routers.SLRouter',
+                'purchase.routers.PLRouter',
+                'scomuser.routers.UserRouter', 
+                'events.routers.EventsRouter', 
+                'haystack.routers.DefaultRouter',]

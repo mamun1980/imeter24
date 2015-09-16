@@ -113,7 +113,7 @@ DATABASES = {
         'NAME': 'premier',                      # Or path to database file if using sqlite3.
         'USER': 'pgsql',                      # Not used with sqlite3.
         'PASSWORD': 'Scom411400',                  # Not used with sqlite3.
-        'HOST': '10.221.0.41',                      # Set to empty string for localhost. Not used with sqlite3.
+        'HOST': 'django.scom.ca',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '5442',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
@@ -347,7 +347,14 @@ HAYSTACK_DEFAULT_OPERATOR = 'AND'
 ELASTICSEARCH_DEFAULT_ANALYZER = "whitespace"
 HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 
+
+
 HAYSTACK_ROUTERS = ['inventory.routers.MasterRouter', 
-                'schedule.routers.MasterRouter', 
-                'purchase.routers.PORouter','purchase.routers.SLRouter','purchase.routers.PLRouter',
-                'scomuser.routers.UserRouter','events.routers.EventsRouter','haystack.routers.DefaultRouter',]
+                'schedule.routers.JobRouter', 
+                'schedule.routers.JobControlRouter',
+                'purchase.routers.PORouter',
+                'purchase.routers.SLRouter',
+                'purchase.routers.PLRouter',
+                'scomuser.routers.UserRouter', 
+                'events.routers.EventsRouter', 
+                'haystack.routers.DefaultRouter',]

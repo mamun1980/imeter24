@@ -74,7 +74,7 @@ WSGI_APPLICATION = 'premierelevator.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'premier_live',                      # Or path to database file if using sqlite3.
+        'NAME': 'premier_test',                      # Or path to database file if using sqlite3.
         'USER': 'postgres',                      # Not used with sqlite3.
         'PASSWORD': 'qweqwe',                  # Not used with sqlite3.
         'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -312,6 +312,11 @@ HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 #                     'haystack.routers.DefaultRouter']
 
 HAYSTACK_ROUTERS = ['inventory.routers.MasterRouter', 
-                'schedule.routers.MasterRouter', 
-                'purchase.routers.PORouter','purchase.routers.SLRouter','purchase.routers.PLRouter',
-                'scomuser.routers.UserRouter', 'events.routers.EventsRouter', 'haystack.routers.DefaultRouter',]
+                'schedule.routers.JobRouter', 
+                'schedule.routers.JobControlRouter',
+                'purchase.routers.PORouter',
+                'purchase.routers.SLRouter',
+                'purchase.routers.PLRouter',
+                'scomuser.routers.UserRouter', 
+                'events.routers.EventsRouter', 
+                'haystack.routers.DefaultRouter',]
