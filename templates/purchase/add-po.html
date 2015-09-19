@@ -277,14 +277,21 @@ $(document).on("change", "input[name='item_cost']", function(e){
 	$("#calculated_total_amount span.amount").text(item_total.toFixed(4));
 	var hst_tax = $("#id_hst_taxable").val();
 	var pst_tax = $("#id_pst_taxable").val();
+	
 	if(hst_tax == '1'){
 		var hst_tax_amount = parseFloat($("#id_hst_taxable_amount").val())
-		item_total += hst_tax_amount;
+		hst_tax_total = (item_total * hst_tax_amount)/100;
+	} else {
+		hst_tax_total = 0;
 	}
 	if(pst_tax == '1'){
 		var pst_tax_amount = parseFloat($("#id_pst_taxable_amount").val())
-		item_total += pst_tax_amount;
+		pst_tax_total = (item_total * pst_tax_amount)/100;
+	} else {
+		pst_tax_total = 0;
 	}
+
+	item_total = item_total + pst_tax_total + hst_tax_total;
 
 	$("#id_total_po_amount").val(item_total.toFixed(4));
 	item_total = 0;
@@ -302,14 +309,21 @@ $(document).on("change", "input[name='item_sub_total']",function(e){
 
 	var hst_tax = $("#id_hst_taxable").val();
 	var pst_tax = $("#id_pst_taxable").val();
+	
 	if(hst_tax == '1'){
 		var hst_tax_amount = parseFloat($("#id_hst_taxable_amount").val())
-		item_total += hst_tax_amount;
+		hst_tax_total = (item_total * hst_tax_amount)/100;
+	} else {
+		hst_tax_total = 0;
 	}
 	if(pst_tax == '1'){
 		var pst_tax_amount = parseFloat($("#id_pst_taxable_amount").val())
-		item_total += pst_tax_amount;
+		pst_tax_total = (item_total * pst_tax_amount)/100;
+	} else {
+		pst_tax_total = 0;
 	}
+
+	item_total = item_total + pst_tax_total + hst_tax_total;
 
 	$("#id_total_po_amount").val(item_total.toFixed(4));
 
@@ -334,17 +348,24 @@ $(document).on("change", "input[name='item_qty']", function(e){
 	});
 	
 	$("#calculated_total_amount span.amount").text(item_total.toFixed(4));
+	
 	var hst_tax = $("#id_hst_taxable").val();
 	var pst_tax = $("#id_pst_taxable").val();
-	console.log("hst tax "+ hst_tax);
+	
 	if(hst_tax == '1'){
 		var hst_tax_amount = parseFloat($("#id_hst_taxable_amount").val())
-		item_total += hst_tax_amount;
+		hst_tax_total = (item_total * hst_tax_amount)/100;
+	} else {
+		hst_tax_total = 0;
 	}
 	if(pst_tax == '1'){
 		var pst_tax_amount = parseFloat($("#id_pst_taxable_amount").val())
-		item_total += pst_tax_amount;
+		pst_tax_total = (item_total * pst_tax_amount)/100;
+	} else {
+		pst_tax_total = 0;
 	}
+
+	item_total = item_total + pst_tax_total + hst_tax_total;
 
 	$("#id_total_po_amount").val(item_total.toFixed(4));
 	
@@ -754,6 +775,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
     $scope.selectItem = function(item) {
     	console.log(item);
     	$scope.add_item_seq_no++;
+    	console.log(" Item seq no: "+$scope.add_item_seq_no);
     	$scope.search_item = '';
     	$scope.mixed_currency = false;
     	$("#items_list").hide();
@@ -829,8 +851,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 	    		return;
 	    	}
 			
-    	} 
-
+    	}
     	
     	var str = "<tr class='add_item'>";
     	str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+item_number+"' readonly><input type='hidden' name='po_item_seq' value='"+$scope.add_item_seq_no+"'></td>";
@@ -841,7 +862,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
     	str += "</select></td>";
 
     	str += "<td><input type='currency' class='form-control' step='0.0001' name='item_cost' value='"+wholesale_cost+"'></td>";
-    	str += "<td><input type='number' class='form-control' step='0.01' name='item_qty' value='0' ng-model='item_qty"+item_number+"' max='"+order_constrain+"' required></td>";
+    	str += "<td><input type='number' class='form-control' step='0.01' name='item_qty' value='0' ng-model='item_qty_"+item_number.replace("-","_")+"' max='"+order_constrain+"' required></td>";
     	str += "<td><input type='currency' step='0.0001' name='item_sub_total' class='form-control' value='0.0' readonly></td>";
     	str += "<td><input type='text' class='form-control item-job-number' name='item_job_number' placeholder='Start typing to search job'><input type='hidden' name='item_job_id' class='item_job_id'></td>";
     	str += "<td><textarea rows='1' class='form-control' name='item_comment' placeholder='Put your comments here'></textarea></td>";
@@ -863,6 +884,18 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
     	// }
     	$("tbody#add_item_list").prepend(element);
 
+    	if ($scope.add_item_seq_no == 1) {
+    		if(item.hst_taxable) {
+    			$scope.hst_tax = 1;
+    			$scope.updateHST($scope.hst_tax);
+    		}
+
+    		if(item.pst_taxable) {
+    			$scope.pst_tax = 1;
+    			$scope.updatePST($scope.pst_tax);
+    		}
+    	}
+
 		$( "input[name='item_job_number']" ).autocomplete({
 	      source: "/schedule/list-filter/",
 	      _renderItem: function( ul, item ) {
@@ -879,7 +912,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 			}
 	    });
 
-
+		
         $scope.item_added = true;
         
     }
@@ -967,11 +1000,29 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 			item_total = item_total + parseFloat(subtotal);
 		});
 
-		if($scope.pst_tax) {
-			item_total += eval(pst_tax_amount);
-		}
 
-		$scope.total_amount = eval(item_total) + eval($scope.hst_tax_amount);
+
+		if($scope.pst_tax) {
+    		var pst_tax_amount = $scope.pst_tax_amount;
+    		var pst_tax_total = (item_total *  eval(pst_tax_amount))/100;
+    	} else {
+    		var pst_tax_total = 0;
+    	}
+
+    	console.log("pst tax amount:"+ pst_tax_amount);
+
+    	if($scope.hst_tax) {
+    		var hst_tax_amount = $scope.hst_tax_amount;
+    		var hst_tax_total = (item_total *  eval(hst_tax_amount))/100;
+    	} else {
+    		// var pst_tax_amount = $scope.pst_tax_amount;
+    		var hst_tax_total = 0;
+    	}
+
+    	console.log("hst tax amount:"+ hst_tax_amount);
+
+    	$scope.total_amount = item_total + hst_tax_total + pst_tax_total;
+
 		$scope.total_amount = $scope.total_amount.toFixed(4);
 
     };
@@ -988,11 +1039,26 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 		});
 
 		if($scope.hst_tax) {
-			item_total += eval(hst_tax_amount);
-		}
+    		var hst_tax_amount = $scope.hst_tax_amount;
+    		var hst_tax_total = (item_total *  eval(hst_tax_amount))/100;
+    	} else {
+    		var hst_tax_total = 0;
+    	}
 
-		$scope.total_amount = eval(item_total) + eval($scope.pst_tax_amount);
-		$scope.total_amount = $scope.total_amount.toFixed(4);
+    	console.log("hst tax amount:"+ hst_tax_amount);
+
+    	if($scope.pst_tax) {
+    		var pst_tax_amount = $scope.pst_tax_amount;
+    		var pst_tax_total = (item_total *  eval(pst_tax_amount))/100;
+    	} else {
+    		// var pst_tax_amount = $scope.pst_tax_amount;
+    		var pst_tax_total = 0;
+    	}
+
+    	console.log("pst tax amount:"+ pst_tax_amount);
+
+    	$scope.total_amount = item_total + hst_tax_total + pst_tax_total;
+    	$scope.total_amount = $scope.total_amount.toFixed(4);		
 
     };
 
@@ -1003,40 +1069,62 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 			var subtotal = $(this).val();
 			item_total = item_total + parseFloat(subtotal);
 		});
+		
 		if($scope.hst_tax) {
     		var hst_tax_amount = $scope.hst_tax_amount;
-    		item_total += eval(hst_tax_amount);
+    		var hst_tax_total = (item_total *  eval(hst_tax_amount))/100;
+    	} else {
+    		var hst_tax_total = 0;
     	}
+
+    	console.log("hst tax amount:"+ hst_tax_amount);
 
     	if(pst==1) {
     		var pst_tax_amount = $scope.pst_tax_amount;
-    		$scope.total_amount = eval(item_total) + eval(pst_tax_amount);
+    		var pst_tax_total = (item_total *  eval(pst_tax_amount))/100;
     	} else {
     		// var pst_tax_amount = $scope.pst_tax_amount;
-    		$scope.total_amount = eval(item_total);
+    		var pst_tax_total = 0;
     	}
-    	$scope.total_amount = $scope.total_amount.toFixed(4);
+
+    	console.log("pst tax amount:"+ pst_tax_amount);
+
+    	$scope.total_amount = item_total + hst_tax_total + pst_tax_total;
+
     	
     }
 
     $scope.updateHST = function(hst) {
+    	console.log('running update hst...');
     	var item_total = 0;
 		$("tbody#add_item_list tr input[name='item_sub_total']").each(function(index){
 			var subtotal = $(this).val();
 			item_total = item_total + parseFloat(subtotal);
 		});
+
+		console.log("item total:"+ item_total);
+		
 		if($scope.pst_tax) {
     		var pst_tax_amount = $scope.pst_tax_amount;
-    		item_total += eval(pst_tax_amount);
+    		var pst_tax_total = (item_total *  eval(pst_tax_amount))/100;
+    	} else {
+    		var pst_tax_total = 0;
     	}
-    	if(hst==0) {
+
+    	console.log("pst tax amount:"+ pst_tax_amount);
+
+    	if(hst==1) {
     		var hst_tax_amount = $scope.hst_tax_amount;
-    		$scope.total_amount = eval(item_total) + eval(hst_tax_amount);
+    		var hst_tax_total = (item_total *  eval(hst_tax_amount))/100;
     	} else {
     		// var pst_tax_amount = $scope.pst_tax_amount;
-    		$scope.total_amount = eval(item_total);
+    		var hst_tax_total = 0;
     	}
-    	$scope.total_amount = $scope.total_amount.toFixed(4);
+
+    	console.log("hst tax amount:"+ hst_tax_amount);
+
+    	$scope.total_amount = item_total + hst_tax_total + pst_tax_total;
+
     }
 
 	

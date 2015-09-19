@@ -448,7 +448,7 @@
 		<label for="id_hst_taxable">Hst taxable:</label>
 	</th>
 	<td>
-		<select class="form-control tax" ng-model="hst_tax" id="id_hst_taxable" name="hst_taxable" ng-change="updateHST({[{hst_tax}]})">
+		<select class="form-control tax" ng-model="hst_tax" id="id_hst_taxable" name="hst_taxable" ng-change="updateHST(hst_tax)">
 		<option value="0">NO</option>
 		<option value="1">YES</option>
 		</select>

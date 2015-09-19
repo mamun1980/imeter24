@@ -110,6 +110,21 @@ def add_new_item(request):
         if item_form.is_valid():
             try:
                 item = item_form.save()
+                # import pdb; pdb.set_trace();
+                hst_taxable = request.POST.get("hst_taxable")
+                pst_taxable = request.POST.get("pst_taxable")
+
+                if not hst_taxable:
+                    item.hst_taxable = False
+                else:
+                    item.hst_taxable = True
+
+                if not pst_taxable:
+                    item.pst_taxable = False
+                else:
+                    item.pst_taxable = True
+
+                item.save()
                                 
                 return HttpResponseRedirect("/inventory/list/")
             except Exception, e:
@@ -158,7 +173,19 @@ def edit_item(request, itemid):
     if request.method == 'POST':
         item_form = ItemForm(request.POST,request.FILES, instance=item)
         if item_form.is_valid():
-            item_form.save()
+            item = item_form.save()
+            hst_taxable = request.POST.get("hst_taxable")
+            pst_taxable = request.POST.get("pst_taxable")
+
+            if not hst_taxable:
+                item.hst_taxable = False
+            else:
+                item.hst_taxable = True
+
+            if not pst_taxable:
+                item.pst_taxable = False
+            else:
+                item.pst_taxable = True
             item.save()
             return HttpResponseRedirect("/inventory/list/")
     else:
@@ -613,6 +640,8 @@ def search_item(request):
         item_dict['item_unit_measure'] = item.item_unit_measure
         item_dict['item_unit_measure_id'] = item.item_unit_measure_id
         item_dict['warehouse_location'] = item.warehouse_location
+        item_dict['hst_taxable'] = item.hst_taxable
+        item_dict['pst_taxable'] = item.pst_taxable
 
 
         item_list.append(item_dict)

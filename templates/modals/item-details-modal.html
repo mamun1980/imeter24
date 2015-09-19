@@ -16,12 +16,6 @@
 
 		<textarea class="form-control custom_details" name="custom_details"></textarea>
 	</div>
-	
-	<div>
-		<b>Comments</b>
-
-		<textarea class="form-control custom_comment" name="custom_comment"></textarea>
-	</div>
     		
 </div>
 <div class="modal-footer">
@@ -42,14 +36,11 @@
 
         var tr = $("tbody#add_item_list").find("a[data-seq='"+item_seq_no+"']").closest("tr");
         var newrow = "<tr class='bg-warning'>";
-        newrow += "<td colspan='1'><b>Customisation details</b></td>";
-        newrow += "<td colspan='5'><textarea class='form-control' name='custom_detail_"+item_seq_no+"'>";
+        newrow += "<td colspan='2'><b>Customisation details</b></td>";
+        newrow += "<td colspan='8'><textarea class='form-control' name='custom_detail_"+item_seq_no+"'>";
         newrow += custom_detail;
         newrow += "</textarea></td>";
-        newrow += "<td colspan='1'><b>Comment</b></td>";
-        newrow += "<td colspan='4'><textarea class='form-control' name='custom_comment_"+item_seq_no+"'>";
-        newrow += custom_comment;
-        newrow += "</textarea></td>";
+        
         newrow += "</tr>";
 
         tr.after(newrow);

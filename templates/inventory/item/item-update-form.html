@@ -369,6 +369,22 @@
 </div>
 <div class="row">
 	<div class="col-md-5  ">
+		<label for="id_terms">HST Taxable:</label>
+	</div>
+	<div class="col-md-7  ">
+	    <input type="checkbox" {% if item.hst_taxable %} checked {% endif %} data-toggle="toggle" data-on="Yes" data-off="No" name="hst_taxable" style="margin-left: 10px; margin-right: 20px;">
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-5  ">
+		<label for="id_terms">PST Taxable:</label>
+	</div>
+	<div class="col-md-7  ">
+	    <input type="checkbox" {% if item.pst_taxable %} checked {% endif %} data-toggle="toggle" data-on="Yes" data-off="No" name="pst_taxable" style="margin-left: 10px; margin-right: 20px;">
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-5  ">
 		<label for="id_terms">Terms:</label>
 	</div>
 	<div class="col-md-7  ">

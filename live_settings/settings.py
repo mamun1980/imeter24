@@ -215,7 +215,7 @@ HAYSTACK_CONNECTIONS = {
         # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
         'ENGINE': 'premierelevator.search_backend.ConfigurableElasticSearchEngine',
         # 'ENGINE': 'elasticstack.backends.ConfigurableElasticSearchEngine',
-        'URL': 'http://10.221.0.42:9200/',
+        'URL': 'http://10.221.0.42:9201/',
         'INDEX_NAME': 'contact',
         "INDEX": "not_analyzed",
         'EXCLUDED_INDEXES': ['inventory.search_indexes.ItemIndex', 
@@ -230,7 +230,7 @@ HAYSTACK_CONNECTIONS = {
     'inventory': {
         # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
         'ENGINE': 'premierelevator.search_backend.ConfigurableElasticSearchEngine',
-        'URL': 'http://10.221.0.42:9200/',
+        'URL': 'http://10.221.0.42:9201/',
         'INDEX_NAME': 'inventory',
         "INDEX": "not_analyzed",
         'EXCLUDED_INDEXES': ['contacts.search_indexes.ContactIndex', 
@@ -245,7 +245,7 @@ HAYSTACK_CONNECTIONS = {
     'job': {
         # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
         'ENGINE': 'premierelevator.search_backend.ConfigurableElasticSearchEngine',
-        'URL': 'http://10.221.0.42:9200/',
+        'URL': 'http://10.221.0.42:9201/',
         'INDEX_NAME': 'job',
         'EXCLUDED_INDEXES': ['contacts.search_indexes.ContactIndex', 
                             'inventory.search_indexes.ItemIndex',
@@ -259,7 +259,7 @@ HAYSTACK_CONNECTIONS = {
     'jobcontrol': {
         # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
         'ENGINE': 'premierelevator.search_backend.ConfigurableElasticSearchEngine',
-        'URL': 'http://10.221.0.42:9200/',
+        'URL': 'http://10.221.0.42:9201/',
         'INDEX_NAME': 'jobcontrol',
         'EXCLUDED_INDEXES': ['contacts.search_indexes.ContactIndex', 
                             'inventory.search_indexes.ItemIndex',
@@ -273,7 +273,7 @@ HAYSTACK_CONNECTIONS = {
     'po': {
         # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
         'ENGINE': 'premierelevator.search_backend.ConfigurableElasticSearchEngine',
-        'URL': 'http://10.221.0.42:9200/',
+        'URL': 'http://10.221.0.42:9201/',
         'INDEX_NAME': 'po',
         'EXCLUDED_INDEXES': ['contacts.search_indexes.ContactIndex', 
                             'inventory.search_indexes.ItemIndex',
@@ -287,7 +287,7 @@ HAYSTACK_CONNECTIONS = {
     'pl': {
         # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
         'ENGINE': 'premierelevator.search_backend.ConfigurableElasticSearchEngine',
-        'URL': 'http://10.221.0.42:9200/',
+        'URL': 'http://10.221.0.42:9201/',
         'INDEX_NAME': 'pl',
         'EXCLUDED_INDEXES': ['contacts.search_indexes.ContactIndex', 
                             'inventory.search_indexes.ItemIndex',
@@ -301,7 +301,7 @@ HAYSTACK_CONNECTIONS = {
     'sl': {
         # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
         'ENGINE': 'premierelevator.search_backend.ConfigurableElasticSearchEngine',
-        'URL': 'http://10.221.0.42:9200/',
+        'URL': 'http://10.221.0.42:9201/',
         'INDEX_NAME': 'sl',
         'EXCLUDED_INDEXES': ['contacts.search_indexes.ContactIndex', 
                             'inventory.search_indexes.ItemIndex',
@@ -315,7 +315,7 @@ HAYSTACK_CONNECTIONS = {
     'user': {
         # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
         'ENGINE': 'premierelevator.search_backend.ConfigurableElasticSearchEngine',
-        'URL': 'http://10.221.0.42:9200/',
+        'URL': 'http://10.221.0.42:9201/',
         'INDEX_NAME': 'user',
         'EXCLUDED_INDEXES': ['contacts.search_indexes.ContactIndex', 
                             'inventory.search_indexes.ItemIndex',
@@ -329,7 +329,7 @@ HAYSTACK_CONNECTIONS = {
     'events': {
         # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
         'ENGINE': 'premierelevator.search_backend.ConfigurableElasticSearchEngine',
-        'URL': 'http://10.221.0.42:9200/',
+        'URL': 'http://10.221.0.42:9201/',
         'INDEX_NAME': 'events',
         'EXCLUDED_INDEXES': ['contacts.search_indexes.ContactIndex', 
                             'inventory.search_indexes.ItemIndex',

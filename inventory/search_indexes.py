@@ -46,6 +46,8 @@ class ItemIndex(indexes.SearchIndex, indexes.Indexable):
         self.prepared_data['order_restriction'] = obj.order_restriction
         self.prepared_data['quantity_on_order'] = obj.quantity_on_order
         self.prepared_data['qty_on_request'] = obj.qty_on_request
+        self.prepared_data['hst_taxable'] = obj.hst_taxable
+        self.prepared_data['pst_taxable'] = obj.pst_taxable
 
         return self.prepared_data
 

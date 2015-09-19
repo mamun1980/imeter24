@@ -388,6 +388,23 @@
 </tr>
 <tr>
 	<th colspan="1">
+		<label for="id_hst_taxable">HST Taxable:</label>
+	</th>
+	<td colspan="2" colspan="1">
+		{{ item_form.hst_taxable.errors }}
+		<input type="checkbox" checked data-toggle="toggle" data-on="Yes" data-off="No" name="hst_taxable" style="margin-left: 10px; margin-right: 20px;">
+	</td>
+
+	<th colspan="1">
+		<label for="id_duty_percentage">PST Taxable:</label>
+	</th>
+	<td colspan="2">
+		{{ item_form.pst_taxable.errors }}
+		<input type="checkbox" checked data-toggle="toggle" data-on="Yes" data-off="No" name="pst_taxable" style="margin-left: 10px; margin-right: 20px;">
+	</td>
+</tr>
+<tr>
+	<th colspan="1">
 		<label for="id_shipping_weight">Shipping weight:</label>
 	</th>
 	<td colspan="2" colspan="1">
@@ -403,7 +420,6 @@
 		<input class="form-control decimal" id="id_duty_percentage" name="duty_percentage" placeholder="Duty percentage" type="text">
 	</td>
 </tr>
-
 <tr>
 	<th colspan="1">
 		<label for="id_website">Website:</label>

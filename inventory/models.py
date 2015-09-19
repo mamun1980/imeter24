@@ -132,7 +132,8 @@ class Item(models.Model):
 	# 	help_text=_("Anything entered here can only be displayed online."))
 	# site = models.ForeignKey(Contact, blank=True, null=True, related_name='item-site',
 	#  	help_text="Indicate which contact/site this record belongs to")
-	
+	hst_taxable = models.BooleanField(verbose_name="HST Taxable", default=True)
+	pst_taxable = models.BooleanField(verbose_name="PST Taxable", default=True)
 	website = models.URLField(blank=True, null=True, max_length=250)
 	item_image = models.ImageField(upload_to='item_image', blank=True, null=True)
 	date_added = models.DateTimeField('date added', auto_now_add=True)
