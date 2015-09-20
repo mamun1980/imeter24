@@ -640,8 +640,13 @@ def search_item(request):
         item_dict['item_unit_measure'] = item.item_unit_measure
         item_dict['item_unit_measure_id'] = item.item_unit_measure_id
         item_dict['warehouse_location'] = item.warehouse_location
-        item_dict['hst_taxable'] = item.hst_taxable
-        item_dict['pst_taxable'] = item.pst_taxable
+        # item_dict['hst_taxable'] = item.hst_taxable
+        # item_dict['pst_taxable'] = item.pst_taxable
+        supplier_doc = {}
+        supplier_doc['name'] = item.supplier['name']
+        supplier_doc['hst_tax'] = item.supplier['hst_tax']
+        supplier_doc['pst_tax'] = item.supplier['pst_tax']
+        item_dict['supplier'] = supplier_doc
 
 
         item_list.append(item_dict)

@@ -443,6 +443,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
         }
 
         $scope.add_item_seq_no = 0;
+        $scope.set_supplier = false;
 		
 	}
 
@@ -472,7 +473,6 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
     		url = "/contacts/auto/?q=" + q
     		$http({method: 'GET', url: url}).
 	            success(function(data, status, headers, config) {
-	                console.log(data.results.length);
 	                $scope.suppliers = data.results;
 	                
 	            });
@@ -486,6 +486,25 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 
 	$scope.setSupplier = function(con){
 		console.log(con);
+		$scope.set_supplier = true;
+
+		if(con.hst_tax_exempt){
+			$scope.hst_tax = 1;
+			$scope.updateHST($scope.hst_tax);
+		} else {
+			$scope.hst_tax = 0;	
+			$scope.updateHST($scope.hst_tax);
+		}
+
+		if(con.pst_tax_exempt){
+			$scope.pst_tax = 1;
+			$scope.updatePST($scope.pst_tax);
+		} else {
+			$scope.pst_tax = 0;	
+			$scope.updatePST($scope.pst_tax);
+		}
+		
+
 		$("#supplier_contact_list").hide();
 		$scope.supplier_contact = con;
 		// $scope.supplier = con;
@@ -776,6 +795,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
     	console.log(item);
     	$scope.add_item_seq_no++;
     	console.log(" Item seq no: "+$scope.add_item_seq_no);
+
     	$scope.search_item = '';
     	$scope.mixed_currency = false;
     	$("#items_list").hide();
@@ -885,15 +905,33 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
     	$("tbody#add_item_list").prepend(element);
 
     	if ($scope.add_item_seq_no == 1) {
-    		if(item.hst_taxable) {
-    			$scope.hst_tax = 1;
-    			$scope.updateHST($scope.hst_tax);
+    		if($scope.set_supplier) {
+    			if($scope.hst_tax) {
+	    			$scope.updateHST($scope.hst_tax);
+	    		}
+
+	    		if($scope.pst_tax) {
+	    			$scope.updatePST($scope.pst_tax);
+	    		}	
+    		} else {
+    			var supplier = item.supplier;
+    			if(supplier.hst_tax) {
+    				$scope.hst_tax = 1;
+    				$scope.updateHST($scope.hst_tax);
+    			} else {
+    				$scope.hst_tax = 0;
+    			}
+
+    			if(supplier.pst_tax) {
+    				$scope.pst_tax = 1;
+    				$scope.updatePST($scope.pst_tax);
+    			} else {
+    				$scope.pst_tax = 0;
+    			}
+    			console.log(supplier);
     		}
 
-    		if(item.pst_taxable) {
-    			$scope.pst_tax = 1;
-    			$scope.updatePST($scope.pst_tax);
-    		}
+    		
     	}
 
 		$( "input[name='item_job_number']" ).autocomplete({
@@ -1085,6 +1123,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
     	} else {
     		// var pst_tax_amount = $scope.pst_tax_amount;
     		var pst_tax_total = 0;
+    		$scope.pst_tax_amount = $("#pst_default_amount").val();
     	}
 
     	console.log("pst tax amount:"+ pst_tax_amount);
@@ -1119,6 +1158,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
     	} else {
     		// var pst_tax_amount = $scope.pst_tax_amount;
     		var hst_tax_total = 0;
+    		$scope.hst_tax_amount = $("#hst_default_amount").val();
     	}
 
     	console.log("hst tax amount:"+ hst_tax_amount);

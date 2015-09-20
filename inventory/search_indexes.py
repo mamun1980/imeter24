@@ -49,6 +49,21 @@ class ItemIndex(indexes.SearchIndex, indexes.Indexable):
         self.prepared_data['hst_taxable'] = obj.hst_taxable
         self.prepared_data['pst_taxable'] = obj.pst_taxable
 
+        try:
+            supplier = obj.primary_supplier
+            supplier_profile = obj.primary_supplier.contactprofile
+            supplier_doc = {}
+            supplier_doc['name'] = supplier.contact_name
+            supplier_doc['hst_tax'] = supplier_profile.hst_tax_exempt
+            supplier_doc['pst_tax'] = supplier_profile.pst_tax_exempt
+            self.prepared_data['supplier'] = supplier_doc
+        except Exception, e:
+            supplier_doc = {}
+            supplier_doc['name'] = None
+            supplier_doc['hst_tax'] = None
+            supplier_doc['pst_tax'] = None
+            self.prepared_data['supplier'] = supplier_doc
+
         return self.prepared_data
 
 

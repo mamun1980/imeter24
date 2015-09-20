@@ -319,4 +319,5 @@ HAYSTACK_ROUTERS = ['inventory.routers.MasterRouter',
                 'purchase.routers.PLRouter',
                 'scomuser.routers.UserRouter', 
                 'events.routers.EventsRouter', 
+                'contacts.routers.ContactRouter',
                 'haystack.routers.DefaultRouter',]

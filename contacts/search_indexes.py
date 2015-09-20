@@ -38,10 +38,19 @@ class ContactIndex(indexes.SearchIndex, indexes.Indexable):
             elist.append(email)
 
         self.prepared_data['emails'] = elist
-
         
-        # if obj.contactprofile:
-        #     con_profile = obj.contactprofile
+        try:
+            con_profile = obj.contactprofile
+            self.prepared_data['hst_tax_exempt'] = con_profile.hst_tax_exempt
+            self.prepared_data['hst_number'] = con_profile.hst_number
+            self.prepared_data['pst_tax_exempt'] = con_profile.pst_tax_exempt
+            self.prepared_data['pst_number'] = con_profile.pst_number
+        except Exception, e:
+            pass
+
+            
+
+
         #     term = {}
         #     if con_profile.terms:
         #         term['id'] = con_profile.terms.id

@@ -200,7 +200,13 @@ LOGGING = {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
+        },
+    'console':{
+            'level': 'INFO',
+            'class': 'logging.StreamHandler'
         }
+
+
     },
     'loggers': {
         'django.request': {
@@ -209,8 +215,13 @@ LOGGING = {
             'propagate': True,
         },
         'elasticsearch': {
-            'handlers': ['mail_admins'],
-            'level': 'DEBUG',
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'elasticsearch.trace': {
+            'handlers': ['console'],
+            'level': 'INFO',
             'propagate': True,
         },
     }
@@ -362,4 +373,5 @@ HAYSTACK_ROUTERS = ['inventory.routers.MasterRouter',
                 'purchase.routers.PLRouter',
                 'scomuser.routers.UserRouter', 
                 'events.routers.EventsRouter', 
+                'contacts.routers.ContactRouter',
                 'haystack.routers.DefaultRouter',]

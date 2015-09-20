@@ -59,6 +59,10 @@ def autocomplete(request):
             contact_dict['postal_code'] = con.postal_code
             contact_dict['phones'] = con.phones
             contact_dict['emails'] = con.emails
+            contact_dict['hst_tax_exempt'] = con.hst_tax_exempt
+            contact_dict['hst_number'] = con.hst_number
+            contact_dict['pst_tax_exempt'] = con.pst_tax_exempt
+            contact_dict['pst_number'] = con.pst_number
             # contact_dict['search_string'] = con.search_string
             suggestions.append(contact_dict)
 
