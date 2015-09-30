@@ -121,8 +121,8 @@ class POForm(forms.ModelForm):
         widget=forms.Select(attrs={"class": "form-control"}))
     datetime = forms.CharField(required=False,
         widget=forms.DateTimeInput(attrs={"class": "form-control", 'placeholder': "YYYY-MM-DD HH:MM:SS"}))
-    po_status = forms.ChoiceField(required=False, choices=PO_STATUS_ADD,
-        widget=forms.Select(attrs={"class": "form-control"}))
+    # po_status = forms.ChoiceField(required=False, choices=PO_STATUS_ADD,
+    #     widget=forms.Select(attrs={"class": "form-control"}))
     po_que = forms.ChoiceField(required=False, choices=PO_QUE,
         widget=forms.Select(attrs={"class": "form-control"}))
 
@@ -136,10 +136,12 @@ class POForm(forms.ModelForm):
         # sv = SystemVariable.objects.get(id=1)
         # import pdb; pdb.set_trace();
         if self.action == 'new':
+            sv = SystemVariable.objects.get(id=1)
+            next_po_number = sv.get_next_po_number
             po.po_created_by = self.request.user
             po.datetime = datetime.datetime.now()
-            po_number = self.request.POST['next_number']
-            po.po_number = po_number
+            # po_number = self.request.POST['next_number']
+            po.po_number = next_po_number
         elif self.action == 'update':
             po.po_created_by = self.request.user
             po.datetime = datetime.datetime.now()
@@ -155,7 +157,7 @@ class POForm(forms.ModelForm):
     class Meta:
         """docstring for Meta"""
         model = PurchaseOrder
-        exclude = ['sub_total', 'po_created_by', 'search_string', 'datetime']
+        exclude = ['sub_total', 'po_status', 'po_created_by', 'search_string', 'datetime']
 
 
 class POFormEdit(POForm):

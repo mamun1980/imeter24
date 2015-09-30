@@ -1,23 +1,78 @@
 import datetime
 from haystack import indexes
-from purchase.models import PurchaseOrder, ShippingList, PackingList
+from purchase.models import PurchaseOrder, ShippingList, PackingList, PurchaseItem
 
 
 class PurchaseOrderIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.CharField(document=True, use_template=True)
     po_number = indexes.CharField(model_attr='po_number', boost=2)
-    # po_status = indexes.CharField(model_attr='po_status', indexed=False, null=True)
-    supplier = indexes.CharField(model_attr='supplier__contact_name', null=True)
+    po_status = indexes.CharField(model_attr='po_status', indexed=False, null=True)
+    # supplier = indexes.CharField(model_attr='supplier__contact_name', null=True)
     terms = indexes.CharField(model_attr='terms__term',  null=True)
     shipping_inst = indexes.CharField(model_attr='shipping_inst', null=True)
+    hst_taxable = indexes.CharField(model_attr='hst_taxable', null=True)
+    hst_taxable_amount = indexes.CharField(model_attr='hst_taxable_amount', null=True)
+    total_hst_tax = indexes.CharField(model_attr='total_hst_tax', null=True)
+    pst_taxable = indexes.CharField(model_attr='pst_taxable', null=True)
+    pst_taxable_amount = indexes.CharField(model_attr='pst_taxable_amount', null=True)
+    total_pst_tax = indexes.CharField(model_attr='total_pst_tax', null=True)
+    total_tax = indexes.CharField(model_attr='total_tax', null=True)
 
     def get_model(self):
         return PurchaseOrder
 
+    # def prepare(self, obj):
+    #     self.prepared_data = super(PurchaseOrderIndex, self).prepare(obj)
+        
+    #     self.prepared_data['po_status'] = obj.status_verbose
+    #     return self.prepared_data
+
     def prepare(self, obj):
         self.prepared_data = super(PurchaseOrderIndex, self).prepare(obj)
-        
-        self.prepared_data['po_status'] = obj.status_verbose
+        supplier = obj.supplier
+        supplier_dict = {}
+        if supplier:
+            supplier_dict['id'] = supplier.id
+            supplier_dict['contact_name'] = supplier.contact_name
+            phones = supplier.contact_phone.all()
+            phs = []
+            for ph in phones:
+                phone = {}
+                phone['number'] = ph.phone
+                phone['ext'] = ph.phone_ext
+                phone['type'] = ph.phone_type.phone_type
+                phs.append(phone)
+            supplier_dict['phones'] = phs
+            emails = supplier.contact_emails.all()
+            elist = []
+            for em in emails:
+                email = {}
+                email['email_type'] = em.email_address_type.email_type
+                email['email_address'] = em.email_address
+                elist.append(email)
+
+            supplier_dict['emails'] = elist
+
+            self.prepared_data['supplier'] = supplier_dict
+        else:
+            self.prepared_data['supplier'] = supplier_dict
+
+        items = PurchaseItem.objects.filter(po=obj)
+        item_list = []
+        if items:
+            for item in items:
+                item_dic = {}
+                item_dic['item_number'] = item.item.item_number
+                item_dic['description'] = item.item.description
+                item_dic['qty_ordered'] = item.qty
+                item_dic['item_recv'] = item.item_recv
+                item_dic['sub_total'] = item.sub_total
+
+                item_list.append(item_dic)
+
+        self.prepared_data['po_items'] = item_list
+
+        # self.prepared_data['po_status'] = obj.po_status
         return self.prepared_data
 
     def index_queryset(self, using=None):
@@ -49,18 +104,18 @@ class ShippingListIndex(indexes.SearchIndex, indexes.Indexable):
                 phone['ext'] = ph.phone_ext
                 phone['type'] = ph.phone_type.phone_type
                 phs.append(phone)
-                sold_to_dict['phones'] = phs
-                emails = sold_to.contact_emails.all()
-                elist = []
-                for em in emails:
-                    email = {}
-                    email['email_type'] = em.email_address_type.email_type
-                    email['email_address'] = em.email_address
-                    elist.append(email)
+            sold_to_dict['phones'] = phs
+            emails = sold_to.contact_emails.all()
+            elist = []
+            for em in emails:
+                email = {}
+                email['email_type'] = em.email_address_type.email_type
+                email['email_address'] = em.email_address
+                elist.append(email)
 
-                sold_to_dict['emails'] = elist
+            sold_to_dict['emails'] = elist
 
-                self.prepared_data['sold_to'] = sold_to_dict
+            self.prepared_data['sold_to'] = sold_to_dict
         # ============= Ship To =================
         ship_to = obj.ship_to
         if ship_to:

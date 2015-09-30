@@ -3,9 +3,11 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import permission_required
+from contacts.models import *
 from schedule.forms import *
 from schedule.models import *
 import json, datetime
+
 
 from haystack.forms import ModelSearchForm, SearchForm
 from haystack.query import SearchQuerySet, EmptySearchQuerySet
@@ -221,6 +223,7 @@ def job_list(request):
     # import pdb; pdb.set_trace();
     user = request.user
     from django.core.serializers.json import DjangoJSONEncoder
+    import datetime
     today = datetime.date.today()
     enddate = today + datetime.timedelta(days=7)
 
@@ -230,6 +233,7 @@ def job_list(request):
     for job in jobs:
         job_dict = {}
         
+        job_dict['id'] = job.id
         job_dict['job_number'] = job.job_number
         job_dict['cab_designation'] = job.cab_designation
         job_dict['date_opened'] = job.date_opened
@@ -264,7 +268,10 @@ def job_list(request):
                 job_dict['job_current_state'] = "job-status-yellow"
             else:
                 # job_dict['job_current_state'] = "job-status-green"
-                state = getJobStatusState(job.jobstatus)
+                    
+                jobstatus, created = JobStatus.objects.get_or_create(job=job)
+                    
+                state = getJobStatusState(jobstatus)
 
                 if state == 'job-status-red':
                     job_dict['job_current_state'] = "job-status-red"
@@ -418,8 +425,9 @@ def edit_job(request, jobid):
     '''
     Updates a job with job id (jobid)
     '''
+    # import pdb; pdb.set_trace();
     if request.method == "POST":
-        # import pdb; pdb.set_trace();
+        
         jobid = request.POST.get("jobid")
         job = Job.objects.get(id=jobid)
         
@@ -434,7 +442,7 @@ def edit_job(request, jobid):
         job = Job.objects.get(id=jobid)
         job_form = JobEditForm(instance=job)
     
-    job_status = JobStatus.objects.get(job=job)
+    job_status, created = JobStatus.objects.get_or_create(job=job)
     job_status_form = JobStatusForm(instance=job_status)
 
     comments = Comment.objects.filter(job_number=job.job_number).order_by("-datetime")
@@ -934,5 +942,150 @@ def elevetor_type_delete(request):
     et.delete()
     return HttpResponse(et_id)
 
+def job_control_json(request, jc_id):
+    jc = JobControl.objects.get(job_number=jc_id)
+    jc_doc = {}
+    jc_doc['job_number'] = jc.job_number
+    jc_doc['job_name'] = jc.job_name
+    jc_doc['number_of_cabs'] = jc.number_of_cabs
+    jc_doc['elevetor_type'] = jc.elevetor_type
+    jc_doc['number_of_floors'] = jc.number_of_floors
+    jc_doc['front'] = jc.front
+    jc_doc['rear'] = jc.rear
+    jc_doc['rgw'] = jc.rgw
+    jc_doc['capacity'] = jc.capacity
+    jc_doc['customer_po_number'] = jc.customer_po_number
+    if jc.delivery_date:
+        jc_doc['delivery_date'] = jc.delivery_date.strftime('%m/%d/%Y')
+    else:
+        jc_doc['delivery_date'] = None
+    if jc.start_date:
+        jc_doc['start_date'] = jc.start_date.strftime('%m/%d/%Y')
+    else:
+        jc_doc['start_date'] = None
+    
+    try:
+        # import pdb; pdb.set_trace();
+        installed_by = jc.installed_by
+        installed_by_doc = {}
+        installed_by_doc['id'] = installed_by.id
+        installed_by_doc['contact_name'] = installed_by.contact_name
+        installed_by_doc['city'] = installed_by.city
+        installed_by_doc['country'] = installed_by.country
+        installed_by_doc['phones'] = []
+        installed_by_phones = ContactPhone.objects.filter(contact=installed_by)
+        for cphone in installed_by_phones:
+            phone = {}
+            phone['type'] = cphone.phone_type.phone_type
+            phone['number'] = cphone.phone
+            phone['phone_ext'] = cphone.phone_ext
+            installed_by_doc['phones'].append(phone)
+
+        installed_by_doc['emails'] = []
+        cemails = ContactEmailAddress.objects.filter(contact=installed_by)
+
+        for cemail in cemails:
+            email = {}
+            email['email_address_type'] = cemail.email_address_type.email_type
+            email['email_address'] = cemail.email_address
+            installed_by_doc['emails'].append(email)
+
+        jc_doc['installed_by'] = installed_by_doc
+
+    except Exception, e:
+        jc_doc['installed_by'] = None
+
+
+    # ================== sold to ==============
+
+    try:
+        # import pdb; pdb.set_trace();
+        sold_to = jc.sold_to
+        sold_to_doc = {}
+        sold_to_doc['id'] = sold_to.id
+        sold_to_doc['contact_name'] = sold_to.contact_name
+        sold_to_doc['city'] = sold_to.city
+        sold_to_doc['country'] = sold_to.country
+        sold_to_doc['phones'] = []
+        phones = ContactPhone.objects.filter(contact=sold_to)
+        for cphone in phones:
+            phone = {}
+            phone['type'] = cphone.phone_type.phone_type
+            phone['number'] = cphone.phone
+            phone['phone_ext'] = cphone.phone_ext
+            sold_to_doc['phones'].append(phone)
+
+        sold_to_doc['emails'] = []
+        emails = ContactEmailAddress.objects.filter(contact=sold_to)
+
+        for cemail in emails:
+            email = {}
+            email['email_address_type'] = cemail.email_address_type.email_type
+            email['email_address'] = cemail.email_address
+            sold_to_doc['emails'].append(email)
+
+        jc_doc['sold_to'] = sold_to_doc
+
+    except Exception, e:
+        jc_doc['sold_to'] = None
+
+
+    # ================== ship to ============
+
+    try:
+        # import pdb; pdb.set_trace();
+        ship_to = jc.ship_to
+        ship_to_doc = {}
+        ship_to_doc['id'] = ship_to.id
+        ship_to_doc['contact_name'] = ship_to.contact_name
+        ship_to_doc['city'] = ship_to.city
+        ship_to_doc['country'] = ship_to.country
+        ship_to_doc['phones'] = []
+        phones = ContactPhone.objects.filter(contact=ship_to)
+        for cphone in phones:
+            phone = {}
+            phone['type'] = cphone.phone_type.phone_type
+            phone['number'] = cphone.phone
+            phone['phone_ext'] = cphone.phone_ext
+            ship_to_doc['phones'].append(phone)
+
+        ship_to_doc['emails'] = []
+        emails = ContactEmailAddress.objects.filter(contact=ship_to)
+
+        for cemail in emails:
+            email = {}
+            email['email_address_type'] = cemail.email_address_type.email_type
+            email['email_address'] = cemail.email_address
+            sold_to_doc['emails'].append(email)
+
+        jc_doc['ship_to'] = ship_to_doc
+
+    except Exception, e:
+        jc_doc['ship_to'] = None
+
+    jc_doc['estimated_price_for_job'] = jc.estimated_price_for_job
+
+    jc_json = json.dumps(jc_doc)
+    return HttpResponse(jc_json, mimetype='application/json')
+
+
 def job_control_edit(request, jobid):
-    return HttpResponse("Hello world!")
+    jc = JobControl.objects.get(job_number=jobid)
+
+    jc_form = JobControlForm(request.POST, instance=jc, action='update')
+    if request.method == 'POST':
+        # import pdb; pdb.set_trace();
+        if jc_form.is_valid():
+            jc_form.save()
+            return HttpResponseRedirect("/schedule/job-control/list/")
+        else:
+            return render(request, "schedule/job-control-edit.html", {'jc': jc})
+    else:
+        return render(request, "schedule/job-control-edit.html", {'jc': jc})
+
+
+
+def job_control_delete(request, jobid):
+    jc = JobControl.objects.get(job_number=jobid)
+    jc.delete()
+    return HttpResponseRedirect("/schedule/job-control/list/")

@@ -39,8 +39,10 @@ urlpatterns = patterns('',
     
     url(r'^job-control/add/$', 'schedule.views.job_control_add', name='job-control-add'),
     url(r'^job-control/edit/(?P<jobid>\w+)/$', 'schedule.views.job_control_edit', name='job-control-edit'),
+    url(r'^job-control/delete/(?P<jobid>\w+)/$', 'schedule.views.job_control_delete', name='job-control-delete'),
     url(r'^job-control/list/$', 'schedule.views.job_control_list', name='job-control-add'),
     url(r'^job-control/list/json/$', 'schedule.views.job_control_list_json', name='job-control-add-json'),
+    url(r'^job-control/(?P<jc_id>\w+)/json/$', 'schedule.views.job_control_json', name='job-control-json'),
     url(r'^job-control/search/$', 'schedule.views.job_control_search', name='job-control-search'),
 
     url(r'^elevetor-type/add/$', 'schedule.views.elevetor_type_add', name='elevetor-type-add'),

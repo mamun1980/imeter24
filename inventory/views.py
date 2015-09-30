@@ -642,11 +642,23 @@ def search_item(request):
         item_dict['warehouse_location'] = item.warehouse_location
         # item_dict['hst_taxable'] = item.hst_taxable
         # item_dict['pst_taxable'] = item.pst_taxable
-        supplier_doc = {}
-        supplier_doc['name'] = item.supplier['name']
-        supplier_doc['hst_tax'] = item.supplier['hst_tax']
-        supplier_doc['pst_tax'] = item.supplier['pst_tax']
-        item_dict['supplier'] = supplier_doc
+        if item.supplier:
+            supplier_doc = {}
+            supplier_doc['contact_name'] = item.supplier['contact_name']
+            supplier_doc['hst_tax'] = item.supplier['hst_tax']
+            supplier_doc['pst_tax'] = item.supplier['pst_tax']
+            supplier_doc['id'] = item.supplier['id']
+            supplier_doc['address_1'] = item.supplier['address_1']
+            supplier_doc['attention_to'] = item.supplier['attention_to']
+            supplier_doc['city'] = item.supplier['city']
+            supplier_doc['province'] = item.supplier['province']
+            supplier_doc['country'] = item.supplier['country']
+            supplier_doc['postal_code'] = item.supplier['postal_code']
+            supplier_doc['phones'] = item.supplier['phones']
+            supplier_doc['emails'] = item.supplier['emails']
+            
+
+            item_dict['supplier'] = supplier_doc
 
 
         item_list.append(item_dict)

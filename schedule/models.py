@@ -174,7 +174,7 @@ class ElevetorType(models.Model):
 
 
 class JobControl(models.Model):
-	job_number = models.CharField(max_length=20)
+	job_number = models.CharField(max_length=20, primary_key=True)
 	# next_job_number = models.CharField(max_length=20, null=True, blank=True)
 	job_name = models.CharField(max_length=20, null=True, blank=True)
 	number_of_cabs = models.CharField(max_length=20, null=True, blank=True)

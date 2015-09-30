@@ -1,6 +1,7 @@
 import datetime
 from haystack import indexes
 from inventory.models import Item
+from contacts.models import ContactPhone, ContactEmailAddress
 
 
 class ItemIndex(indexes.SearchIndex, indexes.Indexable):
@@ -49,20 +50,60 @@ class ItemIndex(indexes.SearchIndex, indexes.Indexable):
         self.prepared_data['hst_taxable'] = obj.hst_taxable
         self.prepared_data['pst_taxable'] = obj.pst_taxable
 
-        try:
-            supplier = obj.primary_supplier
+        
+        supplier = obj.primary_supplier
+        supplier_doc = {}
+        if supplier:
             supplier_profile = obj.primary_supplier.contactprofile
-            supplier_doc = {}
-            supplier_doc['name'] = supplier.contact_name
+            if supplier_profile:
+                if supplier_profile.fob:
+                    supplier_doc['fob'] = supplier_profile.fob
+                if supplier_profile.terms:
+                    supplier_doc['terms'] = supplier_profile.terms.term
+                    supplier_doc['term_id'] = supplier_profile.terms.id
+                if supplier_profile.shipping_method:
+                    supplier_doc['shipvia'] = supplier_profile.shipping_method.delivery_choice
+                    supplier_doc['shipvia_id'] = supplier_profile.shipping_method.id
             supplier_doc['hst_tax'] = supplier_profile.hst_tax_exempt
             supplier_doc['pst_tax'] = supplier_profile.pst_tax_exempt
-            self.prepared_data['supplier'] = supplier_doc
-        except Exception, e:
-            supplier_doc = {}
-            supplier_doc['name'] = None
-            supplier_doc['hst_tax'] = None
-            supplier_doc['pst_tax'] = None
-            self.prepared_data['supplier'] = supplier_doc
+        
+            supplier_doc['contact_name'] = supplier.contact_name
+        
+            supplier_doc['id'] = supplier.pk
+            supplier_doc['address_1'] = supplier.address_1
+            supplier_doc['attention_to'] = supplier.attention_to
+            supplier_doc['city'] = supplier.city
+            supplier_doc['province'] = supplier.province
+            supplier_doc['country'] = supplier.country
+            supplier_doc['postal_code'] = supplier.postal_code
+            supplier_doc['postal_code'] = supplier.postal_code
+            supplier_doc['postal_code'] = supplier.postal_code
+            supplier_doc['postal_code'] = supplier.postal_code
+
+        
+
+            supplier_doc['phones'] = []
+            phones = ContactPhone.objects.filter(contact=supplier)
+            for cphone in phones:
+                phone = {}
+                phone['type'] = cphone.phone_type.phone_type
+                phone['number'] = cphone.phone
+                phone['phone_ext'] = cphone.phone_ext
+                supplier_doc['phones'].append(phone)
+
+            supplier_doc['emails'] = []
+            cemails = ContactEmailAddress.objects.filter(contact=supplier)
+
+            for cemail in cemails:
+                email = {}
+                email['email_address_type'] = cemail.email_address_type.email_type
+                email['email_address'] = cemail.email_address
+                supplier_doc['emails'].append(email)
+
+        
+
+        self.prepared_data['supplier'] = supplier_doc
+        
 
         return self.prepared_data
 

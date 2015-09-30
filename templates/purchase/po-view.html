@@ -159,21 +159,28 @@
 							<th width="25%">HST Taxable</th>
 							<td>
 								{% if po.hst_taxable == '1' %}
-									<b>Yes</b>, Amount: {{po.hst_taxable_amount}} {{po.po_currency}}
+									<b>Yes</b>, Tax rate: {{po.hst_taxable_amount}} {{po.po_currency}}, Total HST tax amount: {{ po.total_hst_tax }}
+								{% else %}
+									<b>No</b>
+								{% endif %}
+							</td>
+						</tr>
+
+						<tr>
+							<th width="25%">PST Taxable</th>
+							<td>
+								
+								{% if po.pst_taxable == '1' %}
+									<b>Yes</b>, Tax rate: {{po.pst_taxable_amount}} {{po.po_currency}}, Total PST tax amount: {{ po.total_pst_tax }}
 								{% else %}
 									<b>No</b>
 								{% endif %}
 							</td>
 						</tr>
 						<tr>
-							<th width="25%">PST Taxable</th>
+							<th width="25%">Total Tax</th>
 							<td>
-								
-								{% if po.pst_taxable == '1' %}
-									<b>Yes</b>, Amount: {{po.pst_taxable_amount}} {{po.po_currency}}
-								{% else %}
-									<b>No</b>
-								{% endif %}
+								{{ po.total_tax }}
 							</td>
 						</tr>
 						<tr>

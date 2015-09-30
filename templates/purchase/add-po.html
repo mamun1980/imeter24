@@ -120,6 +120,9 @@ table.item thead {
 	color: #FF0;
 	font-size: 16px;
 }
+#po_list table tbody tr{
+	border: 1px solid #000 !important;
+}
 span.amount {
 	color: #FF0;
 	font-size: 16px;
@@ -172,7 +175,7 @@ input.ng-invalid-max {
 	background-color: red;
 }
 #po_list {
-	width: 700px;
+	width: 98%;
 	border: 1px solid #000;
 }
 #po_list table {
@@ -255,46 +258,56 @@ $( "input[name='item_job_number']" ).autocomplete({
 	}
 });
 
-
 // item search
 
 $(document).on("change", "input[name='item_cost']", function(e){
-	var cost = $(this).val();
-	var cost_fl = parseFloat(cost).toFixed(4);
-	var qty = $(this).closest('tr').find('input[name="item_qty"]').val();
-	var qty_fl = parseFloat(qty).toFixed(2);
-	var sub_total = qty_fl * cost_fl;
-	$(this).val(cost_fl);
+	var cost = parseFloat($(this).val());
+	var qty = parseFloat($(this).closest('tr').find('input[name="item_qty"]').val());
+	var sub_total = parseFloat(cost * qty).toFixed(2);
+	// console.log(sub_total);
+	$(this).closest('tr').find("input[name='item_sub_total']").val(sub_total);
 
-	$(this).closest('tr').find("input[name='item_sub_total']").val(sub_total.toFixed(4));
 	var item_total = 0;
 
 	$("tbody#add_item_list tr input[name='item_sub_total']").each(function(index){
-			var subtotal = $(this).val();
-			item_total = item_total + parseFloat(subtotal);
-		});
-	
-	$("#calculated_total_amount span.amount").text(item_total.toFixed(4));
+		var subtotal = $(this).val();
+		item_total = item_total + parseFloat(subtotal);
+		// console.log(item_total);
+	});
+
+	$("#calculated_total_amount span.amount").text(item_total.toFixed(2));
+	$("#po_total_before_tax").val(item_total.toFixed(2));
+
 	var hst_tax = $("#id_hst_taxable").val();
 	var pst_tax = $("#id_pst_taxable").val();
 	
 	if(hst_tax == '1'){
 		var hst_tax_amount = parseFloat($("#id_hst_taxable_amount").val())
-		hst_tax_total = (item_total * hst_tax_amount)/100;
+		hst_tax_total = parseFloat((item_total * hst_tax_amount)/100).toFixed(3);
 	} else {
-		hst_tax_total = 0;
+		hst_tax_total = 0.000;
 	}
+	$("#hst_tax_amount").val(parseFloat(hst_tax_total).toFixed(3));
+
 	if(pst_tax == '1'){
 		var pst_tax_amount = parseFloat($("#id_pst_taxable_amount").val())
-		pst_tax_total = (item_total * pst_tax_amount)/100;
+		pst_tax_total = parseFloat((item_total * pst_tax_amount)/100).toFixed(3);
 	} else {
-		pst_tax_total = 0;
+		pst_tax_total = 0.000;
 	}
+	$("#pst_tax_amount").val(parseFloat(pst_tax_total).toFixed(3));
 
-	item_total = item_total + pst_tax_total + hst_tax_total;
+	var total_tax_amount = parseFloat(pst_tax_total) + parseFloat(hst_tax_total);
+	$("#total_tax_amount").val(total_tax_amount.toFixed(2));
 
-	$("#id_total_po_amount").val(item_total.toFixed(4));
+	item_total = parseFloat(item_total) + parseFloat(total_tax_amount);
+
+	$("#id_total_po_amount").val(item_total.toFixed(2));
 	item_total = 0;
+
+
+
+
 });   	
 
 $(document).on("change", "input[name='item_sub_total']",function(e){
@@ -305,69 +318,84 @@ $(document).on("change", "input[name='item_sub_total']",function(e){
 		// console.log(itemtotal);
 	});
 	
-	$("#calculated_total_amount span.amount").text(item_total.toFixed(4));
+	$("#calculated_total_amount span.amount").text(item_total.toFixed(2));
+	$("#po_total_before_tax").val(item_total.toFixed(2));
 
 	var hst_tax = $("#id_hst_taxable").val();
 	var pst_tax = $("#id_pst_taxable").val();
 	
 	if(hst_tax == '1'){
 		var hst_tax_amount = parseFloat($("#id_hst_taxable_amount").val())
-		hst_tax_total = (item_total * hst_tax_amount)/100;
+		hst_tax_total = parseFloat((item_total * hst_tax_amount)/100).toFixed(3);
 	} else {
-		hst_tax_total = 0;
+		hst_tax_total = 0.000;
 	}
+	$("#pst_tax_amount").val(parseFloat(pst_tax_total).toFixed(3));
+
 	if(pst_tax == '1'){
 		var pst_tax_amount = parseFloat($("#id_pst_taxable_amount").val())
-		pst_tax_total = (item_total * pst_tax_amount)/100;
+		pst_tax_total = parseFloat((item_total * pst_tax_amount)/100).toFixed(3);
 	} else {
-		pst_tax_total = 0;
+		pst_tax_total = 0.000;
 	}
 
-	item_total = item_total + pst_tax_total + hst_tax_total;
+	$("#pst_tax_amount").val(parseFloat(pst_tax_total).toFixed(3));
 
-	$("#id_total_po_amount").val(item_total.toFixed(4));
+	var total_tax_amount = parseFloat(pst_tax_total) + parseFloat(hst_tax_total);
+	$("#total_tax_amount").val(total_tax_amount.toFixed(2));
+
+	item_total = parseFloat(item_total) + parseFloat(total_tax_amount);
+
+	$("#id_total_po_amount").val(item_total.toFixed(2));
 
 	item_total = 0;
 });
 
 $(document).on("change", "input[name='item_qty']", function(e){
 	var qty = parseFloat($(this).val());
-	var qty_fl = parseFloat(qty);
-	var cost = $(this).closest('tr').find('input[name="item_cost"]').val();
-	var cost_fl = parseFloat(cost).toFixed(4);
-	
-	var sub_total = qty_fl * cost_fl;
-	
-	$(this).closest('tr').find("input[name='item_sub_total']").val(sub_total.toFixed(4));
+	var cost = parseFloat($(this).closest('tr').find('input[name="item_cost"]').val());
+	var sub_total = parseFloat(cost * qty).toFixed(2);
+
+	$(this).closest('tr').find("input[name='item_sub_total']").val(sub_total);
 
 	var item_total = 0;
+
 	$("tbody#add_item_list tr input[name='item_sub_total']").each(function(index){
 		var subtotal = $(this).val();
 		item_total = item_total + parseFloat(subtotal);
-		
+		// console.log(item_total);
 	});
 	
-	$("#calculated_total_amount span.amount").text(item_total.toFixed(4));
+	
+	$("#calculated_total_amount span.amount").text(item_total.toFixed(2));
+	$("#po_total_before_tax").val(item_total.toFixed(2));
 	
 	var hst_tax = $("#id_hst_taxable").val();
 	var pst_tax = $("#id_pst_taxable").val();
 	
 	if(hst_tax == '1'){
 		var hst_tax_amount = parseFloat($("#id_hst_taxable_amount").val())
-		hst_tax_total = (item_total * hst_tax_amount)/100;
+		hst_tax_total = parseFloat((item_total * hst_tax_amount)/100).toFixed(3);
 	} else {
-		hst_tax_total = 0;
+		hst_tax_total = 0.000;
 	}
+	$("#hst_tax_amount").val(parseFloat(hst_tax_total).toFixed(3));
+
 	if(pst_tax == '1'){
 		var pst_tax_amount = parseFloat($("#id_pst_taxable_amount").val())
-		pst_tax_total = (item_total * pst_tax_amount)/100;
+		pst_tax_total = parseFloat((item_total * pst_tax_amount)/100).toFixed(3);
 	} else {
-		pst_tax_total = 0;
+		pst_tax_total = 0.000;
 	}
 
-	item_total = item_total + pst_tax_total + hst_tax_total;
+	$("#pst_tax_amount").val(parseFloat(pst_tax_total).toFixed(3));
 
-	$("#id_total_po_amount").val(item_total.toFixed(4));
+	var total_tax_amount = parseFloat(pst_tax_total) + parseFloat(hst_tax_total);
+	$("#total_tax_amount").val(total_tax_amount.toFixed(2));
+
+	item_total = item_total + total_tax_amount;
+
+	$("#id_total_po_amount").val(item_total.toFixed(2));
 	
 	
 	var item_subtotal_qty = 0;
@@ -380,6 +408,7 @@ $(document).on("change", "input[name='item_qty']", function(e){
 
 	item_total = 0;
 	item_subtotal_qty = 0;
+	
 });
 var poApp = angular.module("poApp", [], function ($interpolateProvider) {
         $interpolateProvider.startSymbol("{[{");
@@ -392,12 +421,14 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 		// $scope.ship_via = ['shippingone', 'shippingtwo', 'other'];
 		$scope.pst_tax = 0;
 		$scope.hst_tax = 0;
-		$scope.total_amount = 0.0;
+		$scope.total_amount = '0.00';
 		
 		var hst = $("#hst_default_amount").val();
 		$scope.hst_tax_amount = hst;
 		var pst = $("#pst_default_amount").val();
 		$scope.pst_tax_amount = pst;
+
+		$scope.total_tax_amount = '0.00';
 		
 		$scope.show_add_button = true;
 		$scope.show_update_button = false;
@@ -444,6 +475,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 
         $scope.add_item_seq_no = 0;
         $scope.set_supplier = false;
+        $scope.po_total_before_tax = '0.00';
 		
 	}
 
@@ -511,11 +543,6 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 		$("#id_supplier").val(con.id);
 		$("#supplier_contact_details").show();
 		$scope.search_supplier = con.contact_name;
-		
-		// autoselect ship_to
-		// $scope.ship_to_contact = con;
-		// $("#id_ship_to").val(con.id);
-		// $("#ship_to_contact_details").show();
 
 		// autoselect ship via
 		if(con.shipvia_id){
@@ -569,7 +596,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 			$http({method: 'GET', url: url}).
 	        	success(function(data, status, headers, config){
 	        	$scope.pos = data;
-	        	console.log(data);
+	        	// console.log(data);
 	        	if(data.length > 0){
 	        		$scope.show_po_list = true;	
 	        	} else {
@@ -599,8 +626,8 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 		
 
 		$http({method: 'GET', url: po_url}).success(function(data, status, headers, config){
-			console.log("po items:");
-			console.log(data.items);
+			
+			console.log(data);
 			$scope.po_checked = true;
 			
 			$("#id_po_number_search").val(data.po_number);
@@ -655,44 +682,33 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 			if(data.return_type){
 				$("#id_returned_type").val(data.return_type.id);	
 			}
-			var po_amount = 0;
 			// $("#id_hst_taxable").val(data.hst_taxable);
-			if(data.hst_taxable == 1){
+			if(data.hst_taxable == '1'){
 				$scope.hst_tax = 1;
-				
-				if(data.hst_taxable_amount == undefined) {
-					// $("#id_hst_taxable_amount").val(0);	
-					$scope.hst_tax_amount = 0;
-				} else {
-					// $("#id_hst_taxable_amount").val(data.hst_taxable_amount);
-					$scope.hst_tax_amount = data.hst_taxable_amount;
-					
-					po_amount += parseFloat(data.hst_taxable_amount);
-				}
+				$scope.hst_tax_amount = parseFloat(data.hst_taxable_amount).toFixed(2);
+				$("#hst_tax_amount").val(parseFloat(data.total_hst_tax).toFixed(2));
 			}
 			// $("#id_pst_taxable").val(data.pst_taxable);
-			if(data.pst_taxable == 1){
+			if(data.pst_taxable == '1'){
 				$scope.pst_tax = 1;
-				// console.log("pst : "+data.pst_taxable_amount);
-				if(data.pst_taxable_amount == undefined) {
-					$scope.pst_tax_amount = 0;
-				} else {
-					
-					$scope.pst_tax_amount = data.pst_taxable_amount;
-					
-					po_amount += parseFloat(data.pst_taxable_amount);
-				}
-				
+				$scope.pst_tax_amount = parseFloat(data.pst_taxable_amount).toFixed(2);
+				// $scope.total_tax_amount = data.total_tax;
+				$("#pst_tax_amount").val(parseFloat(data.total_pst_tax).toFixed(2));
 			}
 
-			$("#id_total_po_amount").val(data.total_po_amount);
-			po_amount = parseFloat(data.total_po_amount) - po_amount;
+			$scope.total_tax_amount = parseFloat(data.total_tax).toFixed(2);
+
+			$("#id_total_po_amount").val(parseFloat(data.total_po_amount).toFixed(2));
+			// po_amount = parseFloat(data.total_po_amount) - po_amount;
 			$("#items_total_qty").val(data.items_total);
-			$("#calculated_total_amount span.amount").text(po_amount.toFixed(4));
+			
+			// $("#calculated_total_amount span.amount").text(po_amount.toFixed(2));
+			$scope.po_total_before_tax = parseFloat(data.po_total_before_tax).toFixed(2);
 
 			$scope.po_items = data.items;
 			if(data.items.length > 0){
 				$scope.item_added = true;
+				$scope.add_item_seq_no++;
 			}
 
 			var myitem = $("tbody#add_item_list tr.add_item");
@@ -711,12 +727,12 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 		    	var item_qty_received = $scope.po_items[i].item_received;
 		    	var last_received_date = $scope.po_items[i].item_recv_date;
 		    	var item_custom_detail = $scope.po_items[i].custom_detail
-		    	var item_custom_comment = $scope.po_items[i].custom_comment
+		    	// var item_custom_comment = $scope.po_items[i].custom_comment
 		 //    	// console.log(item.qty_received_date);
 		    	
 		    	
 		    	var str = "<tr class='add_item'>";
-		    	str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+item_number+"' readonly></td>";
+		    	str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+item_number+"' readonly><input type='hidden' name='po_item_seq' value='"+i+"'></td>";
 		    	str += "<td><textarea class='form-control' rows='1'>"+item_description+"</textarea></td>";
 		    	
 		    	str += "<td><select class='form-control' name='unit'>";
@@ -732,16 +748,17 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 		    	str += "<td><input type='text' name='last_received_date' class='form-control' value='"+last_received_date+"' readonly></td>";
 
 
-		    	str += "<td><input type='hidden' name='pi_id' value='"+p_item_id+"'><a class='remove-item btn' ng-click='removeField($event)'><span class='glyphicon glyphicon-remove'></span></a></td>";
+		    	str += "<td><input type='hidden' name='pi_id' value='"+p_item_id+"'><a class='unit-measure-edit' data-toggle='modal' data-seq='"+i+"' data-target='#itemDetailsModal'><i class='glyphicon glyphicon-pencil'></i></a><a class='remove-item btn' ng-click='removeField($event)'><span class='glyphicon glyphicon-remove'></span></a></td>";
+		    	
+
 		    	str += "</tr>";
 
 		    	if(item_custom_detail != '') {
 		    		var custom_str = '';
-		    		custom_str += '<tr class="bg-warning"><td colspan="1"><b>';
-		    		custom_str += '</b></td><td colspan="5"><textarea class="form-control" name="custom_detail_1">';
+		    		custom_str += '<tr id="'+p_item_id+'" class="bg-warning"><td colspan="2"><b>Customisation Details';
+		    		custom_str += '</b></td><td colspan="8"><textarea class="form-control" name="custom_detail_'+i+'">';
 		    		custom_str += item_custom_detail;
-		    		custom_str += '</textarea></td><td colspan="1"><b>Comment</b></td><td colspan="4"><textarea class="form-control" name="custom_comment_1">';
-		    		custom_str += item_custom_comment;
+		    		
 		    		custom_str += '</textarea></td></tr>';
 
 		    		str += custom_str;
@@ -928,7 +945,34 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
     			} else {
     				$scope.pst_tax = 0;
     			}
+    			console.log(" Supplier : =====");
     			console.log(supplier);
+
+    			$("input[name='search_supplier']").removeClass("ng-pristine");
+    			$("input[name='search_supplier']").addClass("ng-dirty");
+
+    			$("#supplier_contact_list").hide();
+				
+				$scope.supplier_contact = supplier;
+				// $scope.supplier = con;
+				$("#id_supplier").val(supplier.id);
+				$("#supplier_contact_details").show();
+				$scope.search_supplier = supplier.contact_name;
+
+				// autoselect ship via
+				if(supplier.shipvia_id){
+					$("#id_ship_via").val(supplier.shipvia_id);	
+				}
+				
+				// autoselect terms
+				if(supplier.term){
+					$("#id_terms").val(supplier.term.id);
+				}
+				
+				// autoselect FOB
+				if(supplier.fob){
+					$("#id_fob").val(supplier.fob);	
+				}
     		}
 
     		
@@ -967,6 +1011,8 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
         console.log("removed item id:"+removed_item_id)
         
 		$(event.target).closest('tr').remove();
+		$("tr#"+removed_item_id).remove();
+		
 		var item_total = 0;
 		$("tbody#add_item_list tr input[name='item_sub_total']").each(function(index){
 			var subtotal = $(this).val();
@@ -974,27 +1020,45 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 		});
 		
 		$("#calculated_total_amount span.amount").text(item_total.toFixed(4));
+		$("#po_total_before_tax").val(item_total.toFixed(2));
+
+
 		var hst_tax = $("#id_hst_taxable").val();
 		var pst_tax = $("#id_pst_taxable").val();
 
-		if(hst_tax == '1'){
-			var hst_tax_amount = parseFloat($("#id_hst_taxable_amount").val())
-			item_total += hst_tax_amount;
-		}
-		if(pst_tax == '1'){
-			var pst_tax_amount = parseFloat($("#id_pst_taxable_amount").val())
-			item_total += pst_tax_amount;
-		}
-		console.log("items total:"+item_total);
-		$("#id_total_po_amount").val(item_total.toFixed(4));
-		// recalculate total amount
+		if($scope.pst_tax) {
+    		var pst_tax_amount = $scope.pst_tax_amount;
+    		var pst_tax_total = parseFloat((item_total *  eval(pst_tax_amount))/100).toFixed(3);
+    	} else {
+    		var pst_tax_total = 0.000;
+    	}
+
+    	$("#pst_tax_amount").val(parseFloat(pst_tax_total).toFixed(3));
+
+    	if($scope.hst_tax) {
+    		var hst_tax_amount = $scope.hst_tax_amount;
+    		var hst_tax_total = parseFloat((item_total *  eval(hst_tax_amount))/100).toFixed(3);
+    	} else {
+    		// var pst_tax_amount = $scope.pst_tax_amount;
+    		var hst_tax_total = 0.000;
+    	}
+    	$("#hst_tax_amount").val(parseFloat(hst_tax_total).toFixed(3));
+
+    	var total_tax_amount = parseFloat(pst_tax_total) + parseFloat(hst_tax_total);
+		$("#total_tax_amount").val(total_tax_amount.toFixed(2));
+
+		$scope.total_amount = parseFloat(item_total) + parseFloat(total_tax_amount);
+
+		$scope.total_amount = $scope.total_amount.toFixed(2);
+
+
+
 		var item_subtotal_qty = 0;
 		$("tbody#add_item_list tr input[name='item_qty']").each(function(index){
 			var subtotal_qty = $(this).val();
 			item_subtotal_qty = item_subtotal_qty + parseFloat(subtotal_qty);
 		});
 		$("#id_items_total").val(item_subtotal_qty.toFixed(2));
-		item_total = 0;
 		item_subtotal_qty = 0;
 
 		if(items_length == 1) {
@@ -1030,7 +1094,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
     	$scope.hst_tax_amount = amount;
 		var pst_tax_amount = parseFloat($scope.pst_tax_amount);
 		// console.log(pst_tax_amount);
-		console.log(amount);
+		// console.log(amount);
 
 		var item_total = 0;
 		$("tbody#add_item_list tr input[name='item_sub_total']").each(function(index){
@@ -1042,26 +1106,28 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 
 		if($scope.pst_tax) {
     		var pst_tax_amount = $scope.pst_tax_amount;
-    		var pst_tax_total = (item_total *  eval(pst_tax_amount))/100;
+    		var pst_tax_total = parseFloat((item_total *  eval(pst_tax_amount))/100).toFixed(3);
     	} else {
-    		var pst_tax_total = 0;
+    		var pst_tax_total = 0.000;
     	}
 
-    	console.log("pst tax amount:"+ pst_tax_amount);
+    	$("#pst_tax_amount").val(parseFloat(pst_tax_total).toFixed(3));
 
     	if($scope.hst_tax) {
     		var hst_tax_amount = $scope.hst_tax_amount;
-    		var hst_tax_total = (item_total *  eval(hst_tax_amount))/100;
+    		var hst_tax_total = parseFloat((item_total *  eval(hst_tax_amount))/100).toFixed(3);
     	} else {
     		// var pst_tax_amount = $scope.pst_tax_amount;
-    		var hst_tax_total = 0;
+    		var hst_tax_total = 0.000;
     	}
+    	$("#hst_tax_amount").val(parseFloat(hst_tax_total).toFixed(3));
 
-    	console.log("hst tax amount:"+ hst_tax_amount);
+    	var total_tax_amount = parseFloat(pst_tax_total) + parseFloat(hst_tax_total);
+		$("#total_tax_amount").val(total_tax_amount.toFixed(2));
 
-    	$scope.total_amount = item_total + hst_tax_total + pst_tax_total;
+		$scope.total_amount = parseFloat(item_total) + parseFloat(total_tax_amount);
 
-		$scope.total_amount = $scope.total_amount.toFixed(4);
+		$scope.total_amount = $scope.total_amount.toFixed(2);
 
     };
     $scope.addPstAmount = function(amount){
@@ -1078,92 +1144,108 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 
 		if($scope.hst_tax) {
     		var hst_tax_amount = $scope.hst_tax_amount;
-    		var hst_tax_total = (item_total *  eval(hst_tax_amount))/100;
+    		var hst_tax_total = parseFloat((item_total *  eval(hst_tax_amount))/100).toFixed(3);
     	} else {
-    		var hst_tax_total = 0;
+    		var hst_tax_total = 0.000;
     	}
 
-    	console.log("hst tax amount:"+ hst_tax_amount);
+    	$("#hst_tax_amount").val(parseFloat(hst_tax_total).toFixed(3));
 
     	if($scope.pst_tax) {
     		var pst_tax_amount = $scope.pst_tax_amount;
-    		var pst_tax_total = (item_total *  eval(pst_tax_amount))/100;
+    		var pst_tax_total = parseFloat((item_total *  eval(pst_tax_amount))/100).toFixed(3);
     	} else {
     		// var pst_tax_amount = $scope.pst_tax_amount;
-    		var pst_tax_total = 0;
+    		var pst_tax_total = 0.000;
     	}
 
-    	console.log("pst tax amount:"+ pst_tax_amount);
+    	$("#pst_tax_amount").val(parseFloat(pst_tax_total).toFixed(3));
 
-    	$scope.total_amount = item_total + hst_tax_total + pst_tax_total;
-    	$scope.total_amount = $scope.total_amount.toFixed(4);		
+    	var total_tax_amount = parseFloat(pst_tax_total) + parseFloat(hst_tax_total);
+		$("#total_tax_amount").val(total_tax_amount.toFixed(2));
+
+		$scope.total_amount = parseFloat(item_total) + parseFloat(total_tax_amount);
+
+		$scope.total_amount = $scope.total_amount.toFixed(2);	
 
     };
 
     $scope.updatePST = function(pst) {
-    	
+    	console.log("PST :"+ pst + " HST :" + $scope.hst_tax);
     	var item_total = 0;
 		$("tbody#add_item_list tr input[name='item_sub_total']").each(function(index){
 			var subtotal = $(this).val();
 			item_total = item_total + parseFloat(subtotal);
 		});
 		
-		if($scope.hst_tax) {
+		if($scope.hst_tax == 1) {
     		var hst_tax_amount = $scope.hst_tax_amount;
-    		var hst_tax_total = (item_total *  eval(hst_tax_amount))/100;
+    		var hst_tax_total = parseFloat((item_total *  eval(hst_tax_amount))/100).toFixed(3);
     	} else {
-    		var hst_tax_total = 0;
+    		var hst_tax_total = 0.000;
     	}
-
-    	console.log("hst tax amount:"+ hst_tax_amount);
+    	console.log("hst tax amount:"+ hst_tax_total);
+    	$("#hst_tax_amount").val(parseFloat(hst_tax_total).toFixed(3));
 
     	if(pst==1) {
     		var pst_tax_amount = $scope.pst_tax_amount;
-    		var pst_tax_total = (item_total *  eval(pst_tax_amount))/100;
+    		var pst_tax_total = parseFloat((item_total *  eval(pst_tax_amount))/100).toFixed(3);
     	} else {
     		// var pst_tax_amount = $scope.pst_tax_amount;
-    		var pst_tax_total = 0;
+    		var pst_tax_total = 0.000;
     		$scope.pst_tax_amount = $("#pst_default_amount").val();
     	}
 
-    	console.log("pst tax amount:"+ pst_tax_amount);
+    	console.log("pst tax amount:"+ pst_tax_total);
 
-    	$scope.total_amount = item_total + hst_tax_total + pst_tax_total;
+    	$("#pst_tax_amount").val(parseFloat(pst_tax_total).toFixed(3));
+
+    	var total_tax_amount = parseFloat(pst_tax_total) + parseFloat(hst_tax_total);
+		$("#total_tax_amount").val(parseFloat(total_tax_amount).toFixed(2));
+
+		$scope.total_amount = parseFloat(item_total) + parseFloat(total_tax_amount);
+
+		$scope.total_amount = $scope.total_amount.toFixed(2);
 
     	
     }
 
     $scope.updateHST = function(hst) {
-    	console.log('running update hst...');
+    	console.log("HST :"+ hst + " PST :" + $scope.pst_tax);
     	var item_total = 0;
 		$("tbody#add_item_list tr input[name='item_sub_total']").each(function(index){
 			var subtotal = $(this).val();
 			item_total = item_total + parseFloat(subtotal);
 		});
 
-		console.log("item total:"+ item_total);
 		
-		if($scope.pst_tax) {
+		if($scope.pst_tax == 1) {
     		var pst_tax_amount = $scope.pst_tax_amount;
-    		var pst_tax_total = (item_total *  eval(pst_tax_amount))/100;
+    		var pst_tax_total = parseFloat((item_total *  eval(pst_tax_amount))/100).toFixed(2);
     	} else {
     		var pst_tax_total = 0;
     	}
 
-    	console.log("pst tax amount:"+ pst_tax_amount);
+    	console.log("pst tax amount:"+ pst_tax_total);
+    	$("#pst_tax_amount").val(parseFloat(pst_tax_total).toFixed(3));
 
     	if(hst==1) {
     		var hst_tax_amount = $scope.hst_tax_amount;
-    		var hst_tax_total = (item_total *  eval(hst_tax_amount))/100;
+    		var hst_tax_total = parseFloat((item_total *  eval(hst_tax_amount))/100).toFixed(2);
     	} else {
     		// var pst_tax_amount = $scope.pst_tax_amount;
     		var hst_tax_total = 0;
     		$scope.hst_tax_amount = $("#hst_default_amount").val();
     	}
+    	console.log("hst tax amount:"+ hst_tax_total);
+    	$("#hst_tax_amount").val(parseFloat(hst_tax_total).toFixed(3));
 
-    	console.log("hst tax amount:"+ hst_tax_amount);
+    	var total_tax_amount = parseFloat(pst_tax_total) + parseFloat(hst_tax_total);
+		$("#total_tax_amount").val(total_tax_amount.toFixed(2));
 
-    	$scope.total_amount = item_total + hst_tax_total + pst_tax_total;
+		$scope.total_amount = parseFloat(item_total) + parseFloat(total_tax_amount);
+
+		$scope.total_amount = $scope.total_amount.toFixed(2);
 
     }
 

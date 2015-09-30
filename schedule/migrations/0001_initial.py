@@ -121,8 +121,7 @@ class Migration(SchemaMigration):
 
         # Adding model 'JobControl'
         db.create_table(u'schedule_jobcontrol', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('job_number', self.gf('django.db.models.fields.CharField')(max_length=20)),
+            ('job_number', self.gf('django.db.models.fields.CharField')(max_length=20, primary_key=True)),
             ('job_name', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
             ('number_of_cabs', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
             ('sold_to', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='job-control-sold_to', null=True, to=orm['contacts.Contact'])),
@@ -221,10 +220,9 @@ class Migration(SchemaMigration):
             'elevetor_type': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'job-con-elevetor-type'", 'null': 'True', 'to': u"orm['schedule.ElevetorType']"}),
             'estimated_price_for_job': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '10', 'decimal_places': '4', 'blank': 'True'}),
             'front': ('django.db.models.fields.CharField', [], {'max_length': '20', 'null': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'installed_by': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contacts.Contact']", 'null': 'True', 'blank': 'True'}),
             'job_name': ('django.db.models.fields.CharField', [], {'max_length': '20', 'null': 'True', 'blank': 'True'}),
-            'job_number': ('django.db.models.fields.CharField', [], {'max_length': '20'}),
+            'job_number': ('django.db.models.fields.CharField', [], {'max_length': '20', 'primary_key': 'True'}),
             'number_of_cabs': ('django.db.models.fields.CharField', [], {'max_length': '20', 'null': 'True', 'blank': 'True'}),
             'number_of_floors': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'rear': ('django.db.models.fields.CharField', [], {'max_length': '20', 'null': 'True', 'blank': 'True'}),

@@ -80,7 +80,7 @@ class PurchaseOrder(models.Model):
 	po_number = models.CharField(verbose_name='PO Number', max_length=20, primary_key=True)
 	next_number = models.CharField(verbose_name='Next Number', max_length=20, blank=True, null= True)
 	date_issued = models.DateField(blank=True, null=True)
-	po_status = models.CharField(max_length=20, blank=True, null=True, default='0')
+	po_status = models.CharField(max_length=20, blank=True, null=True, default='New')
 	date_expected = models.DateField(blank=True, null=True)
 	supplier = models.ForeignKey(Contact, blank=True, null=True, related_name='po_item_supplier')
 	ship_to = models.ForeignKey(Contact, blank=True, null=True, related_name='po_ship_to')
@@ -97,10 +97,17 @@ class PurchaseOrder(models.Model):
 	returned_type = models.CharField(max_length=100, blank=True, null=True)
 	# items = models.ManyToManyField(PurchaseItem, blank=True, null=True)
 	items_total = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
+	po_total_before_tax = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
 	hst_taxable = models.CharField(max_length=2, blank=True, null=True)
 	hst_taxable_amount = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
+	total_hst_tax = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
+	
 	pst_taxable = models.CharField(max_length=2, blank=True, null=True)
 	pst_taxable_amount = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
+	total_pst_tax = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
+	
+	total_tax = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
+	
 	po_currency = models.ForeignKey(Currency, max_length=20, blank=True, null=True)
 	total_po_amount = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
 	po_overwridden_by = models.ForeignKey(User, blank=True, null=True, 
@@ -114,12 +121,12 @@ class PurchaseOrder(models.Model):
 	def __unicode__(self):
 		return self.po_number
 
-	@property
-	def status_verbose(self):
-		if self.po_status:
-			return dict(PO_STATUS)[int(self.po_status)]
-		else:
-			return "Unknown"
+	# @property
+	# def status_verbose(self):
+	# 	if self.po_status:
+	# 		return dict(PO_STATUS)[int(self.po_status)]
+	# 	else:
+	# 		return "Unknown"
 
 	def que_verbose(self):
 		if self.po_que == '':

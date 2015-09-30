@@ -54,8 +54,11 @@
 		  				<td>{[{jc.installed_by}]}</td>
 		  				<td>{[{jc.job_name}]}</td>
 		  				<td>{[{jc.estimated_price_for_job}]}</td>
-		  				<td>
-		  					<a href="/schedule/job-control/edit/{[{jc.job_number}]}/">EDIT</a>
+		  				<td width="100">
+		  					<div class="btn-group" role="group">
+		  					<a class="btn btn-warning btn-xs" href="/schedule/job-control/edit/{[{jc.job_number}]}/">Edit</a>
+		  					<a class="btn btn-danger btn-xs" href="/schedule/job-control/delete/{[{jc.job_number}]}/">Delete</a>
+		  					</div>
 		  				</td>
 		  			</tr>
 		  			<tr ng-show="!job_controls.length">

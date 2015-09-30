@@ -82,12 +82,13 @@ a.close {
 	<div class="col-md-12" ng-controller="AddJobControlController">
 		<div class="panel panel-primary">
 			<div class="panel-heading">
-		    	<h4>Add Job Control</h4>
+		    	<h4>Edit Job Control</h4>
 		  	</div>
 			<div class="panel-body">
-				<form action="/schedule/job-control/add/" method="POST" enctype="multipart/form-data">{% csrf_token %}
-					{% include "schedule/partial/job-control-form.html" %}
-					<input type="submit" class="btn btn-primary btn-lg" value="Add job control">
+				<form action="/schedule/job-control/edit/{{jc.job_number}}/" method="POST" enctype="multipart/form-data">{% csrf_token %}
+				<input type="hidden" id="jc_id" value="{{jc.job_number}}">
+					{% include "schedule/job-control-edit-form.html" %}
+					<input type="submit" class="btn btn-primary btn-lg" value="Update job control">
 				</form>
 			</div>
 		</div>
@@ -114,6 +115,54 @@ scheduleApp.controller('AddJobControlController', ['$scope', '$http', '$compile'
 		
         // $("#show_job_list").hide()
         $scope.show_job_list = false;
+        var jc_id = $("#jc_id").val();
+        console.log(jc_id);
+        var url = "/schedule/job-control/"+jc_id+"/json/";
+        $http({method: 'GET', url: url}).
+            success(function(job, status, headers, config) {
+            	console.log(job);
+                $scope.job_number = job.job_number;
+                $scope.job_name = job.job_name;
+				$scope.start_date = job.start_date;
+				$scope.number_of_cabs = job.number_of_cabs;
+				
+				$scope.sold_to = job.sold_to;
+				// $scope.sold_to_id = job.sold_to_id;
+				// $scope.sold_to_contacts = job.sold_to_contacts;
+				if(job.sold_to){
+					$scope.sold_to_contact_details = true;	
+				}
+				
+				
+				$scope.ship_to = job.ship_to;
+				// $scope.ship_to_id = job.ship_to_id;
+				if(job.ship_to){
+					$scope.ship_to_contact_details = true;	
+				}
+				
+
+				// $scope.installed_by_contact = job.installed_by_contact;
+				// $scope.installed_by_id = job.installed_by_id;
+				$scope.installed_by = job.installed_by;
+				if(job.installed_by){
+					$scope.installed_by_contact_details = true;	
+				}
+				
+
+				$scope.elevetor_type = job.elevetor_type;
+				$scope.number_of_floors = job.number_of_floors;
+				$scope.front = job.front;
+				$scope.rear = job.rear;
+				$scope.rgw = job.rgw;
+				$scope.capacity = job.capacity;
+				$scope.customer_po_number = job.customer_po_number;
+				$scope.delivery_date = job.delivery_date;
+				
+				$scope.estimated_price_for_job = job.estimated_price_for_job;
+                // Select deafult contacts               
+            
+        	});
+        
         
 	};
 
@@ -130,67 +179,6 @@ scheduleApp.controller('AddJobControlController', ['$scope', '$http', '$compile'
 		$scope.show_installed_by_contact_list = false;
 	}
 
-	$scope.searchJob = function(job_number) {
-		console.log(job_number.length);
-		if (job_number.length > 1) {
-			var url = "/schedule/job-control/search/?q="+job_number+"/";
-			$http({method: 'GET', url: url}).
-            success(function(data, status, headers, config) {
-                $scope.jobs = data;
-                // Select deafult contacts
-                console.log(data);
-                if(data.length > 0) {
-                	$scope.show_job_list = true;	
-                	$scope.add_new_job = false;
-                } else {
-                	$scope.show_job_list = false;
-                	$scope.add_new_job = true;
-                }
-                
-            
-        	});
-			
-		} else {
-			$scope.show_job_list = false;
-			$scope.add_new_job = false;
-		}
-		
-	}
-
-	$scope.selectJob = function (job) {
-		console.log(job);
-		$scope.show_job_list = false;
-		$scope.job_number = job.job_number;
-		$scope.job_name = job.job_name;
-		$scope.start_date = job.start_date;
-		$scope.number_of_cabs = job.number_of_cabs;
-		
-		$scope.sold_to = job.sold_to;
-		// $scope.sold_to_id = job.sold_to_id;
-		// $scope.sold_to_contacts = job.sold_to_contacts;
-		$scope.sold_to_contact_details = true;
-		
-		$scope.ship_to = job.ship_to;
-		// $scope.ship_to_id = job.ship_to_id;
-		$scope.ship_to_contact_details = true;
-
-		// $scope.installed_by_contact = job.installed_by_contact;
-		// $scope.installed_by_id = job.installed_by_id;
-		$scope.installed_by = job.installed_by;
-		$scope.installed_by_contact_details = true;
-
-		$scope.elevetor_type = job.elevetor_type;
-		$scope.number_of_floors = job.number_of_floors;
-		$scope.front = job.front;
-		$scope.rear = job.rear;
-		$scope.rgw = job.rgw;
-		$scope.capacity = job.capacity;
-		$scope.customer_po_number = job.customer_po_number;
-		$scope.delivery_date = job.delivery_date;
-		
-		$scope.estimated_price_for_job = job.estimated_price_for_job;
-
-	}
 
 	
 	// sold to google seach and select

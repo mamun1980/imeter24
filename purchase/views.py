@@ -216,7 +216,7 @@ def approve_purchase_request(request, pk):
             po.date_issued = datetime.now()
             po.po_created_by = request.user
             po.fob = 'Oshawa, Ontario, Canada'
-            po.po_status = 0
+            po.po_status = 'New'
             po.save_final_draft = 1
             po.supplier = pr.item.primary_supplier
             po.save()
@@ -475,10 +475,6 @@ def add_new_po(request):
     # import pdb; pdb.set_trace()
     try:
         sv = SystemVariable.objects.get(id=1)
-        next_po_number = sv.get_next_po_number
-        if not next_po_number:
-            messages.warning(request, "System varible is not set for PO. Please ask your admin to update System variable.")
-            return HttpResponseRedirect("/")
     except Exception, e:
         messages.warning(request, "System varible is not set for PO. Please ask your admin to update System variable.")
         return HttpResponseRedirect("/")
@@ -500,10 +496,12 @@ def add_new_po(request):
         if po_form.is_valid():
             po = po_form.save()
             
-            po.po_created_by = request.user
-            # po.datetime = datetime.datetime.now()
-            po.save_final_draft = 1
-            po.po_status = 0
+            if po_number == "":
+                po.po_created_by = request.user
+                # po.datetime = datetime.datetime.now()
+                po.save_final_draft = 1
+                po.po_status = 'New'
+                po.save()
             # po.search_string = po.po_number + " "
             # if po.supplier:
             #     po.search_string += po.supplier.contact_name + " "
@@ -536,7 +534,7 @@ def add_new_po(request):
                     item_dict['sub_total'] = float(sub_total) if sub_total != '' else sub_total
                     
                     item_dict['item_custom_detail'] = request.POST.get('custom_detail_'+item_seq, '')
-                    item_dict['item_custom_comment'] = request.POST.get('custom_comment_'+item_seq, '')
+                    # item_dict['item_custom_comment'] = request.POST.get('custom_comment_'+item_seq, '')
 
                     items.append(item_dict)
                     count = count + 1
@@ -552,24 +550,24 @@ def add_new_po(request):
 
                     try:
                         pi, created = PurchaseItem.objects.get_or_create(po=po, item=itemobj)
+                        
+                        pi.job_number = job
+                        if item['qty'] != '':
+                            pi.qty = item['qty']
+                        if item['unit'] != '':
+                            pi.unit = item['unit']
+                        if item['cost'] != '':
+                            pi.cost = item['cost']
+                        if item['sub_total'] != '':
+                            pi.sub_total = item['sub_total']
+                        pi.comment = item['comment']
+
+                        pi.custom_detail = item['item_custom_detail']
+                            # pi.custom_comment = item['item_custom_comment']
+
                         if created:
-                            pi.job_number = job
-                            if item['qty'] != '':
-                                pi.qty = item['qty']
-                            if item['unit'] != '':
-                                pi.unit = item['unit']
-                            if item['cost'] != '':
-                                pi.cost = item['cost']
-                            if item['sub_total'] != '':
-                                pi.sub_total = item['sub_total']
-                            pi.comment = item['comment']
-
-                            pi.custom_detail = item['item_custom_detail']
-                            pi.custom_comment = item['item_custom_comment']
-
-
                             pi.purchase_status = 0
-                            pi.save()
+                        pi.save()
                     except Exception, e:
                         raise e
                     # Update inventory item for Last PO info
@@ -584,12 +582,12 @@ def add_new_po(request):
                         itemobj.last_cost_paid = pi.cost
                         itemobj.last_PO_ordered_by = po.po_created_by
                         itemobj.last_PO_supplier = po.supplier
-                        if pi.qty:
+                        if pi.qty and itemobj.max_order_qty_remains:
                             itemobj.max_order_qty_remains = itemobj.max_order_qty_remains - Decimal(pi.qty)
 
                     itemobj.save()
             
-            po.save()
+            
             
             po_extra_contacts = POContact.objects.filter(purchase_order=po.po_number)
             po_items = PurchaseItem.objects.filter(po=po)
@@ -637,7 +635,7 @@ def add_new_po(request):
 
         return render(request, "purchase/add-po.html", 
             {"po_number":'NEW' , 'po_contact_form': po_contact_form, 'currencies': currencies,
-            'delivery_choices': delivery_choices, 'terms': terms, 'next_po_number':next_po_number,
+            'delivery_choices': delivery_choices, 'terms': terms,
             'deliver_internals': deliver_internals, 'users': users, 'item_unit_measures':item_unit_measures,
             'adminusers': adminusers, 'sv': sv})
 
@@ -741,7 +739,7 @@ def add_new_po_and_email(request):
         po.total_amount = total_amount
 
         po.save_final_draft = 1
-        po.po_status = 0
+        po.po_status = 'New'
 
         po.save()
 
@@ -809,11 +807,12 @@ def save_po(request):
 
 
 def search_po(request):
-    # query = request.GET.get('q','')
-    # if request.GET.get('q'):
-    #     purchase_orders = SearchQuerySet().using('po').filter(content=AutoQuery(query)).load_all()[:30]
-    # else:
-    purchase_orders = SearchQuerySet().using('po').all().load_all()[:30]
+    # import pdb; pdb.set_trace();
+    query = request.GET.get('q','')
+    if request.GET.get('q'):
+        purchase_orders = SearchQuerySet().using('po').filter(content=AutoQuery(query))[:30]
+    else:
+        purchase_orders = SearchQuerySet().using('po').all().load_all()[:30]
 
     po_list = []
     for po in purchase_orders:
@@ -824,6 +823,14 @@ def search_po(request):
             po_dict['supplier'] = po.supplier
             po_dict['terms'] = po.terms
             po_dict['shipping_inst'] = po.shipping_inst
+            po_dict['items'] = po.po_items
+            po_dict['hst_taxable'] = po.hst_taxable
+            po_dict['hst_taxable_amount'] = po.hst_taxable_amount
+            po_dict['total_hst_tax'] = po.total_hst_tax
+            po_dict['pst_taxable'] = po.pst_taxable
+            po_dict['pst_taxable_amount'] = po.pst_taxable_amount
+            po_dict['total_pst_tax'] = po.total_pst_tax
+            po_dict['total_tax'] = po.total_tax
 
             po_list.append(po_dict)
 
@@ -904,11 +911,8 @@ def get_po_by_id(request,pk):
     else:
         po_dict['date_expected'] = None
 
-    if po.po_status:
-        po_status = {}
-        po_status['id'] = po.po_status
-        po_status['label'] = po.status_verbose
-        po_dict['po_status'] = po_status
+    po_dict['po_status'] = po.po_status
+
     if po.supplier:
         supplier = {}
         supplier['id'] = str(po.supplier.id)
@@ -1001,12 +1005,28 @@ def get_po_by_id(request,pk):
         po_dict['items_total'] = po.items_total.to_eng_string()
     else:
         po_dict['items_total'] = None
+
     po_dict['hst_taxable'] = po.hst_taxable
-    if po.hst_taxable_amount:
+    if po.hst_taxable:
         po_dict['hst_taxable_amount'] = po.hst_taxable_amount.to_eng_string()
+        po_dict['total_hst_tax'] = po.total_hst_tax.to_eng_string()
+    else:
+        po_dict['hst_taxable_amount'] = po.hst_taxable_amount.to_eng_string()
+        po_dict['total_hst_tax'] = po.total_hst_tax.to_eng_string()
+
     po_dict['pst_taxable'] = po.pst_taxable
-    if po.pst_taxable_amount:
+    if po.pst_taxable:
         po_dict['pst_taxable_amount'] = po.pst_taxable_amount.to_eng_string()
+        po_dict['total_pst_tax'] = po.total_pst_tax.to_eng_string()
+    else:
+        po_dict['pst_taxable_amount'] = po.pst_taxable_amount.to_eng_string()
+        po_dict['total_pst_tax'] = po.total_pst_tax.to_eng_string()
+
+    if po.total_tax:
+        po_dict['total_tax'] = po.total_tax.to_eng_string()
+    else:
+        po_dict['total_tax'] = po.total_tax.to_eng_string()
+
     if po.po_currency:
         currency = {}
         currency['id'] = str(po.po_currency.id)
@@ -1058,6 +1078,7 @@ def get_po_by_id(request,pk):
 
         if po_item.job_number:
             item['job_number'] = po_item.job_number.job_number
+        
         item['qty'] = po_item.qty.to_eng_string()
         item['cost'] = po_item.cost.to_eng_string()
         
@@ -1096,6 +1117,7 @@ def get_po_by_id(request,pk):
         po_items.append(item)
 
     po_dict['items'] = po_items
+    po_dict['po_total_before_tax'] = po.po_total_before_tax.to_eng_string()
 
     json_posts = json.dumps(po_dict)
     return HttpResponse(json_posts, mimetype='application/json')
@@ -1133,7 +1155,7 @@ def get_purchase_orders(request):
             po_dict['date_expected'] = None
 
         po_dict['po_number'] = po.po_number
-        po_dict['status'] = po.status_verbose
+        po_dict['status'] = po.po_status
         if po.purchasing_agent:
             po_dict['purchasing_agent'] = po.purchasing_agent.username
         else:
@@ -1201,10 +1223,10 @@ def cancel_po_status(request, pk):
         po = PurchaseOrder.objects.get(po_number=po_number)
         po_status.po = po
         po_status.datetime = datetime.now()
-        po_status.status = 6
+        po_status.status = 'Canceled'
         po_status.save()
 
-        po.po_status = 6
+        po.po_status = 'Canceled'
         po.save()
         return HttpResponse(po_status.pk)
     else:
@@ -1530,9 +1552,9 @@ def receive_item(request, item_id):
             # Update PO Status
             pitems = PurchaseItem.objects.filter(po=po, purchase_status__lte=1)
             if not pitems:
-                po.po_status = 4
+                po.po_status = 'Accounting Confirmed'
             else:
-                po.po_status = 2
+                po.po_status = 'Partial Received'
             po.save()
 
             # Update Inventory item

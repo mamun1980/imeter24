@@ -8,300 +8,23 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'DeliverInternal'
-        db.create_table(u'purchase_deliverinternal', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('department', self.gf('django.db.models.fields.CharField')(max_length=50, null=True, blank=True)),
-            ('description', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-        ))
-        db.send_create_signal(u'purchase', ['DeliverInternal'])
+        # Adding field 'PurchaseOrder.total_hst_tax'
+        db.add_column(u'purchase_purchaseorder', 'total_hst_tax',
+                      self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True),
+                      keep_default=False)
 
-        # Adding model 'PurchaseRequest'
-        db.create_table(u'purchase_purchaserequest', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user_requested', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='po_requested_user', null=True, to=orm['auth.User'])),
-            ('item', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['inventory.Item'], null=True, blank=True)),
-            ('description', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('order_qty', self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True)),
-            ('item_require_before', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('requeste_created_at', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
-            ('approved_qty', self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True)),
-            ('approved_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('status', self.gf('django.db.models.fields.CharField')(max_length=15, null=True, blank=True)),
-        ))
-        db.send_create_signal(u'purchase', ['PurchaseRequest'])
-
-        # Adding model 'PurchaseRequestComment'
-        db.create_table(u'purchase_purchaserequestcomment', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('purchase_request', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['purchase.PurchaseRequest'])),
-            ('comment', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('commnet_date', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
-            ('user_commented', self.gf('django.db.models.fields.related.ForeignKey')(related_name='prc_user', to=orm['auth.User'])),
-        ))
-        db.send_create_signal(u'purchase', ['PurchaseRequestComment'])
-
-        # Adding model 'PurchaseOrder'
-        db.create_table(u'purchase_purchaseorder', (
-            ('po_number', self.gf('django.db.models.fields.CharField')(max_length=20, primary_key=True)),
-            ('next_number', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('date_issued', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('po_status', self.gf('django.db.models.fields.CharField')(default='New', max_length=20, null=True, blank=True)),
-            ('date_expected', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('supplier', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='po_item_supplier', null=True, to=orm['contacts.Contact'])),
-            ('ship_to', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='po_ship_to', null=True, to=orm['contacts.Contact'])),
-            ('ship_via', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='po_shipping_method', null=True, to=orm['contacts.DeliveryChoice'])),
-            ('terms', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='po_payment_terms', null=True, to=orm['contacts.PaymentTerm'])),
-            ('fob', self.gf('django.db.models.fields.CharField')(max_length=200, null=True, blank=True)),
-            ('shipping_inst', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('deliver_internal', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['purchase.DeliverInternal'], null=True, blank=True)),
-            ('date_confirmed', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('blanket_po', self.gf('django.db.models.fields.CharField')(max_length=2, null=True, blank=True)),
-            ('purchasing_agent', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='purchasing_agent', null=True, to=orm['auth.User'])),
-            ('returned_type', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
-            ('items_total', self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True)),
-            ('hst_taxable', self.gf('django.db.models.fields.CharField')(max_length=2, null=True, blank=True)),
-            ('hst_taxable_amount', self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True)),
-            ('pst_taxable', self.gf('django.db.models.fields.CharField')(max_length=2, null=True, blank=True)),
-            ('pst_taxable_amount', self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True)),
-            ('po_currency', self.gf('django.db.models.fields.related.ForeignKey')(max_length=20, to=orm['contacts.Currency'], null=True, blank=True)),
-            ('total_po_amount', self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True)),
-            ('po_overwridden_by', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='po_overwridden_by', null=True, to=orm['auth.User'])),
-            ('datetime', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2015, 2, 11, 0, 0), null=True, blank=True)),
-            ('po_que', self.gf('django.db.models.fields.CharField')(max_length=30, null=True, blank=True)),
-            ('po_created_by', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='po_created_by', null=True, to=orm['auth.User'])),
-            ('save_final_draft', self.gf('django.db.models.fields.NullBooleanField')(null=True, blank=True)),
-            ('search_string', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-        ))
-        db.send_create_signal(u'purchase', ['PurchaseOrder'])
-
-        # Adding model 'PurchaseItem'
-        db.create_table(u'purchase_purchaseitem', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('po', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['purchase.PurchaseOrder'], null=True, blank=True)),
-            ('item', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['inventory.Item'], null=True, blank=True)),
-            ('job_number', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['schedule.Job'], null=True, blank=True)),
-            ('unit', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('qty', self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True)),
-            ('cost', self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True)),
-            ('sub_total', self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True)),
-            ('purchase_status', self.gf('django.db.models.fields.CharField')(max_length=15, null=True, blank=True)),
-            ('comment', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('search_string', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('item_recv', self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True)),
-            ('item_recv_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-        ))
-        db.send_create_signal(u'purchase', ['PurchaseItem'])
-
-        # Adding model 'RequestItem'
-        db.create_table(u'purchase_requestitem', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('pr', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['purchase.PurchaseRequest'], null=True, blank=True)),
-            ('item', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['inventory.Item'], null=True, blank=True)),
-            ('approved_qty', self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True)),
-            ('approved_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('po', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['purchase.PurchaseOrder'], null=True, blank=True)),
-            ('total_po_qty', self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True)),
-            ('status', self.gf('django.db.models.fields.IntegerField')(max_length=2, null=True, blank=True)),
-        ))
-        db.send_create_signal(u'purchase', ['RequestItem'])
-
-        # Adding model 'POStatus'
-        db.create_table(u'purchase_postatus', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('po', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['purchase.PurchaseOrder'], null=True, db_column='po_number', blank=True)),
-            ('status_by', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='po_status_by', null=True, to=orm['auth.User'])),
-            ('datetime', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2015, 2, 11, 0, 0), null=True, blank=True)),
-            ('status', self.gf('django.db.models.fields.CharField')(default='Canceled', max_length=20, null=True, blank=True)),
-            ('status_comment', self.gf('django.db.models.fields.TextField')(max_length=1000, null=True, blank=True)),
-        ))
-        db.send_create_signal(u'purchase', ['POStatus'])
-
-        # Adding model 'POContact'
-        db.create_table(u'purchase_pocontact', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('purchase_order', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('contact_type', self.gf('django.db.models.fields.CharField')(max_length=50, null=True, blank=True)),
-            ('contact', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
-            ('contact_name', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
-        ))
-        db.send_create_signal(u'purchase', ['POContact'])
-
-        # Adding model 'ReceivedItemHistory'
-        db.create_table(u'purchase_receiveditemhistory', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('purchase_item', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['purchase.PurchaseItem'], null=True, blank=True)),
-            ('item_po', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['purchase.PurchaseOrder'], null=True, blank=True)),
-            ('qty_received', self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True)),
-            ('sub_total', self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True)),
-            ('item_received_date', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
-            ('reveived_by', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='item_recv_by', null=True, to=orm['auth.User'])),
-            ('comment', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('search_string', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-        ))
-        db.send_create_signal(u'purchase', ['ReceivedItemHistory'])
-
-        # Adding model 'ShippingList'
-        db.create_table(u'purchase_shippinglist', (
-            ('sl_number', self.gf('django.db.models.fields.CharField')(max_length=20, primary_key=True)),
-            ('sold_to', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='sl_sold_to', null=True, to=orm['contacts.Contact'])),
-            ('ship_to', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='sl_ship_to', null=True, to=orm['contacts.Contact'])),
-            ('ordered_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('date_required', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('job_number', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['schedule.Job'], null=True, blank=True)),
-            ('customer_po_number', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('customer_job_number', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('ship_via', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='sl_ship_via', null=True, to=orm['contacts.DeliveryChoice'])),
-            ('sl_status', self.gf('django.db.models.fields.CharField')(max_length=2, null=True, blank=True)),
-            ('search_string', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-        ))
-        db.send_create_signal(u'purchase', ['ShippingList'])
-
-        # Adding model 'ShippingItem'
-        db.create_table(u'purchase_shippingitem', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('item', self.gf('django.db.models.fields.related.ForeignKey')(related_name='shipping-item', to=orm['inventory.Item'])),
-            ('description', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('ordered', self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True)),
-            ('shipped', self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True)),
-            ('shipped_total_to_date', self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True)),
-            ('shipped_by', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='item_shipped_by', null=True, to=orm['auth.User'])),
-            ('last_shipped', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('backordered', self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True)),
-            ('filled', self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True)),
-            ('shipping_list', self.gf('django.db.models.fields.related.ForeignKey')(related_name='sl-item', to=orm['purchase.ShippingList'])),
-            ('item_ship_status', self.gf('django.db.models.fields.CharField')(max_length=10, null=True, blank=True)),
-            ('search_string', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-        ))
-        db.send_create_signal(u'purchase', ['ShippingItem'])
-
-        # Adding model 'PackingList'
-        db.create_table(u'purchase_packinglist', (
-            ('pl_number', self.gf('django.db.models.fields.CharField')(max_length=20, primary_key=True)),
-            ('sl', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['purchase.ShippingList'], null=True, blank=True)),
-            ('sold_to', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='sold_to', null=True, to=orm['contacts.Contact'])),
-            ('ship_to', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='ship_to', null=True, to=orm['contacts.Contact'])),
-            ('date_issued', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('date_shipped', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('shipped_by', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='shipped_by', null=True, to=orm['auth.User'])),
-            ('nel_packing_slip', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('job_number', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['schedule.Job'], null=True, blank=True)),
-            ('generated_by', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='generated_by', null=True, to=orm['auth.User'])),
-            ('order_type', self.gf('django.db.models.fields.CharField')(max_length=50, null=True, blank=True)),
-            ('ship_via', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='ship_via', null=True, to=orm['contacts.DeliveryChoice'])),
-            ('hold_at_dept_for_pickup', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('customer_broker', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='pl_customer_broker', null=True, to=orm['contacts.Contact'])),
-            ('customer_po_number', self.gf('django.db.models.fields.CharField')(max_length=50, null=True, blank=True)),
-            ('freight_charges', self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True)),
-            ('status', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('invoiced_on', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('search_string', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-        ))
-        db.send_create_signal(u'purchase', ['PackingList'])
-
-        # Adding model 'PackingItem'
-        db.create_table(u'purchase_packingitem', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('shipping_item', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['purchase.ShippingItem'], null=True, blank=True)),
-            ('description', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('unit', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('qty_ordered', self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True)),
-            ('qty_bo', self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True)),
-            ('qty_shipped', self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True)),
-            ('status', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('pl', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['purchase.PackingList'], null=True, blank=True)),
-            ('search_string', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-        ))
-        db.send_create_signal(u'purchase', ['PackingItem'])
-
-        # Adding model 'Invoice'
-        db.create_table(u'purchase_invoice', (
-            ('invoice_number', self.gf('django.db.models.fields.CharField')(max_length=20, primary_key=True)),
-            ('invoiced_by', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='invoiced_by', null=True, to=orm['auth.User'])),
-            ('sold_to', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='invoice-sold-to', null=True, to=orm['contacts.Contact'])),
-            ('ship_to', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='invoice-ship-to', null=True, to=orm['contacts.Contact'])),
-            ('broker', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='invoice_broker', null=True, to=orm['contacts.Contact'])),
-            ('pl', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='packing-list', null=True, to=orm['purchase.PackingList'])),
-            ('date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('ship_via', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='invoice_shipping_method', null=True, to=orm['contacts.DeliveryChoice'])),
-            ('po', self.gf('django.db.models.fields.CharField')(max_length=50, null=True, blank=True)),
-            ('job', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['schedule.Job'], null=True, blank=True)),
-            ('terms', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='invoice_payment_terms', null=True, to=orm['contacts.PaymentTerm'])),
-            ('fob', self.gf('django.db.models.fields.CharField')(max_length=200, null=True, blank=True)),
-            ('invoice_qty', self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True)),
-            ('sub_total', self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True)),
-            ('discount', self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True)),
-            ('discount_type', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('comment', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('discounted_sub_total', self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True)),
-            ('hst_taxable', self.gf('django.db.models.fields.CharField')(max_length=2, null=True, blank=True)),
-            ('hst_taxable_amount', self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True)),
-            ('pst_taxable', self.gf('django.db.models.fields.CharField')(max_length=2, null=True, blank=True)),
-            ('pst_taxable_amount', self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True)),
-            ('invoice_currency', self.gf('django.db.models.fields.related.ForeignKey')(max_length=20, to=orm['contacts.Currency'], null=True, blank=True)),
-            ('total_amount', self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True)),
-            ('status', self.gf('django.db.models.fields.CharField')(max_length=5, null=True, blank=True)),
-        ))
-        db.send_create_signal(u'purchase', ['Invoice'])
-
-        # Adding model 'InvoicedItem'
-        db.create_table(u'purchase_invoiceditem', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('invoice', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['purchase.Invoice'], null=True, blank=True)),
-            ('item', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['purchase.PackingItem'], unique=True, null=True, blank=True)),
-            ('unit', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('qty', self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True)),
-            ('price', self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True)),
-            ('sub_total', self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True)),
-        ))
-        db.send_create_signal(u'purchase', ['InvoicedItem'])
+        # Adding field 'PurchaseOrder.total_pst_tax'
+        db.add_column(u'purchase_purchaseorder', 'total_pst_tax',
+                      self.gf('django.db.models.fields.DecimalField')(default=0.0, null=True, max_digits=10, decimal_places=4, blank=True),
+                      keep_default=False)
 
 
     def backwards(self, orm):
-        # Deleting model 'DeliverInternal'
-        db.delete_table(u'purchase_deliverinternal')
+        # Deleting field 'PurchaseOrder.total_hst_tax'
+        db.delete_column(u'purchase_purchaseorder', 'total_hst_tax')
 
-        # Deleting model 'PurchaseRequest'
-        db.delete_table(u'purchase_purchaserequest')
-
-        # Deleting model 'PurchaseRequestComment'
-        db.delete_table(u'purchase_purchaserequestcomment')
-
-        # Deleting model 'PurchaseOrder'
-        db.delete_table(u'purchase_purchaseorder')
-
-        # Deleting model 'PurchaseItem'
-        db.delete_table(u'purchase_purchaseitem')
-
-        # Deleting model 'RequestItem'
-        db.delete_table(u'purchase_requestitem')
-
-        # Deleting model 'POStatus'
-        db.delete_table(u'purchase_postatus')
-
-        # Deleting model 'POContact'
-        db.delete_table(u'purchase_pocontact')
-
-        # Deleting model 'ReceivedItemHistory'
-        db.delete_table(u'purchase_receiveditemhistory')
-
-        # Deleting model 'ShippingList'
-        db.delete_table(u'purchase_shippinglist')
-
-        # Deleting model 'ShippingItem'
-        db.delete_table(u'purchase_shippingitem')
-
-        # Deleting model 'PackingList'
-        db.delete_table(u'purchase_packinglist')
-
-        # Deleting model 'PackingItem'
-        db.delete_table(u'purchase_packingitem')
-
-        # Deleting model 'Invoice'
-        db.delete_table(u'purchase_invoice')
-
-        # Deleting model 'InvoicedItem'
-        db.delete_table(u'purchase_invoiceditem')
+        # Deleting field 'PurchaseOrder.total_pst_tax'
+        db.delete_column(u'purchase_purchaseorder', 'total_pst_tax')
 
 
     models = {
@@ -393,6 +116,7 @@ class Migration(SchemaMigration):
             'description': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'duty_percentage': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '10', 'decimal_places': '2', 'blank': 'True'}),
             'estimated_wholesale_cost': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '10', 'decimal_places': '2', 'blank': 'True'}),
+            'hst_taxable': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'item_image': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'item_number': ('django.db.models.fields.CharField', [], {'max_length': '20', 'primary_key': 'True'}),
             'item_unit_measure': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['inventory.ItemUnitMeasure']", 'null': 'True', 'blank': 'True'}),
@@ -415,6 +139,7 @@ class Migration(SchemaMigration):
             'primary_supplier': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'item_supplier'", 'null': 'True', 'to': u"orm['contacts.Contact']"}),
             'producer_of_item': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contacts.Contact']", 'null': 'True', 'blank': 'True'}),
             'production_type': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['inventory.ProductionType']", 'null': 'True', 'blank': 'True'}),
+            'pst_taxable': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'qty_on_request': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '10', 'decimal_places': '4', 'blank': 'True'}),
             'qty_received': ('django.db.models.fields.DecimalField', [], {'default': '0.0', 'null': 'True', 'max_digits': '10', 'decimal_places': '2', 'blank': 'True'}),
             'qty_received_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
@@ -496,12 +221,12 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'PackingItem'},
             'description': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'pl': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['purchase.PackingList']", 'null': 'True', 'blank': 'True'}),
+            'pl': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'pl_items'", 'null': 'True', 'to': u"orm['purchase.PackingList']"}),
             'qty_bo': ('django.db.models.fields.DecimalField', [], {'default': '0.0', 'null': 'True', 'max_digits': '10', 'decimal_places': '4', 'blank': 'True'}),
             'qty_ordered': ('django.db.models.fields.DecimalField', [], {'default': '0.0', 'null': 'True', 'max_digits': '10', 'decimal_places': '4', 'blank': 'True'}),
             'qty_shipped': ('django.db.models.fields.DecimalField', [], {'default': '0.0', 'null': 'True', 'max_digits': '10', 'decimal_places': '4', 'blank': 'True'}),
             'search_string': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
-            'shipping_item': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['purchase.ShippingItem']", 'null': 'True', 'blank': 'True'}),
+            'sl_item': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['purchase.ShippingItem']", 'null': 'True', 'blank': 'True'}),
             'status': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'unit': ('django.db.models.fields.CharField', [], {'max_length': '20', 'null': 'True', 'blank': 'True'})
         },
@@ -537,7 +262,7 @@ class Migration(SchemaMigration):
         },
         u'purchase.postatus': {
             'Meta': {'object_name': 'POStatus'},
-            'datetime': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2015, 2, 11, 0, 0)', 'null': 'True', 'blank': 'True'}),
+            'datetime': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2015, 9, 30, 0, 0)', 'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'po': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['purchase.PurchaseOrder']", 'null': 'True', 'db_column': "'po_number'", 'blank': 'True'}),
             'status': ('django.db.models.fields.CharField', [], {'default': "'Canceled'", 'max_length': '20', 'null': 'True', 'blank': 'True'}),
@@ -548,6 +273,8 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'PurchaseItem'},
             'comment': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'cost': ('django.db.models.fields.DecimalField', [], {'default': '0.0', 'null': 'True', 'max_digits': '10', 'decimal_places': '4', 'blank': 'True'}),
+            'custom_comment': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'custom_detail': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'item': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['inventory.Item']", 'null': 'True', 'blank': 'True'}),
             'item_recv': ('django.db.models.fields.DecimalField', [], {'default': '0.0', 'null': 'True', 'max_digits': '10', 'decimal_places': '4', 'blank': 'True'}),
@@ -566,7 +293,7 @@ class Migration(SchemaMigration):
             'date_confirmed': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
             'date_expected': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
             'date_issued': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
-            'datetime': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2015, 2, 11, 0, 0)', 'null': 'True', 'blank': 'True'}),
+            'datetime': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2015, 9, 30, 0, 0)', 'null': 'True', 'blank': 'True'}),
             'deliver_internal': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['purchase.DeliverInternal']", 'null': 'True', 'blank': 'True'}),
             'fob': ('django.db.models.fields.CharField', [], {'max_length': '200', 'null': 'True', 'blank': 'True'}),
             'hst_taxable': ('django.db.models.fields.CharField', [], {'max_length': '2', 'null': 'True', 'blank': 'True'}),
@@ -578,7 +305,7 @@ class Migration(SchemaMigration):
             'po_number': ('django.db.models.fields.CharField', [], {'max_length': '20', 'primary_key': 'True'}),
             'po_overwridden_by': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'po_overwridden_by'", 'null': 'True', 'to': u"orm['auth.User']"}),
             'po_que': ('django.db.models.fields.CharField', [], {'max_length': '30', 'null': 'True', 'blank': 'True'}),
-            'po_status': ('django.db.models.fields.CharField', [], {'default': "'New'", 'max_length': '20', 'null': 'True', 'blank': 'True'}),
+            'po_status': ('django.db.models.fields.CharField', [], {'default': "'0'", 'max_length': '20', 'null': 'True', 'blank': 'True'}),
             'pst_taxable': ('django.db.models.fields.CharField', [], {'max_length': '2', 'null': 'True', 'blank': 'True'}),
             'pst_taxable_amount': ('django.db.models.fields.DecimalField', [], {'default': '0.0', 'null': 'True', 'max_digits': '10', 'decimal_places': '4', 'blank': 'True'}),
             'purchasing_agent': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'purchasing_agent'", 'null': 'True', 'to': u"orm['auth.User']"}),
@@ -590,7 +317,9 @@ class Migration(SchemaMigration):
             'shipping_inst': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'supplier': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'po_item_supplier'", 'null': 'True', 'to': u"orm['contacts.Contact']"}),
             'terms': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'po_payment_terms'", 'null': 'True', 'to': u"orm['contacts.PaymentTerm']"}),
-            'total_po_amount': ('django.db.models.fields.DecimalField', [], {'default': '0.0', 'null': 'True', 'max_digits': '10', 'decimal_places': '4', 'blank': 'True'})
+            'total_hst_tax': ('django.db.models.fields.DecimalField', [], {'default': '0.0', 'null': 'True', 'max_digits': '10', 'decimal_places': '4', 'blank': 'True'}),
+            'total_po_amount': ('django.db.models.fields.DecimalField', [], {'default': '0.0', 'null': 'True', 'max_digits': '10', 'decimal_places': '4', 'blank': 'True'}),
+            'total_pst_tax': ('django.db.models.fields.DecimalField', [], {'default': '0.0', 'null': 'True', 'max_digits': '10', 'decimal_places': '4', 'blank': 'True'})
         },
         u'purchase.purchaserequest': {
             'Meta': {'object_name': 'PurchaseRequest'},
@@ -668,7 +397,6 @@ class Migration(SchemaMigration):
         },
         u'schedule.job': {
             'Meta': {'object_name': 'Job'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'address_1': ('django.db.models.fields.TextField', [], {'max_length': '500', 'null': 'True', 'blank': 'True'}),
             'cab_designation': ('django.db.models.fields.CharField', [], {'max_length': '50', 'null': 'True', 'blank': 'True'}),
             'contact_email': ('django.db.models.fields.CharField', [], {'max_length': '500', 'null': 'True', 'blank': 'True'}),
@@ -682,8 +410,9 @@ class Migration(SchemaMigration):
             'drawing_req_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
             'drawing_sent_to_customer_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
             'eng_comment': ('django.db.models.fields.TextField', [], {'max_length': '200', 'null': 'True', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'job_name': ('django.db.models.fields.CharField', [], {'max_length': '150', 'null': 'True', 'blank': 'True'}),
-            'job_number': ('django.db.models.fields.CharField', [], {'max_length': '20', 'primary_key': 'True'}),
+            'job_number': ('django.db.models.fields.CharField', [], {'max_length': '20'}),
             'number_of_cabs': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'po_number': ('django.db.models.fields.CharField', [], {'max_length': '40', 'null': 'True', 'blank': 'True'}),
             'search_string': ('django.db.models.fields.TextField', [], {'max_length': '1000', 'null': 'True', 'blank': 'True'}),

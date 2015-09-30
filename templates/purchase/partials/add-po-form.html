@@ -3,7 +3,7 @@
 	<th width="150">
 		<label for="id_po_number">PO Number:</label>
 	</th>
-	<td colspan="3">
+	<td colspan="11">
 		<div style="position: relative;">
 			<input class="form-control" ng-model='search_po' maxlength="25" id="id_po_number_search"  type="search" name="po_number_search" ng-change="searchPo(search_po)" placeholder="Search for PO by Customer Name, Address, Phone Number, Item Description, PO Number or leave Blank for New PO" autocomplete="off" ng-disabled="po_checked">
 			
@@ -11,21 +11,54 @@
 				<table class="table">
 					<thead>
 						<tr>
-							<td>PO Number</td>
-							<td>PO Status</td>
-							<td>Supplier</td>
-							<td>Terms</td>
-							<td>Shipping Inst</td>	
-							<th><a class="close" ng-click="closeMe()">X</a></th>
+							<th>PO Number</th>
+							<th>Supplier</th>
+							<th>Contact Number</th>
+							<th>PO Status</th>
+							<th width="50%" align="center">PO Items</th>	
+							<th>
+								<a class="close" ng-click="closeMe()">X</a>
+							</th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr ng-repeat="po in pos | filter:search_po" ng-click="selectPo(po)">
+						<tr ng-repeat="po in pos | filter:search_po" ng-click="selectPo(po)" ng-class-odd="'odd'">
 							<td>{[{po.po_number}]}</td>
+							
+							<td>
+								<a href="/contacts/edit/{[{po.supplier.id}]}/">
+									{[{po.supplier.contact_name}]}
+								</a>
+							</td>
+							<td>{[{po.supplier.phones[0].number}]}</td>
 							<td>{[{po.po_status}]}</td>
-							<td>{[{po.supplier}]}</td>
-							<td>{[{po.terms}]}</td>
-							<td>{[{po.shipping_inst}]}</td>
+							<td>
+								<table class="table" border="1">
+									<thead>
+										<tr style="background-color:#000; color: #FFF;">
+											<th>Item Number</th>
+											<th>Description</th>
+											<th>Qty Ordered</th>
+											<th>Qty Received</th>
+											<th>Item Cost</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr ng-repeat="item in po.items" >
+											<td>{[{ item.item_number }]}</td>
+											<td>{[{ item.description }]}</td>
+											<td>{[{ item.qty_ordered }]}</td>
+											<td>{[{ item.item_recv }]}</td>
+											<td>{[{ item.sub_total }]}</td>
+										</tr>
+										<tr ng-show="!po.items.length">
+											<td colspan="5">
+												No Items
+											</td>
+										</tr>
+									</tbody>
+								</table>	
+							</td>
 							<td></td>
 						</tr>
 						<tr ng-show="!pos.length">
@@ -52,13 +85,13 @@
 	<th width="150">
 		<label for="id_date_issued">Date issued:</label>
 	</th>
-	<td>
+	<td colspan="4">
 		<input ng-model="dateIssued" class="form-control datepicker" id="id_date_issued" name="date_issued" value="{[{dateIssued}]}" placeholder="date issued" type="text" >
 	</td>
 	<th width="150">
 		<label for="id_date_expected">Date expected:</label>
 	</th>
-	<td>
+	<td colspan="4">
 
 
 		<input class="form-control datepicker" id="id_date_expected" name="date_expected" placeholder="date expected" type="text">
@@ -70,7 +103,7 @@
 	<th width="150" ng-class="{'ng-pristine': purchase_add_form.search_supplier.$pristine || purchase_add_form.search_supplier.$invalid}">
 		<label for="id_supplier">Supplier:</label>
 	</th>
-	<td colspan="3">
+	<td colspan="9">
 	<div class="contact_box">
 		<input type="text" ng-model="search_supplier" placeholder="start typing to search supplier" class="form-control" name="search_supplier" ng-required='true' ng-change="searchSupplier(search_supplier)" >
 		<span ng-show="purchase_add_form.search_supplier.$dirty && purchase_add_form.search_supplier.$error.required">*This field is required.</span>
@@ -154,7 +187,7 @@
 	<th width="150">
 		<label for="id_ship_to">Ship to:</label>
 	</th>
-	<td colspan="3">
+	<td colspan="9">
 	<div class="contact_box">
 		
 	
@@ -231,7 +264,7 @@
 	<th width="150">
 		<label for="id_ship_via">Ship via:</label>
 	</th>
-	<td>
+	<td colspan="4">
 		<select class="form-control" id="id_ship_via" name="ship_via">
 		{% for dc in delivery_choices %}
 			<option value="{{dc.id}}">{{dc.delivery_choice}}</option>
@@ -242,7 +275,7 @@
 	<th width="150">
 		<label for="id_deliver_internal">Department deliver internal:</label>
 	</th>
-	<td>
+	<td colspan="4">
 		<select class="form-control" id="id_deliver_internal" name="deliver_internal">
 			{% for di in deliver_internals %}
 			<option value="{{di.id}}">
@@ -257,7 +290,7 @@
 	<th width="150">
 		<label for="id_shipping_inst">Shipping inst:</label>
 	</th>
-	<td colspan="3">
+	<td colspan="9">
 		<textarea class="form-control" cols="40" id="id_shipping_inst" name="shipping_inst" placeholder="Shipping Inst" rows="3"></textarea>
 	</td>
 </tr>
@@ -266,7 +299,7 @@
 	<th width="150">
 		<label for="id_blanket_po">Blanket po:</label>
 	</th>
-	<td>
+	<td colspan="4">
 		<select class="form-control" id="id_blanket_po" name="blanket_po" placeholder="Blanket PO">
 		<option value="0">NO</option>
 		<option value="1">YES</option>
@@ -276,7 +309,7 @@
 	<th>
 		<label for="id_terms">Terms:</label>
 	</th>
-	<td colspan="3">
+	<td colspan="4">
 		<select class="form-control" id="id_terms" name="terms">
 			{% for pt in terms %}
 				<option value="{{pt.id}}" {% if pt.id = 2 %} selected="selected" {% endif %}>{{pt.term}}</option>
@@ -288,7 +321,7 @@
 	<th width="150">
 		<label for="id_purchasing_agent">Purchasing agent:</label>
 	</th>
-	<td>
+	<td colspan="4">
 		<select class="form-control" id="id_purchasing_agent" name="purchasing_agent">
 		{% for user in users %}
 			<option value="{{user.id}}" {% if user.id == request.user.id %}selected='selected' {% endif %}>
@@ -301,7 +334,7 @@
 	<th width="150">
 		<label for="id_returned_type">Type:</label>
 	</th>
-	<td>
+	<td colspan="4">
 		<select class="form-control" id="id_returned_type" name="returned_type">
 		<option value="0">Purchase Order</option>
 		<option value="1">Return For Credit</option>
@@ -315,13 +348,13 @@
 	</td>
 </tr>
 <tr>
-	<td colspan="4" align="center" ng-class="{'item_error ng-pristine': !item_added, 'bg-primary': item_added }">
+	<td colspan="10" align="center" ng-class="{'item_error ng-pristine': !item_added, 'bg-primary': item_added }">
 		<span style="font-size: 14px; font-style: bold;">Add Items here for this purchase order</h4>
 		<a href="/inventory/item/add/" class="btn btn-default" target="_blank">Add New Item To Inventory</a>
 	</td>
 </tr>
 <tr>
-	<td colspan="4" ng-class="{'item_error ng-pristine': !item_added, 'bg-info': item_added }">
+	<td colspan="10" ng-class="{'item_error ng-pristine': !item_added, 'bg-info': item_added }">
 		<div class="item_box">
 						
 			<table class="table item">
@@ -431,9 +464,12 @@
 					<span id='items_total_qty'>0.0</span>
 					<input class="form-control" id="id_items_total" name="items_total" type="hidden">
 				</td>
-				<td colspan="2">Total Amount</td>
-				<td width="120">{{ currency.get_currency_icon }}<span class="amount">0</span></td>
-				<td width="10" colspan="5"></td>
+				<td colspan="2"></td>
+				<td colspan="2">Total Amount Without Tax:</td>
+				<td width="120">{{ currency.get_currency_icon }}<span class="amount">{[{ po_total_before_tax }]}</span></td>
+				<td width="10" colspan="4">
+					<input type="hidden" id="po_total_before_tax" name="po_total_before_tax" value="{[{ po_total_before_tax }]}">
+				</td>
 			</tr>
 				
 			</table>
@@ -444,36 +480,64 @@
 </tr>
 
 <tr class="bg-success">
-	<th width="150">
+	<th width="150" colspan="2">
 		<label for="id_hst_taxable">Hst taxable:</label>
 	</th>
-	<td>
+	<td colspan="3">
 		<select class="form-control tax" ng-model="hst_tax" id="id_hst_taxable" name="hst_taxable" ng-change="updateHST(hst_tax)">
 		<option value="0">NO</option>
 		<option value="1">YES</option>
 		</select>
 		
 		<input class="form-control decimal tax" ng-if="hst_tax" ng-model="hst_tax_amount" ng-change="addHstAmount(hst_tax_amount)" id="id_hst_taxable_amount" name="hst_taxable_amount" type="text">
+
+		<input type="hidden" ng-if="!hst_tax" name="hst_taxable_amount" value="0.00">
+		
 		<input type="hidden" id="hst_default_amount" value="{{ sv.default_hst_tax_amount}}">
 	</td>
-	<th width="150">
+	<td colspan="1">
+		<label for="">HST tax Amount:</label>
+	</td>
+	<td colspan="4">
+		<input type="text" name="total_hst_tax" id="hst_tax_amount" class="form-control" value="0.000" readonly="readonly">
+	</td>
+</tr>
+<tr class="bg-success">
+	<th width="150" colspan="2">
 		<label for="id_pst_taxable">Pst taxable:</label>
 	</th>
-	<td>
+	<td colspan="3">
 		<select class="form-control tax" ng-model="pst_tax" id="id_pst_taxable" name="pst_taxable" ng-change="updatePST(pst_tax)">
 		<option value="0">NO</option>
 		<option value="1">YES</option>
 		</select>
 		<input class="form-control decimal tax" ng-if="pst_tax" ng-model="pst_tax_amount" id="id_pst_taxable_amount" name="pst_taxable_amount" ng-change="addPstAmount(pst_tax_amount)" placeholder="PST Taxable Amount" value="0.0" type="text">
+		<input type="hidden" ng-if="!pst_tax" name="pst_taxable_amount" value="0.00">
+
 		<input type="hidden" id="pst_default_amount" value="{{ sv.default_pst_tax_amount}}">
 	</td>
+	<td colspan="1">
+		<label for="">PST tax Amount:</label>
+	</td>
+	<td colspan="4">
+		<input type="text" name="total_pst_tax" id="pst_tax_amount" class="form-control" value="0.000" readonly="readonly">
+	</td>
 </tr>
-
+<tr class="bg-warning">
+	<th colspan="5">
+	</th>
+	<th colspan="2">
+		<label for="id_po_currency">Total tax amount:</label>
+	</th>
+	<td colspan="3">
+		<input type="text" class="form-control" id="total_tax_amount" style="font-size: 14px;" name="total_tax" value="{[{ total_tax_amount }]}" readonly="readonly">
+	</td>
+</tr>
 <tr class="bg-info">
 	<th width="150">
 		<label for="id_po_currency">Po currency:</label>
 	</th>
-	<td>
+	<td colspan="4">
 		<select class="form-control" id="id_po_currency" name="po_currency">
 		{% for currency in currencies %}
 		<option data-currency-icon="{{ currency.get_currency_icon }}" value="{{currency.id}}" {% if currency.id == 1 %} selected="selected" {% endif %}>
@@ -485,23 +549,20 @@
 	<th width="150">
 		<label for="id_total_po_amount">Total po amount:</label>
 	</th>
-	<td>
-		<input class="form-control" ng-model="total_amount" id="id_total_po_amount" name="total_po_amount" value="0.0" readonly="readonly" type="text">
+	<td colspan="4">
+		<input class="form-control" ng-model="total_amount" id="id_total_po_amount" name="total_po_amount" value="0.00" readonly="readonly" type="text">
 	</td>
 </tr>
 
 <tr>
-	<td>
-		
-		
-	</td>
-	<td colspan="2">
+
+	<td colspan="6">
 		<label>PDF PO </label> <input type="checkbox" data-toggle="toggle" data-on="Yes" data-off="No" name="pdf_po" style="margin-left: 10px; margin-right: 20px;">
 		<label>Print PO</label><input type="checkbox" data-toggle="toggle" data-on="Yes" data-off="No"  name="print_po" style="margin-left: 10px; margin-right: 20px;">
 		<label>Email PO</label><input type="checkbox" data-toggle="toggle" data-on="Yes" data-off="No" name="email_po" style="margin-left: 10px; margin-right: 20px;">
 		<label>Fax PO</label><input type="checkbox" data-toggle="toggle" data-on="Yes" data-off="No" name="fax_po" style="margin-left: 10px; margin-right: 20px;">
 	</td>
-	<td>
+	<td colspan="4">
 		<button type="submit" ng-show="show_update_button" class="btn btn-primary btn-large form-control" ng-disabled="!(purchase_add_form.$valid && purchase_add_form.$dirty && item_added)">Update PO</button>
 		<button type="submit" ng-show="show_add_button" class="btn btn-primary btn-large form-control" ng-disabled="!(purchase_add_form.$valid && purchase_add_form.$dirty && item_added)">Create PO</button>
 	</td>

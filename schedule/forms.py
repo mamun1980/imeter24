@@ -329,7 +329,7 @@ class JobControlForm(forms.ModelForm):
         if self.action == 'new':
             # import pdb; pdb.set_trace();
             sv = SystemVariable.objects.get(id=1)
-            job_control.job_number = 'JC'+str(sv.next_job_number)
+            job_control.job_number = 'J'+str(sv.next_job_number)
             job_control.save()
 
             sv.next_job_number = int(sv.next_job_number) + 1
