@@ -615,6 +615,8 @@ def add_new_po(request):
             if fax_po:
                 print fax_po
 
+            po.save()
+
             return HttpResponseRedirect("/purchase/list-purchase-orders/")
 
             # return render(request, "purchase/show_draft_po.html", {'po': po, 'extra_contacts': po_extra_contacts, 'po_items': po_items})
