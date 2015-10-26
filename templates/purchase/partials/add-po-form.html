@@ -30,7 +30,11 @@
 									{[{po.supplier.contact_name}]}
 								</a>
 							</td>
-							<td>{[{po.supplier.phones[0].number}]}</td>
+							<td>
+								<a href="/purchase/call-contact/{[{ po.supplier.phones[0].number }]}/extension/{[{po.supplier.phones[0].number}]}/">
+									{[{po.supplier.phones[0].number}]}
+								</a>
+							</td>
 							<td>{[{po.po_status}]}</td>
 							<td>
 								<table class="table" border="1">
@@ -122,7 +126,14 @@
 					<p><b>country</b>: {[{supplier_contact.country}]}</p>
 				</td>
 			</tr>
-			
+			<tr>
+				<th>Phones</th>
+				<td colspan="2">
+					<li ng-repeat="ph in supplier_contact.phones">
+						<span class='bg-info phone'>{[{ ph.type}]}: {[{ ph.number}]} ({[{ph.ext}]})</span>
+					</li>
+				</td>
+			</tr>
 			<tr>
 				<th>Emails</th>
 				<td colspan="2">

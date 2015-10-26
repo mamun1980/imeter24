@@ -33,6 +33,10 @@ from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from purchase.serializer import *
 
 
+def call_contact(request, number, ext):
+    output = str(number) + ":" +str(ext)
+    return HttpResponse(output)
+
 def html_to_pdf_response(html):
     result = StringIO.StringIO()
     pdf = pisa.pisaDocument(
@@ -473,6 +477,7 @@ def add_purchase_order(request):
 @csrf_exempt
 def add_new_po(request):
     # import pdb; pdb.set_trace()
+    
     try:
         sv = SystemVariable.objects.get(id=1)
     except Exception, e:
@@ -588,32 +593,110 @@ def add_new_po(request):
                     itemobj.save()
             
             
-            
+            import time
             po_extra_contacts = POContact.objects.filter(purchase_order=po.po_number)
             po_items = PurchaseItem.objects.filter(po=po)
-
+            domain = request.get_host()
+            url = 'http://'+domain+'/purchase/pdf-po/'+po.po_number+'/'
             # import pdb; pdb.set_trace()
+            context = {
+                'po': po,
+                'purchase_items': po_items
+            }
+            temp = "purchase/pdf_po.html"
+
+            try:
+                report = Report.objects.get(report_type__icontains='PO Email')    
+            except Exception, e:
+                report = Report.objects.get(id=1)
+
             if email_po:
+                if domain != '127.0.0.1:8000':
+                    filepath = '/usr/home/www/'+domain+'/temp/'+po.po_number+"_"+str(time.time())+"_temp_fax.pdf"
+                else:
+                    filepath = '/home/mamun/report/'+po.po_number+"_"+str(time.time())+"_temp_fax.pdf"
+
                 try:
-                    report = Report.objects.get(report_type__icontains='PO Email')    
+                    
+                    write_pdf(temp, context, filepath)
+                    
+                    single_report = SingleReport.objects.create(report=report)
+                    single_report.que_type = 'email'
+                    single_report.search_string = "="+str(po.po_number)
+                    single_report.search_status_type = 'PO'
+                    single_report.current_job_status = 'new'
+                    single_report.script_name = report.python_script
+                    single_report.save()
+
                 except Exception, e:
-                    report = Report.objects.get(id=1)    
-                
-                single_report = SingleReport.objects.create(report=report)
-                single_report.que_type = 'email'
-                single_report.search_string = "="+str(po.po_number)
-                single_report.search_status_type = 'PO'
-                single_report.script_name = report.python_script
-                single_report.save()
+                    raise e
+            
+
 
             if pdf_po:
-                print pdf_po
+                
+                if domain != '127.0.0.1:8000':
+                    filepath = '/usr/home/www/'+domain+'/temp/'+po.po_number+"_"+str(time.time())+"_temp_fax.pdf"
+                else:
+                    filepath = '/home/mamun/report/'+po.po_number+"_"+str(time.time())+"_temp.pdf"
+
+                try:
+
+                    write_pdf(temp, context, filepath)
+
+                    single_report = SingleReport.objects.create(report=report)
+                    single_report.que_type = 'pdf'
+                    single_report.search_string = "="+str(po.po_number)
+                    single_report.search_status_type = 'PO'
+                    single_report.current_job_status = 'new'
+                    single_report.email = 'paul@scom.ca'
+                    single_report.script_name = report.python_script
+                    single_report.save()
+                except Exception, e:
+                    raise e
+                
 
             if print_po:
-                print print_po
+                if domain != '127.0.0.1:8000':
+                    filepath = '/usr/home/www/'+domain+'/temp/'+po.po_number+"_"+str(time.time())+"_temp_fax.pdf"
+                else:
+                    filepath = '/home/mamun/report/'+po.po_number+"_"+str(time.time())+"_temp_print.pdf"
+
+                try:
+
+                    write_pdf(temp, context, filepath)
+
+                    single_report = SingleReport.objects.create(report=report)
+                    single_report.que_type = 'print'
+                    single_report.search_string = "="+str(po.po_number)
+                    single_report.search_status_type = 'PO'
+                    single_report.current_job_status = 'new'
+                    single_report.script_name = report.python_script
+                    single_report.save()
+
+                except Exception, e:
+                    raise e
 
             if fax_po:
-                print fax_po
+                if domain != '127.0.0.1:8000':
+                    filepath = '/usr/home/www/'+domain+'/temp/'+po.po_number+"_"+str(time.time())+"_temp_fax.pdf"
+                else:
+                    filepath = '/home/mamun/report/'+po.po_number+"_"+str(time.time())+"_temp_fax.pdf"
+
+                try:
+                    
+                    write_pdf(temp, context, filepath)
+                    
+                    single_report = SingleReport.objects.create(report=report)
+                    single_report.que_type = 'fax'
+                    single_report.search_string = "="+str(po.po_number)
+                    single_report.search_status_type = 'PO'
+                    single_report.current_job_status = 'new'
+                    single_report.script_name = report.python_script
+                    single_report.save()
+
+                except Exception, e:
+                    raise e
 
             po.save()
 
@@ -640,6 +723,43 @@ def add_new_po(request):
             'delivery_choices': delivery_choices, 'terms': terms,
             'deliver_internals': deliver_internals, 'users': users, 'item_unit_measures':item_unit_measures,
             'adminusers': adminusers, 'sv': sv})
+
+
+
+def write_pdf(template_src, context_dict, filename):
+    template = get_template(template_src)
+    context = Context(context_dict)
+    html  = template.render(context)
+    result = open(filename, 'wb') # Changed from file to filename
+    pdf = pisa.pisaDocument(StringIO.StringIO(
+        html.encode("UTF-8")), result)
+    result.close()
+    
+
+def pdf_po(request, po_id):
+    # import pdb; pdb.set_trace();
+    # resource_directory = os.path.dirname(os.path.dirname(__file__))
+    # rendered_html = render_to_string("purchase/pdf_po.html", locals())
+    po = PurchaseOrder.objects.get(po_number=po_id)
+    purchase_items = PurchaseItem.objects.filter(po=po)
+
+    domain = request.get_host()
+    url = 'http://'+domain+'/purchase/pdf-po/'+po.po_number+'/'
+    if domain != '127.0.0.1:8000':
+        filepath = '/usr/home/www/'+domain+'/temp/'+po.po_number+".pdf"
+    else:
+        filepath = '/home/mamun/report/'+po.po_number+".pdf"
+
+    context = {
+        'po': po,
+        'purchase_items': purchase_items
+    }
+
+    temp = "purchase/pdf_po.html"
+
+    write_pdf(temp, context, filepath)
+
+    return render(request, "purchase/pdf_po.html", {'po': po, 'purchase_items':purchase_items})
 
 
 @csrf_exempt

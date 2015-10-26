@@ -13,6 +13,7 @@ QUE_TYPE = (
 	('email', 'Email'),
 	('printer', 'Printer'),
 	('fax', 'Fax'),
+	('pdf', 'Pdf'),
 
 )
 

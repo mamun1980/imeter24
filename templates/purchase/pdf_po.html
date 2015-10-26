@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
 <html>
 <head>
 	<title>PO Report</title>
 <style type="text/css">
-@page {
+ @page {
   size: a4 landscape;
   margin: 0.5cm;
   font-style: 16px;
@@ -37,10 +37,10 @@ ul {
 <body>
 <table width="100%" cellpadding="10">
 	<tr>
-		<td width="80%">
+		<td width="60%">
 			<img src="{{resource_directory}}/statics/images/PremierLogo.jpeg" width="150" height="100">
 		</td>
-		<td align="right">
+		<td align="center">
 			<table>
 				<tr><td><h1>Purchase Order</h1></td></tr>
 			</table>
@@ -58,7 +58,7 @@ ul {
 		<td style="text-align: left;">
 			1400 Phillip Murray Avenue, Oshawa, Ontario (Canada) - L1J7E8
 		</td>
-		<td>
+		<td align="center">
 			<span>Tel: (416) 773-1400</span>
 			<span>Fax: (416) 847-5284</span>
 		</td>
@@ -75,14 +75,7 @@ ul {
 									<th colspan="2" cellspacing="2">Supplier</th>
 								</tr>
 							</thead>
-							<tr>
-								<td colspan="2">
-								<ul>
-									<li></li>
-								</ul>
-									
-								</td>
-							</tr>
+							
 							<tr>
 								<td width="100">Contact Name</td>
 								<td>
@@ -125,14 +118,7 @@ ul {
 									<th colspan="2">Ship To</th>
 								</tr>
 							</thead>
-							<tr>
-								<td colspan="2">
-								<ul>
-									<li></li>
-								</ul>
-									
-								</td>
-							</tr>
+							
 							<tr>
 								<td width="100">Contact Name</td>
 								<td>
@@ -175,22 +161,15 @@ ul {
 									<th colspan="2" cellspacing="2">Issued By</th>
 								</tr>
 							</thead>
+							
 							<tr>
-								<td colspan="2">
-								<ul>
-									<li></li>
-								</ul>
-									
-								</td>
-							</tr>
-							<tr>
-								<td width="100">First Name</td>
+								<td width="100">First Name: </td>
 								<td>
 									{{po.purchasing_agent.first_name}}
 								</td>
 							</tr>
 							<tr>
-								<td width="100">Last Name</td>
+								<td width="100">Last Name: </td>
 								<td>
 									{{po.purchasing_agent.last_name}}
 								</td>
@@ -228,9 +207,9 @@ ul {
 	</tr>
 	<tr>
 		<td colspan="2" width="100%">
-			<table width="100%" cellpadding="1">
-				<thead>
-					<tr>
+			<table width="100%">
+				<thead width="100%">
+					<tr width="100%">
 						<th>Date Issued</th>
 						<th>Date Expected</th>
 						<th>Ship Via</th>
@@ -239,8 +218,8 @@ ul {
 						<th>Terms</th>
 					</tr>
 				</thead>
-				<tbody>
-					<tr>
+				<tbody width="100%">
+					<tr width="100%">
 						<td>{{po.date_issued}}</td>
 						<td>{{po.date_expected}}</td>
 						<td>{{po.ship_via.delivery_choice}}</td>
@@ -276,11 +255,19 @@ ul {
 						<td>{{item.sub_total}}</td>
 					</tr>
 				{% endfor %}
+				<tr>
+					<th colspan="5">Total HST Tax</th>
+					<td style="background-color: #EEE; color: red">{{po.total_hst_tax}}</td>
+				</tr>
+				<tr>
+					<th colspan="5">Total PST Tax</th>
+					<td style="background-color: #EEE; color: red">{{po.total_pst_tax}}</td>
+				</tr>
 				</tbody>
 				<tfoot>
 					<tr>
-						<th colspan="5">Total This Purchase Order</th>
-						<th>{{po.total_po_amount}}</th>
+						<th colspan="5" align="right">Total This Purchase Order: </th>
+						<th align="left">{{po.total_po_amount}}</th>
 					</tr>
 				</tfoot>
 			</table>
@@ -309,7 +296,7 @@ ul {
 					</td>
 				</tr>
 				<tr>
-					<td width="80%" align="right">
+					<td colspan="2" width="80%" align="right">
 						<b>Authorized By</b>
 					</td>
 					<td align="right">

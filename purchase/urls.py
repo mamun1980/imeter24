@@ -12,7 +12,7 @@ urlpatterns = patterns('',
     url(r'^list-approved-pr/$', 'purchase.views.list_approved_pr', name='list-approved-pr'),
     url(r'^list-ri/json/$', 'purchase.views.list_ri_json', name='list-ri-json'),
     url(r'^request-item/delete/$', 'purchase.views.request_item_delete', name='ri-delete'),
-
+    url(r'^call-contact/(?P<number>\d+)/extension/(?P<ext>\d+)/$','purchase.views.call_contact'),
     url(r'^add-po2/$', 'purchase.views.add_purchase_order', name='add-purchase-order'),
     
     url(r'^generate-po/(?P<po_id>\w+)/$', 'purchase.views.generate_po', name='generate-po'),
@@ -23,7 +23,11 @@ urlpatterns = patterns('',
     url(r'^add-po/$', 'purchase.views.add_new_po', name='add-new-po'),
     url(r'^add-po-email/$', 'purchase.views.add_new_po_and_email', name='add-new-po-email'),
     # url(r'^add-po/$', 'purchase.views.add_new_po', name='add-new-po'),
+    url(r'^pdf-po/(?P<po_id>\w+)/$', 'purchase.views.pdf_po', name='pdf-po'),
     url(r'^save-po/$', 'purchase.views.save_po', name='save-po'),
+    # url(r'^save-po/$', 'purchase.views.save_po', name='save-po'),
+
+
     url(r'^show-draft-po/$', 'purchase.views.show_draft_po', name='draft-po'),
     url(r'^list/$', 'purchase.views.po_list', name='po-list'),
     url(r'^get-po-by-id/(?P<pk>\w+)/$', 'purchase.views.get_po_by_id', name='get-po-by-id'),
