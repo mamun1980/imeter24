@@ -28,14 +28,34 @@ from haystack.query import SearchQuerySet, EmptySearchQuerySet
 from haystack.views import SearchView
 from haystack.inputs import Raw, Clean, AutoQuery
 import re
-
+import time
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from purchase.serializer import *
 
 
-def call_contact(request, number, ext):
-    output = str(number) + ":" +str(ext)
+@csrf_exempt
+def call_number(request, number, ext):
+    # import pdb; pdb.set_trace();
+    output = str(number)+":"+str(ext)
+    phone = str(number)
+    if ext != '0':
+        phone += '-ext-'+str(ext)
+
+    domain = request.get_host()
+    if domain == '127.0.0.1:8000':
+        filename = '/home/mamun/paul_asterisk/'+str(time.time())+'_'+phone+".call"
+    else:
+        filename = '/rmt/asterisk/var/spool/asterisk/outgoing/temp_'+phone+".call"
+    f = open (filename,'w')
+    f.write ('Channel: DAHDI/g0/6478399800\n')
+    f.write ('CallerID: "SCOM Temp Alarm" <8009991001>\n')
+    f.write ('Application: Playback\n')
+    f.write ('Data: custom/temp_warning \n')
+    f.write ('MaxRetries: 5\n')
+    f.write ('RetryTime: 30\n')
+    f.close()
     return HttpResponse(output)
+
 
 def html_to_pdf_response(html):
     result = StringIO.StringIO()

@@ -1,0 +1,64 @@
+<!-- Modal -->
+<!-- Modal -->
+<div class="modal fade" id="itemDetailsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h4 class="modal-title" id="myModalLabel">Add custom details</h4>
+</div>
+
+<div class="modal-body" style="text-align: left;">
+<input type="hidden" name="item_seq" id="item_seq">
+	<div>
+		<b>Item customisation details</b>
+
+		<textarea class="form-control custom_details" name="custom_details"></textarea>
+	</div>
+	
+	<div>
+		<b>Comments</b>
+
+		<textarea class="form-control custom_comment" name="custom_comment"></textarea>
+	</div>
+    		
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default close-modal" data-dismiss="modal">Close</button>
+    <button type="button" class="btn btn-primary" id="itemDetailsUpdate">Update changes</button>
+</div>
+
+<script type="text/javascript">
+(function(){
+	
+    $("#itemDetailsUpdate").on("click", function(e){
+        e.preventDefault();
+        var custom_detail = $("textarea.custom_details").val();      
+        var custom_comment = $("textarea.custom_comment").val();
+        var item_seq_no = $("#item_seq").val();
+        
+        $('#itemDetailsModal').modal('hide');
+
+        var tr = $("tbody#add_item_list").find("a[data-seq='"+item_seq_no+"']").closest("tr");
+        var newrow = "<tr class='bg-warning'>";
+        newrow += "<td colspan='1'><b>Customisation details</b></td>";
+        newrow += "<td colspan='2'><textarea class='form-control' name='custom_detail_"+item_seq_no+"'>";
+        newrow += custom_detail;
+        newrow += "</textarea></td>";
+        newrow += "<td colspan='1'><b>Comment</b></td>";
+        newrow += "<td colspan='3'><textarea class='form-control' name='custom_comment_"+item_seq_no+"'>";
+        newrow += custom_comment;
+        newrow += "</textarea></td>";
+        newrow += "</tr>";
+
+        tr.after(newrow);
+        
+    });
+
+})(jQuery)
+    
+</script>
+		</div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

@@ -22,8 +22,8 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr ng-repeat="po in pos | filter:search_po" ng-click="selectPo(po)" ng-class-odd="'odd'">
-							<td>{[{po.po_number}]}</td>
+						<tr ng-repeat="po in pos | filter:search_po" ng-class-odd="'odd'">
+							<td ng-click="selectPo(po)">{[{po.po_number}]}</td>
 							
 							<td>
 								<a href="/contacts/edit/{[{po.supplier.id}]}/">
@@ -31,7 +31,7 @@
 								</a>
 							</td>
 							<td>
-								<a href="/purchase/call-contact/{[{ po.supplier.phones[0].number }]}/extension/{[{po.supplier.phones[0].number}]}/">
+								<a href="#" data-call="/purchase/call-contact/{[{po.supplier.phones[0].number}]}/extension/{[{po.supplier.phones[0].ext || 0 }]}/" class="call_number">
 									{[{po.supplier.phones[0].number}]}
 								</a>
 							</td>

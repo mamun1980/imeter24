@@ -241,6 +241,36 @@ $(document).on("change", "input.decimal", function(e){
 // $("a.close").on("click", function(){
 // 	$(this).closest('table').hide();
 // });
+$(document).on("click", "a.call_number", function(e){
+	e.preventDefault();
+	alert("Calling...");
+	var url = $(this).data('call');
+	console.log(url);
+	$.ajax({
+		type: "POST",
+		url: url,
+		success: function(rdata) {
+               console.log(rdata);
+           }
+	});
+});
+
+$("a.call_number").on("click", function(e){
+	// alert("hello");
+	e.preventDefault();
+	console.log('hello');
+	// var url = $(this).data('call');
+	// console.log(url);
+
+	// return false;
+	// $.ajax({
+	// 		type: "POST",
+	// 		url: url,
+	// 		success: function(rdata) {
+ //                alert("Hello world!");
+ //            }
+	// 	});
+});
 
 $( "input[name='item_job_number']" ).autocomplete({
   source: "/schedule/list-filter/",
@@ -480,6 +510,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 	}
 
 	$scope.init();
+
 
 	// suppplier google search and select
 	$scope.closeMe = function() {

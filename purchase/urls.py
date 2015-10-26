@@ -12,7 +12,7 @@ urlpatterns = patterns('',
     url(r'^list-approved-pr/$', 'purchase.views.list_approved_pr', name='list-approved-pr'),
     url(r'^list-ri/json/$', 'purchase.views.list_ri_json', name='list-ri-json'),
     url(r'^request-item/delete/$', 'purchase.views.request_item_delete', name='ri-delete'),
-    url(r'^call-contact/(?P<number>\d+)/extension/(?P<ext>\d+)/$','purchase.views.call_contact'),
+
     url(r'^add-po2/$', 'purchase.views.add_purchase_order', name='add-purchase-order'),
     
     url(r'^generate-po/(?P<po_id>\w+)/$', 'purchase.views.generate_po', name='generate-po'),
@@ -27,6 +27,7 @@ urlpatterns = patterns('',
     url(r'^save-po/$', 'purchase.views.save_po', name='save-po'),
     # url(r'^save-po/$', 'purchase.views.save_po', name='save-po'),
 
+    url(r'^call-contact/(?P<number>[-\w]+)/extension/(?P<ext>\w+)/$', 'purchase.views.call_number'),
 
     url(r'^show-draft-po/$', 'purchase.views.show_draft_po', name='draft-po'),
     url(r'^list/$', 'purchase.views.po_list', name='po-list'),
