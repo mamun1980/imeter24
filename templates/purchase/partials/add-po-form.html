@@ -107,171 +107,197 @@
 	<th width="150" ng-class="{'ng-pristine': purchase_add_form.search_supplier.$pristine || purchase_add_form.search_supplier.$invalid}">
 		<label for="id_supplier">Supplier:</label>
 	</th>
-	<td colspan="9">
-	<div class="contact_box">
-		<input type="text" ng-model="search_supplier" placeholder="start typing to search supplier" class="form-control" name="search_supplier" ng-required='true' ng-change="searchSupplier(search_supplier)" >
+	<td colspan="4">
+		<input type="text" ng-model="search_supplier" placeholder="start typing to search supplier" class="form-control" name="search_supplier" ng-required='true' ng-change="searchSupplier(search_supplier)" style="width: 95%; display: inline;" ><a href="/admin/contacts/contact/add/" class="add-another" id="add_id_primary_supplier" onclick="return showAddAnotherPopup(this);"> <img src="/statics/admin/img/icon_addlink.gif" width="10" height="10" alt="Add Another"></a>
 		<span ng-show="purchase_add_form.search_supplier.$dirty && purchase_add_form.search_supplier.$error.required">*This field is required.</span>
+		<div class="contact_list">
+			<table class="table selectable" class="ui-autocomplete ui-widget-content-custom ui-corner-all" id="supplier_contact_list">
+				<thead>
+					<tr>
+						<th>Contact Name</th><th>Address</th><th> Primary Cont No.</th>
+						<th><a href="" class="close" ng-click="hideSupplierContact()">x</a></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="ui-menu-item" ng-repeat="contact in suppliers" ng-click="setSupplier(contact)">
+						
+						
+						<td class="contact_name">{[{contact.contact_name}]}</td>
+						<td class="address_1">
+							<p ng-if="contact.address_1 != ''">{[{contact.address_1}]}</p>
+							<p ng-if="contact.city != ''">City / Province: {[{contact.city}]}<span ng-if="contact.province != ''">, {[{contact.province}]}</span></p>
+							<p>
+							<span ng-if="contact.postal_code !=''">Post code: {[{ contact.postal_code }]}, </span>
+							<span ng-if="contact.country != ''"> country: {[{contact.country}]}</span>
+							</p>
+						</td>
+						
+						<td class="city">
+							<div class='phone' ng-repeat="phon in contact.phones" ng-if="$first">
+								{[{phon.number}]} <span ng-if="phon.ext !=''"> (ext: {[{phon.ext}]})</span>
+							</div>
+						</td>
+						
+						<td>
+							
+						</td>
+					</tr>
+				</tbody>
+			</table>
 
-		<table class="table" id="supplier_contact_details" ng-show="supplier_contact">
-			<tr>
-				<th width="150">Contact Name</th>
-				<td colspan="2">{[{ supplier_contact.contact_name }]}</td>
-			</tr>
-			<tr>
-				<th>Address</th>
-				<td colspan="2">
-					<p>{[{supplier_contact.address_1}]}</p>
-					<p><b>city / province</b>: {[{supplier_contact.city}]}<span ng-show="{[{supplier_contact.province}]}">, {[{supplier_contact.province}]}</span></p>
-					<p><b>Post code</b>: {[{ supplier_contact.postal_code }]}</p>
-					<p><b>country</b>: {[{supplier_contact.country}]}</p>
-				</td>
-			</tr>
-			<tr>
-				<th>Phones</th>
-				<td colspan="2">
-					<li ng-repeat="ph in supplier_contact.phones">
-						<span class='bg-info phone'>{[{ ph.type}]}: {[{ ph.number}]} ({[{ph.ext}]})</span>
-					</li>
-				</td>
-			</tr>
-			<tr>
-				<th>Emails</th>
-				<td colspan="2">
-					<li ng-repeat="em in supplier_contact.emails">
-						<span class='bg-info email'>{[{ em.email_address}]} ({[{em.email_type}]})</span>
-					</li>
-				</td>
-			</tr>
-			<tr>
-				<th colspan="3">
-					<a class="btn btn-info" ng-click="addExtraContact()">
-						Add Extra Contact
-					</a>
-				</th>
-			</tr>
-			<tfoot class="extra-contact">
-					
-			</tfoot>
-			
-			
-		</table>
-
-		<table class="table selectable" class="ui-autocomplete ui-widget-content-custom ui-corner-all" id="supplier_contact_list">
-			<thead>
-				<tr>
-					<th>Contact Name</th><th>Address 1</th><th> Primary Cont No.</th>
-					<th><a href="" class="close" ng-click="hideSupplierContact()">x</a></th>
+			<input type="hidden" name="supplier" id="id_supplier">
+		</div>
+		
+	</td>
+	<th width="150">
+		<label for="id_ship_to">Ship to:</label>
+	</th>
+	<td colspan="4">
+		<input type="text" ng-model="search_ship_to" placeholder="start typing to search ship to contact" class="form-control" ng-change="searchShipTo(search_ship_to)" style="width: 95%; display: inline;"><a href="/admin/contacts/contact/add/" class="add-another" id="add_id_primary_supplier" onclick="return showAddAnotherPopup(this);"> <img src="/statics/admin/img/icon_addlink.gif" width="10" height="10" alt="Add Another"></a>
+		<div class="contact_list">
+			<table class="table selectable" class="ui-autocomplete ui-widget-content-custom ui-corner-all" id="ship_to_contact_list">
+				<thead>
+					<tr>
+						<th>Contact Name</th><th>Address</th><th> Primary Cont No.</th>
+						<th><a href="" class="close" ng-click="hideShiptoContact()">x</a></th>
+					</tr>
+				</thead>
+				<tbody>
+				
 				</tr>
-			</thead>
-			<tbody>
-			<tr class="ui-menu-item" ng-repeat="contact in suppliers" ng-click="setSupplier(contact)">
-				
-				
-				<td class="contact_name">{[{contact.contact_name}]}</td>
-				<td class="address_1">
-					<p>{[{contact.address_1}]}</p>
-					<p>City / Province: {[{contact.city}]}<span ng-show="{[{contact.province}]}">, {[{contact.province}]}</span></p>
-					<p>Post code: {[{ contact.postal_code }]}<span ng-show="{[{contact.country}]}"> , country: {[{contact.country}]}</span></p>
-				</td>
-				
-				<td class="city">
-					<div class='phone' ng-repeat="phon in contact.phones" ng-if="$first">
-						<span>{[{phon.number}]} (ext: {[{phon.phone_ext}]})</span>
-					</div>
-				</td>
-				
-				<td>
-					
-				</td>
-				
-			</tr>
-			</tbody>
-		</table>
+					<tr class="ui-menu-item" ng-repeat="contact in shipto" ng-click="selectShipTo(contact)">
+						
+						
+						<td class="contact_name">{[{contact.contact_name}]}</td>
+						<td class="address_1">
+							<p ng-if="contact.address_1 != ''">{[{contact.address_1}]}</p>
+							<p ng-if="contact.city != ''">City / Province: {[{contact.city}]}<span ng-if="contact.province != ''">, {[{contact.province}]}</span></p>
+							<p>
+							<span ng-if="contact.postal_code !=''">Post code: {[{ contact.postal_code }]}, </span>
+							<span ng-if="contact.country != ''"> country: {[{contact.country}]}</span>
+							</p>
+						</td>
+						
+						<td class="city">
+							<div class='phone' ng-repeat="phon in contact.phones" ng-if="$first">
+								{[{phon.number}]} <span ng-if="phon.ext !=''"> (ext: {[{phon.ext}]})</span>
+							</div>
+						</td>
+						
+						<td>
+							
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		
 
-		<input type="hidden" name="supplier" id="id_supplier">
-	</div>
-
+			<input id="id_ship_to" name="ship_to" type="hidden">
+		</div>
 
 	</td>
 </tr>
 <tr>
-	<th width="150">
-		<label for="id_ship_to">Ship to:</label>
-	</th>
-	<td colspan="9">
-	<div class="contact_box">
-		
-	
-		<input type="text" ng-model="search_ship_to" placeholder="start typing to search ship to contact" class="form-control" ng-change="searchShipTo(search_ship_to)">
-		<table class="table" id="ship_to_contact_details">
-			<tr>
-				<th width="150">Contact Name</th>
-				<td>{[{ ship_to_contact.contact_name }]}</td>
-			</tr>
-			<tr>
-				<th>Address</th>
-				<td colspan="2">
-					<p>{[{ship_to_contact.address_1}]}</p>
-					<p><b>city / province</b>: {[{ship_to_contact.city}]}<span ng-show="{[{ship_to_contact.province}]}">, {[{ship_to_contact.province}]}</span></p>
-					<p><b>Post code</b>: {[{ ship_to_contact.postal_code }]}</p>
-					<p><b>country</b>: {[{ship_to_contact.country}]}</p>
-				</td>
-			</tr>
-			<tr>
-				<th>Phone</th>
-				<td>
-					<li ng-repeat='phone in ship_to_contact.phones'>
-						{[{ phone.type }]}: {[{phone.number}]} (ext-{[{phone.ext}]})
-					</li>
-				</td>
-			</tr>
-			<tr>
-				<th>Email</th>
-				<td>
-					<li ng-repeat="em in supplier_contact.emails">
-						<span class='bg-info email'>{[{ em.email_address}]} ({[{em.email_type}]})</span>
-					</li>
-				</td>
-			</tr>
-		</table>
-		<table class="table selectable" class="ui-autocomplete ui-widget-content-custom ui-corner-all" id="ship_to_contact_list">
-			<thead>
+	<td colspan="5">
+		<div class="contact_box">
+			<table class="table" id="supplier_contact_details" ng-show="supplier_contact">
 				<tr>
-					<th>Contact Name</th><th>Address 1</th><th> Primary Cont No.</th>
-					<th><a href="" class="close" ng-click="hideShiptoContact()">x</a></th>
+					<th width="150">Contact Name</th>
+					<td colspan="2">{[{ supplier_contact.contact_name }]}</td>
 				</tr>
-			</thead>
-			<tbody>
-			<tr class="ui-menu-item" ng-repeat="contact in shipto" ng-click="selectShipTo(contact)">
+				<tr>
+					<th>Address</th>
+					<td colspan="2">
+						<p ng-if="supplier_contact.address_1 != ''">
+							<b>Address Line1: </b>{[{supplier_contact.address_1}]}
+						</p>
+						<p ng-if="supplier_contact.address_2 != ''">
+							<b>Address Line2:</b>{[{supplier_contact.address_2}]}
+						</p>
+						<p><b>city / province</b>: {[{supplier_contact.city}]}<span ng-if="supplier_contact.province != ''">, {[{supplier_contact.province}]}</span></p>
+						
+						<p><b>country</b>: {[{supplier_contact.country}]}</p>
+						<p><b>Post code</b>: {[{ supplier_contact.postal_code }]}</p>
+					</td>
+				</tr>
+				<tr>
+					<th>Phones</th>
+					<td colspan="2">
+						<li ng-repeat="ph in supplier_contact.phones">
+							<span class='bg-info phone'>{[{ ph.type}]}: {[{ ph.number}]} </span> <span ng-if="ph.ext != ''">Ext: ({[{ph.ext}]})</span>
+						</li>
+					</td>
+				</tr>
+				<tr>
+					<th>Emails</th>
+					<td colspan="2">
+						<li ng-repeat="em in supplier_contact.emails">
+							<span class='bg-info email'>{[{ em.email_address}]} ({[{em.email_type}]})</span>
+						</li>
+					</td>
+				</tr>
+				<tr>
+					<th colspan="3">
+						<a class="btn btn-info" ng-click="addExtraContact()">
+							Add Extra Contact
+						</a>
+					</th>
+				</tr>
+							
 				
-				
-				<td class="contact_name">{[{contact.contact_name}]}</td>
-				<td class="address_1">
-					<p>{[{contact.address_1}]}</p>
-					<p>City / Province: {[{contact.city}]}<span ng-show="{[{contact.province}]}">, {[{contact.province}]}</span></p>
-					<p>Post code: {[{ contact.postal_code }]}<span ng-show="{[{contact.country}]}"> , country: {[{contact.country}]}</span></p>
-				</td>
-				<td class="city">
-					<div class='phone' ng-repeat="phon in contact.phones" ng-if="$first">
-						<span>{[{phon.number}]} (ext: {[{phon.phone_ext}]})</span>
-					</div>
-				</td>
-				
-				<td>
-					
-				</td>
-				
-			</tr>
-			</tbody>
-		</table>
+			</table>
+			<table class="table" id="extra_contact_list">
+			
+			</table>
+			
+		</div>
 		
-
-		<input id="id_ship_to" name="ship_to" type="hidden">
-	</div>
-
-</td>
+		
+	</td>
+	<td colspan="5">
+		<div class="contact_box">
+			<table class="table" id="ship_to_contact_details">
+				<tr>
+					<th width="150">Contact Name</th>
+					<td>{[{ ship_to_contact.contact_name }]}</td>
+				</tr>
+				<tr>
+					<th>Address</th>
+					<td colspan="2">
+						<p ng-if="ship_to_contact.address_1 != ''">
+							<b>Address Line1: </b>{[{ship_to_contact.address_1}]}
+						</p>
+						<p ng-if="ship_to_contact.address_2 != ''">
+							<b>Address Line2:</b>{[{ship_to_contact.address_2}]}
+						</p>
+						<p><b>city / province</b>: {[{ship_to_contact.city}]}<span ng-if="ship_to_contact.province != ''">, {[{ship_to_contact.province}]}</span></p>
+						
+						<p><b>country</b>: {[{ship_to_contact.country}]}</p>
+						<p><b>Post code</b>: {[{ ship_to_contact.postal_code }]}</p>
+					</td>
+				</tr>
+				<tr>
+					<th>Phone</th>
+					<td>
+						<li ng-repeat='phone in ship_to_contact.phones'>
+							<span> {[{ phone.type }]}: {[{phone.number}]} </span> <span ng-if="phone.phone_ext != ''">Ext: ( {[{phone.phone_ext}]} )</span>
+						</li>
+					</td>
+				</tr>
+				<tr>
+					<th>Email</th>
+					<td>
+						<li ng-repeat="em in ship_to_contact.emails">
+							<span class='bg-info email'>{[{ em.email_address}]} ({[{em.email_type}]})</span>
+						</li>
+					</td>
+				</tr>
+			</table>
+		</div>
+		
+	</td>
 </tr>
-<tr class="bg-success">	
+<tr class="bg-info">	
 	<th width="150">
 		<label for="id_ship_via">Ship via:</label>
 	</th>
@@ -306,7 +332,7 @@
 	</td>
 </tr>
 
-<tr class="bg-success">
+<tr class="bg-info">
 	<th width="150">
 		<label for="id_blanket_po">Blanket po:</label>
 	</th>
@@ -328,7 +354,7 @@
 		</select>
 	</td>
 </tr>
-<tr class="bg-info">
+<tr class="bg-success">
 	<th width="150">
 		<label for="id_purchasing_agent">Purchasing agent:</label>
 	</th>
@@ -490,7 +516,7 @@
 
 </tr>
 
-<tr class="bg-success">
+<tr class="bg-info">
 	<th width="150" colspan="2">
 		<label for="id_hst_taxable">Hst taxable:</label>
 	</th>

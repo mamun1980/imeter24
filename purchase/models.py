@@ -227,13 +227,13 @@ class POStatus(models.Model):
 		return dict(PO_STATUS)[int(self.status)]
 
 class POContact(models.Model):
-	purchase_order = models.CharField(max_length=20, blank=True, null=True)
+	purchase_order = models.ForeignKey(PurchaseOrder, blank=True, null=True)
 	contact_type = models.CharField(max_length=50, blank=True, null=True)
 	contact = models.CharField(max_length=100, blank=True, null=True)
 	contact_name = models.CharField(max_length=100, blank=True, null=True)
 
 	def __unicode__(self):
-		return "%s - %s " % (self.purchase_order, self.contact)
+		return str(self.contact_name)
 
 	class Meta:
 		permissions = (

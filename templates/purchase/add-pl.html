@@ -39,12 +39,16 @@ table > tbody {
 	position: absolute;
 	top: 34px;
 	left: 0px;
+    width: 980px;
 	background-color: #DDD;
 	z-index: 1000;
 	/*border: 1px solid #000;*/
 	-webkit-box-shadow: 0px 0px 10px 0px rgba(50, 50, 50, 0.75);
 	-moz-box-shadow:    0px 0px 10px 0px rgba(50, 50, 50, 0.75);
 	box-shadow:         0px 0px 10px 0px rgba(50, 50, 50, 0.75);
+}
+#ship_to_contact_list {
+    left: -600px !important;
 }
 .sold_to_contact tbody tr:hover, .ship_to_contact tbody tr:hover, .customer_broker_contact tbody tr:hover {
 	background-color: #616183;
@@ -120,13 +124,24 @@ p.item_desc {
 
 </div>
 
-
+{% include "modals/add-modal.html" %}
 <script type="text/javascript">
 (function(){
 $(".datepicker").datepicker();
 $("a.close").on("click", function(){
 	$(this).closest('table').hide();
 });
+
+$("a#add_id_primary_supplier").on("click", function(e){
+        e.preventDefault();
+        url = "/contacts/add/rel/",
+        mdal = $('#addModal');
+        mdal.on("shown.bs.modal", function(){
+            $("#addModal .modal-content").load(url);
+            // console.log(url);
+        }).modal();
+        return false;
+    });
 
 var plApp = angular.module("plApp", [], function ($interpolateProvider) {
         $interpolateProvider.startSymbol("{[{");

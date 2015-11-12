@@ -10,7 +10,7 @@
 {% block content %}
 <style type="text/css">
 .selectable .ui-selected, #selectable-producer .ui-selected { background: #F39814; color: white; }
-.selectable,#selectable-producer { list-style-type: none; margin: 0; padding: 0px 2px 0px 0px; width: 100%; }
+.selectable,#selectable-producer { list-style-type: none; margin: 0; padding: 0px 2px 0px 0px; width: 980px; }
 .selectable thead tr, #selectable-producer thead tr { margin: 0px 3px; padding: 0.4em; font-size: 1.4em; height: 35px; background-color: #ed791a; }
 .selectable tbody tr, #selectable-producer tbody tr { margin: 0px 3px; padding: 0.4em; font-size: 1.4em; height: 35px; border-bottom: 1px solid #EEE; }
 .selectable tbody tr:hover, #selectable-producer tbody tr:hover { background-color: #FECA40; color: #000; }
@@ -60,7 +60,7 @@
 	background-color: #616183;
 }
 
-.contact_box, .item_box {
+.contact_box,.contact_list, .item_box {
 	position: relative;
 }
 .input-group {
@@ -74,7 +74,7 @@ table#supplier_contact_details th, table#ship_to_contact_details th{
 }
 #ship_to_contact_list, #supplier_contact_list {
 	position: absolute;
-	top: 34px;
+	top: 0px;
 	left: 0px;
 	background-color: #DDD;
 	z-index: 1000;
@@ -82,6 +82,9 @@ table#supplier_contact_details th, table#ship_to_contact_details th{
 	-webkit-box-shadow: 0px 0px 10px 0px rgba(50, 50, 50, 0.75);
 	-moz-box-shadow:    0px 0px 10px 0px rgba(50, 50, 50, 0.75);
 	box-shadow:         0px 0px 10px 0px rgba(50, 50, 50, 0.75);
+}
+#ship_to_contact_list {
+	left: -560px !important;
 }
 
 #items_list {
@@ -237,7 +240,19 @@ $(".datepicker").datepicker();
 $(document).on("change", "input.decimal", function(e){
 	var myval = parseFloat($(this).val())
 	$(this).val(myval.toFixed(2));
-})
+});
+
+$("a#add_id_primary_supplier").on("click", function(e){
+	e.preventDefault();
+	url = "/contacts/add/rel/",
+	mdal = $('#addModal');
+	mdal.on("shown.bs.modal", function(){
+		$("#addModal .modal-content").load(url);
+		// console.log(url);
+	}).modal();
+	return false;
+});
+
 // $("a.close").on("click", function(){
 // 	$(this).closest('table').hide();
 // });
@@ -470,6 +485,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 		// get premier #1 contact
 		$http({method: 'GET', url: "/contacts/get-contact/1/"}).
         	success(function(data, status, headers, config){
+        	// console.log(data);
         	$scope.ship_to_contact = data;
 			$("#id_ship_to").val(data.id);
 			$("#ship_to_contact_details").show();
@@ -537,6 +553,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
     		$http({method: 'GET', url: url}).
 	            success(function(data, status, headers, config) {
 	                $scope.suppliers = data.results;
+	                console.log(data.results);
 	                
 	            });
 	        $("#supplier_contact_list").show();
@@ -583,7 +600,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 		// autoselect terms
 		if(con.term){
 			$("#id_terms").val(con.term.id);	
-			console.log("Terms id"+ con.term.id);
+			// console.log("Terms id"+ con.term.id);
 		}
 		
 		// autoselect FOB
@@ -673,7 +690,21 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 				$scope.supplier_contact = data.supplier;
 				$scope.search_supplier = data.supplier.contact_name;
 				$("#id_supplier").val(data.supplier.id);
-				$scope.purchase_add_form.search_supplier.$setViewValue($scope.purchase_add_form.search_supplier.$viewValue);	
+				$scope.purchase_add_form.search_supplier.$setViewValue($scope.purchase_add_form.search_supplier.$viewValue);
+
+				if(data.extra_contacts.length > 0){
+					var ec_div = $("#extra_contact_list");
+
+					for(var i=0; i < data.extra_contacts.length; i++) {
+						var extra_contact = data.extra_contacts[i];
+						if(i==0) {
+							var header = "<tr class='bg-primary'><td>Contact Type</td><td>Contact Details</td><td>Contact Name</td><td>Action</td></tr>";
+							ec_div.html(header);
+						}
+						var con = "<tr class='bg-info'><td>"+extra_contact.contact_type+"</td><td>"+extra_contact.contact+"</td><td>"+extra_contact.contact_name+"</td><td><a href='' data-pecid='"+extra_contact.id+"' class='delete-extra-contact'>Delete</a><input type='hidden' name='po_extra_contacts' value='"+extra_contact.id+"'></td></tr>";
+						ec_div.append(con);
+					}
+				}	
 			}
 			$("#supplier_contact_details").show();
 
@@ -1182,7 +1213,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
     $scope.addExtraContact = function() {
 		console.log("testing..");
 		mdal = $('#addModal');
-		url = "/purchase/add-po-contact/p1004/",
+		url = "/purchase/add-extra-contact/",
 		mdal.on("shown.bs.modal", function(){
 			$("#addModal .modal-content").load(url);
 			

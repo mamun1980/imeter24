@@ -1,6 +1,6 @@
 import datetime
 from haystack import indexes
-from purchase.models import PurchaseOrder, ShippingList, PackingList, PurchaseItem
+from purchase.models import PurchaseOrder, ShippingList, PackingList, PurchaseItem, POContact
 
 
 class PurchaseOrderIndex(indexes.SearchIndex, indexes.Indexable):
@@ -71,6 +71,19 @@ class PurchaseOrderIndex(indexes.SearchIndex, indexes.Indexable):
                 item_list.append(item_dic)
 
         self.prepared_data['po_items'] = item_list
+
+        extra_contacts = POContact.objects.filter(purchase_order=obj)
+        ec_list = []
+        if extra_contacts:
+            for ec in extra_contacts:
+                ex_con = {}
+                ex_con['id'] = ec.pk
+                ex_con['contact_type'] = ec.contact_type
+                ex_con['contact'] = ec.contact
+                ex_con['contact_name'] = ec.contact_name
+                ec_list.append(ex_con)
+        self.prepared_data['extra_contacts'] = ec_list
+
 
         # self.prepared_data['po_status'] = obj.po_status
         return self.prepared_data

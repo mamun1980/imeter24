@@ -48,7 +48,7 @@ urlpatterns = patterns('',
 
     url(r'^get-po-items/(?P<po_id>\w+)/$', 'purchase.views.get_po_items', name='get-purchase-order-items'),
 
-    url(r'^add-po-contact/(?P<po_id>[\w ,\'-]+)/$', 'purchase.views.add_po_contact', name='add-purchase-order-contact'),
+    url(r'^add-extra-contact/$', 'purchase.views.add_extra_contact', name='add-purchase-order-contact'),
 
     url(r'^po-extra-contact/(?P<po_id>[\w ,\'-]+)/$', 'purchase.views.extra_po_contact', name='add-extra-purchase-order-contact'),
     url(r'^delete-po-contact/$', 'purchase.views.delete_extra_po_contact', name='delete-extra-purchase-order-contact'),

@@ -496,8 +496,7 @@ def add_purchase_order(request):
 
 @csrf_exempt
 def add_new_po(request):
-    # import pdb; pdb.set_trace()
-    
+
     try:
         sv = SystemVariable.objects.get(id=1)
     except Exception, e:
@@ -505,7 +504,7 @@ def add_new_po(request):
         return HttpResponseRedirect("/")
 
     if request.method == 'POST':
-        # import pdb; pdb.set_trace()
+        
         po_number = request.POST.get("po_number","")
         email_po = request.POST.get("email_po")
         fax_po = request.POST.get("fax_po")
@@ -530,7 +529,16 @@ def add_new_po(request):
             # po.search_string = po.po_number + " "
             # if po.supplier:
             #     po.search_string += po.supplier.contact_name + " "
-        
+            
+            # ========== Add / Remove extra contact
+            # import pdb; pdb.set_trace();
+            extra_contact_ids = request.POST.getlist('po_extra_contacts')
+            if extra_contact_ids:
+                for extra_contact_id in extra_contact_ids:
+                    extra_contact = POContact.objects.get(id=extra_contact_id)
+                    extra_contact.purchase_order = po
+                    extra_contact.save()
+
             items = []
             item_list = request.POST.getlist('added_item_number')
             po_items_seq = request.POST.getlist('po_item_seq')
@@ -642,7 +650,7 @@ def add_new_po(request):
                     
                     single_report = SingleReport.objects.create(report=report)
                     single_report.que_type = 'email'
-                    single_report.search_string = "="+str(po.po_number)
+                    # single_report.search_string = "="+str(po.po_number)
                     single_report.search_status_type = 'PO'
                     single_report.current_job_status = 'new'
                     single_report.script_name = report.python_script
@@ -666,7 +674,7 @@ def add_new_po(request):
 
                     single_report = SingleReport.objects.create(report=report)
                     single_report.que_type = 'pdf'
-                    single_report.search_string = "="+str(po.po_number)
+                    # single_report.search_string = "="+str(po.po_number)
                     single_report.search_status_type = 'PO'
                     single_report.current_job_status = 'new'
                     single_report.email = 'paul@scom.ca'
@@ -688,7 +696,7 @@ def add_new_po(request):
 
                     single_report = SingleReport.objects.create(report=report)
                     single_report.que_type = 'print'
-                    single_report.search_string = "="+str(po.po_number)
+                    # single_report.search_string = "="+str(po.po_number)
                     single_report.search_status_type = 'PO'
                     single_report.current_job_status = 'new'
                     single_report.script_name = report.python_script
@@ -709,7 +717,7 @@ def add_new_po(request):
                     
                     single_report = SingleReport.objects.create(report=report)
                     single_report.que_type = 'fax'
-                    single_report.search_string = "="+str(po.po_number)
+                    # single_report.search_string = "="+str(po.po_number)
                     single_report.search_status_type = 'PO'
                     single_report.current_job_status = 'new'
                     single_report.script_name = report.python_script
@@ -1071,6 +1079,19 @@ def get_po_by_id(request,pk):
         po_dict['supplier'] = supplier
     else:
         po_dict['supplier'] = 'None'
+
+    extra_contacts = POContact.objects.filter(purchase_order=po)
+    ec_list = []
+    if extra_contacts:
+        for ec in extra_contacts:
+            ex = {}
+            ex['id'] = ec.id
+            ex['contact_type'] = ec.contact_type
+            ex['contact'] = ec.contact
+            ex['contact_name'] = ec.contact_name
+            ec_list.append(ex)
+
+    po_dict['extra_contacts'] = ec_list
 
     if po.ship_to:
         ship_to = {}
@@ -1547,15 +1568,13 @@ def delete_purchase_order(request):
 
 
 @csrf_exempt
-def add_po_contact(request, po_id):
+def add_extra_contact(request):
     if request.method == 'POST':
         # import pdb; pdb.set_trace();
-        po_number = request.POST.get('purchase_order')
         po_contact_type = request.POST.get('contact_type')
         po_contact = request.POST.get('contact')
         po_contact_name = request.POST.get('contact_name')
-        pocontact = POContact(purchase_order=po_number, 
-            contact_type=po_contact_type, 
+        pocontact = POContact(contact_type=po_contact_type, 
             contact=po_contact, contact_name=po_contact_name)
         
         pocontact.save()
@@ -1563,7 +1582,7 @@ def add_po_contact(request, po_id):
     else:
         pocontactform = POContactForm()
 
-        return render(request, "purchase/add-po-contact.html", {'po_contact_form': pocontactform, 'po_number': po_id})
+        return render(request, "purchase/add-po-contact.html", {'po_contact_form': pocontactform})
 
 
 @login_required

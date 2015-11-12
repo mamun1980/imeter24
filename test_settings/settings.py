@@ -31,7 +31,7 @@ PROJECT_LINK = 'test.premierelevator.com'
 SECRET_KEY = '=p-w(0yxl$rm&kkoumfyuh)$hj#2su=nkkl+xe$f6e1ibr9lev'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True 
+DEBUG = False 
 TEMPLATE_DEBUG = DEBUG 
 
 ADMINS = (
@@ -204,6 +204,10 @@ LOGGING = {
     'console':{
             'level': 'INFO',
             'class': 'logging.StreamHandler'
+        },
+    'null':{
+            'level': 'INFO',
+            'class': 'logging.NullHandler'
         }
 
 
@@ -215,12 +219,12 @@ LOGGING = {
             'propagate': True,
         },
         'elasticsearch': {
-            'handlers': ['console'],
+            'handlers': ['null'],
             'level': 'INFO',
             'propagate': True,
         },
         'elasticsearch.trace': {
-            'handlers': ['console'],
+            'handlers': ['null'],
             'level': 'INFO',
             'propagate': True,
         },

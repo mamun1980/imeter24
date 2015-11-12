@@ -47,9 +47,14 @@ table.contact th{
 }
 .contact_box .sold_to_contact,.contact_box .ship_to_contact, .contact_box .installed_by_contact {
 	position: absolute;
-	width: 100%;
+	width: 980px;
+	top:-16px;
+	left: 102px;
 	z-index: 1000;
 	border: 1px solid #000;
+}
+.ship_to_contact {
+	left: -430px !important;
 }
 .sold_to_contact thead, .ship_to_contact thead, .installed_by_contact thead{
 	background-color: #ed791a;
@@ -94,7 +99,7 @@ a.close {
 	</div>
 </section>
 </div>
-
+{% include "modals/add-modal.html" %}
 <script type="text/javascript">
 
 (function(){
@@ -103,7 +108,16 @@ $(document).on("change", "input.decimal", function(e){
 	var myval = parseFloat($(this).val())
 	$(this).val(myval.toFixed(2));
 });
-
+$("a#add_id_primary_supplier").on("click", function(e){
+	e.preventDefault();
+	url = "/contacts/add/rel/",
+	mdal = $('#addModal');
+	mdal.on("shown.bs.modal", function(){
+		$("#addModal .modal-content").load(url);
+		// console.log(url);
+	}).modal();
+	return false;
+});
 var scheduleApp = angular.module("scheduleApp", [], function ($interpolateProvider) {
     $interpolateProvider.startSymbol("{[{");
     $interpolateProvider.endSymbol("}]}");

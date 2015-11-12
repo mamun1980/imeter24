@@ -1,6 +1,6 @@
 import datetime
 from haystack import indexes
-from contacts.models import Contact, ContactPhone
+from contacts.models import Contact, ContactPhone, ContactEmailAddress
 
 
 class ContactIndex(indexes.SearchIndex, indexes.Indexable):
@@ -10,6 +10,7 @@ class ContactIndex(indexes.SearchIndex, indexes.Indexable):
     country = indexes.CharField(model_attr='country', indexed=False)
     province = indexes.CharField(model_attr='province', indexed=False)
     address_1 = indexes.CharField(model_attr='address_1')
+    address_2 = indexes.CharField(model_attr='address_2')
     attention_to = indexes.CharField(model_attr='attention_to', indexed=False)
     postal_code = indexes.CharField(model_attr='postal_code', indexed=False)
     # phones = indexes.MultiValueField(indexed=False, null=True)
@@ -20,7 +21,8 @@ class ContactIndex(indexes.SearchIndex, indexes.Indexable):
 
     def prepare(self, obj):
         self.prepared_data = super(ContactIndex, self).prepare(obj)
-        phones = obj.contact_phone.all()
+        # phones = obj.contact_phone.all()
+        phones = ContactPhone.objects.filter(contact=obj)
         phs = []
         for ph in phones:
             phone = {}
@@ -29,7 +31,8 @@ class ContactIndex(indexes.SearchIndex, indexes.Indexable):
             phone['type'] = ph.phone_type.phone_type
             phs.append(phone)
         self.prepared_data['phones'] = phs
-        emails = obj.contact_emails.all()
+        # emails = obj.contact_emails.all()
+        emails = ContactEmailAddress.objects.filter(contact=obj)
         elist = []
         for em in emails:
             email = {}

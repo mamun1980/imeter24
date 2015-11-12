@@ -73,6 +73,12 @@ table#supplier_contact_details th, table#ship_to_contact_details th, table#sold_
     top: 34px;
 	border: 2px solid #333;
 }
+#ship_to_contact_list,#sold_to_contact_list, #broker_contact_list {
+    width: 980px !important;
+}
+#broker_contact_list {
+    left: -540px !important;
+}
 #ship_to_contact_list thead, #sold_to_contact_list thead, #broker_contact_list thead{
 	background-color: #ed791a;
 	color: #FFF;
@@ -208,7 +214,18 @@ input.ng-invalid-max {
 	$(document).on("change", "input.decimal", function(e){
 		var myval = parseFloat($(this).val())
 		$(this).val(myval.toFixed(2));
-	})
+	});
+
+    $("a#add_id_primary_supplier").on("click", function(e){
+        e.preventDefault();
+        url = "/contacts/add/rel/",
+        mdal = $('#addModal');
+        mdal.on("shown.bs.modal", function(){
+            $("#addModal .modal-content").load(url);
+            // console.log(url);
+        }).modal();
+        return false;
+    });
 	// $("a.close").on("click", function(){
 	// 	$(this).closest('table').hide();
 	// });

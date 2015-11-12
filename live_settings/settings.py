@@ -31,7 +31,7 @@ PROJECT_LINK = 'ol.premierelevator.com'
 SECRET_KEY = '=p-w(0yxl$rm&kkoumfyuh)$hj#2su=nkkl+xe$f6e1ibr9lev'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True 
+DEBUG = False 
 TEMPLATE_DEBUG = DEBUG 
 
 ADMINS = (

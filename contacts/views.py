@@ -52,6 +52,7 @@ def autocomplete(request):
             contact_dict['id'] = con.pk
             contact_dict['contact_name'] = con.contact_name
             contact_dict['address_1'] = con.address_1
+            contact_dict['address_2'] = con.address_2
             contact_dict['attention_to'] = con.attention_to
             contact_dict['city'] = con.city
             contact_dict['province'] = con.province
@@ -89,6 +90,7 @@ def search_contact(request):
                 contact_dict['id'] = con.pk
                 contact_dict['contact_name'] = con.contact_name
                 contact_dict['address_1'] = con.address_1
+                contact_dict['address_2'] = con.address_2
                 contact_dict['attention_to'] = con.attention_to
                 contact_dict['city'] = con.city
                 contact_dict['province'] = con.province
@@ -1229,6 +1231,9 @@ def get_contact(request, pk):
     con_dict['id'] = contact.id
     con_dict['contact_name'] = contact.contact_name
     con_dict['address_1'] = contact.address_1
+    con_dict['address_2'] = contact.address_2
+    con_dict['postal_code'] = contact.postal_code
+    con_dict['attention_to'] = contact.attention_to
     con_dict['city'] = contact.city
     con_dict['province'] = contact.province
     con_dict['country'] = contact.country
@@ -1251,7 +1256,18 @@ def get_contact(request, pk):
         phone['phone_ext'] = cphone.phone_ext
         phones.append(phone)
 
-    con_dict['contact_numbers'] = phones
+    con_dict['phones'] = phones
+
+    cemails = ContactEmailAddress.objects.filter(contact=contact)
+    emails = []
+    for em in cemails:
+        email = {}
+        email['email_type'] = em.email_address_type.email_type
+        email['email_address'] = em.email_address
+        emails.append(email)
+
+    con_dict['emails'] = emails
+    
     json_posts = json.dumps(con_dict, cls=DjangoJSONEncoder)
     return HttpResponse(json_posts, mimetype='application/json')
 
