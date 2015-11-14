@@ -123,10 +123,14 @@
 			  				<td><label for="id_search_string">Search String</label></td>
 			  				<td><input class="form-control" id="id_search_string" value="{[{search_string}]}" maxlength="200" name="search_string" placeholder="Search String" type="text"></td>
 			  				</tr>
-			  			
 			  				<tr>
-			  				<td><label for="id_schedule_type">Search Status type:</label></td>
-			  				<td>
+			  				<td><label for="id_filepath">File Path</label></td>
+			  				<td><input class="form-control" id="id_filepath" value="{[{filepath}]}" maxlength="200" name="filepath" placeholder="File Path" type="text"></td>
+			  				</tr>
+				  			
+				  				<tr>
+				  				<td><label for="id_schedule_type">Search Status type:</label></td>
+				  				<td>
 			  					<select class="form-control ng-pristine ng-valid" id="id_search_status_type" name="search_status_type" ng-model="search_status_type">
 			  						
 									<option value="new">New</option>
@@ -143,6 +147,7 @@
 								<button type="submit" class="btn btn-primary btn-lg form-control login-btn">Update Single Report Job</button>
 							</td>
 						</tr>
+
 			  		</tbody></table>
 
 			  	</form>

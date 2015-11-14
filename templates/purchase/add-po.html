@@ -661,6 +661,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 		
 	}
 	$scope.selectPo = function(po){
+		console.log(po);
 		$scope.show_update_button = true;
 		$scope.show_add_button = false;
 		$scope.show_po_list = false;
@@ -675,7 +676,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 
 		$http({method: 'GET', url: po_url}).success(function(data, status, headers, config){
 			
-			console.log(data);
+			// console.log(data);
 			$scope.po_checked = true;
 			
 			$("#id_po_number_search").val(data.po_number);

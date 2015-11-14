@@ -593,6 +593,7 @@ def list_single_job(request):
     for job in jobs:
         job_dict = {}
         job_dict['id'] = job.pk
+        job_dict['filepath'] = job.filepath
 
         job_dict['permission'] = {}
         job_dict['permission']['can_add_singlereport'] = user.has_perm("report.add_sinlgereport")

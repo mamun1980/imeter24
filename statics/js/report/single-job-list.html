@@ -8,11 +8,8 @@
 		<th>Current job status</th>
 		<th>Date submitted</th>
 		<th> Comments </th>
-
-		<th>Search start date</th>
-		<th>Search end date</th>
-		<th>Search stringe</th>
-		<th>Search status type</th>
+		<th>File Path</th>
+		
 		
 		<th>Action</th>
 		
@@ -27,11 +24,8 @@
 			<td> {[{ job.current_job_status }]} </td>
 			<td> {[{ job.date_submitted }]} </td>
 			<td> {[{ job.report_description }]} </td>
-
-			<td> {[{ job.search_start_date }]} </td>
-			<td> {[{ job.search_end_date }]} </td>
-			<td> {[{ job.search_string }]} </td>
-			<td> {[{ job.search_status_type }]} </td>
+			<td>{[{ job.filepath }]}</td>
+			
 			
 			<td>
 				<a href="/report/singlejob/view/{[{job.id}]}/" >View</a>

@@ -45,26 +45,48 @@
 						<tr>
 							<th width="25%">Supplier</th>
 							<td>
-								<p class='bg-info'><b class='left-info'>Contact Name</b> : {{po.supplier}} </p>
-								<p class='bg-info'><b class='left-info'>Address</b> : {{po.supplier.address_1}} </p>
-								<p class='bg-info'><b class='left-info'>City</b> : {{po.supplier.city}} </p>
-								<p class='bg-info'><b class='left-info'>Supplier Contact</b> : {{po.supplier.contact.mail_list}} </p>
-								<table class='table'>
-									<tr>
-										<th>Extra Contact Type</th>
-										<th>Contact</th>
-										<th>Action</th>
-									</tr>
-								{% for con in extra_contacts %}
-									<tr>
-										<td>{{con.contact_type}}</td>
-										<td>{{con.contact}}</td>
-										<td><a href='' data-pecid="{{con.id}}" class='delete-extra-contact'>Delete</a></td>
-									</tr>
-								{% empty %}
-									<tr><td colspan='3'></td></tr>
-								{% endfor  %}
-								</table>
+								<p><h4>{{po.supplier}} </h4></p>
+								<p><b class=''>Contact Name</b> : {{po.supplier.attention_to}} </p>
+								<p><b class=''>Address</b> : {{po.supplier.address_1}} <br>{{po.supplier.address_2}} </p>
+								<p><b class=''>City</b> : {{po.supplier.city}} </p>
+								<p><b class=''>Post Code</b> : {{po.supplier.postal_code}} </p>
+								<p><b class=''>Supplier Contacts</b></p>
+								<p>
+									<table class="table">
+										<tr>
+											<td width="100">Phones:</td>
+											<td>
+												{% for ph in phones %}
+												<li>{{ ph.phone_type }}: {{ ph.phone }}</li>
+												{% endfor %}
+											</td>
+										</tr>
+										<tr>
+											<td width="100">Emails:</td>
+											<td>
+												{% for em in emails %}
+												<li>{{ em.email_address_type }}: {{ em.email_address }}</li>
+												{% endfor %}
+											</td>
+										</tr>
+									</table>
+								</p>
+								{% if extra_contacts %}
+									<table class='table'>
+										<tr class="bg-info">
+											<th>Extra Contact Type</th>
+											<th>Contact</th>
+											<th>Action</th>
+										</tr>
+									{% for con in extra_contacts %}
+										<tr>
+											<td>{{con.contact_type}}</td>
+											<td>{{con.contact}}</td>
+											<td><a href='' data-pecid="{{con.id}}" class='delete-extra-contact'>Delete</a></td>
+										</tr>
+									{% endfor  %}
+									</table>
+								{% endif %}
 							</td>
 						</tr>
 						

@@ -125,10 +125,11 @@
 						<td class="contact_name">{[{contact.contact_name}]}</td>
 						<td class="address_1">
 							<p ng-if="contact.address_1 != ''">{[{contact.address_1}]}</p>
-							<p ng-if="contact.city != ''">City / Province: {[{contact.city}]}<span ng-if="contact.province != ''">, {[{contact.province}]}</span></p>
+							<p ng-if="contact.city != ''">{[{contact.city}]}<span ng-if="contact.province != ''">, {[{contact.province}]}</span></p>
 							<p>
-							<span ng-if="contact.postal_code !=''">Post code: {[{ contact.postal_code }]}, </span>
-							<span ng-if="contact.country != ''"> country: {[{contact.country}]}</span>
+							<span ng-if="contact.country != ''">{[{contact.country}]}</span>
+							<span ng-if="contact.postal_code !=''">, {[{ contact.postal_code }]}</span>
+							
 							</p>
 						</td>
 						
@@ -171,10 +172,11 @@
 						<td class="contact_name">{[{contact.contact_name}]}</td>
 						<td class="address_1">
 							<p ng-if="contact.address_1 != ''">{[{contact.address_1}]}</p>
-							<p ng-if="contact.city != ''">City / Province: {[{contact.city}]}<span ng-if="contact.province != ''">, {[{contact.province}]}</span></p>
+							<p ng-if="contact.city != ''">{[{contact.city}]}<span ng-if="contact.province != ''">, {[{contact.province}]}</span></p>
 							<p>
-							<span ng-if="contact.postal_code !=''">Post code: {[{ contact.postal_code }]}, </span>
-							<span ng-if="contact.country != ''"> country: {[{contact.country}]}</span>
+							<span ng-if="contact.country != ''">{[{contact.county}]}</span>
+							<span ng-if="contact.postal_code !=''">, {[{ contact.postal_code }]}</span>
+							
 							</p>
 						</td>
 						
@@ -203,21 +205,21 @@
 			<table class="table" id="supplier_contact_details" ng-show="supplier_contact">
 				<tr>
 					<th width="150">Contact Name</th>
-					<td colspan="2">{[{ supplier_contact.contact_name }]}</td>
+					<td colspan="2">{[{ supplier_contact.attention_to }]}</td>
 				</tr>
 				<tr>
 					<th>Address</th>
 					<td colspan="2">
 						<p ng-if="supplier_contact.address_1 != ''">
-							<b>Address Line1: </b>{[{supplier_contact.address_1}]}
+							{[{supplier_contact.address_1}]}
 						</p>
 						<p ng-if="supplier_contact.address_2 != ''">
-							<b>Address Line2:</b>{[{supplier_contact.address_2}]}
+							{[{supplier_contact.address_2}]}
 						</p>
-						<p><b>city / province</b>: {[{supplier_contact.city}]}<span ng-if="supplier_contact.province != ''">, {[{supplier_contact.province}]}</span></p>
+						<p>{[{supplier_contact.city}]}<span ng-if="supplier_contact.province != ''">, {[{supplier_contact.province}]}</span></p>
 						
-						<p><b>country</b>: {[{supplier_contact.country}]}</p>
-						<p><b>Post code</b>: {[{ supplier_contact.postal_code }]}</p>
+						<p>{[{supplier_contact.country}]}<span ng-if="supplier_contact.postal_code != ''">, {[{ supplier_contact.postal_code }]}
+						</span></p>
 					</td>
 				</tr>
 				<tr>
@@ -259,21 +261,20 @@
 			<table class="table" id="ship_to_contact_details">
 				<tr>
 					<th width="150">Contact Name</th>
-					<td>{[{ ship_to_contact.contact_name }]}</td>
+					<td>{[{ ship_to_contact.attention_to }]}</td>
 				</tr>
 				<tr>
 					<th>Address</th>
 					<td colspan="2">
 						<p ng-if="ship_to_contact.address_1 != ''">
-							<b>Address Line1: </b>{[{ship_to_contact.address_1}]}
+							{[{ship_to_contact.address_1}]}
 						</p>
 						<p ng-if="ship_to_contact.address_2 != ''">
-							<b>Address Line2:</b>{[{ship_to_contact.address_2}]}
+							{[{ship_to_contact.address_2}]}
 						</p>
-						<p><b>city / province</b>: {[{ship_to_contact.city}]}<span ng-if="ship_to_contact.province != ''">, {[{ship_to_contact.province}]}</span></p>
+						<p>{[{ship_to_contact.city}]}<span ng-if="ship_to_contact.province != ''">, {[{ship_to_contact.province}]}</span></p>
 						
-						<p><b>country</b>: {[{ship_to_contact.country}]}</p>
-						<p><b>Post code</b>: {[{ ship_to_contact.postal_code }]}</p>
+						<p>{[{ship_to_contact.country}]}<span ng-if="ship_to_contact.postal_code != ''">, {[{ ship_to_contact.postal_code }]}</span></p>
 					</td>
 				</tr>
 				<tr>

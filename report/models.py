@@ -128,7 +128,7 @@ class SingleReport(models.Model):
 	report = models.ForeignKey(Report, blank=True, null=True)
 	report_description = models.TextField(blank=True, null=True)
 	script_name = models.CharField(max_length=200, blank=True, null=True)
-
+	filepath = models.CharField(max_length=250, blank=True, null=True)
 	que_type = models.CharField(max_length=20, choices=QUE_TYPE, null=True, blank=True)
 	email = models.CharField(max_length=500, blank=True, null=True)
 	printer = models.ForeignKey(Printer, blank=True, null=True)

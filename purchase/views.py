@@ -650,6 +650,7 @@ def add_new_po(request):
                     
                     single_report = SingleReport.objects.create(report=report)
                     single_report.que_type = 'email'
+                    single_report.filepath = filepath
                     # single_report.search_string = "="+str(po.po_number)
                     single_report.search_status_type = 'PO'
                     single_report.current_job_status = 'new'
@@ -674,6 +675,7 @@ def add_new_po(request):
 
                     single_report = SingleReport.objects.create(report=report)
                     single_report.que_type = 'pdf'
+                    single_report.filepath = filepath
                     # single_report.search_string = "="+str(po.po_number)
                     single_report.search_status_type = 'PO'
                     single_report.current_job_status = 'new'
@@ -696,6 +698,7 @@ def add_new_po(request):
 
                     single_report = SingleReport.objects.create(report=report)
                     single_report.que_type = 'print'
+                    single_report.filepath = filepath
                     # single_report.search_string = "="+str(po.po_number)
                     single_report.search_status_type = 'PO'
                     single_report.current_job_status = 'new'
@@ -717,6 +720,7 @@ def add_new_po(request):
                     
                     single_report = SingleReport.objects.create(report=report)
                     single_report.que_type = 'fax'
+                    single_report.filepath = filepath
                     # single_report.search_string = "="+str(po.po_number)
                     single_report.search_status_type = 'PO'
                     single_report.current_job_status = 'new'
@@ -984,19 +988,19 @@ def search_po(request):
 
             po_list.append(po_dict)
 
-    try:
-        page = int(request.GET.get('page','1'))
-    except ValueError:
-        page = 1
-    paginator = Paginator(po_list, 30)
-    try:
-        pages = paginator.page(page)
-    except (EmptyPage, InvalidPage):
-        pages = paginator.page(paginator.num_pages)
+    # try:
+    #     page = int(request.GET.get('page','1'))
+    # except ValueError:
+    #     page = 1
+    # paginator = Paginator(po_list, 30)
+    # try:
+    #     pages = paginator.page(page)
+    # except (EmptyPage, InvalidPage):
+    #     pages = paginator.page(paginator.num_pages)
 
-    results = pages.object_list
+    # results = pages.object_list
 
-    data = json.dumps(results)
+    data = json.dumps(po_list)
     return HttpResponse(data)
 
 
@@ -1067,8 +1071,23 @@ def get_po_by_id(request,pk):
         supplier = {}
         supplier['id'] = str(po.supplier.id)
         supplier['contact_name'] = po.supplier.contact_name
+        supplier['attention_to'] = po.supplier.attention_to
+        supplier['address_1'] = po.supplier.address_1
+        supplier['address_2'] = po.supplier.address_2
+        supplier['country'] = po.supplier.country
         supplier['city'] = po.supplier.city
+        supplier['postal_code'] = po.supplier.postal_code
         supplier['province'] = po.supplier.province
+        supplier['phones'] = []
+        phones = ContactPhone.objects.filter(contact=po.supplier)
+        # import pdb; pdb.set_trace();
+        for phone in phones:
+            ph = {}
+            ph['type'] = phone.phone_type.phone_type
+            ph['number'] = phone.phone
+            ph['phone_ext'] = phone.phone_ext
+            supplier['phones'].append(ph)
+
         supplier['emails'] = []
         semails = ContactEmailAddress.objects.filter(contact=po.supplier)
         for email in semails:
@@ -1097,8 +1116,24 @@ def get_po_by_id(request,pk):
         ship_to = {}
         ship_to['id'] = str(po.ship_to.id)
         ship_to['contact_name'] = po.ship_to.contact_name
+        ship_to['attention_to'] = po.ship_to.attention_to
+        ship_to['address_1'] = po.ship_to.address_1
+        ship_to['address_2'] = po.ship_to.address_2
+        ship_to['country'] = po.ship_to.country
         ship_to['city'] = po.ship_to.city
+        ship_to['postal_code'] = po.ship_to.postal_code
         ship_to['province'] = po.ship_to.province
+
+        ship_to['phones'] = []
+        phones = ContactPhone.objects.filter(contact=po.ship_to)
+        # import pdb; pdb.set_trace();
+        for phone in phones:
+            ph = {}
+            ph['type'] = phone.phone_type.phone_type
+            ph['number'] = phone.phone
+            ph['phone_ext'] = phone.phone_ext
+            ship_to['phones'].append(ph)
+
         ship_to['emails'] = []
         shemails = semails = ContactEmailAddress.objects.filter(contact=po.ship_to)
         for email in shemails:
@@ -1366,12 +1401,13 @@ def view_purchase_order(request, pk):
     po = PurchaseOrder.objects.get(po_number=pk)
     pitems = PurchaseItem.objects.filter(po=po)
     status_comments = POStatus.objects.filter(po=po)
-
+    phones = ContactPhone.objects.filter(contact=po.supplier)
+    emails = ContactEmailAddress.objects.filter(contact=po.supplier)
     poecontacts = POContact.objects.filter(purchase_order=po.po_number)
 
     return render(request, "purchase/po-view.html", 
         {'po': po, 'extra_contacts': poecontacts, 'status_comments': status_comments,
-        'purchase_items': pitems})
+        'purchase_items': pitems, 'phones': phones, 'emails': emails})
 
 @csrf_exempt
 def cancel_po_status(request, pk):

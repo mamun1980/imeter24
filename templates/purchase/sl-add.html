@@ -257,6 +257,7 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
 		$("#ship_to_contact_list").hide();
 		$scope.search_ship_to = ""
 		$scope.ship_to_contact = con;
+        $scope.search_ship_to = con.contact_name;
 		$("#id_ship_to").val(con.id);
 		$("#ship_to_contact_details").show();
 

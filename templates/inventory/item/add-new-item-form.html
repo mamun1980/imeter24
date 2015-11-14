@@ -87,21 +87,20 @@
 			<table class='table'>
 				<tr class="bg-info">
 					<th width="150">Contact Name</th>
-					<td colspan="2">{[{ supplier.contact_name }]}</td>
+					<td colspan="2">{[{ supplier.attention_to }]}</td>
 				</tr>
 				<tr class="bg-warning">
 					<th>Address</th>
 					<td colspan="2">
 						<p ng-if="supplier.address_1 != ''">
-							<b>Address Line1: </b>{[{supplier.address_1}]}
+							{[{supplier.address_1}]}
 						</p>
 						<p ng-if="supplier.address_2 != ''">
-							<b>Address Line2:</b>{[{supplier.address_2}]}
+							{[{supplier.address_2}]}
 						</p>
-						<p><b>city / province</b>: {[{supplier.city}]}<span ng-if="supplier.province != ''">, {[{supplier.province}]}</span></p>
+						<p>{[{supplier.city}]}<span ng-if="supplier.province != ''">, {[{supplier.province}]}</span></p>
 						
-						<p><b>country</b>: {[{supplier.country}]}</p>
-						<p><b>Post code</b>: {[{ supplier.postal_code }]}</p>
+						<p>{[{supplier.country}]}<span ng-if="supplier.postal_code != ''">,{[{ supplier.postal_code }]}</span></p>
 					</td>
 				</tr>
 				<tr class="bg-info">
@@ -340,21 +339,21 @@
 				<table class='table'>
 					<tr class="bg-info">
 						<th width="150">Contact Name</th>
-						<td colspan="2">{[{ producer.contact_name }]}</td>
+						<td colspan="2">{[{ producer.attention_to }]}</td>
 					</tr>
 					<tr class="bg-warning">
 						<th>Address</th>
 						<td colspan="2">
 							<p ng-if="producer.address_1 != ''">
-								<b>Address Line1: </b>{[{producer.address_1}]}
+								{[{producer.address_1}]}
 							</p>
 							<p ng-if="producer.address_2 != ''">
-								<b>Address Line2:</b>{[{producer.address_2}]}
+								{[{producer.address_2}]}
 							</p>
-							<p><b>city / province</b>: {[{producer.city}]}<span ng-if="producer.province != ''">, {[{producer.province}]}</span></p>
+							<p>{[{producer.city}]}<span ng-if="producer.province != ''">, {[{producer.province}]}</span></p>
 							
-							<p><b>country</b>: {[{producer.country}]}</p>
-							<p><b>Post code</b>: {[{ producer.postal_code }]}</p>
+							<p>{[{producer.country}]}</p>
+							<p>{[{ producer.postal_code }]}</p>
 						</td>
 					</tr>
 					<tr class="bg-info">

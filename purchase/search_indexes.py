@@ -34,6 +34,13 @@ class PurchaseOrderIndex(indexes.SearchIndex, indexes.Indexable):
         if supplier:
             supplier_dict['id'] = supplier.id
             supplier_dict['contact_name'] = supplier.contact_name
+            supplier_dict['attention_to'] = supplier.attention_to
+            supplier_dict['address_1'] = supplier.address_1
+            supplier_dict['address_2'] = supplier.address_2
+            supplier_dict['city'] = supplier.city
+            supplier_dict['province'] = supplier.province
+            supplier_dict['country'] = supplier.country
+            supplier_dict['postal_code'] = supplier.postal_code
             phones = supplier.contact_phone.all()
             phs = []
             for ph in phones:
