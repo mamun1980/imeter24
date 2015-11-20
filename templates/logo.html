@@ -39,15 +39,7 @@
 						
 					{% endif %}
 
-					{% if user.is_staff and perms.scomuser.view_department %}
-						<li class="divider"></li>
-						{% if perms.scomuser.add_department %}
-							<li><a href="/scomuser/department/add/">Add Department</a></li>
-						{% endif %}
-
-							<li><a href="/scomuser/departments/">Department List</a></li>
-						
-					{% endif %}
+					
 
 					{% if user.is_staff and perms.auth.view_group %}
 						

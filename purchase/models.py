@@ -240,6 +240,15 @@ class POContact(models.Model):
 			('view_po_contact', 'Can View PO Contacts'),	
 		)
 
+class POShipToContact(models.Model):
+	purchase_order = models.ForeignKey(PurchaseOrder, blank=True, null=True)
+	contact_type = models.CharField(max_length=50, blank=True, null=True)
+	contact = models.CharField(max_length=100, blank=True, null=True)
+	contact_name = models.CharField(max_length=100, blank=True, null=True)
+
+	def __unicode__(self):
+		return str(self.contact_name)
+
 
 class ReceivedItemHistory(models.Model):
 	purchase_item = models.ForeignKey(PurchaseItem, blank=True, null=True)

@@ -50,27 +50,7 @@
 								<p><b class=''>Address</b> : {{po.supplier.address_1}} <br>{{po.supplier.address_2}} </p>
 								<p><b class=''>City</b> : {{po.supplier.city}} </p>
 								<p><b class=''>Post Code</b> : {{po.supplier.postal_code}} </p>
-								<p><b class=''>Supplier Contacts</b></p>
-								<p>
-									<table class="table">
-										<tr>
-											<td width="100">Phones:</td>
-											<td>
-												{% for ph in phones %}
-												<li>{{ ph.phone_type }}: {{ ph.phone }}</li>
-												{% endfor %}
-											</td>
-										</tr>
-										<tr>
-											<td width="100">Emails:</td>
-											<td>
-												{% for em in emails %}
-												<li>{{ em.email_address_type }}: {{ em.email_address }}</li>
-												{% endfor %}
-											</td>
-										</tr>
-									</table>
-								</p>
+								
 								{% if extra_contacts %}
 									<table class='table'>
 										<tr class="bg-info">

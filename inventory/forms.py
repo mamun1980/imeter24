@@ -81,8 +81,8 @@ class ItemForm(forms.ModelForm):
 
 	# stock_status_type = forms.ChoiceField(required=False, choices=STOCK_STATUS_TYPE,
  #        widget=forms.Select(attrs={"class": "form-control"}))
-	warehouse_location = forms.ModelChoiceField(required=False, queryset=Location.objects.all(),
-        widget=forms.Select(attrs={"class": "form-control"}))
+	warehouse_location = forms.CharField(max_length=25, required=False,
+        widget=forms.TextInput(attrs={"class": "form-control", 'placeholder':"Warehouse Location"}))
 
 	# lowest_price_supplier = forms.ModelChoiceField(required=False, queryset=Contact.objects.all(), 
 	# 	widget=forms.Select(attrs={"class": "form-control"}))
@@ -122,8 +122,8 @@ class ItemForm(forms.ModelForm):
         widget=forms.TextInput(attrs={"class": "form-control", 'placeholder':"Preference Criteria"}))
 	producer_of_item = forms.ModelChoiceField(required=False, queryset=Contact.objects.all(),
         widget=forms.Select(attrs={"class": "form-control"}))
-	shipping_weight = forms.DecimalField(max_digits=10, decimal_places=4, required=False,
-        widget=forms.NumberInput(attrs={"class": "form-control", 'placeholder':"Shipping weight"}))
+	shipping_weight = forms.CharField(max_length=25, required=False,
+        widget=forms.TextInput(attrs={"class": "form-control", 'placeholder':"Lead Time"}))
 	minimum_qty_on_hand = forms.DecimalField(max_digits=10, decimal_places=4, required=False,
         widget=forms.NumberInput(attrs={"class": "form-control decimal", 'placeholder':"Minimum quantity on hand"}))
 	duty_percentage = forms.DecimalField(max_digits=10, decimal_places=4, required=False,
@@ -159,7 +159,7 @@ class ItemForm(forms.ModelForm):
 			'max_single_order_qty', 'estimated_wholesale_cost', 'retail_price', 'production_type',
 			'catalog_number', 'country_of_origin', 'lead_time', 'customs_designation', 
 			'customer_tariff_number', 'preference_criteria', 'producer_of_item', 'shipping_weight', 
-			'minimum_qty_on_hand', 'duty_percentage', 'terms', 'website', 'item_image')
+			'minimum_qty_on_hand', 'deliver_internal', 'duty_percentage', 'terms', 'website', 'item_image')
 
 	def save(self, commit=True):
 		item = super(ItemForm, self).save(commit=False)
@@ -170,7 +170,7 @@ class ItemForm(forms.ModelForm):
 			item.qty_received = 0.0;
 			item.qty_on_request = 0.0;
 			item.date_added = datetime.datetime.now();
-			item.stock_status_type = 'no-stock';
+			# item.stock_status_type = 'no-stock';
 		
 		item.save()
 		return item
@@ -205,6 +205,19 @@ class LocationForm(forms.ModelForm):
 	class Meta:
 		model = Location	
 
+
+
+
+
+
+class DeliverInternalForm(forms.ModelForm):
+    department = forms.CharField( max_length=50,
+        widget=forms.TextInput(attrs={"class": "form-control", 'required': 'True', 'placeholder':"Department"}))
+    description = forms.CharField( max_length=250, required=False,
+        widget=forms.Textarea(attrs={"class": "form-control", 'rows':2, 'required': 'False', 'placeholder':"Department Description"}))
+    
+    class Meta:
+        model = DeliverInternal 
 
 
 

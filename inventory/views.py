@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from inventory.forms import *
+from inventory.models import *
 # Create your views here.
 from scomuser.models import *
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
@@ -88,6 +89,7 @@ def add_new_item(request):
     production_types = ProductionType.objects.all()
     terms = PaymentTerm.objects.all()
     designations = CustomsDesignation.objects.all()
+    deliver_internals = DeliverInternal.objects.all()
     if request.method == "POST":
         # import pdb; pdb.set_trace();
         item_number = request.POST.get("item_number","")
@@ -135,7 +137,7 @@ def add_new_item(request):
 
     return render(request, "inventory/item/add-new-item.html", 
         {'item_form': item_form, 'page_title': 'Add Item', 'currencies': currencies, 
-        'departments': departments, 'unit_measures': unit_measures, 'locations': locations,
+        'departments': departments, 'unit_measures': unit_measures, 'deliver_internals':deliver_internals,
         'production_types': production_types, 'terms': terms, 'designations': designations})
 
 
@@ -618,6 +620,7 @@ def search_item(request):
 
         item_dict = {}
         item_dict['item_number'] = item.item_number
+        item_dict['date_added'] = item.date_added.strftime('%b, %d %Y')
         item_dict['description'] = item.description
         item_dict['primary_supplier'] = item.primary_supplier
         item_dict['last_PO'] = item.last_PO
@@ -954,3 +957,73 @@ def item_reindex(request):
             item.search_string += " " + item.primary_supplier.contact_name
         item.save()
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+
+
+
+
+# Deliver Internal start here
+@login_required
+@permission_required("purchase.add_deliverinternal")
+@csrf_exempt
+def add_deliverinternal(request):
+    if request.method == "POST":
+        deliverinternal_frm = DeliverInternalForm(request.POST)
+        if deliverinternal_frm.is_valid():
+            deliverinternal_frm.save()
+            return HttpResponseRedirect("/inventory/deliverinternal-list/")
+    else:
+        deliverinternal_frm = DeliverInternalForm()
+    
+    return render(request, "inventory/add-deliverinternal.html",
+            {'deliverinternal_frm': deliverinternal_frm, 'page_title': 'Add Unit Measure'})
+
+
+@login_required
+@permission_required("inventory.change_deliverinternal")
+@csrf_exempt
+def edit_deliverinternal(request, id):
+    deliverinternal = DeliverInternal.objects.get(id=id)
+    if request.method == "POST":
+        deliverinternal_frm = DeliverInternalForm(request.POST, instance=deliverinternal)
+        if deliverinternal_frm.is_valid():
+            deliverinternal_frm.save()
+            return HttpResponseRedirect("/inventory/deliverinternal-list/")
+    else:
+        deliverinternal_frm = DeliverInternalForm(instance=deliverinternal)
+    
+    return render(request, "inventory/edit-deliverinternal.html",
+            {'deliverinternal_frm': deliverinternal_frm, 'id':id, 'page_title': 'Edit Unit Measure'})
+
+
+@csrf_exempt
+@login_required
+@permission_required("inventory.delete_deliverinternal")
+def delete_deliverinternal(request):
+    if request.method == "POST":
+        di_id = request.POST.get("id")
+        deliverinternal = DeliverInternal.objects.get(id=di_id)
+        deliverinternal.delete()
+        return HttpResponse(di_id)
+    else:
+        return HttpResponse("Hello World!")
+
+@login_required
+@permission_required("inventory.view_deliverinternal")
+def list_deliverinternal(request):
+    deliverinternals = DeliverInternal.objects.all()
+    return render(request, "inventory/list-deliverinternal.html", 
+        {'deliverinternals': deliverinternals, 'page_title': 'List Deliver Internal'})
+
+def list_deliverinternal_json(request):
+    deliverinternals = DeliverInternal.objects.all()
+    di_list = []
+    for di in deliverinternals:
+        di_dict = {}
+        di_dict['id'] = di.id
+        di_dict['department'] = di.department
+        di_dict['description'] = di.description
+        di_list.append(di_dict)
+
+    json_posts = json.dumps(di_list)
+    return HttpResponse(json_posts, mimetype='application/json')

@@ -497,6 +497,7 @@ def add_purchase_order(request):
 @csrf_exempt
 def add_new_po(request):
 
+
     try:
         sv = SystemVariable.objects.get(id=1)
     except Exception, e:
@@ -504,7 +505,7 @@ def add_new_po(request):
         return HttpResponseRedirect("/")
 
     if request.method == 'POST':
-        
+
         po_number = request.POST.get("po_number","")
         email_po = request.POST.get("email_po")
         fax_po = request.POST.get("fax_po")
@@ -519,23 +520,65 @@ def add_new_po(request):
 
         if po_form.is_valid():
             po = po_form.save()
-            
             if po_number == "":
                 po.po_created_by = request.user
                 # po.datetime = datetime.datetime.now()
                 po.save_final_draft = 1
                 po.po_status = 'New'
                 po.save()
-            # po.search_string = po.po_number + " "
-            # if po.supplier:
-            #     po.search_string += po.supplier.contact_name + " "
-            
+
+                # check for contacts................
+                con_phone_types = request.POST.getlist('po_contact_phone_type')
+                if con_phone_types:
+                    count = 0
+                    for ph_type in con_phone_types:
+                        if ph_type == 'Fax':
+                            po_contact = POContact(purchase_order=po, contact_type='Fax')
+                        else:
+                            po_contact = POContact(purchase_order=po, contact_type='Phone')
+
+                        if request.POST.getlist('po_contact_phone_ext')[count]:
+                            contact = request.POST.getlist('po_contact_phone_number')[count] + " ext:" + request.POST.getlist('po_contact_phone_ext')[count]
+                        else:
+                            contact = request.POST.getlist('po_contact_phone_number')[count]
+                        con_attention = request.POST.getlist('po_contact_phone_attention')[count]
+                        count = count + 1
+
+                        po_contact.contact = contact
+                        po_contact.contact_name = con_attention
+                        po_contact.save()
+                con_email_types = request.POST.getlist('po_contact_email_type')
+                
+                if con_email_types:
+                    count = 0
+                    for email_type in con_email_types:
+                        po_contact = POContact(purchase_order=po,contact_type='Email')
+                        contact = request.POST.getlist('po_contact_email')[count]
+                        contact_name = request.POST.getlist('po_contact_email_attention')[count]
+                        count = count + 1
+                        po_contact.contact = contact
+                        po_contact.contact_name = contact_name
+                        po_contact.save()
+
+                # return HttpResponse("Hello world!")
+
+
+
+
             # ========== Add / Remove extra contact
             # import pdb; pdb.set_trace();
             extra_contact_ids = request.POST.getlist('po_extra_contacts')
             if extra_contact_ids:
                 for extra_contact_id in extra_contact_ids:
                     extra_contact = POContact.objects.get(id=extra_contact_id)
+                    extra_contact.purchase_order = po
+                    extra_contact.save()
+
+
+            extra_shipto_contact_ids = request.POST.getlist('po_extra_shipto_contacts')
+            if extra_shipto_contact_ids:
+                for extra_contact_id in extra_shipto_contact_ids:
+                    extra_contact = POShipToContact.objects.get(id=extra_contact_id)
                     extra_contact.purchase_order = po
                     extra_contact.save()
 
@@ -730,6 +773,7 @@ def add_new_po(request):
                 except Exception, e:
                     raise e
 
+            po.items_total = request.POST.get("items_total")
             po.save()
 
             return HttpResponseRedirect("/purchase/list-purchase-orders/")
@@ -739,6 +783,7 @@ def add_new_po(request):
             
             return HttpResponseRedirect("/purchase/add-po/")
     else:
+
         currencies = Currency.objects.all()
         delivery_choices = DeliveryChoice.objects.all()
         terms = PaymentTerm.objects.all()
@@ -1056,6 +1101,7 @@ def get_po_by_id(request,pk):
 
     po_dict = {}
     po_dict['po_number'] = po.po_number
+    po_dict['total_qty'] = po.items_total.to_eng_string()
     po_dict['next_number'] = po.next_number
     if po.date_issued:
         po_dict['date_issued'] = po.date_issued.isoformat()
@@ -1601,6 +1647,23 @@ def delete_purchase_order(request):
         po.delete();
         return HttpResponse(po_id)
 
+
+@csrf_exempt
+def add_shipto_extra_contact(request):
+    if request.method == 'POST':
+        # import pdb; pdb.set_trace();
+        po_contact_type = request.POST.get('contact_type')
+        po_contact = request.POST.get('contact')
+        po_contact_name = request.POST.get('contact_name')
+        pocontact = POShipToContact(contact_type=po_contact_type, 
+            contact=po_contact, contact_name=po_contact_name)
+        
+        pocontact.save()
+        return render(request, "purchase/extra-shipto-po-contact.html", {'pocontact': pocontact})
+    else:
+        pocontactform = POShipToContactForm()
+
+        return render(request, "purchase/add-po-shipto-contact.html", {'po_contact_form': pocontactform})
 
 
 @csrf_exempt
@@ -2942,71 +3005,71 @@ def shipping_list(request):
     return render(request, "purchase/shipping-list.html", {'sl_list': sl_list})
 
 
-# Deliver Internal start here
-@login_required
-@permission_required("purchase.add_deliverinternal")
-@csrf_exempt
-def add_deliverinternal(request):
-    if request.method == "POST":
-        deliverinternal_frm = DeliverInternalForm(request.POST)
-        if deliverinternal_frm.is_valid():
-            deliverinternal_frm.save()
-            return HttpResponseRedirect("/purchase/deliverinternal-list/")
-    else:
-        deliverinternal_frm = DeliverInternalForm()
+# # Deliver Internal start here
+# @login_required
+# @permission_required("purchase.add_deliverinternal")
+# @csrf_exempt
+# def add_deliverinternal(request):
+#     if request.method == "POST":
+#         deliverinternal_frm = DeliverInternalForm(request.POST)
+#         if deliverinternal_frm.is_valid():
+#             deliverinternal_frm.save()
+#             return HttpResponseRedirect("/purchase/deliverinternal-list/")
+#     else:
+#         deliverinternal_frm = DeliverInternalForm()
     
-    return render(request, "purchase/add-deliverinternal.html",
-            {'deliverinternal_frm': deliverinternal_frm, 'page_title': 'Add Unit Measure'})
+#     return render(request, "purchase/add-deliverinternal.html",
+#             {'deliverinternal_frm': deliverinternal_frm, 'page_title': 'Add Unit Measure'})
 
 
-@login_required
-@permission_required("inventory.change_deliverinternal")
-@csrf_exempt
-def edit_deliverinternal(request, id):
-    deliverinternal = DeliverInternal.objects.get(id=id)
-    if request.method == "POST":
-        deliverinternal_frm = DeliverInternalForm(request.POST, instance=deliverinternal)
-        if deliverinternal_frm.is_valid():
-            deliverinternal_frm.save()
-            return HttpResponseRedirect("/purchase/deliverinternal-list/")
-    else:
-        deliverinternal_frm = DeliverInternalForm(instance=deliverinternal)
+# @login_required
+# @permission_required("inventory.change_deliverinternal")
+# @csrf_exempt
+# def edit_deliverinternal(request, id):
+#     deliverinternal = DeliverInternal.objects.get(id=id)
+#     if request.method == "POST":
+#         deliverinternal_frm = DeliverInternalForm(request.POST, instance=deliverinternal)
+#         if deliverinternal_frm.is_valid():
+#             deliverinternal_frm.save()
+#             return HttpResponseRedirect("/purchase/deliverinternal-list/")
+#     else:
+#         deliverinternal_frm = DeliverInternalForm(instance=deliverinternal)
     
-    return render(request, "purchase/edit-deliverinternal.html",
-            {'deliverinternal_frm': deliverinternal_frm, 'id':id, 'page_title': 'Edit Unit Measure'})
+#     return render(request, "purchase/edit-deliverinternal.html",
+#             {'deliverinternal_frm': deliverinternal_frm, 'id':id, 'page_title': 'Edit Unit Measure'})
 
 
-@csrf_exempt
-@login_required
-@permission_required("inventory.delete_deliverinternal")
-def delete_deliverinternal(request):
-    if request.method == "POST":
-        di_id = request.POST.get("id")
-        deliverinternal = DeliverInternal.objects.get(id=di_id)
-        deliverinternal.delete()
-        return HttpResponse(di_id)
-    else:
-        return HttpResponse("Hello World!")
+# @csrf_exempt
+# @login_required
+# @permission_required("inventory.delete_deliverinternal")
+# def delete_deliverinternal(request):
+#     if request.method == "POST":
+#         di_id = request.POST.get("id")
+#         deliverinternal = DeliverInternal.objects.get(id=di_id)
+#         deliverinternal.delete()
+#         return HttpResponse(di_id)
+#     else:
+#         return HttpResponse("Hello World!")
 
-@login_required
-@permission_required("inventory.view_deliverinternal")
-def list_deliverinternal(request):
-    deliverinternals = DeliverInternal.objects.all()
-    return render(request, "purchase/list-deliverinternal.html", 
-        {'deliverinternals': deliverinternals, 'page_title': 'List Deliver Internal'})
+# @login_required
+# @permission_required("inventory.view_deliverinternal")
+# def list_deliverinternal(request):
+#     deliverinternals = DeliverInternal.objects.all()
+#     return render(request, "purchase/list-deliverinternal.html", 
+#         {'deliverinternals': deliverinternals, 'page_title': 'List Deliver Internal'})
 
-def list_deliverinternal_json(request):
-    deliverinternals = DeliverInternal.objects.all()
-    di_list = []
-    for di in deliverinternals:
-        di_dict = {}
-        di_dict['id'] = di.id
-        di_dict['department'] = di.department
-        di_dict['description'] = di.description
-        di_list.append(di_dict)
+# def list_deliverinternal_json(request):
+#     deliverinternals = DeliverInternal.objects.all()
+#     di_list = []
+#     for di in deliverinternals:
+#         di_dict = {}
+#         di_dict['id'] = di.id
+#         di_dict['department'] = di.department
+#         di_dict['description'] = di.description
+#         di_list.append(di_dict)
 
-    json_posts = json.dumps(di_list)
-    return HttpResponse(json_posts, mimetype='application/json')
+#     json_posts = json.dumps(di_list)
+#     return HttpResponse(json_posts, mimetype='application/json')
 
 @csrf_exempt
 @login_required

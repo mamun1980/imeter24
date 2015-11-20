@@ -19,6 +19,11 @@ urlpatterns = patterns('',
 
     url(r'^item/comment/add/$', 'inventory.views.add_item_comment', name='add-item-comment'),
 
+    url(r'^deliverinternal-list/$', 'inventory.views.list_deliverinternal', name='list-purchase-deliverinternal'),
+    url(r'^deliverinternals/json/$', 'inventory.views.list_deliverinternal_json', name='list-purchase-deliverinternal-json'),
+    url(r'^deliverinternal/add/$', 'inventory.views.add_deliverinternal', name='add-purchase-deliverinternal'),
+    url(r'^deliverinternal/edit/(?P<id>\d+)/$', 'inventory.views.edit_deliverinternal', name='edit-purchase-deliverinternal'),
+    url(r'^deliverinternal/delete/$', 'inventory.views.delete_deliverinternal', name='delete-purchase-deliverinternal'),
 
     url(r'^unit-measure-list/$', 'inventory.views.list_unit_measue', name='list-inventory-unit-measure'),
     url(r'^unit-measure-list/json/$', 'inventory.views.list_unit_measue_json2'),

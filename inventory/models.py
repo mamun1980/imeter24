@@ -2,10 +2,24 @@ from django.db import models
 from contacts.models import *
 from scomuser.models import *
 from inventory.choices import *
-# from purchase.models import PurchaseItem
+# from purchase.models import DeliverInternal
 from django_fsm import FSMField, transition
 # Create your models here.
 
+class DeliverInternal(models.Model):
+	department = models.CharField(max_length=50, blank=True, null=True, help_text="BIN # in warehouse")
+	description = models.TextField(blank=True, null=True)
+
+	def __unicode__(self):
+		return self.department
+
+	class Meta:
+		verbose_name = "Deliver Internal"
+		verbose_name_plural = "Deliver Internals"
+
+		permissions = (
+    		('view_deliverinternal', 'Can View Deliver Internal'),
+    	)
 
 class ItemUnitMeasure(models.Model):
 	unit_name = models.CharField(max_length=20, null=True, blank=True)
@@ -67,7 +81,6 @@ class Location(models.Model):
     		('view_location', 'Can View Location'),
     	)
 
-
 class Item(models.Model):
 	item_number = models.CharField(max_length=20, primary_key=True)
 	description  = models.TextField(blank=True, null=True)
@@ -93,7 +106,7 @@ class Item(models.Model):
 	
 	stock_status_type = models.CharField(max_length=10, choices=STOCK_STATUS_TYPE, default="normal")
 	currency = models.ForeignKey(Currency, max_length=20, blank=True, null=True)
-	warehouse_location = models.ForeignKey(Location, blank=True, null=True)
+	warehouse_location = models.CharField(max_length=20, blank=True, null=True)
 
 	lowest_price_supplier = models.ForeignKey(Contact, blank=True, null=True, related_name="economic_supplier")
 	lowest_price_paid = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
@@ -125,7 +138,7 @@ class Item(models.Model):
 	customer_tariff_number  = models.CharField(max_length=50, blank=True, null=True)
 	preference_criteria = models.CharField(max_length=50, blank=True, null=True)
 	producer_of_item = models.ForeignKey(Contact, blank=True, null=True)
-	shipping_weight = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+	shipping_weight = models.CharField(max_length=50, blank=True, null=True)
 	minimum_qty_on_hand = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True)
 	duty_percentage = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
 	# notes = GenericRelation(Comment, object_id_field='object_pk', 
@@ -138,6 +151,7 @@ class Item(models.Model):
 	item_image = models.ImageField(upload_to='item_image', blank=True, null=True)
 	date_added = models.DateTimeField('date added', auto_now_add=True)
 	date_modified = models.DateTimeField('date modified', auto_now=True)
+	deliver_internal = models.ForeignKey(DeliverInternal, blank=True, null=True)
 	terms = models.ForeignKey(PaymentTerm, blank=True, null=True, related_name='item_payment_terms')
 	search_string 	  = models.TextField(null=True, blank=True, verbose_name='Search String')
 	state = FSMField(default='new')

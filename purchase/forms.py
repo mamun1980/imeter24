@@ -201,7 +201,17 @@ class POContactForm(forms.ModelForm):
         model = POContact
         exclude = ['purchase_order',]
 
-
+class POShipToContactForm(forms.ModelForm):
+    contact_type = forms.ChoiceField(required=False, choices=CON_TYPE,
+        widget=forms.Select(attrs={"class": "form-control"}))
+    contact = forms.CharField( max_length=100, required=False, label='Enter Email',
+        widget=forms.TextInput(attrs={"class": "form-control", 'placeholder': "type contact"}))
+    contact_name = forms.CharField( max_length=100, required=False, label='Contact Name',
+        widget=forms.TextInput(attrs={"class": "form-control", 'placeholder': "contact name"}))
+    
+    class Meta:
+        model = POShipToContact
+        exclude = ['purchase_order',]
 
 
 class ItemReeiveForm(forms.ModelForm):
@@ -331,14 +341,14 @@ class ShippingListForm(forms.ModelForm):
 
 
 
-class DeliverInternalForm(forms.ModelForm):
-    department = forms.CharField( max_length=50,
-        widget=forms.TextInput(attrs={"class": "form-control", 'required': 'True', 'placeholder':"Department"}))
-    description = forms.CharField( max_length=250, required=False,
-        widget=forms.Textarea(attrs={"class": "form-control", 'rows':2, 'required': 'False', 'placeholder':"Department Description"}))
+# class DeliverInternalForm(forms.ModelForm):
+#     department = forms.CharField( max_length=50,
+#         widget=forms.TextInput(attrs={"class": "form-control", 'required': 'True', 'placeholder':"Department"}))
+#     description = forms.CharField( max_length=250, required=False,
+#         widget=forms.Textarea(attrs={"class": "form-control", 'rows':2, 'required': 'False', 'placeholder':"Department Description"}))
     
-    class Meta:
-        model = DeliverInternal 
+#     class Meta:
+#         model = DeliverInternal 
 
 
 

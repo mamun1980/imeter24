@@ -270,6 +270,12 @@ $(document).on("click", "a.call_number", function(e){
 	});
 });
 
+$(document).on("click", "a.delete-contact", function(e){
+	console.log("Hello world!");
+	var row = $(this).closest("tr");
+	row.remove();
+});
+
 $("a.call_number").on("click", function(e){
 	// alert("hello");
 	e.preventDefault();
@@ -565,7 +571,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 	}
 
 	$scope.setSupplier = function(con){
-		console.log(con);
+		// console.log(con);
 		$scope.set_supplier = true;
 
 		if(con.hst_tax_exempt){
@@ -661,7 +667,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 		
 	}
 	$scope.selectPo = function(po){
-		console.log(po);
+		// console.log(po);
 		$scope.show_update_button = true;
 		$scope.show_add_button = false;
 		$scope.show_po_list = false;
@@ -676,7 +682,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 
 		$http({method: 'GET', url: po_url}).success(function(data, status, headers, config){
 			
-			// console.log(data);
+			console.log(data);
 			$scope.po_checked = true;
 			
 			$("#id_po_number_search").val(data.po_number);
@@ -685,6 +691,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 			$("#id_date_issued").val(data.date_issued);
 			$("#id_date_expected").val(data.date_expected);
 			$("#id_date_issued").val(data.date_issued);
+			$("#items_total_qty").html(parseFloat(data.items_total).toFixed(2));
 
 			
 			if(data.supplier){
@@ -783,8 +790,8 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 		    	var unit_measure_id = $scope.po_items[i].unit;
 		    	var item_comment = $scope.po_items[i].comment;
 		    	var wholesale_cost = $scope.po_items[i].cost;
-		    	var item_qty = $scope.po_items[i].qty;
-		    	var item_sub_total = $scope.po_items[i].sub_total;
+		    	var item_qty = parseFloat($scope.po_items[i].qty).toFixed(2);
+		    	var item_sub_total = parseFloat($scope.po_items[i].sub_total).toFixed(2);
 		    	var item_job_number = $scope.po_items[i].job_number;
 		    	var item_job_number_id = $scope.po_items[i].job_number_id;
 		    	var item_qty_received = $scope.po_items[i].item_received;
@@ -1215,6 +1222,18 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 		console.log("testing..");
 		mdal = $('#addModal');
 		url = "/purchase/add-extra-contact/",
+		mdal.on("shown.bs.modal", function(){
+			$("#addModal .modal-content").load(url);
+			
+			// console.log(url);
+		}).modal();
+		return false;
+    };
+
+    $scope.addShipToExtraContact = function() {
+		console.log("testing..");
+		mdal = $('#addModal');
+		url = "/purchase/add-shipto-extra-contact/",
 		mdal.on("shown.bs.modal", function(){
 			$("#addModal .modal-content").load(url);
 			

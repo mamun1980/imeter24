@@ -204,20 +204,34 @@
 									</ul>
 								</li>
 								{% endif %}
-								{% if perms.inventory.view_location %}
+								
+								{% if perms.purchase.view_deliverinternal %}
 								<li class="divider"></li>
 
 								<li class="dropdown-submenu">
-									<a href="/inventory/location-list/">Location</a>
+									<a href="/inventory/deliverinternal-list/">Deliver Internal</a>
 									<ul class="dropdown-menu">
-										{% if perms.inventory.add_location %}
-										<li><a href="/inventory/location/add/">Add Location</a></li>
-										{% endif %}
-										<li><a href="/inventory/location-list/">Location List</a></li>
+										
+										<li><a href="/inventory/deliverinternal/add/">Add Deliver Internal</a></li>
+										
+										<li><a href="/inventory/deliverinternal-list/">Deliver Internal List</a></li>
 										
 									</ul>
 								</li>
 								{% endif %}
+
+								<li class="divider"></li>
+								<li class="dropdown-submenu">
+								<a href="/inventory/deliverinternal-list/">Department</a>
+								<ul class="dropdown-menu">
+									
+										<li><a href="/scomuser/department/add/">Add Department</a></li>
+									
+
+									<li><a href="/scomuser/departments/">Department List</a></li>
+									
+								</ul>
+								
 
 								
 							</ul>
@@ -315,21 +329,6 @@
 								</li>
 								{% endif %}
 
-								{% if perms.purchase.view_deliverinternal %}
-								<li class="divider"></li>
-
-								<li class="dropdown-submenu">
-									<a href="/purchase/deliverinternal-list/">Deliver Internal</a>
-									<ul class="dropdown-menu">
-										{% if perms.inventory.add_location %}
-										<li><a href="/purchase/deliverinternal/add/">Add Deliver Internal</a></li>
-										{% endif %}
-										<li><a href="/purchase/deliverinternal-list/">Deliver Internal List</a></li>
-										
-									</ul>
-								</li>
-								{% endif %}
-								
 								
 								
 							</ul>

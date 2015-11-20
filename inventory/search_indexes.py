@@ -11,6 +11,7 @@ class ItemIndex(indexes.SearchIndex, indexes.Indexable):
     primary_supplier = indexes.CharField(model_attr='primary_supplier__contact_name', indexed=False, null=True)
     last_PO = indexes.CharField(model_attr='last_PO', indexed=False, null=True)
     terms = indexes.CharField(model_attr='terms__term', indexed=False, null=True)
+    date_added = indexes.DateField(model_attr='date_added', indexed=False, null=True)
     quantity_on_hand = indexes.CharField(model_attr='quantity_on_hand', indexed=False, null=True)
     max_single_order_qty = indexes.CharField(model_attr='max_single_order_qty', indexed=False, null=True)
     max_order_qty_remains = indexes.CharField(model_attr='max_order_qty_remains', indexed=False, null=True)
@@ -19,7 +20,7 @@ class ItemIndex(indexes.SearchIndex, indexes.Indexable):
     item_unit_measure = indexes.CharField(model_attr='item_unit_measure__unit_name', indexed=False, null=True)
     item_unit_measure_id = indexes.CharField(model_attr='item_unit_measure__pk', indexed=False, null=True)
     currency = indexes.CharField(model_attr='currency__currency', indexed=False, null=True)
-    warehouse_location = indexes.CharField(model_attr='warehouse_location__warehouse_location', indexed=False, null=True)
+    warehouse_location = indexes.CharField(model_attr='warehouse_location', indexed=False, null=True)
     production_type = indexes.CharField(model_attr='production_type__production_type_name', indexed=False, null=True)
 
     def get_model(self):
@@ -76,9 +77,7 @@ class ItemIndex(indexes.SearchIndex, indexes.Indexable):
             supplier_doc['province'] = supplier.province
             supplier_doc['country'] = supplier.country
             supplier_doc['postal_code'] = supplier.postal_code
-            supplier_doc['postal_code'] = supplier.postal_code
-            supplier_doc['postal_code'] = supplier.postal_code
-            supplier_doc['postal_code'] = supplier.postal_code
+            
 
         
 
