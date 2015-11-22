@@ -293,22 +293,7 @@
 						<p><span ng-if="ship_to_contact.postal_code != ''">{[{ ship_to_contact.postal_code }]}</span></p>
 					</td>
 				</tr>
-				<tr>
-					<th>Phone</th>
-					<td>
-						<li ng-repeat='phone in ship_to_contact.phones'>
-							<span> {[{ phone.type }]}: {[{phone.number}]} </span> <span ng-if="phone.phone_ext != ''">Ext: ( {[{phone.phone_ext}]} )</span>
-						</li>
-					</td>
-				</tr>
-				<tr>
-					<th>Email</th>
-					<td>
-						<li ng-repeat="em in ship_to_contact.emails">
-							<span class='bg-info email'>{[{ em.email_address}]} ({[{em.email_type}]})</span>
-						</li>
-					</td>
-				</tr>
+				
 				<tr>
 					<th colspan="3">
 						<a class="btn btn-info" ng-click="addShipToExtraContact()">
@@ -318,7 +303,35 @@
 				</tr>
 			</table>
 			<table class="table" id="ship_to_extra_contact_list">
-			
+				<thead>
+					<tr class='bg-primary'><td>Contact Type</td><td>Contact Details</td><td>Contact Name</td><td>Action</td></tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="ph in ship_to_contact.phones">
+						<td>{[{ ph.type}]}</td>
+						<td>{[{ ph.number}]}<span ng-if="ph.phone_ext != ''"> Ext: ({[{ph.phone_ext}]})</span></td>
+						<td>{[{ ship_to_contact.attention_to }]}</td>
+						<td>
+							<a href="" class='delete-contact'>Delete</a>
+							<input type="hidden" name='po_shipto_contact_phone_type'  value="{[{ ph.type }]}">
+							<input type="hidden" name='po_shipto_contact_phone_number'  value="{[{ ph.number }]}">
+							<input type="hidden" name='po_shipto_contact_phone_ext'  value="{[{ ph.ext }]}">
+							<input type="hidden" name='po_shipto_contact_phone_attention'  value="{[{ ship_to_contact.attention_to }]}">
+						</td>
+					</tr>
+					<tr ng-repeat="em in ship_to_contact.emails">
+						<td>{[{ em.email_type}]}</td>
+						<td>{[{ em.email_address }]} </td>
+						<td>{[{ ship_to_contact.attention_to }]}</td>
+						<td>
+							<a href="" class='delete-contact'>Delete</a>
+							<input type="hidden" name='po_shipto_contact_email_type' value
+							="{[{ em.email_type}]}" >
+							<input type="hidden" name='po_contact_email' value="{[{ em.email_address}]}" >
+							<input type="hidden" name='po_shipto_contact_email_attention' value="{[{ ship_to_contact.attention_to}]}" >
+						</td>
+					</tr>
+				</tbody>
 			</table>
 		</div>
 		

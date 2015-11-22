@@ -53,6 +53,7 @@ urlpatterns = patterns('',
 
     url(r'^po-extra-contact/(?P<po_id>[\w ,\'-]+)/$', 'purchase.views.extra_po_contact', name='add-extra-purchase-order-contact'),
     url(r'^delete-po-contact/$', 'purchase.views.delete_extra_po_contact', name='delete-extra-purchase-order-contact'),
+    url(r'^delete-shipto-po-contact/$', 'purchase.views.delete_shipto_extra_po_contact'),
 
     url(r'^pending-list/$', 'purchase.views.purchase_pending_list', name='purchase-pending-list'),
     url(r'^get-pending-list/$', 'purchase.views.get_pending_list', name='get-pending-list'),

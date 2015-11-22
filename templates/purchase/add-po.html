@@ -491,7 +491,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 		// get premier #1 contact
 		$http({method: 'GET', url: "/contacts/get-contact/1/"}).
         	success(function(data, status, headers, config){
-        	// console.log(data);
+        	console.log(data);
         	$scope.ship_to_contact = data;
 			$("#id_ship_to").val(data.id);
 			$("#ship_to_contact_details").show();
@@ -691,7 +691,9 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 			$("#id_date_issued").val(data.date_issued);
 			$("#id_date_expected").val(data.date_expected);
 			$("#id_date_issued").val(data.date_issued);
-			$("#items_total_qty").html(parseFloat(data.items_total).toFixed(2));
+			var items_total = parseFloat(data.items_total).toFixed(2);
+			$("#items_total_qty").html(items_total);
+			$("#id_items_total").val(items_total);
 
 			
 			if(data.supplier){
@@ -719,7 +721,22 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 			$scope.ship_to_contact = data.ship_to;
 			if(data.ship_to) {
 				$scope.search_ship_to = data.ship_to.contact_name;
-				$("#id_ship_to").val(data.ship_to.id);	
+				$("#id_ship_to").val(data.ship_to.id);
+
+				if(data.extra_shipto_contacts.length > 0){
+					var ec_div = $("#ship_to_extra_contact_list");
+
+					for(var i=0; i < data.extra_shipto_contacts.length; i++) {
+						var extra_contact = data.extra_shipto_contacts[i];
+						if(i==0) {
+							var header = "<tr class='bg-primary'><td>Contact Type</td><td>Contact Details</td><td>Contact Name</td><td>Action</td></tr>";
+							ec_div.html(header);
+						}
+						var con = "<tr class='bg-info'><td>"+extra_contact.contact_type+"</td><td>"+extra_contact.contact+"</td><td>"+extra_contact.contact_name+"</td><td><a href='' data-pecid='"+extra_contact.id+"' class='delete-shipto-extra-contact'>Delete</a><input type='hidden' name='po_shipto_extra_contacts' value='"+extra_contact.id+"'></td></tr>";
+						ec_div.append(con);
+					}
+				}
+
 			}
 			$("#ship_to_contact_details").show();
 
@@ -1421,7 +1438,26 @@ $(document).on("click", "a.delete-extra-contact", function(e){
 
         }
 	});
-})
+});
+
+$(document).on("click", "a.delete-shipto-extra-contact", function(e){
+	e.preventDefault();
+	var poecid = $(this).data("pecid");
+	// var url = "/purchase/delete-po-contact/";
+	$.ajax({
+		type: "POST",
+		url: "/purchase/delete-shipto-po-contact/",
+		
+		data: {
+			'poecid': poecid,
+		},
+		success: function(rdata) {
+			
+			$("a[data-pecid='"+rdata+"']").closest("tr").remove();
+
+        }
+	});
+});
 
 $(document).on("change", "input.demo_box", function(e){
 	e.preventDefault();

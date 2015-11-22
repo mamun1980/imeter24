@@ -560,6 +560,40 @@ def add_new_po(request):
                         po_contact.contact_name = contact_name
                         po_contact.save()
 
+
+                # ========= shipto contact ==================
+                con_shipto_phone_types = request.POST.getlist('po_shipto_contact_phone_type')
+                if con_shipto_phone_types:
+                    count = 0
+                    for ph_type in con_shipto_phone_types:
+                        if ph_type == 'Fax':
+                            po_contact = POShipToContact(purchase_order=po, contact_type='Fax')
+                        else:
+                            po_contact = POShipToContact(purchase_order=po, contact_type='Phone')
+
+                        if request.POST.getlist('po_shipto_contact_phone_ext')[count]:
+                            contact = request.POST.getlist('po_shipto_contact_phone_number')[count] + " ext:" + request.POST.getlist('po_contact_phone_ext')[count]
+                        else:
+                            contact = request.POST.getlist('po_shipto_contact_phone_number')[count]
+                        con_attention = request.POST.getlist('po_shipto_contact_phone_attention')[count]
+                        count = count + 1
+
+                        po_contact.contact = contact
+                        po_contact.contact_name = con_attention
+                        po_contact.save()
+                con_shipto_email_types = request.POST.getlist('po_shipto_contact_email_type')
+                
+                if con_shipto_email_types:
+                    count = 0
+                    for email_type in con_shipto_email_types:
+                        po_contact = POShipToContact(purchase_order=po,contact_type='Email')
+                        contact = request.POST.getlist('po_shipto_contact_email')[count]
+                        contact_name = request.POST.getlist('po_shipto_contact_email_attention')[count]
+                        count = count + 1
+                        po_contact.contact = contact
+                        po_contact.contact_name = contact_name
+                        po_contact.save()
+
                 # return HttpResponse("Hello world!")
 
 
@@ -1101,7 +1135,10 @@ def get_po_by_id(request,pk):
 
     po_dict = {}
     po_dict['po_number'] = po.po_number
-    po_dict['total_qty'] = po.items_total.to_eng_string()
+    if po.items_total:
+        po_dict['total_qty'] = po.items_total.to_eng_string()
+    else:
+        po_dict['total_qty'] = '0.00'
     po_dict['next_number'] = po.next_number
     if po.date_issued:
         po_dict['date_issued'] = po.date_issued.isoformat()
@@ -1157,6 +1194,19 @@ def get_po_by_id(request,pk):
             ec_list.append(ex)
 
     po_dict['extra_contacts'] = ec_list
+
+    extra_shipto_contacts = POShipToContact.objects.filter(purchase_order=po)
+    ec_list = []
+    if extra_shipto_contacts:
+        for ec in extra_shipto_contacts:
+            ex = {}
+            ex['id'] = ec.id
+            ex['contact_type'] = ec.contact_type
+            ex['contact'] = ec.contact
+            ex['contact_name'] = ec.contact_name
+            ec_list.append(ex)
+
+    po_dict['extra_shipto_contacts'] = ec_list
 
     if po.ship_to:
         ship_to = {}
@@ -1695,6 +1745,14 @@ def extra_po_contact(request, po_id):
 def delete_extra_po_contact(request):
     poecid = request.POST.get("poecid")
     extra_contact = POContact.objects.get(id=poecid)
+    extra_contact.delete()
+    return HttpResponse(poecid)
+
+
+@csrf_exempt
+def delete_shipto_extra_po_contact(request):
+    poecid = request.POST.get("poecid")
+    extra_contact = POShipToContact.objects.get(id=poecid)
     extra_contact.delete()
     return HttpResponse(poecid)
 
