@@ -569,7 +569,7 @@ def add_new_po(request):
                         if ph_type == 'Fax':
                             po_contact = POShipToContact(purchase_order=po, contact_type='Fax')
                         else:
-                            po_contact = POShipToContact(purchase_order=po, contact_type='Phone')
+                            po_contact = POShipToContact(purchase_order=po, contact_type=ph_type)
 
                         if request.POST.getlist('po_shipto_contact_phone_ext')[count]:
                             contact = request.POST.getlist('po_shipto_contact_phone_number')[count] + " ext:" + request.POST.getlist('po_contact_phone_ext')[count]
@@ -581,12 +581,13 @@ def add_new_po(request):
                         po_contact.contact = contact
                         po_contact.contact_name = con_attention
                         po_contact.save()
-                con_shipto_email_types = request.POST.getlist('po_shipto_contact_email_type')
                 
+                con_shipto_email_types = request.POST.getlist('po_shipto_contact_email_type')
+                # import pdb; pdb.set_trace();
                 if con_shipto_email_types:
                     count = 0
                     for email_type in con_shipto_email_types:
-                        po_contact = POShipToContact(purchase_order=po,contact_type='Email')
+                        po_contact = POShipToContact(purchase_order=po,contact_type=email_type)
                         contact = request.POST.getlist('po_shipto_contact_email')[count]
                         contact_name = request.POST.getlist('po_shipto_contact_email_attention')[count]
                         count = count + 1

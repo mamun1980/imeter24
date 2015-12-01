@@ -11,10 +11,9 @@ from contacts.forms import *
 from contacts.models import *
 import json
 
-
 from haystack.forms import ModelSearchForm, SearchForm
 from haystack.query import SearchQuerySet, EmptySearchQuerySet
-from haystack.views import SearchView
+from haystack.views import SearchView, search_view_factory
 from haystack.inputs import Raw, Clean, AutoQuery
 import re
 
@@ -45,7 +44,7 @@ def autocomplete(request):
     query = request.GET.get('q', '')
     suggestions = []
     if len(query) > 1:
-        sqs = SearchQuerySet().using('default').filter(content=query)[:10]
+        sqs = SearchQuerySet().models(Contact).filter(content=query)[:10]
         suggestions = []
         for con in sqs:
             contact_dict = {}
@@ -74,13 +73,16 @@ def autocomplete(request):
     })
     return HttpResponse(the_data, content_type='application/json')
 
+
+
+
 def search_contact(request):
     # import pdb; pdb.set_trace();
     query = request.GET.get('q','')
     if request.GET.get('q'):
-        contacts = SearchQuerySet().using('default').filter(content=AutoQuery(query)).load_all()[:30]
+        contacts = SearchQuerySet().models(Contact).filter(content=AutoQuery(query)).load_all()[:30]
     else:
-        contacts = SearchQuerySet().using('default').all().load_all()[:30]
+        contacts = SearchQuerySet().models(Contact).all().load_all()[:30]
 
     contact_list = []
     if contacts:

@@ -634,6 +634,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 	}
 
 	$scope.selectShipTo = function(con) {
+		console.log(con);
 		$("#ship_to_contact_list").hide();
 		$scope.search_ship_to = ""
 		$scope.ship_to_contact = con;

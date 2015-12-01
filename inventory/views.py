@@ -22,7 +22,7 @@ def autocomplete(request):
     query = request.GET.get('q', '')
     suggestions = []
     if len(query) > 1:
-        sqs = SearchQuerySet().using('default').filter(content=query)[:10]
+        sqs = SearchQuerySet().models(Contact).filter(content=query)[:10]
 
         items_list = []
         for item in items:
@@ -355,9 +355,9 @@ def list_item(request):
         else:
             item_dict['terms'] = None
 
-        if item.warehouse_location:
-            item_dict['warehouse_location'] = item.warehouse_location.warehouse_location
-            item_dict['location_description'] = item.warehouse_location.description
+        if item.warehouse_location != '':
+            item_dict['warehouse_location'] = item.warehouse_location
+            # item_dict['location_description'] = item.warehouse_location.description
         if item.production_type:
             item_dict['production_type'] = item.production_type.production_type_name
         else:
@@ -512,9 +512,9 @@ def get_item(request, itemnumber):
         item_dict['terms'] = None
 
     if item.warehouse_location:
-        item_dict['warehouse_location'] = item.warehouse_location.warehouse_location
-        item_dict['warehouse_location_id'] = item.warehouse_location.id
-        item_dict['location_description'] = item.warehouse_location.description
+        item_dict['warehouse_location'] = item.warehouse_location
+        # item_dict['warehouse_location_id'] = item.warehouse_location.id
+        # item_dict['location_description'] = item.warehouse_location.description
     if item.production_type:
         item_dict['production_type'] = item.production_type.production_type_name
         item_dict['production_type_id'] = item.production_type.id
@@ -611,9 +611,10 @@ def search_item(request):
     # import pdb; pdb.set_trace()
     query = request.GET.get('q','')
     if request.GET.get('q'):
-        items = SearchQuerySet().using('inventory').filter(content=AutoQuery(query)).load_all()[:20]
+        # items = SearchQuerySet().using('inventory').filter(content=AutoQuery(query)).load_all()[:20]
+        items = SearchQuerySet().filter(content=AutoQuery(query)).models(Item).load_all()[:20]
     else:
-        items = SearchQuerySet().using('inventory').all().load_all()[:20]
+        items = SearchQuerySet().models(Item).all().load_all()[:20]
 
     item_list = []
     for item in items:

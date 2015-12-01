@@ -1,4 +1,6 @@
 from django.conf.urls import patterns, include, url
+from haystack.views import SearchView, search_view_factory
+
 
 urlpatterns = patterns('',
     # Examples:
