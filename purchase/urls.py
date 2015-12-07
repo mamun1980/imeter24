@@ -51,6 +51,9 @@ urlpatterns = patterns('',
     url(r'^add-extra-contact/$', 'purchase.views.add_extra_contact', name='add-purchase-order-contact'),
     url(r'^add-shipto-extra-contact/$', 'purchase.views.add_shipto_extra_contact'),
 
+    url(r'^add-sl-shipto-extra-contact/$', 'purchase.views.add_sl_shipto_extra_contact'),
+    url(r'^add-sl-soldto-extra-contact/$', 'purchase.views.add_sl_soldto_extra_contact'),
+
     url(r'^po-extra-contact/(?P<po_id>[\w ,\'-]+)/$', 'purchase.views.extra_po_contact', name='add-extra-purchase-order-contact'),
     url(r'^delete-po-contact/$', 'purchase.views.delete_extra_po_contact', name='delete-extra-purchase-order-contact'),
     url(r'^delete-shipto-po-contact/$', 'purchase.views.delete_shipto_extra_po_contact'),
@@ -82,6 +85,8 @@ urlpatterns = patterns('',
     url(r'^delete-invoice/$', 'purchase.views.delete_invoice', name='delete-invoice'),
 
     url(r'^add-sl/$', 'purchase.views.add_shipping_list', name='add-shipping-list'),
+    url(r'^delete-sl-soldto-contact/$', 'purchase.views.delete_soldto_contact'),
+    url(r'^delete-sl-shipto-contact/$', 'purchase.views.delete_shipto_contact'),
 
     url(r'^sl/search/$', 'purchase.views.search_shiping_list', name='search-shiping-list'),
     url(r'^generate-sl/(?P<sl_number>\w+)/$', 'purchase.views.generate_sl', name='generate-sl'),

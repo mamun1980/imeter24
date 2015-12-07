@@ -183,6 +183,7 @@ var premierApp = angular.module("premierApp", [], function ($interpolateProvider
 premierApp.controller('ContactController',['$scope', '$http', function ($scope, $http) {
     $scope.init = function(){
         $http.get("/contacts/search/").success(function(data){  
+        	console.log(data);
           	$scope.contacts = data;
           	$scope.full_contact = data;
         })

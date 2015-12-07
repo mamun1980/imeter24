@@ -1,0 +1,81 @@
+<form name="slshiptocontact" action="/purchase/add-sl-shipto-extra-contact/" method="POST" enctype="multipart/form-data">{% csrf_token %}
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h4 class="modal-title" id="myModalLabel">Add Extra Contact</h4>
+</div>
+
+
+<div class="modal-body">
+	<table class="add-user-table">
+	{% for fl in slcontactform %}
+		<tr>
+			<td>{{ fl.label_tag }}</td>
+			<td>{{ fl.errors }}{{ fl }}</td>
+		</tr>
+	{% endfor %}
+	</table>
+</div>
+
+
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-default close-modal" data-dismiss="modal">Close</button>
+    <button type="submit" class="btn btn-primary">Add Contact</button>
+</div>
+</form>
+<script type="text/javascript">
+	(function(){
+
+		$("form[name='slshiptocontact']").on("submit", function(e){
+			e.preventDefault();
+			form_data = $(this).serialize();
+			// console.log($(this).attr('action'));
+			$.ajax({
+				type: "POST",
+				url: $(this).attr('action'),
+				data: form_data,
+				success: function(rdata) {
+					console.log(rdata);
+	                $( "button.close-modal" ).trigger( "click" );
+	                // var em = "<li> mamun@gmali.com</li>";
+	                var extraContactPlaceHolder = $("#sl_ship_to_extra_contact_list");
+	                var contacts = extraContactPlaceHolder.find("tr");
+	                var header = "<tr class='bg-primary'><td>Contact Type</td><td>Contact Details</td><td>Contact Name</td><td>Action</td></tr>";
+	                
+	                
+	                if (contacts.length > 0) {
+	                	extraContactPlaceHolder.append(rdata);
+					} else {
+						extraContactPlaceHolder.html(header);
+						extraContactPlaceHolder.append(rdata);
+					}
+	                
+	                // window.location.reload(false);
+	                // win = window.open("",'_blank');
+	                // win.location.href = "/contacts/edit/" + rdata + "/";
+
+	            }
+			});
+
+		});
+
+		var c_name = $("#id_primary_supplier_demo").val();
+		// console.log('contact name :'+c_name);
+		$("#id_contact_name").val(c_name);
+		var label = $("#id_contact").closest("tr").find("label");
+		$('select#id_contact_type').on('change', function (e) {
+		    var optionSelected = $("option:selected", this);
+		    
+		    var textSelected   = optionSelected.text();
+		    if(textSelected == 'Email') {
+		    	label.text("Enter Email");
+		    } else if(textSelected == 'Phone') {
+		    	label.text("Enter Phone Number");
+		    } else if(textSelected == 'Fax') {
+		    	label.text("Enter Fax Number");
+		    }
+		});
+
+	})(jQuery)
+
+</script>

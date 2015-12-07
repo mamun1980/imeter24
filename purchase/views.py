@@ -1700,21 +1700,38 @@ def delete_purchase_order(request):
 
 
 @csrf_exempt
-def add_shipto_extra_contact(request):
+def add_sl_soldto_extra_contact(request):
     if request.method == 'POST':
         # import pdb; pdb.set_trace();
         po_contact_type = request.POST.get('contact_type')
         po_contact = request.POST.get('contact')
         po_contact_name = request.POST.get('contact_name')
-        pocontact = POShipToContact(contact_type=po_contact_type, 
+        pocontact = SLSoldToContact(contact_type=po_contact_type, 
             contact=po_contact, contact_name=po_contact_name)
         
         pocontact.save()
-        return render(request, "purchase/extra-shipto-po-contact.html", {'pocontact': pocontact})
+        return render(request, "purchase/extra-sl-soldto-contact.html", {'pocontact': pocontact})
     else:
-        pocontactform = POShipToContactForm()
+        pocontactform = SLSoldToContactForm()
 
-        return render(request, "purchase/add-po-shipto-contact.html", {'po_contact_form': pocontactform})
+        return render(request, "purchase/add-sl-soldto-extra-contact-form.html", {'po_contact_form': pocontactform})
+
+@csrf_exempt
+def add_sl_shipto_extra_contact(request):
+    if request.method == 'POST':
+        # import pdb; pdb.set_trace();
+        sl_contact_type = request.POST.get('contact_type')
+        sl_contact = request.POST.get('contact')
+        sl_contact_name = request.POST.get('contact_name')
+        slcontact = SLShipToContact(contact_type=sl_contact_type, 
+            contact=sl_contact, contact_name=sl_contact_name)
+        
+        slcontact.save()
+        return render(request, "purchase/extra-sl-shipto-contact.html", {'slcontact': slcontact})
+    else:
+        slcontactform = SLShipToContactForm()
+
+        return render(request, "purchase/add-sl-shipto-extra-contact-form.html", {'slcontactform': slcontactform})
 
 
 @csrf_exempt
@@ -1748,6 +1765,21 @@ def delete_extra_po_contact(request):
     extra_contact = POContact.objects.get(id=poecid)
     extra_contact.delete()
     return HttpResponse(poecid)
+
+@csrf_exempt
+def delete_soldto_contact(request):
+    # import pdb; pdb.set_trace();
+    contactid = request.POST.get("contactid")
+    extra_contact = SLSoldToContact.objects.get(id=contactid)
+    extra_contact.delete()
+    return HttpResponse(contactid)
+
+@csrf_exempt
+def delete_shipto_contact(request):
+    contactid = request.POST.get("contactid")
+    extra_contact = SLShipToContact.objects.get(id=contactid)
+    extra_contact.delete()
+    return HttpResponse(contactid)
 
 
 @csrf_exempt
@@ -1940,7 +1972,7 @@ def search_packing_list(request):
 def search_shiping_list(request):
     query = request.GET.get('q','')
     if request.GET.get('q'):
-        sls = SearchQuerySet().using('sl').filter(content=AutoQuery(query)).load_all()[:10]
+        sls = SearchQuerySet().using('sl').filter(content=AutoQuery(query)).load_all()[:3]
     else:
         sls = SearchQuerySet().using('sl').all().load_all()[:10]
 
@@ -1951,8 +1983,44 @@ def search_shiping_list(request):
                 sl_dict = {}
                 sl_dict['sl_number'] = sl.sl_number
                 sl_dict['job_number'] = sl.job_number
-                sl_dict['sold_to'] = sl.sold_to
-                sl_dict['ship_to'] = sl.ship_to
+                # import pdb; pdb.set_trace();
+                if sl.sold_to:
+                    slsoldtocontacts = SLSoldToContact.objects.filter(sl=sl.object)
+                    soldto_contact_list = []
+                    for sc in slsoldtocontacts:
+                        soldto_contact = {}
+                        soldto_contact['id'] = sc.id
+                        soldto_contact['type'] = sc.contact_type
+                        soldto_contact['number'] = sc.contact
+                        soldto_contact['ext'] = ""
+                        soldto_contact['contact_name'] = sc.contact_name
+                        soldto_contact_list.append(soldto_contact)
+
+                    sl_dict['sold_to'] = sl.sold_to
+                    sl_dict['sold_to']['phones'] = soldto_contact_list
+                    sl_dict['sold_to']['emails'] = []
+                else:
+                    sl_dict['sold_to'] = None
+
+                if sl.ship_to:
+                    slshiptocontacts = SLShipToContact.objects.filter(sl=sl.object)
+                    shipto_contact_list = []
+                    # import pdb; pdb.set_trace();
+                    for sc in slshiptocontacts:
+                        shipto_contact = {}
+                        shipto_contact['id'] = sc.id
+                        shipto_contact['type'] = sc.contact_type
+                        shipto_contact['number'] = sc.contact
+                        shipto_contact['ext'] = ""
+                        shipto_contact['contact_name'] = sc.contact_name
+                        shipto_contact_list.append(shipto_contact)
+
+                    # import pdb; pdb.set_trace();
+                    sl_dict['ship_to'] = sl.ship_to
+                    sl_dict['ship_to']['phones'] = shipto_contact_list
+                    sl_dict['ship_to']['emails'] = []
+                else:
+                    sl_dict['ship_to'] = None
                 
                 if sl.object.ordered_date:
                     sl_dict['ordered_date'] = sl.object.ordered_date.isoformat()
@@ -2561,8 +2629,8 @@ def packing_list(request):
 @csrf_exempt
 def add_shipping_list(request):
     ship_vias = DeliveryChoice.objects.filter(is_active=True)
-    sv = SystemVariable.objects.get(id=1)
-    next_sl_number = sv.next_sl_number
+    # sv = SystemVariable.objects.get(id=1)
+    # next_sl_number = sv.next_sl_number
     if request.method == 'POST':
         # import pdb; pdb.set_trace();
         user = request.user 
@@ -2581,18 +2649,114 @@ def add_shipping_list(request):
                 sl_form = ShippingListForm(request.POST, request=request, action='new')    
             except Exception, e:
                 raise e
-            
-            
-
 
         item_ordered = request.POST.getlist('item_ordered')
-        # item_shipped = request.POST.getlist('item_shipped')
-        # item_backordered = request.POST.getlist('item_backordered')
-        # shipped_total_to_date = request.POST.getlist('shipped_total_to_date')
-        # import pdb; pdb.set_trace();
         if sl_form.is_valid():
             try:
-                sl = sl_form.save()    
+                sl = sl_form.save()
+
+                form_action = request.POST.get("form_action")
+                if form_action == 'new':
+                    # ============= add contacts for sold_to ==========
+
+                    sold_to_phone_numbers = request.POST.getlist("sl_sold_to_phone_number", "")
+                    sl_sold_to_emails = request.POST.getlist("sl_sold_to_email", "")
+                    if sold_to_phone_numbers:
+                        sl_sold_to_phone_types = request.POST.getlist("sl_sold_to_phone_type", "")
+                        sl_sold_to_phone_exts = request.POST.getlist("sl_sold_to_phone_ext", "")
+                        sl_sold_to_phone_attentions = request.POST.getlist("sl_sold_to_phone_attention", "")
+                        i=0
+                        for ph_num in sold_to_phone_numbers:
+                            ph_type = sl_sold_to_phone_types[i]
+                            ph_ext = sl_sold_to_phone_exts[i]
+                            ph_number = ph_num
+                            contact_name = sl_sold_to_phone_attentions[i]
+                            if ph_ext != "":
+                                phone_number = str(ph_number)+"-"+str(ph_ext)
+                            else:
+                                phone_number = str(ph_number)
+                            sl_sold_contact = SLSoldToContact(sl=sl, contact_type=str(ph_type), contact=phone_number, contact_name=contact_name)
+                            sl_sold_contact.save()
+                            i = i+1
+                    
+                    if sl_sold_to_emails:
+                        sl_sold_to_email_types = request.POST.getlist("sl_sold_to_email_type", "")
+                        sl_sold_to_email_attentions = request.POST.getlist("sl_sold_to_email_attention", "")
+                        i=0
+                        for email in sl_sold_to_emails:
+                            e_type = sl_sold_to_email_types[i]
+                            contact_name = sl_sold_to_email_attentions[i]
+                            sl_sold_contact = SLSoldToContact(sl=sl, contact_type=str(e_type), 
+                                contact=email, contact_name=contact_name)
+                            sl_sold_contact.save()
+                            i = i+1
+
+                    sl_soldto_extra_contacts = request.POST.getlist("sl_soldto_extra_contacts", "")
+                    for extra_contact_id in sl_soldto_extra_contacts:
+                        sl_sold_contact = SLSoldToContact.objects.get(id=extra_contact_id)
+                        sl_sold_contact.sl = sl
+                        sl_sold_contact.save()
+
+
+                # ============= add contacts for ship_to ==========
+                    # import pdb; pdb.set_trace();
+                    ship_to_contact_ids = request.POST.getlist("sl_ship_to_contact_id")
+                    ship_to_phone_numbers = request.POST.getlist("sl_ship_to_phone_number", "")
+                    sl_ship_to_emails = request.POST.getlist("sl_ship_to_email", "")
+                    if ship_to_phone_numbers:
+                        sl_ship_to_phone_types = request.POST.getlist("sl_ship_to_phone_type", "")
+                        sl_ship_to_phone_exts = request.POST.getlist("sl_ship_to_phone_ext", "")
+                        sl_ship_to_phone_attentions = request.POST.getlist("sl_ship_to_phone_attention", "")
+                        i=0
+                        for ph_num in ship_to_phone_numbers:
+                            ph_type = sl_ship_to_phone_types[i]
+                            ph_ext = sl_ship_to_phone_exts[i]
+                            ph_number = ph_num
+                            contact_name = sl_ship_to_phone_attentions[i]
+                            if ph_ext != "":
+                                phone_number = str(ph_number)+"-"+str(ph_ext)
+                            else:
+                                phone_number = str(ph_number)
+                            sl_ship_contact = SLShipToContact(sl=sl, contact_type=str(ph_type), contact=phone_number, contact_name=contact_name)
+                            sl_ship_contact.save()
+                            i = i+1
+                    
+                    if sl_ship_to_emails:
+                        sl_ship_to_email_types = request.POST.getlist("sl_ship_to_email_type", "")
+                        sl_ship_to_email_attentions = request.POST.getlist("sl_ship_to_email_attention", "")
+                        i=0
+                        for email in sl_ship_to_emails:
+                            e_type = sl_ship_to_email_types[i]
+                            contact_name = sl_ship_to_email_attentions[i]
+                            sl_sold_contact = SLShipToContact(sl=sl, contact_type=str(e_type), 
+                                contact=email, contact_name=contact_name)
+                            sl_ship_contact.save()
+                            i = i+1
+
+
+                    sl_shipto_extra_contacts = request.POST.getlist("sl_shipto_extra_contacts", "")
+                    for extra_contact_id in sl_shipto_extra_contacts:
+                        sl_sold_contact = SLShipToContact.objects.get(id=extra_contact_id)
+                        sl_sold_contact.sl = sl
+                        sl_sold_contact.save()
+                
+                else:
+                    sl_soldto_extra_contacts = request.POST.getlist("sl_soldto_extra_contacts", "")
+                    for extra_contact_id in sl_soldto_extra_contacts:
+                        sl_sold_contact = SLSoldToContact.objects.get(id=extra_contact_id)
+                        sl_sold_contact.sl = sl
+                        sl_sold_contact.save()
+
+                    sl_shipto_extra_contacts = request.POST.getlist("sl_shipto_extra_contacts", "")
+                    for extra_contact_id in sl_shipto_extra_contacts:
+                        sl_sold_contact = SLShipToContact.objects.get(id=extra_contact_id)
+                        sl_sold_contact.sl = sl
+                        sl_sold_contact.save()
+
+                    
+
+
+
             except Exception, e:
                 raise e
             
@@ -2651,7 +2815,7 @@ def add_shipping_list(request):
         
         sl_form = ShippingListForm()
         return render(request, "purchase/sl-add.html", 
-            {'sl_form': sl_form, 'ship_vias': ship_vias, 'next_sl_number': next_sl_number})
+            {'sl_form': sl_form, 'ship_vias': ship_vias})
 
 def get_sl_json(request):
     # import pdb; pdb.set_trace()
@@ -2990,7 +3154,10 @@ def view_shipping_list(request, sl_id):
     # import pdb; pdb.set_trace();
     sl = ShippingList.objects.get(sl_number=sl_id)
     sl_items = ShippingItem.objects.filter(shipping_list=sl)
-    return render(request, "purchase/view-sl.html", {'sl': sl, 'sl_items': sl_items})
+    sl_soldto_contacts = SLSoldToContact.objects.filter(sl=sl)
+    sl_shipto_contacts = SLShipToContact.objects.filter(sl=sl)
+    return render(request, "purchase/view-sl.html", {'sl': sl, 'sl_items': sl_items, 
+        'sl_soldto_contacts': sl_soldto_contacts, 'sl_shipto_contacts': sl_shipto_contacts})
 
 
 def edit_shipping_list(request, sl_id):

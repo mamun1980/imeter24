@@ -10,7 +10,7 @@
 
 {% block content %}
 <style>
-.contact_box, .item_box {
+.contact_box, .item_box, .ship_to_box {
 	position: relative;
 }
 table#sold_to_contact_details, table#ship_to_contact_details {
@@ -29,9 +29,18 @@ table > tbody {
 }
 #sold_to_contact_list, #ship_to_contact_list {
     width: 980px !important;
+    position: absolute;
+    top: 34px;
+    z-index: 1000;
+}
+#sold_to_contact_list {
+    
+    left: 0px;
+    /*background-color: #ed791a;*/
+    
 }
 #ship_to_contact_list {
-    left: -620px !important;
+    right: 535px;
 }
 #ship_to_contact_list thead, #sold_to_contact_list thead {
     color: #FFF;
@@ -43,13 +52,7 @@ table > tbody {
     background-color: #333;
     font-size: 14px;
 }
-#ship_to_contact_list, #sold_to_contact_list {
-    position: absolute;
-    top: 34px;
-    left: 0px;
-    /*background-color: #ed791a;*/
-    z-index: 1000;
-}
+
 #items_list{
 	position: absolute;
 	top: 45px;
@@ -115,6 +118,7 @@ a.close {
 
 <section class="row " ng-controller="AddSLController">
 	<form action="/purchase/add-sl/" name="add_sl_form" method="POST" enctype="multipart/form-data">{% csrf_token %}
+    <input type="hidden" id="form_action" name="form_action" value="">
 	
 	<div class="col-md-12">
 		
@@ -142,13 +146,44 @@ a.close {
 {% include "modals/add-modal.html" %}
 <!-- SL Number -->
 <script type="text/javascript">
+
 (function(){
 	$(".datepicker").datepicker();
 	$("a.close").on("click", function(){
 		$(this).closest('table').hide();
 
 	});
-	
+	$("#form_action").val("new");
+    $(document).on("click", "a.delete-contact", function(e){
+        // console.log("Hello world!");
+        var row = $(this).closest("tr");
+        row.remove();
+        var poecid = $(this).data("contactid");
+        var type = $(this).data("contacttype");
+        if(poecid != ""){
+            if(type=='shipto') {
+                var url = "/purchase/delete-sl-shipto-contact/";
+            } else if(type=='soldto') {
+                var url = "/purchase/delete-sl-soldto-contact/";    
+            }
+            
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                
+                data: {
+                    'contactid': poecid,
+                },
+                success: function(rdata) {
+                    
+                    $("a[data-contactid='"+rdata+"']").closest("tr").remove();
+
+                }
+            });    
+        }
+        
+    });
 $("a#add_id_primary_supplier").on("click", function(e){
         e.preventDefault();
         url = "/contacts/add/rel/",
@@ -173,7 +208,6 @@ var slApp = angular.module("slApp", [], function ($interpolateProvider) {
 slApp.controller('AddSLController',['$scope', '$http','$compile', function ($scope, $http, $compile) {
 	
 	$scope.init = function() {
-
 
 		$http({method: 'GET', url: "/inventory/items/"}).
             success(function(data, status, headers, config) {
@@ -212,9 +246,34 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
         // $scope.search_sl = 'new';
         
         // $("#ship-to-container").hide();
+        // $scope.sold_to_contact = false;
 	};
 
 	$scope.init();
+
+    $scope.addSoldToExtraContact = function() {
+        console.log("testing..");
+        mdal = $('#addModal');
+        url = "/purchase/add-sl-soldto-extra-contact/",
+        mdal.on("shown.bs.modal", function(){
+            $("#addModal .modal-content").load(url);
+            
+            // console.log(url);
+        }).modal();
+        return false;
+    };
+
+    $scope.addShipToExtraContact = function() {
+        console.log("testing..");
+        mdal = $('#addModal');
+        url = "/purchase/add-sl-shipto-extra-contact/",
+        mdal.on("shown.bs.modal", function(){
+            $("#addModal .modal-content").load(url);
+            
+            // console.log(url);
+        }).modal();
+        return false;
+    };
 
     $scope.searchJob = function(q) {
         if(q.length > 1) {
@@ -426,6 +485,7 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
             $http({method: 'GET', url: url}).
                 success(function(data, status, headers, config){
                 $scope.sls = data;
+                // console.log(data);
             });
             // $("#po_list").show();
             $scope.show_sl_list = true;
@@ -436,7 +496,8 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
         
     }
     $scope.selectSL = function(sl){
-        
+        console.log(sl);
+        $("#form_action").val("update");
         $scope.search_sl = sl.sl_number;
         $scope.sl_checked = true;
         $scope.show_sl_list = false;
@@ -448,7 +509,7 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
         if(sl.sold_to){
             $("#sold_to_contact_details").show();
             $scope.sold_to_contact = sl.sold_to;
-            $scope.search_sold_to = sl.sold_to.contact_name;
+            $scope.search_sold_to = sl.sold_to.attention_to;
             $("#id_sold_to").val(sl.sold_to.id);  
             $scope.add_sl_form.search_sold_to.$setViewValue($scope.add_sl_form.search_sold_to.$viewValue);    
         }
@@ -456,11 +517,10 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
         if(sl.ship_to){
             $("#ship_to_contact_details").show();
             $scope.ship_to_contact = sl.ship_to;
-            $scope.search_ship_to = sl.ship_to.contact_name;
+            $scope.search_ship_to = sl.ship_to.attention_to;
             $("#id_ship_to").val(sl.ship_to.id);    
         }
         
-
         $("#id_ordered_date").val(sl.ordered_date);
         $("#id_date_required").val(sl.date_required);
         $("#id_customer_po_number").val(sl.customer_po_number);

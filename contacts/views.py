@@ -42,11 +42,15 @@ def contact_test(request):
 
 def autocomplete(request):
     query = request.GET.get('q', '')
+    if request.GET.get('q'):
+        sqs = SearchQuerySet().using('default').filter(content=query)[:10]
+    else:
+        sqs = SearchQuerySet().using('default').filter(content=query)[:10]
+        
     suggestions = []
-    if len(query) > 1:
-        sqs = SearchQuerySet().models(Contact).filter(content=query)[:10]
-        suggestions = []
-        for con in sqs:
+    
+    for con in sqs:
+        if con is not None:
             contact_dict = {}
             contact_dict['id'] = con.pk
             contact_dict['contact_name'] = con.contact_name
@@ -80,9 +84,9 @@ def search_contact(request):
     # import pdb; pdb.set_trace();
     query = request.GET.get('q','')
     if request.GET.get('q'):
-        contacts = SearchQuerySet().models(Contact).filter(content=AutoQuery(query)).load_all()[:30]
+        contacts = SearchQuerySet().using('default').filter(content=AutoQuery(query)).load_all()[:30]
     else:
-        contacts = SearchQuerySet().models(Contact).all().load_all()[:30]
+        contacts = SearchQuerySet().using('default').load_all()[:30]
 
     contact_list = []
     if contacts:

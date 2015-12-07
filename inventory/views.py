@@ -22,7 +22,7 @@ def autocomplete(request):
     query = request.GET.get('q', '')
     suggestions = []
     if len(query) > 1:
-        sqs = SearchQuerySet().models(Contact).filter(content=query)[:10]
+        sqs = SearchQuerySet().using('inventory').filter(content=query)[:10]
 
         items_list = []
         for item in items:
@@ -611,17 +611,20 @@ def search_item(request):
     # import pdb; pdb.set_trace()
     query = request.GET.get('q','')
     if request.GET.get('q'):
-        # items = SearchQuerySet().using('inventory').filter(content=AutoQuery(query)).load_all()[:20]
-        items = SearchQuerySet().filter(content=AutoQuery(query)).models(Item).load_all()[:20]
+        items = SearchQuerySet().using('inventory').filter(content=AutoQuery(query)).load_all()[:20]
+        # items = SearchQuerySet().models(Item).filter(content=AutoQuery(query)).models(Item).load_all()[:20]
     else:
-        items = SearchQuerySet().models(Item).all().load_all()[:20]
+        items = SearchQuerySet().using('inventory').all().load_all()[:20]
 
     item_list = []
     for item in items:
 
         item_dict = {}
         item_dict['item_number'] = item.item_number
-        item_dict['date_added'] = item.date_added.strftime('%b, %d %Y')
+        if item.date_added:
+            item_dict['date_added'] = item.date_added.strftime('%b, %d %Y')
+        else:
+            item_dict['date_added'] = None
         item_dict['description'] = item.description
         item_dict['primary_supplier'] = item.primary_supplier
         item_dict['last_PO'] = item.last_PO

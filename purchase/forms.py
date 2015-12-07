@@ -214,6 +214,31 @@ class POShipToContactForm(forms.ModelForm):
         exclude = ['purchase_order',]
 
 
+class SLShipToContactForm(forms.ModelForm):
+    contact_type = forms.ChoiceField(required=False, choices=CON_TYPE,
+        widget=forms.Select(attrs={"class": "form-control"}))
+    contact = forms.CharField( max_length=100, required=False, label='Enter Email',
+        widget=forms.TextInput(attrs={"class": "form-control", 'placeholder': "type contact"}))
+    contact_name = forms.CharField( max_length=100, required=False, label='Contact Name',
+        widget=forms.TextInput(attrs={"class": "form-control", 'placeholder': "contact name"}))
+    
+    class Meta:
+        model = SLShipToContact
+        exclude = ['sl',]
+
+
+class SLSoldToContactForm(forms.ModelForm):
+    contact_type = forms.ChoiceField(required=False, choices=CON_TYPE,
+        widget=forms.Select(attrs={"class": "form-control"}))
+    contact = forms.CharField( max_length=100, required=False, label='Enter Email',
+        widget=forms.TextInput(attrs={"class": "form-control", 'placeholder': "type contact"}))
+    contact_name = forms.CharField( max_length=100, required=False, label='Contact Name',
+        widget=forms.TextInput(attrs={"class": "form-control", 'placeholder': "contact name"}))
+    
+    class Meta:
+        model = SLSoldToContact
+        exclude = ['sl',]
+
 class ItemReeiveForm(forms.ModelForm):
     # purchase_item = forms.ModelChoiceField(required=False, queryset=PurchaseItem.objects.all(), 
     #   widget=forms.Select(attrs={"class": "form-control", 'readonly':'readonly'}))

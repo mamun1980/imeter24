@@ -115,7 +115,13 @@ class ShippingListIndex(indexes.SearchIndex, indexes.Indexable):
         if sold_to:
             sold_to_dict = {}
             sold_to_dict['id'] = sold_to.id
-            sold_to_dict['contact_name'] = sold_to.contact_name
+            sold_to_dict['attention_to'] = sold_to.attention_to
+            sold_to_dict['address_1'] = sold_to.address_1
+            sold_to_dict['address_2'] = sold_to.address_2
+            sold_to_dict['city'] = sold_to.city
+            sold_to_dict['province'] = sold_to.province
+            sold_to_dict['country'] = sold_to.country
+            sold_to_dict['postal_code'] = sold_to.postal_code
             phones = sold_to.contact_phone.all()
             phs = []
             for ph in phones:
@@ -141,7 +147,13 @@ class ShippingListIndex(indexes.SearchIndex, indexes.Indexable):
         if ship_to:
             ship_to_dict = {}
             ship_to_dict['id'] = ship_to.id
-            ship_to_dict['contact_name'] = ship_to.contact_name
+            ship_to_dict['attention_to'] = ship_to.attention_to
+            ship_to_dict['address_1'] = ship_to.address_1
+            ship_to_dict['address_2'] = ship_to.address_2
+            ship_to_dict['city'] = ship_to.city
+            ship_to_dict['province'] = ship_to.province
+            ship_to_dict['country'] = ship_to.country
+            ship_to_dict['postal_code'] = ship_to.postal_code
             phones = ship_to.contact_phone.all()
             phs = []
             for ph in phones:

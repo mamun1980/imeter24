@@ -21,8 +21,8 @@
 					<tbody>
 						<tr ng-repeat="sl in sls | filter:search_sl" ng-click="selectSL(sl)">
 							<td>{[{sl.sl_number}]}</td>
-							<td>{[{sl.sold_to.contact_name}]}</td>
-							<td>{[{sl.ship_to.contact_name}]}</td>
+							<td>{[{sl.sold_to.attention_to}]}</td>
+							<td>{[{sl.ship_to.attention_to}]}</td>
 							<td>{[{sl.job_number}]}</td>
 						</tr>
 						
@@ -52,13 +52,8 @@
 			<table class="table sold_to_contact" id="sold_to_contact_list">
 				<thead>
 					<tr>
-						<th>Contact Name</th>
-						<th> Address </th>
-						
-						<th> Phones </th>
-						
-						
-						<th><a href="" class="close">x</a></th>
+						<th>Contact Name</th><th>Address</th><th> Primary Cont No.</th>
+						<th><a href="" class="close" ng-click="hideSupplierContact()">x</a></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -72,9 +67,11 @@
 							<p ng-if="contact.address_1 != ''">{[{contact.address_1}]}</p>
 							<p ng-if="contact.city != ''">{[{contact.city}]}<span ng-if="contact.province != ''">, {[{contact.province}]}</span></p>
 							<p>
-							<span ng-if="contact.postal_code !=''">{[{ contact.postal_code }]}, </span>
-							<span ng-if="contact.country != ''"> {[{contact.country}]}</span>
+							<span ng-if="contact.country != ''">{[{contact.country}]}</span>
 							</p>
+							<p ng-if="contact.postal_code != ''">{[{ contact.postal_code }]}</p>
+							
+							
 						</td>
 						
 						<td class="city">
@@ -97,18 +94,15 @@
 	<label for="id_ship_to">Ship to:</label>
 	</td>
 	<td colspan="3">
-	<div class="contact_box">
+	<div class="ship_to_box">
 		<input type="text" ng-model="search_ship_to" placeholder="start typing to search ship to contact" class="form-control" ng-change="searchShipTo(search_ship_to)" style="width: 95%; display: inline;"><a href="/admin/contacts/contact/add/" class="add-another" id="add_id_primary_supplier" onclick="return showAddAnotherPopup(this);"> <img src="/statics/admin/img/icon_addlink.gif" width="10" height="10" alt="Add Another"></a>
 		
 		<table class="table ship_to_contact" id="ship_to_contact_list">
 			<thead>
 				<tr>
-					<th>Contact Name</th>
-					<th> Address </th>
-					
-					<th> Phones </th>
-					<th> <a href="" class="close">x</a></th>
-				</tr>
+						<th>Contact Name</th><th>Address</th><th> Primary Cont No.</th>
+						<th><a href="" class="close" ng-click="hideShiptoContact()">x</a></th>
+					</tr>
 			</thead>
 			<tbody>
 				
@@ -120,9 +114,11 @@
 							<p ng-if="contact.address_1 != ''">{[{contact.address_1}]}</p>
 							<p ng-if="contact.city != ''">{[{contact.city}]}<span ng-if="contact.province != ''">, {[{contact.province}]}</span></p>
 							<p>
-							<span ng-if="contact.postal_code !=''">{[{ contact.postal_code }]}, </span>
 							<span ng-if="contact.country != ''">{[{contact.country}]}</span>
 							</p>
+							<p ng-if="contact.postal_code != ''">{[{ contact.postal_code }]}</p>
+							
+							
 						</td>
 						
 						<td class="city">
@@ -164,25 +160,50 @@
 						<p>{[{sold_to_contact.city}]}<span ng-if="sold_to_contact.province != ''">, {[{sold_to_contact.province}]}</span></p>
 						
 						<p>{[{sold_to_contact.country}]}</p>
-						<p>{[{ sold_to_contact.postal_code }]}</p>
+						<p><span ng-if="sold_to_contact.postal_code != ''">{[{ sold_to_contact.postal_code }]}
+						</span></p>
 					</td>
 				</tr>
 				<tr>
-					<th>Phones</th>
-					<td colspan="2">
-						<li ng-repeat="ph in sold_to_contact.phones">
-							<span class='bg-info phone'>{[{ ph.type}]}: {[{ ph.number}]} </span> <span ng-if="ph.ext != ''">Ext: ({[{ph.ext}]})</span>
-						</li>
+					<th colspan="3">
+						<a class="btn btn-info" ng-click="addSoldToExtraContact()">
+							Add Extra Contact
+						</a>
+					</th>
+				</tr>
+			</table>
+			<table class="table" id="sl_sold_to_extra_contact_list" ng-show="sold_to_contact.phones || sold_to_contact.emails">
+			<thead>
+				<tr class='bg-primary'><td>Contact Type</td><td>Contact Details</td><td>Contact Name</td><td>Action</td></tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="ph in sold_to_contact.phones">
+					<td>{[{ ph.type}]}</td>
+					<td>{[{ ph.number}]}<span ng-if="ph.ext != ''"> Ext: ({[{ph.ext}]})</span></td>
+					<td ng-show="ph.contact_name">{[{ ph.contact_name }]}</td>
+					<td ng-show="!ph.contact_name">{[{ sold_to_contact.attention_to }]}</td>
+					<td>
+						<a href="" data-contactid="{[{ph.id}]}" data-contacttype="soldto" class='delete-contact'>Delete</a>
+						<input type="hidden" name='sl_sold_to_phone_type'  value="{[{ ph.type }]}">
+						<input type="hidden" name='sl_sold_to_phone_number'  value="{[{ ph.number }]}">
+						<input type="hidden" name='sl_sold_to_phone_ext'  value="{[{ ph.ext }]}">
+						<input type="hidden" name='sl_sold_to_phone_attention'  value="{[{ sold_to_contact.attention_to }]}">
 					</td>
 				</tr>
-				<tr>
-					<th>Emails</th>
-					<td colspan="2">
-						<li ng-repeat="em in sold_to_contact.emails">
-							<span class='bg-info email'>{[{ em.email_address}]} ({[{em.email_type}]})</span>
-						</li>
+				<tr ng-repeat="em in sold_to_contact.emails">
+					<td>{[{ em.email_type}]}</td>
+					<td>{[{ em.email_address }]} </td>
+					<td>{[{ sold_to_contact.attention_to }]}</td>
+					<td>
+						<a href="" data-contactid="{[{ph.id}]}" class='delete-contact'>Delete</a>
+						<input type="hidden" name='sl_sold_to_email_type' value
+						="{[{ em.email_type}]}" >
+						<input type="hidden" name='sl_sold_to_email' value="{[{ em.email_address}]}" >
+						<input type="hidden" name='sl_sold_to_email_attention' value="{[{ sold_to_contact.attention_to}]}" >
 					</td>
 				</tr>
+				
+			</tbody>
 			</table>
 	</td>
 	<td colspan="2">
@@ -203,25 +224,50 @@
 					<p>{[{ship_to_contact.city}]}<span ng-if="ship_to_contact.province != ''">, {[{ship_to_contact.province}]}</span></p>
 					
 					<p>{[{ship_to_contact.country}]}</p>
-					<p>{[{ ship_to_contact.postal_code }]}</p>
+					<p><span ng-if="ship_to_contact.postal_code != ''">{[{ ship_to_contact.postal_code }]}
+					</span></p>
 				</td>
 			</tr>
 			<tr>
-				<th>Phones</th>
-				<td colspan="2">
-					<li ng-repeat="ph in ship_to_contact.phones">
-						<span class='bg-info phone'>{[{ ph.type}]}: {[{ ph.number}]} </span> <span ng-if="ph.ext != ''">Ext: ({[{ph.ext}]})</span>
-					</li>
+				<th colspan="3">
+					<a class="btn btn-info" ng-click="addShipToExtraContact()">
+						Add Extra Contact
+					</a>
+				</th>
+			</tr>
+		</table>
+		<table class="table" id="sl_ship_to_extra_contact_list" ng-show="ship_to_contact.phones || ship_to_contact.emails">
+		<thead>
+			<tr class='bg-primary'><td>Contact Type</td><td>Contact Details</td><td>Contact Name</td><td>Action</td></tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="ph in ship_to_contact.phones">
+				<td>{[{ ph.type}]}</td>
+				<td>{[{ ph.number}]}<span ng-if="ph.ext != ''"> Ext: ({[{ph.ext}]})</span></td>
+				<td ng-show="ph.contact_name">{[{ ph.contact_name }]}</td>
+				<td ng-show="!ph.contact_name">{[{ ship_to_contact.attention_to }]}</td>
+				<td>
+					<a href="" data-contactid="{[{ph.id}]}" data-contacttype="shipto" class='delete-contact'>Delete</a>
+					<input type="hidden" name='sl_ship_to_phone_type'  value="{[{ ph.type }]}">
+					<input type="hidden" name='sl_ship_to_phone_number'  value="{[{ ph.number }]}">
+					<input type="hidden" name='sl_ship_to_phone_ext'  value="{[{ ph.ext }]}">
+					<input type="hidden" name='sl_ship_to_phone_attention'  value="{[{ ship_to_contact.attention_to }]}">
+					<input type="hidden" name='sl_ship_to_contact_id'  value="{[{ ph.id }]}">
 				</td>
 			</tr>
-			<tr>
-				<th>Emails</th>
-				<td colspan="2">
-					<li ng-repeat="em in ship_to_contact.emails">
-						<span class='bg-info email'>{[{ em.email_address}]} ({[{em.email_type}]})</span>
-					</li>
+			<tr ng-repeat="em in ship_to_contact.emails">
+				<td>{[{ em.email_type}]}</td>
+				<td>{[{ em.email_address }]} </td>
+				<td>{[{ ship_to_contact.attention_to }]}</td>
+				<td>
+					<a href="" data-contactid="{[{ph.id}]}" class='delete-contact'>Delete</a>
+					<input type="hidden" name='sl_ship_to_email_type' value
+					="{[{ em.email_type}]}" >
+					<input type="hidden" name='sl_ship_to_email' value="{[{ em.email_address}]}" >
+					<input type="hidden" name='sl_ship_to_email_attention' value="{[{ ship_to_contact.attention_to}]}" >
 				</td>
 			</tr>
+		<tbody>
 		</table>
 	</td>
 </tr>

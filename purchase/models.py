@@ -250,6 +250,7 @@ class POShipToContact(models.Model):
 		return str(self.contact_name)
 
 
+
 class ReceivedItemHistory(models.Model):
 	purchase_item = models.ForeignKey(PurchaseItem, blank=True, null=True)
 	item_po = models.ForeignKey(PurchaseOrder, blank=True, null=True)
@@ -327,6 +328,26 @@ class ShippingItem(models.Model):
 		permissions = (
 			('view_shipping_item', 'Can View shipping item'),
 		)
+
+
+class SLShipToContact(models.Model):
+	sl = models.ForeignKey(ShippingList, blank=True, null=True)
+	contact_type = models.CharField(max_length=50, blank=True, null=True)
+	contact = models.CharField(max_length=100, blank=True, null=True)
+	contact_name = models.CharField(max_length=100, blank=True, null=True)
+
+	def __unicode__(self):
+		return str(self.contact_name)
+
+
+class SLSoldToContact(models.Model):
+	sl = models.ForeignKey(ShippingList, blank=True, null=True)
+	contact_type = models.CharField(max_length=50, blank=True, null=True)
+	contact = models.CharField(max_length=100, blank=True, null=True)
+	contact_name = models.CharField(max_length=100, blank=True, null=True)
+
+	def __unicode__(self):
+		return str(self.contact_name)
 
 class PackingList(models.Model):
 	pl_number = models.CharField(max_length=20, primary_key=True)
