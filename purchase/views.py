@@ -2051,6 +2051,7 @@ def search_shiping_list(request):
                     item_dict['item_number'] = item.item.item_number
                     item_dict['sl_item_id'] = item.id
                     item_dict['description'] = item.description
+                    item_dict['comment'] = item.search_string
 
                     if item.ordered:
                         item_dict['ordered'] = item.ordered.to_eng_string()
@@ -2762,16 +2763,20 @@ def add_shipping_list(request):
             
             items = []
             items = request.POST.getlist('added_item_number')
+            sl_item_seqs = request.POST.getlist("sl_item_seq")
             deleted_items = request.POST.getlist("removed_item")
             if deleted_items:
                 for deleted_item in deleted_items:
                     si = ShippingItem.objects.get(id=deleted_item)
                     si.delete()
             for i, item in enumerate(items):
+                # import pdb; pdb.set_trace();
                 item_obj = Item.objects.get(item_number=item)
                 try:
                     shipping_item, yes = ShippingItem.objects.get_or_create(item=item_obj, shipping_list=sl)
                     shipping_item.description = item_obj.description
+                    seq = sl_item_seqs[i]
+                    shipping_item.search_string = request.POST.get('comment_detail_'+str(seq))
                 except Exception, e:
                     # shipping_item= ShippingItem.objects.get(item=item_obj, shipping_list=sl)
                     pass

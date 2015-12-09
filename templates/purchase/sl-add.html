@@ -143,6 +143,7 @@ a.close {
 </section>
 
 </div>
+{% include "modals/sl-comment-modal-form.html" %}
 {% include "modals/add-modal.html" %}
 <!-- SL Number -->
 <script type="text/javascript">
@@ -184,7 +185,7 @@ a.close {
         }
         
     });
-$("a#add_id_primary_supplier").on("click", function(e){
+    $("a#add_id_primary_supplier").on("click", function(e){
         e.preventDefault();
         url = "/contacts/add/rel/",
         mdal = $('#addModal');
@@ -247,6 +248,7 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
         
         // $("#ship-to-container").hide();
         // $scope.sold_to_contact = false;
+        $scope.add_item_seq_no = 1;
 	};
 
 	$scope.init();
@@ -364,6 +366,7 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
 	}
 	$scope.selectItem = function(item) {
     	$scope.search_item = '';
+        $scope.add_item_seq_no++;
     	$("#items_list").hide();
     	var myitem = $("tbody#add_item_list tr.add_item");
     	var item_number = item.item_number;
@@ -416,7 +419,7 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
     	}
     	
     	var str = "<tr class='add_item'>";
-    	str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+item_number+"' readonly></td>";
+    	str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+item_number+"' readonly><input type='hidden' name='sl_item_seq' value='"+$scope.add_item_seq_no+"'></td>";
     	str += "<td><p class='bg-info item_desc'>"+item_description+"</p></td>";
     	
     	str += "<td><input type='number' name='item_ordered' class='form-control demo_box' placeholder='Ordered' required></td>";
@@ -431,8 +434,10 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
 
     	str += "<td><input type='text' class='form-control' placeholder='PL Number' readonly='readonly'></td>";
 
-    	str += "<td><a class='remove-item btn' ng-click='removeField($event)'><span class='glyphicon glyphicon-remove'></span></a></td>";
+    	str += "<td><a class='' data-toggle='modal' data-seq='"+$scope.add_item_seq_no+"' data-target='#slCommentModal'><i class='glyphicon glyphicon-pencil'></i></a><a class='remove-item btn' ng-click='removeField($event)'><span class='glyphicon glyphicon-remove'></span></a></td>";
     	str += "</tr>";
+
+
     	
     	var element = $compile(str)($scope);
 
@@ -534,7 +539,7 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
         var myitem = $("tbody#add_item_list tr.add_item");
         for(i=0; i< items.length ; i++) {
             var str = "<tr class='add_item'>";
-            str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+items[i].item_number+"' readonly></td>";
+            str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+items[i].item_number+"' readonly><input type='hidden' name='sl_item_seq' value='"+i+"'></td>";
             str += "<td><p class='bg-info item_desc'>"+items[i].description+"</p></td>";
             
             str += "<td><input type='number' name='item_ordered' class='form-control demo_box' placeholder='Ordered' value='"+items[i].ordered+"'></td>";
@@ -551,6 +556,15 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
 
             str += "<td><a class='remove-item btn' data-item-id='"+items[i].sl_item_id+"' ng-click='deleteField($event)'><span class='glyphicon glyphicon-remove'></span></a></td>";
             str += "</tr>";
+            var newrow = "<tr class='bg-warning'>";
+            newrow += "<td colspan='2'><b>Comment</b></td>";
+            newrow += "<td colspan='6'><textarea class='form-control' name='comment_detail_"+i+"'>";
+            newrow += items[i].comment;
+            newrow += "</textarea></td>";
+            
+            newrow += "</tr>";
+
+            str = str+newrow;
             
             var element = $compile(str)($scope);
 
@@ -559,6 +573,18 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
         }
         
     }
+
+
+
+
+$('#slCommentModal').on('show.bs.modal', function(e) {
+
+    //get data-id attribute of the clicked element
+    var bookId = $(e.relatedTarget).data('seq');
+
+    //populate the textbox
+    $(e.currentTarget).find('#item_seq').val(bookId);
+});
 
 }]);
 </script>
