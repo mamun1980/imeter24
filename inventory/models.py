@@ -138,6 +138,7 @@ class Item(models.Model):
 	customer_tariff_number  = models.CharField(max_length=50, blank=True, null=True)
 	preference_criteria = models.CharField(max_length=50, blank=True, null=True)
 	producer_of_item = models.ForeignKey(Contact, blank=True, null=True)
+	shipping_unit = models.CharField(max_length=50, blank=True, null=True)
 	shipping_weight = models.CharField(max_length=50, blank=True, null=True)
 	minimum_qty_on_hand = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True)
 	duty_percentage = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)

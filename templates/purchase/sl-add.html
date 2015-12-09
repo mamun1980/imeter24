@@ -249,6 +249,11 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
         // $("#ship-to-container").hide();
         // $scope.sold_to_contact = false;
         $scope.add_item_seq_no = 1;
+        var today = new Date();
+        var mm = parseInt(today.getMonth()) + 1;
+        var mydate = mm+"/"+today.getDate()+"/"+today.getFullYear();
+        console.log(mydate);
+        $("#id_ordered_date").val(mydate);
 	};
 
 	$scope.init();
@@ -422,7 +427,7 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
     	str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+item_number+"' readonly><input type='hidden' name='sl_item_seq' value='"+$scope.add_item_seq_no+"'></td>";
     	str += "<td><p class='bg-info item_desc'>"+item_description+"</p></td>";
     	
-    	str += "<td><input type='number' name='item_ordered' class='form-control demo_box' placeholder='Ordered' required></td>";
+    	str += "<td><input type='number' name='item_ordered' class='form-control demo_box' placeholder='Ordered' required autofocus></td>";
 
     	str += "<td><input type='number' name='item_shipped' class='form-control demo_box' placeholder='Shipped today' readonly></td>";
 

@@ -122,6 +122,8 @@ class ItemForm(forms.ModelForm):
         widget=forms.TextInput(attrs={"class": "form-control", 'placeholder':"Preference Criteria"}))
 	producer_of_item = forms.ModelChoiceField(required=False, queryset=Contact.objects.all(),
         widget=forms.Select(attrs={"class": "form-control"}))
+	shipping_unit = forms.CharField(max_length=25, required=False,
+        widget=forms.TextInput(attrs={"class": "form-control", 'placeholder':"Lead Time"}))
 	shipping_weight = forms.CharField(max_length=25, required=False,
         widget=forms.TextInput(attrs={"class": "form-control", 'placeholder':"Lead Time"}))
 	minimum_qty_on_hand = forms.DecimalField(max_digits=10, decimal_places=4, required=False,
@@ -158,7 +160,7 @@ class ItemForm(forms.ModelForm):
 			'item_unit_measure', 'warehouse_location', 'max_order_qty', 
 			'max_single_order_qty', 'estimated_wholesale_cost', 'retail_price', 'production_type',
 			'catalog_number', 'country_of_origin', 'lead_time', 'customs_designation', 
-			'customer_tariff_number', 'preference_criteria', 'producer_of_item', 'shipping_weight', 
+			'customer_tariff_number', 'preference_criteria', 'producer_of_item', 'shipping_weight', 'shipping_unit',
 			'minimum_qty_on_hand', 'deliver_internal', 'duty_percentage', 'terms', 'website', 'item_image')
 
 	def save(self, commit=True):

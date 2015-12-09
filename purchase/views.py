@@ -636,7 +636,7 @@ def add_new_po(request):
 
                     item_dict['qty'] = float(qty) if qty != '' else qty
                     item_dict['unit'] = request.POST.getlist('unit')[count]
-                    item_dict['comment'] = request.POST.getlist('item_comment')[count]
+                    # item_dict['comment'] = request.POST.getlist('item_comment')[count]
                     item_dict['job_number'] = request.POST.getlist('item_job_number')[count]
                     item_dict['job_id'] = request.POST.getlist('item_job_id')[count]
                     cost = request.POST.getlist('item_cost')[count]
@@ -1750,6 +1750,24 @@ def add_extra_contact(request):
         pocontactform = POContactForm()
 
         return render(request, "purchase/add-po-contact.html", {'po_contact_form': pocontactform})
+
+def add_shipto_extra_contact(request):
+    if request.method == 'POST':
+        # import pdb; pdb.set_trace();
+        po_contact_type = request.POST.get('contact_type')
+        po_contact = request.POST.get('contact')
+        po_contact_name = request.POST.get('contact_name')
+        pocontact = POShipToContact(contact_type=po_contact_type, 
+            contact=po_contact, contact_name=po_contact_name)
+        
+        pocontact.save()
+        return render(request, "purchase/extra-po-shipto-contact.html", {'pocontact': pocontact})
+    else:
+        pocontactform = POContactForm()
+
+        return render(request, "purchase/add-po-shipto-contact.html", {'po_contact_form': pocontactform})
+    
+
 
 
 @login_required

@@ -831,7 +831,7 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 		    	str += "<td><input type='number' class='form-control decimal' step='0.01' name='item_qty' value='"+item_qty+"' readonly></td>";
 		    	str += "<td><input type='currency' step='0.0001' name='item_sub_total' class='form-control' value='"+item_sub_total+"' readonly></td>";
 		    	str += "<td><input type='text' class='form-control item-job-number' name='item_job_number' value='"+item_job_number+"' placeholder='Start typing to search job'><input type='hidden' name='item_job_id' class='item_job_id' value='"+item_job_number_id+"'></td>";
-		    	str += "<td><textarea rows='1' class='form-control' name='item_comment' placeholder='Put your comments here'>"+item_comment+"</textarea></td>";
+		    	
 		    	str += "<td><input type='number' step='0.01' name='qty_received' class='form-control' value='"+item_qty_received+"' readonly></td>";
 		    	str += "<td><input type='text' name='last_received_date' class='form-control' value='"+last_received_date+"' readonly></td>";
 
@@ -990,7 +990,9 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
     	str += "<td><input type='number' class='form-control' step='0.01' name='item_qty' value='0' ng-model='item_qty_"+item_number.replace("-","_")+"' max='"+order_constrain+"' required></td>";
     	str += "<td><input type='currency' step='0.0001' name='item_sub_total' class='form-control' value='0.0' readonly></td>";
     	str += "<td><input type='text' class='form-control item-job-number' name='item_job_number' placeholder='Start typing to search job'><input type='hidden' name='item_job_id' class='item_job_id'></td>";
-    	str += "<td><textarea rows='1' class='form-control' name='item_comment' placeholder='Put your comments here'></textarea></td>";
+    	
+    	
+    	
     	str += "<td><input type='number' step='0.01' name='qty_received' class='form-control' value='"+item_qty_received+"' readonly></td>";
     	str += "<td><input type='text' name='last_received_date' class='form-control' value='"+last_received_date+"' readonly></td>";
 

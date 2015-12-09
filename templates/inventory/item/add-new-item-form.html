@@ -472,21 +472,29 @@
 
 <tr>
 	<th colspan="2">
-		<label for="id_shipping_weight">Shipping weight:</label>
+		<label for="id_shipping_unit">Shipping unit:</label>
 	</th>
-	<td colspan="5">
-		{{ item_form.shipping_weight.errors }}
+	<td colspan="2">
+		{{ item_form.shipping_unit.errors }}
 		
-		<select class="form-control" id="id_shipping_weight" name="shipping_weight">
+		<select class="form-control" id="id_shipping_unit" name="shipping_unit">
 			<option value="kilogram">Kilograms</option>
 			<option value="pound">Pounds</option>
 		</select>
+	</td>
+	<th colspan="2">
+		<label for="id_shipping_weight">Shipping weight:</label>
+	</th>
+	<td colspan="3">
+		{{ item_form.shipping_weight.errors }}
+		
+		<input class="form-control decimal" id="id_shipping_weight" name="shipping_weight" placeholder="Shipping Weight" type="text">
 	</td>
 
 	<th colspan="2">
 		<label for="id_duty_percentage">Duty percentage:</label>
 	</th>
-	<td colspan="5">
+	<td colspan="3">
 		{{ item_form.number.errors }}
 		<input class="form-control decimal" id="id_duty_percentage" name="duty_percentage" placeholder="Duty percentage" type="text">
 	</td>
