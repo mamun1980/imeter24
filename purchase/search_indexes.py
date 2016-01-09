@@ -21,12 +21,6 @@ class PurchaseOrderIndex(indexes.SearchIndex, indexes.Indexable):
     def get_model(self):
         return PurchaseOrder
 
-    # def prepare(self, obj):
-    #     self.prepared_data = super(PurchaseOrderIndex, self).prepare(obj)
-        
-    #     self.prepared_data['po_status'] = obj.status_verbose
-    #     return self.prepared_data
-
     def prepare(self, obj):
         self.prepared_data = super(PurchaseOrderIndex, self).prepare(obj)
         supplier = obj.supplier

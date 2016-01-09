@@ -647,11 +647,11 @@ poApp.controller('AddPOController', ['$scope', '$http', '$compile', function ($s
 	$scope.searchPo = function(q) {
 		if(q.length > 1) {
 			$scope.show_add_button = true;
-			url = "/purchase/po/search/";
+			url = "/purchase/po/search/?q="+q;
 			$http({method: 'GET', url: url}).
 	        	success(function(data, status, headers, config){
 	        	$scope.pos = data;
-	        	// console.log(data);
+	        	console.log(data);
 	        	if(data.length > 0){
 	        		$scope.show_po_list = true;	
 	        	} else {

@@ -349,6 +349,7 @@ class SLSoldToContact(models.Model):
 	def __unicode__(self):
 		return str(self.contact_name)
 
+
 class PackingList(models.Model):
 	pl_number = models.CharField(max_length=20, primary_key=True)
 	sl = models.ForeignKey(ShippingList, blank=True, null=True)
@@ -390,6 +391,7 @@ class PackingList(models.Model):
 
 class PackingItem(models.Model):
 	sl_item = models.ForeignKey(ShippingItem, blank=True, null=True)
+	# item = models.ForeignKey(Item, blank=True, null=True)
 	description = models.TextField(blank=True, null=True)
 	unit = models.CharField(max_length=20, blank=True, null=True)
 	qty_ordered = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
@@ -412,7 +414,33 @@ class PackingItem(models.Model):
 			('view_packing_item', 'Can View Packing Item'),
 		)
 
+# PL Form
+class PLSoldToContact(models.Model):
+	pl = models.ForeignKey(PackingList, blank=True, null=True)
+	contact_type = models.CharField(max_length=50, blank=True, null=True)
+	contact = models.CharField(max_length=100, blank=True, null=True)
+	contact_name = models.CharField(max_length=100, blank=True, null=True)
 
+	def __unicode__(self):
+		return str(self.contact_name)
+
+class PLShipToContact(models.Model):
+	pl = models.ForeignKey(PackingList, blank=True, null=True)
+	contact_type = models.CharField(max_length=50, blank=True, null=True)
+	contact = models.CharField(max_length=100, blank=True, null=True)
+	contact_name = models.CharField(max_length=100, blank=True, null=True)
+
+	def __unicode__(self):
+		return str(self.contact_name)
+
+class PLCBContact(models.Model):
+	pl = models.ForeignKey(PackingList, blank=True, null=True)
+	contact_type = models.CharField(max_length=50, blank=True, null=True)
+	contact = models.CharField(max_length=100, blank=True, null=True)
+	contact_name = models.CharField(max_length=100, blank=True, null=True)
+
+	def __unicode__(self):
+		return str(self.contact_name)
 
 class Invoice(models.Model):
 	invoice_number = models.CharField(max_length=20, primary_key=True)

@@ -68,6 +68,14 @@ urlpatterns = patterns('',
     url(r'^pl/search/$', 'purchase.views.search_packing_list', name='search-packing-list'),
     url(r'^get-pl/(?P<pl_number>\w+)/$', 'purchase.views.get_packing_list', name='get-packing-list'),
     
+    url(r'^add-pl-soldto-extra-contact/$', 'purchase.views.add_pl_soldto_extra_contact'),
+    url(r'^add-pl-shipto-extra-contact/$', 'purchase.views.add_pl_shipto_extra_contact'),
+    url(r'^add-pl-cb-extra-contact/$', 'purchase.views.add_pl_cb_extra_contact'),
+
+    url(r'^delete-pl-shipto-contact/$', 'purchase.views.delete_pl_shipto_extra_contact'),
+    url(r'^delete-pl-soldto-contact/$', 'purchase.views.delete_pl_soldto_extra_contact'),
+    url(r'^delete-pl-cb-contact/$', 'purchase.views.delete_pl_cb_extra_contact'),
+
     url(r'^view-pl/(?P<id>\w+)/$', 'purchase.views.view_packing_list', name=''),
     url(r'^edit-pl/(?P<id>\w+)/$', 'purchase.views.edit_packing_list', name='edit-packing-list'),
     url(r'^pl-delete/$', 'purchase.views.delete_packing_list', name='delete-packing-list'),

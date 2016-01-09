@@ -239,6 +239,47 @@ class SLSoldToContactForm(forms.ModelForm):
         model = SLSoldToContact
         exclude = ['sl',]
 
+
+
+# PL Form
+class PLSoldToContactForm(forms.ModelForm):
+    contact_type = forms.ChoiceField(required=False, choices=CON_TYPE,
+        widget=forms.Select(attrs={"class": "form-control"}))
+    contact = forms.CharField( max_length=100, required=False, label='Enter Email',
+        widget=forms.TextInput(attrs={"class": "form-control", 'placeholder': "type contact"}))
+    contact_name = forms.CharField( max_length=100, required=False, label='Contact Name',
+        widget=forms.TextInput(attrs={"class": "form-control", 'placeholder': "contact name"}))
+    
+    class Meta:
+        model = PLSoldToContact
+        exclude = ['pl',]
+
+class PLShipToContactForm(forms.ModelForm):
+    contact_type = forms.ChoiceField(required=False, choices=CON_TYPE,
+        widget=forms.Select(attrs={"class": "form-control"}))
+    contact = forms.CharField( max_length=100, required=False, label='Enter Email',
+        widget=forms.TextInput(attrs={"class": "form-control", 'placeholder': "type contact"}))
+    contact_name = forms.CharField( max_length=100, required=False, label='Contact Name',
+        widget=forms.TextInput(attrs={"class": "form-control", 'placeholder': "contact name"}))
+    
+    class Meta:
+        model = PLShipToContact
+        exclude = ['pl',]
+
+class PLCBContactForm(forms.ModelForm):
+    contact_type = forms.ChoiceField(required=False, choices=CON_TYPE,
+        widget=forms.Select(attrs={"class": "form-control"}))
+    contact = forms.CharField( max_length=100, required=False, label='Enter Email',
+        widget=forms.TextInput(attrs={"class": "form-control", 'placeholder': "type contact"}))
+    contact_name = forms.CharField( max_length=100, required=False, label='Contact Name',
+        widget=forms.TextInput(attrs={"class": "form-control", 'placeholder': "contact name"}))
+    
+    class Meta:
+        model = PLCBContact
+        exclude = ['pl',]
+
+
+
 class ItemReeiveForm(forms.ModelForm):
     # purchase_item = forms.ModelChoiceField(required=False, queryset=PurchaseItem.objects.all(), 
     #   widget=forms.Select(attrs={"class": "form-control", 'readonly':'readonly'}))

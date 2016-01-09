@@ -123,7 +123,7 @@ p.item_desc {
 </section>
 
 </div>
-
+{% include "modals/pl-comment-modal-form.html" %}
 {% include "modals/add-modal.html" %}
 <script type="text/javascript">
 (function(){
@@ -132,6 +132,41 @@ $("a.close").on("click", function(){
 	$(this).closest('table').hide();
 });
 
+    $(document).on("click", "a.delete-contact", function(e){
+        e.preventDefault();
+        
+        var row = $(this).closest("tr");
+        row.remove();
+        var poecid = $(this).data("contactid");
+        var type = $(this).data("contacttype");
+        if(poecid != ""){
+            if(type=='shipto') {
+                var url = "/purchase/delete-pl-shipto-contact/";
+            } else if(type=='soldto') {
+                var url = "/purchase/delete-pl-soldto-contact/";    
+            } else {
+                var url = "/purchase/delete-pl-cb-contact/";
+            }
+            
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                
+                data: {
+                    'contactid': poecid,
+                },
+                success: function(rdata) {
+                    
+                    $("a[data-contactid='"+rdata+"']").closest("tr").remove();
+
+                }
+            });    
+        }
+
+        return false;
+        
+    });
 $("a#add_id_primary_supplier").on("click", function(e){
         e.preventDefault();
         url = "/contacts/add/rel/",
@@ -162,9 +197,11 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
 
         $("#sold_to_contact_list").hide();
         $("#sold_to_contact_details").hide();
+        $("#pl_sold_to_extra_contact_list").hide();
 
         $("#ship_to_contact_list").hide();
         $("#ship_to_contact_details").hide();
+        $("#pl_ship_to_extra_contact_list").hide();
 
         $("#customer_broker_contact_list").hide();
         $("#customer_broker_contact_details").hide();
@@ -181,6 +218,7 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
 
         $scope.show_add_button = true;
         $scope.show_update_button = false;
+        $scope.add_item_seq_no = 1;
 
         // $scope.add_pl_form.$valid.item_empty = false;
         var items_count = $("input.added_item_number").length;
@@ -194,13 +232,49 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
 
 	$scope.init();
 
+    $scope.addSoldToExtraContact = function() {
+        console.log("testing..");
+        mdal = $('#addModal');
+        url = "/purchase/add-pl-soldto-extra-contact/",
+        mdal.on("shown.bs.modal", function(){
+            $("#addModal .modal-content").load(url);
+            
+            // console.log(url);
+        }).modal();
+        return false;
+    };
+
+    $scope.addShipToExtraContact = function() {
+        console.log("testing..");
+        mdal = $('#addModal');
+        url = "/purchase/add-pl-shipto-extra-contact/",
+        mdal.on("shown.bs.modal", function(){
+            $("#addModal .modal-content").load(url);
+            
+            // console.log(url);
+        }).modal();
+        return false;
+    };
+
+    $scope.addCBExtraContact = function() {
+        console.log("testing..");
+        mdal = $('#addModal');
+        url = "/purchase/add-pl-cb-extra-contact/",
+        mdal.on("shown.bs.modal", function(){
+            $("#addModal .modal-content").load(url);
+            
+            // console.log(url);
+        }).modal();
+        return false;
+    };
+
     $scope.deleteItem = function (event) {
 
         var removed_item_id = event.currentTarget.attributes[1].value;
         console.log("removed item: "+ removed_item_id);
         if(removed_item_id){
             var removed_item = "<input type='hidden' name='removed_item' value='"+removed_item_id+"'>";
-            $("#add_pl_item_list tr.removed_item").append(removed_item); 
+            $("#add_item_list tr.removed_item").append(removed_item); 
             $(event.target).closest('tr').remove();   
         }
 
@@ -230,7 +304,7 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
             $http({method: 'GET', url: url}).
                 success(function(data, status, headers, config){
                 $scope.pls = data;
-                console.log(data);
+                // console.log(data);
             });
             // $("#po_list").show();
             $scope.show_pl_list = true;
@@ -254,12 +328,13 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
         $http({method: 'GET', url: url}).
                 success(function(data, status, headers, config){
             $scope.pl = data;
-            
+            console.log(data);            
             
             $("#id_pl_number").val($scope.pl.pl_number);
 
             if ($scope.pl.sold_to) {
                 $("#sold_to_contact_details").show();
+                $("#pl_sold_to_extra_contact_list").show();
                 $scope.sold_to_contact = $scope.pl.sold_to; 
                 $("#id_sold_to").val($scope.pl.sold_to.id); 
                 $scope.search_sold_to = $scope.pl.sold_to.contact_name;
@@ -300,6 +375,7 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
 
             if ($scope.pl.ship_to) {
                 $("#ship_to_contact_details").show();
+                $("#pl_ship_to_extra_contact_list").show();
                 $scope.ship_to_contact = $scope.pl.ship_to; 
                 $("#id_ship_to").val($scope.pl.ship_to.id); 
                 $scope.search_ship_to = $scope.pl.ship_to.contact_name; 
@@ -308,8 +384,10 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
             $("#id_date_shipped").val($scope.pl.date_shipped);
 
             $("#id_date_shipped").val($scope.pl.date_shipped);
-
-            $("#id_generated_by").val($scope.pl.generated_by.id)
+            if($scope.pl.generated_by){
+                $("#id_generated_by").val($scope.pl.generated_by.id)    
+            }
+            
             
             $("#id_ship_via").val($scope.pl.ship_via);
 
@@ -330,13 +408,15 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
         $http({method:'GET', url: '/purchase/get-pl-items/'+pl.pl_number+'/'}).
             success(function(data, status, header, config) {
             var pl_items = data;
-            if(pl_items.length > 0){
-                $scope.item_added = true;
-            }   
+            // console.log(data);
+            // if(pl_items.length > 0){
+            //     $scope.item_added = true;
+            // }   
             if (pl_items.length > 0) {
+                console.log("Item exist.");
                 for(var i=0; i < pl_items.length; i++) {
                     var str = "<tr class='add_item'>";
-                    str += "<td><input type='text' class='form-control added_item_number' name='pl_added_item_number' value='"+pl_items[i].item_number+"' readonly><input type='hidden'  name='pl_item_ids' value='"+pl_items[i].id+"'></td>";
+                    str += "<td><input type='text' class='form-control added_item_number' name='pl_added_item_number' value='"+pl_items[i].item_number+"' readonly><input type='hidden'  name='pl_item_ids' value='"+pl_items[i].id+"'><input type='hidden' name='pl_item_seq' value='"+i+"'></td>";
                     str += "<td><p class='bg-info item_desc'>"+pl_items[i].description+"</p></td>";
                     
                     str += "<td><select class='form-control' name='pl_item_unit'>";
@@ -349,10 +429,14 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
                     
                     str += "<td><a class='remove-item btn' data-item-id='"+pl_items[i].id+"'  ng-click='deleteItem($event)'>X</a></td>";
                     str += "</tr>";
+
+                    str += "<tr><td colspan='2'>Comment</td><td colspan='5'>";
+                    str += "<textarea class='form-control custom_details pl_comment' name='comment_detail_"+i+"'>"+pl_items[i].comment+"</textarea>";
+                    str += "</td></tr>";
                     
                     var element = $compile(str)($scope);
 
-                    $("tbody#add_pl_item_list").prepend(element);   
+                    $("tbody#add_item_list").prepend(element);   
                 }
         
                 $scope.item_added = true;
@@ -412,6 +496,7 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
         $scope.sold_to_contact = con;
         $("#id_sold_to").val(con.id);
         $("#sold_to_contact_details").show();
+        $("#pl_sold_to_extra_contact_list").show();
     };
 
     $scope.searchShipTo  = function(q) {
@@ -436,6 +521,7 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
         $scope.ship_to_contact = con;
         $("#id_ship_to").val(con.id);
         $("#ship_to_contact_details").show();
+        $("#pl_ship_to_extra_contact_list").show();
 
 
     };
@@ -502,7 +588,7 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
             
             $http({method: 'GET', url: url}).
                 success(function(data, status, headers, config){
-                console.log(data);
+                // console.log(data);
                 $scope.items = data;
             });
             $("#items_list").show();
@@ -514,12 +600,12 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
     $scope.selectSLItem = function(item) {
         $("#items_list").hide();
         $scope.search_item = '';
-        // console.log(item);
+        console.log(item);
         // $scope.add_pl_form.$valid.item_empty = true;
         $scope.item_added = true;
         
         var str = "<tr class='add_item'>";
-        str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+item.item_number+"' readonly><input type='hidden'  name='sl_item_ids' value='"+item.sl_item_id+"'></td>";
+        str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+item.item_number+"' readonly><input type='hidden'  name='sl_item_ids' value='"+item.sl_item_id+"'><input type='hidden' name='pl_item_seq' value='"+$scope.add_item_seq_no+"'></td>";
         str += "<td><p class='bg-info item_desc'>"+item.description+"</p></td>";
         
         str += "<td><select class='form-control' name='sl_item_unit'>";
@@ -530,15 +616,26 @@ plApp.controller('AddPLController',['$scope', '$http','$compile', function ($sco
         str += "<td><input type='text' class='form-control decimal' name='sl_item_qtybo' value='"+item.backordered+"' readonly></td>";
         str += "<td><input type='number' name='sl_item_shipped' class='form-control' value='' required max='"+item.backordered+"'></td>";
         
-        str += "<td><a class='remove-item btn' data-item-id='"+item.sl_item_id+"'  ng-click='removeItem($event)'>X</a></td>";
+        str += "<td><a class='' data-toggle='modal' data-seq='"+$scope.add_item_seq_no+"' data-target='#plCommentModal'><i class='glyphicon glyphicon-pencil'></i></a><a class='remove-item btn' data-item-id='"+item.sl_item_id+"'  ng-click='removeItem($event)'>X</a></td>";
         str += "</tr>";
         
         var element = $compile(str)($scope);
 
-        $("tbody#add_pl_item_list").prepend(element);
+        $("tbody#add_item_list").prepend(element);
+        $scope.add_item_seq_no += 1;
 
     }
 }]);
+
+
+$('#plCommentModal').on('show.bs.modal', function(e) {
+
+    //get data-id attribute of the clicked element
+    var bookId = $(e.relatedTarget).data('seq');
+
+    //populate the textbox
+    $(e.currentTarget).find('#item_seq').val(bookId);
+});
 
 })(jQuery)
 </script>

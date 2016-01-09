@@ -46,9 +46,9 @@ tbody th {
 	background-color: #64b8ef;
 }
 </style>
-<div class="container shadow4 main-body">
+<div class="container-fluid shadow4 main-body">
 	<section class="row"  id="view-pl">
-		<article class="col-md-10 col-md-offset-1">
+		<article class="col-md-12">
 			<table class='table table-bordered table-striped'>
 			<thead>
 				<tr class="bg-primary">
@@ -137,44 +137,48 @@ tbody th {
 					<td>{{ pl.invoiced_on }}</td>
 				</tr>
 				
-				<tr>
-					<th width='250'>Items</th>
-					<td>
-					<table class="table">
-						<thead>
-							<tr>
-								<th>PL ID</th>
-								<th>PL Number</th>
-								<th>SL Number</th>
-								<th>Item Number</th>
-								<th>Unit</th>
-								<th>Qty Ordered</th>
-								<th>Qty B/O</th>
-								<th>Qty Shipped</th>
-							</tr>
-						</thead>
-						<tbody>
-						{% for item in pl_items %}
-							<tr>
-								<td>{{item.id}}</td>
-								<td>{{item.pl.pl_number}}</td>
-								<td>{{item.shipping_list}}</td>
-								<td>{{item.sl_item.item.item_number}}</td>
-								<td>{{item.unit}}</td>
-								<td>{{item.qty_ordered}}</td>
-								<td>{{item.qty_bo}}</td>
-								<td>{{item.qty_shipped}}</td>
-							</tr>
-						{% empty %}
-							<p>No Item</p>
-						{% endfor %}
-						</tbody>
-						</table>
-					</td>
-				</tr>
 				{% endif %}
 			</tbody>
 			</table>	
+			<table class="table">
+				<tr >
+					<td class="bg-info" colspan="2">PL Items</td>
+				</tr>
+			</table>
+			<table class="table">
+				<thead>
+					<tr>
+						<th>PL ID</th>
+						<th>PL Number</th>
+						<th>SL Number</th>
+						<th>Item Number</th>
+						<th>Unit</th>
+						<th>Qty Ordered</th>
+						<th>Qty B/O</th>
+						<th>Qty Shipped</th>
+						<th>Comment</th>
+					</tr>
+				</thead>
+				<tbody>
+				{% for item in pl_items %}
+					<tr>
+						<td>{{item.id}}</td>
+						<td>{{item.pl.pl_number}}</td>
+						<td>{{item.shipping_list}}</td>
+						<td>{{item.sl_item.item.item_number}}</td>
+						<td>{{item.unit}}</td>
+						<td>{{item.qty_ordered}}</td>
+						<td>{{item.qty_bo}}</td>
+						<td>{{item.qty_shipped}}</td>
+						<td>{{ item.search_string }}</td>
+					</tr>
+					
+				{% empty %}
+					<p>No Item</p>
+				{% endfor %}
+				</tbody>
+			</table>
+			
 		</article>
 		
 

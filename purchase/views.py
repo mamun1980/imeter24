@@ -524,7 +524,7 @@ def add_new_po(request):
                 po.po_created_by = request.user
                 # po.datetime = datetime.datetime.now()
                 po.save_final_draft = 1
-                po.po_status = 'New'
+                po.po_status = '0'
                 po.save()
 
                 # check for contacts................
@@ -671,7 +671,7 @@ def add_new_po(request):
                             pi.cost = item['cost']
                         if item['sub_total'] != '':
                             pi.sub_total = item['sub_total']
-                        pi.comment = item['comment']
+                        # pi.comment = item['comment']
 
                         pi.custom_detail = item['item_custom_detail']
                             # pi.custom_comment = item['item_custom_comment']
@@ -973,7 +973,7 @@ def add_new_po_and_email(request):
         po.total_amount = total_amount
 
         po.save_final_draft = 1
-        po.po_status = 'New'
+        po.po_status = '0'
 
         po.save()
 
@@ -1734,6 +1734,8 @@ def add_sl_shipto_extra_contact(request):
         return render(request, "purchase/add-sl-shipto-extra-contact-form.html", {'slcontactform': slcontactform})
 
 
+
+
 @csrf_exempt
 def add_extra_contact(request):
     if request.method == 'POST':
@@ -1804,6 +1806,90 @@ def delete_shipto_contact(request):
 def delete_shipto_extra_po_contact(request):
     poecid = request.POST.get("poecid")
     extra_contact = POShipToContact.objects.get(id=poecid)
+    extra_contact.delete()
+    return HttpResponse(poecid)
+
+
+
+# PL form
+@csrf_exempt
+def add_pl_soldto_extra_contact(request):
+    if request.method == 'POST':
+        # import pdb; pdb.set_trace();
+        contact_type = request.POST.get('contact_type')
+        contact = request.POST.get('contact')
+        contact_name = request.POST.get('contact_name')
+        plcontact = PLSoldToContact(contact_type=contact_type, 
+            contact=contact, contact_name=contact_name)
+        
+        plcontact.save()
+        return render(request, "purchase/extra-pl-soldto-contact.html", 
+            {'plcontact': plcontact})
+    else:
+        plcontactform = PLSoldToContactForm()
+
+        return render(request, "purchase/add-pl-soldto-extra-contact-form.html", 
+            {'plcontactform': plcontactform})
+
+
+@csrf_exempt
+def add_pl_shipto_extra_contact(request):
+    if request.method == 'POST':
+        # import pdb; pdb.set_trace();
+        pl_contact_type = request.POST.get('contact_type')
+        pl_contact = request.POST.get('contact')
+        pl_contact_name = request.POST.get('contact_name')
+        contact = PLShipToContact(contact_type=pl_contact_type, 
+            contact=pl_contact, contact_name=pl_contact_name)
+        
+        contact.save()
+        return render(request, "purchase/extra-pl-shipto-contact.html", 
+            {'plcontact': contact})
+    else:
+        plcontactform = PLShipToContactForm()
+
+        return render(request, "purchase/add-pl-shipto-extra-contact-form.html", 
+            {'plcontactform': plcontactform})
+
+@csrf_exempt
+def add_pl_cb_extra_contact(request):
+    if request.method == 'POST':
+        # import pdb; pdb.set_trace();
+        pl_contact_type = request.POST.get('contact_type')
+        pl_contact = request.POST.get('contact')
+        pl_contact_name = request.POST.get('contact_name')
+        contact = PLCBContact(contact_type=pl_contact_type, 
+            contact=pl_contact, contact_name=pl_contact_name)
+        
+        contact.save()
+        return render(request, "purchase/extra-pl-cb-contact.html", 
+            {'plcontact': contact})
+    else:
+        plcontactform = PLCBContactForm()
+
+        return render(request, "purchase/add-pl-cb-extra-contact-form.html", 
+            {'plcontactform': plcontactform})
+
+
+@csrf_exempt
+def delete_pl_soldto_extra_contact(request):
+    # import pdb; pdb.set_trace();
+    poecid = request.POST.get("contactid")
+    extra_contact = PLSoldToContact.objects.get(id=poecid)
+    extra_contact.delete()
+    return HttpResponse(poecid)
+
+@csrf_exempt
+def delete_pl_shipto_extra_contact(request):
+    poecid = request.POST.get("contactid")
+    extra_contact = PLShipToContact.objects.get(id=poecid)
+    extra_contact.delete()
+    return HttpResponse(poecid)
+
+@csrf_exempt
+def delete_pl_cb_extra_contact(request):
+    poecid = request.POST.get("contactid")
+    extra_contact = PLCBContact.objects.get(id=poecid)
     extra_contact.delete()
     return HttpResponse(poecid)
 
@@ -2146,13 +2232,133 @@ def add_packing_list(request):
         pl_item_ordered = request.POST.getlist('pl_item_ordered')
         pl_item_shipped = request.POST.getlist('pl_item_shipped',"")
         deleted_items = request.POST.getlist("removed_item")
+        pl_item_seqs = request.POST.getlist("pl_item_seq")
 
         if pl_form.is_valid():
             try:
                 pl = pl_form.save()
+                
                 if sl_number:
                     sl = ShippingList.objects.get(sl_number=sl_number)
                     pl.sl = sl
+
+                if pl_number == "":
+                    # Adding SoldTo contacts here ===========================
+
+                    # SoldTo Phone Numbers here.........
+                    st_phone_numbers =request.POST.getlist("pl_sold_to_phone_number")
+                    if st_phone_numbers != "":
+                        st_ph_types = request.POST.getlist("pl_sold_to_phone_type")
+                        st_ph_exts = request.POST.getlist("pl_sold_to_phone_ext")
+                        st_ph_contacts = request.POST.getlist("pl_sold_to_phone_attention")
+                        i = 0;
+                        for st_ph in st_phone_numbers:
+                            st_con = PLSoldToContact(pl=pl)
+                            st_con.contact_type = st_ph_types[i]
+                            if st_ph_exts[i] != "":
+                                num = st_ph + "-"+st_ph_exts[i]
+                            else:
+                                num = st_ph
+
+                            st_con.contact = num
+                            st_con.contact_name = st_ph_contacts[i]
+                            st_con.save()
+                            i = i+1
+                    # ============ SoldTo Emails adding ===========
+                    st_emails = request.POST.getlist("pl_sold_to_email")
+                    if st_emails != "":
+                        st_email_types = request.POST.getlist("pl_sold_to_email_type")
+                        st_email_names = request.POST.getlist("pl_sold_to_email_attention")
+                        i = 0
+                        for ste in st_emails:
+                            st_con = PLSoldToContact(pl=pl)
+                            st_con.contact_type = st_email_types[i]
+                            st_con.contact = ste
+                            st_con.contact_name = st_email_names[i]
+                            st_con.save()
+                            i = i+1
+                    # ========= SoldTo extra contacts here ===========
+                    st_extra_contacts = request.POST.getlist("pl_soldto_extra_contacts")
+                    # import pdb; pdb.set_trace();
+                    if st_extra_contacts != "":
+                        for ec in st_extra_contacts:
+                            extra_con = PLSoldToContact.objects.get(id=ec)
+                            extra_con.pl = pl
+                            extra_con.save();
+
+
+                    # Adding ShipTo contacts here ===========================
+
+                    # ShipTo Phone Numbers here.........
+                    st_phone_numbers =request.POST.getlist("pl_ship_to_phone_number")
+                    if st_phone_numbers != "":
+                        st_ph_types = request.POST.getlist("pl_ship_to_phone_type")
+                        st_ph_exts = request.POST.getlist("pl_ship_to_phone_ext")
+                        st_ph_contacts = request.POST.getlist("pl_ship_to_phone_attention")
+                        i = 0;
+                        for st_ph in st_phone_numbers:
+                            st_con = PLShipToContact(pl=pl)
+                            st_con.contact_type = st_ph_types[i]
+                            if st_ph_exts[i] != "":
+                                num = st_ph + "-"+st_ph_exts[i]
+                            else:
+                                num = st_ph
+
+                            st_con.contact = num
+                            st_con.contact_name = st_ph_contacts[i]
+                            st_con.save()
+                            i = i+1
+                    # ============ SoldTo Emails adding ===========
+                    st_emails = request.POST.getlist("pl_ship_to_email")
+                    if st_emails != "":
+                        st_email_types = request.POST.getlist("pl_ship_to_email_type")
+                        st_email_names = request.POST.getlist("pl_ship_to_email_attention")
+                        i = 0
+                        for ste in st_emails:
+                            st_con = PLShipToContact(pl=pl)
+                            st_con.contact_type = st_email_types[i]
+                            st_con.contact = ste
+                            st_con.contact_name = st_email_names[i]
+                            st_con.save()
+                            i = i+1
+                    # ========= SoldTo extra contacts here ===========
+                    st_extra_contacts = request.POST.getlist("pl_shipto_extra_contacts")
+                    # import pdb; pdb.set_trace();
+                    if st_extra_contacts != "":
+                        for ec in st_extra_contacts:
+                            extra_con = PLShipToContact.objects.get(id=ec)
+                            extra_con.pl = pl
+                            extra_con.save();
+                else:
+                    # ========= SoldTo extra contacts here ===========
+                    st_extra_contacts = request.POST.getlist("pl_shipto_extra_contacts")
+                    # import pdb; pdb.set_trace();
+                    if st_extra_contacts != "":
+                        for ec in st_extra_contacts:
+                            extra_con = PLShipToContact.objects.get(id=ec)
+                            extra_con.pl = pl
+                            extra_con.save();
+
+                    # ========= SoldTo extra contacts here ===========
+                    st_extra_contacts = request.POST.getlist("pl_soldto_extra_contacts")
+                    # import pdb; pdb.set_trace();
+                    if st_extra_contacts != "":
+                        for ec in st_extra_contacts:
+                            extra_con = PLSoldToContact.objects.get(id=ec)
+                            extra_con.pl = pl
+                            extra_con.save();
+
+                    # ========= SoldTo extra contacts here ===========
+                    st_extra_contacts = request.POST.getlist("pl_soldto_extra_contacts")
+                    # import pdb; pdb.set_trace();
+                    if st_extra_contacts != "":
+                        for ec in st_extra_contacts:
+                            extra_con = PLSoldToContact.objects.get(id=ec)
+                            extra_con.pl = pl
+                            extra_con.save();
+
+
+
             except Exception, e:
                 messages.warning(request, "Packing list cant saved.")
                 return HttpResponseRedirect("/purchase/add-pl/")
@@ -2171,9 +2377,13 @@ def add_packing_list(request):
             if sl_item_ids:
                 for i, item in enumerate(sl_item_ids):
                     ship_item = ShippingItem.objects.get(id=sl_item_ids[i])
+                    # import pdb; pdb.set_trace();
+                    
+                    seq = pl_item_seqs[i]
                     try:
                         packing_item = PackingItem.objects.create(pl=pl)
                         packing_item.sl_item = ship_item
+                        packing_item.search_string = request.POST.get('comment_detail_'+str(seq))
                     except Exception, e:
                         raise e
                     
@@ -2192,12 +2402,14 @@ def add_packing_list(request):
                     ship_item.shipped_total_to_date = ship_item.shipped
                     ship_item.save()
 
-
+            # import pdb; pdb.set_trace();
             if pl_item_ids:
                 for i, item in enumerate(pl_item_ids):
+                    seq = pl_item_seqs[i]
                     try:
                         packing_item = PackingItem.objects.get(id=item)
                         packing_item.pl = pl
+                        packing_item.search_string = request.POST.get('comment_detail_'+str(seq))
                         ship_item = packing_item.sl_item
                     except Exception, e:
                         pass
@@ -2349,7 +2561,7 @@ def pl_list(request):
             email_list = ContactEmailAddress.objects.filter(contact=pl.sold_to)
             if email_list:
                 pack['sold_to']['emails'] = []
-                for em in emails:
+                for em in email_list:
                     email = {}
                     email['email_address_type'] = em.email_address_type.email_type
                     email['email_address'] = em.email_address
@@ -2379,7 +2591,7 @@ def pl_list(request):
             email_list = ContactEmailAddress.objects.filter(contact=pl.ship_to)
             if email_list:
                 pack['ship_to']['emails'] = []
-                for em in emails:
+                for em in email_list:
                     email = {}
                     email['email_address_type'] = em.email_address_type.email_type
                     email['email_address'] = em.email_address
@@ -2410,7 +2622,7 @@ def pl_list(request):
             email_list = ContactEmailAddress.objects.filter(contact=pl.customer_broker)
             if email_list:
                 pack['customer_broker']['emails'] = []
-                for em in emails:
+                for em in email_list:
                     email = {}
                     email['email_address_type'] = em.email_address_type.email_type
                     email['email_address'] = em.email_address
@@ -2564,10 +2776,124 @@ def edit_packing_list(request, id):
 
 def get_packing_list(request, pl_number):
     pl = PackingList.objects.get(pl_number=pl_number)
-    serializer = PackingListSerializer(pl, context={'request': request})
-    pk_items = PackingItem.objects.filter(pl=pl)
-    data = json.dumps(serializer.data)
-    return HttpResponse(data, content_type='application/json')
+    
+    packing_list = {}
+    packing_list['pl_number'] = pl.pl_number
+    if pl.sl:
+        packing_list['sl'] = pl.sl.id
+    else:
+        packing_list['sl'] = None
+
+    packing_list['sold_to'] = {}
+    if pl.sold_to:
+        packing_list['sold_to']['contact_name'] = pl.sold_to.contact_name
+        packing_list['sold_to']['id'] = pl.sold_to.id
+        if pl.sold_to.attention_to:
+            packing_list['sold_to']['attention_to'] = pl.sold_to.attention_to
+        else:
+            packing_list['sold_to']['attention_to'] = pl.sold_to.contact_name
+        packing_list['sold_to']['address_1'] = pl.sold_to.address_1
+        packing_list['sold_to']['address_2'] = pl.sold_to.address_2
+        packing_list['sold_to']['province'] = pl.sold_to.province
+        packing_list['sold_to']['country'] = pl.sold_to.country
+        packing_list['sold_to']['postal_code'] = pl.sold_to.postal_code
+
+        plsoldtocontacts = PLSoldToContact.objects.filter(pl=pl)
+        soldto_contact_list = []
+        for sc in plsoldtocontacts:
+            soldto_contact = {}
+            soldto_contact['id'] = sc.id
+            soldto_contact['type'] = sc.contact_type
+            soldto_contact['number'] = sc.contact
+            soldto_contact['ext'] = ""
+            soldto_contact['contact_name'] = sc.contact_name
+            soldto_contact_list.append(soldto_contact)
+
+        # packing_list['sold_to'] = pl.sold_to
+        packing_list['sold_to']['contacts'] = soldto_contact_list
+        # packing_list['sold_to']['emails'] = []
+    else:
+        packing_list['sold_to'] = None
+
+    packing_list['ship_to'] = {}
+    # import pdb; pdb.set_trace();
+    if pl.ship_to:
+        packing_list['ship_to']['contact_name'] = pl.ship_to.contact_name
+        packing_list['ship_to']['id'] = pl.ship_to.id
+        if pl.ship_to.attention_to:
+            packing_list['ship_to']['attention_to'] = pl.ship_to.attention_to
+        else:
+            packing_list['ship_to']['attention_to'] = pl.ship_to.contact_name
+        packing_list['ship_to']['address_1'] = pl.ship_to.address_1
+        packing_list['ship_to']['address_2'] = pl.ship_to.address_2
+        packing_list['ship_to']['province'] = pl.ship_to.province
+        packing_list['ship_to']['country'] = pl.ship_to.country
+        packing_list['ship_to']['postal_code'] = pl.ship_to.postal_code
+
+        plshiptocontacts = PLShipToContact.objects.filter(pl=pl)
+        shipto_contact_list = []
+        for sc in plshiptocontacts:
+            shipto_contact = {}
+            shipto_contact['id'] = sc.id
+            shipto_contact['type'] = sc.contact_type
+            shipto_contact['number'] = sc.contact
+            shipto_contact['ext'] = ""
+            shipto_contact['contact_name'] = sc.contact_name
+            shipto_contact_list.append(shipto_contact)
+
+        # packing_list['ship_to'] = pl.ship_to
+        packing_list['ship_to']['contacts'] = shipto_contact_list
+        # packing_list['ship_to']['emails'] = []
+    else:
+        packing_list['ship_to'] = None
+
+    if pl.date_issued:
+        packing_list['date_issued'] = pl.date_issued.isoformat()
+    else:
+        packing_list['date_issued'] = None
+
+    if pl.date_shipped:
+        packing_list['date_shipped'] = pl.date_shipped.isoformat()
+    else:
+        packing_list['date_shipped'] = None
+
+    # import pdb; pdb.set_trace()
+    packing_list['shipped_by'] = pl.shipped_by
+    packing_list['nel_packing_slip'] = pl.nel_packing_slip
+    packing_list['job_number'] = pl.job_number
+    if pl.generated_by:
+        packing_list['generated_by'] = pl.generated_by.id
+    else:
+        packing_list['generated_by'] = None
+    packing_list['order_type'] = pl.order_type
+    if pl.ship_via:
+        packing_list['ship_via'] = pl.ship_via.delivery_choice
+    else:
+        packing_list['ship_via'] = None
+    packing_list['hold_at_dept_for_pickup'] = pl.hold_at_dept_for_pickup
+    packing_list['customer_broker'] = pl.customer_broker
+    packing_list['customer_po_number'] = pl.customer_po_number
+    packing_list['customer_broker'] = pl.customer_broker
+    if pl.freight_charges:
+        packing_list['freight_charges'] = pl.freight_charges.to_eng_string()
+    else:
+        packing_list['freight_charges'] = None
+    packing_list['status'] = pl.status
+    # packing_list['invoiced_on'] = pl.invoiced_on.isoformat()
+
+    if pl.invoiced_on:
+        packing_list['invoiced_on'] = pl.invoiced_on.isoformat()
+    else:
+        packing_list['invoiced_on'] = None
+
+    json_posts = json.dumps(packing_list)
+    return HttpResponse(json_posts, mimetype='application/json')
+
+    # serializer = PackingListSerializer(pl, context={'request': request})
+    # pk_items = PackingItem.objects.filter(pl=pl)
+    # data = json.dumps(serializer.data)
+    # return HttpResponse(data, content_type='application/json')
+    
 
 # supplier = Supplier.objects.get(id=supplier_id)
 # supplier_company = SupplierCompany.objects.get(supplier=supplier)
@@ -2588,14 +2914,15 @@ def get_pl_items(request, pl_number=None):
     else:
         pl_items = PackingItem.objects.filter(status=0)
     
-    
+    # import pdb; pdb.set_trace();
     plitems = []
     for item in pl_items:
         item_dict = {}
         item_dict['id'] = item.id
-        item_dict['item_number'] = item.sl_item.item.item_number
-        item_dict['sl_item_id'] = item.sl_item.id
-        item_dict['item_number'] = item.sl_item.item.item_number
+        if item.sl_item:
+            item_dict['item_number'] = item.sl_item.item.item_number
+            item_dict['sl_item_id'] = item.sl_item.id
+
         item_dict['description'] = item.description
         item_dict['unit'] = item.unit
         if item.qty_ordered:
@@ -2614,6 +2941,7 @@ def get_pl_items(request, pl_number=None):
         item_dict['shipped'] = float(item.qty_shipped)
             
         item_dict['pl'] = item.pl.pl_number
+        item_dict['comment'] = item.search_string
 
         
         
