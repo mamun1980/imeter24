@@ -718,9 +718,9 @@ def add_new_po(request):
 
             if email_po:
                 if domain != '127.0.0.1:8000':
-                    filepath = '/usr/home/www/'+domain+'/temp/'+po.po_number+"_"+str(time.time())+"_temp_fax.pdf"
+                    filepath = '/usr/home/www/'+domain+'/temp/'+po.po_number+"_"+str(time.time())+"_temp_email.pdf"
                 else:
-                    filepath = '/home/mamun/report/'+po.po_number+"_"+str(time.time())+"_temp_fax.pdf"
+                    filepath = '/home/mamun/report/'+po.po_number+"_"+str(time.time())+"_temp_email.pdf"
 
                 try:
                     
@@ -729,9 +729,13 @@ def add_new_po(request):
                     single_report = SingleReport.objects.create(report=report)
                     single_report.que_type = 'email'
                     single_report.filepath = filepath
+
+                    single_report.date_submitted = time.strftime("%Y-%m-%d")
+                    single_report.time_submitted = time.strftime("%X")
                     # single_report.search_string = "="+str(po.po_number)
                     single_report.search_status_type = 'PO'
                     single_report.current_job_status = 'new'
+                    single_report.email = 'paul@scom.ca'
                     single_report.script_name = report.python_script
                     single_report.save()
 
@@ -743,9 +747,9 @@ def add_new_po(request):
             if pdf_po:
                 
                 if domain != '127.0.0.1:8000':
-                    filepath = '/usr/home/www/'+domain+'/temp/'+po.po_number+"_"+str(time.time())+"_temp_fax.pdf"
+                    filepath = '/usr/home/www/'+domain+'/temp/'+po.po_number+"_"+str(time.time())+"_temp_pdf.pdf"
                 else:
-                    filepath = '/home/mamun/report/'+po.po_number+"_"+str(time.time())+"_temp.pdf"
+                    filepath = '/home/mamun/report/'+po.po_number+"_"+str(time.time())+"_temp_pdf.pdf"
 
                 try:
 
@@ -754,10 +758,13 @@ def add_new_po(request):
                     single_report = SingleReport.objects.create(report=report)
                     single_report.que_type = 'pdf'
                     single_report.filepath = filepath
+                    
+                    single_report.date_submitted = time.strftime("%Y-%m-%d")
+                    single_report.time_submitted = time.strftime("%X")
                     # single_report.search_string = "="+str(po.po_number)
                     single_report.search_status_type = 'PO'
                     single_report.current_job_status = 'new'
-                    single_report.email = 'paul@scom.ca'
+                    # single_report.email = 'paul@scom.ca'
                     single_report.script_name = report.python_script
                     single_report.save()
                 except Exception, e:
@@ -766,7 +773,7 @@ def add_new_po(request):
 
             if print_po:
                 if domain != '127.0.0.1:8000':
-                    filepath = '/usr/home/www/'+domain+'/temp/'+po.po_number+"_"+str(time.time())+"_temp_fax.pdf"
+                    filepath = '/usr/home/www/'+domain+'/temp/'+po.po_number+"_"+str(time.time())+"_temp_print.pdf"
                 else:
                     filepath = '/home/mamun/report/'+po.po_number+"_"+str(time.time())+"_temp_print.pdf"
 
@@ -777,6 +784,9 @@ def add_new_po(request):
                     single_report = SingleReport.objects.create(report=report)
                     single_report.que_type = 'print'
                     single_report.filepath = filepath
+
+                    single_report.date_submitted = time.strftime("%Y-%m-%d")
+                    single_report.time_submitted = time.strftime("%X")
                     # single_report.search_string = "="+str(po.po_number)
                     single_report.search_status_type = 'PO'
                     single_report.current_job_status = 'new'
@@ -799,6 +809,9 @@ def add_new_po(request):
                     single_report = SingleReport.objects.create(report=report)
                     single_report.que_type = 'fax'
                     single_report.filepath = filepath
+
+                    single_report.date_submitted = time.strftime("%Y-%m-%d")
+                    single_report.time_submitted = time.strftime("%X")
                     # single_report.search_string = "="+str(po.po_number)
                     single_report.search_status_type = 'PO'
                     single_report.current_job_status = 'new'

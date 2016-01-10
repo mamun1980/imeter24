@@ -324,10 +324,17 @@ def edit_single_report(request, id):
                 printer = Printer.objects.get(printer_id=printer_id)
                 job.printer = printer
                 job.fax = None
+                job.pdf = None
             elif job.que_type == 'fax':
                 job.email = None
                 job.printer = None
+                job.pdf = None
                 job.fax = request.POST.get("fax","")
+            elif job.que_type == 'pdf':
+                job.email = None
+                job.printer = None
+                job.fax = None
+                job.pdf = request.POST.get("pdf","")
 
             # job.search_start_date = request.POST.get("search_start_date", "")
             # job.search_end_date = request.POST.get("search_end_date", "")
@@ -343,7 +350,8 @@ def edit_single_report(request, id):
     else:
         job_form = SingleReportForm(instance=job)
 
-    return render(request, "report/single-job-edit.html", {'job_form': job_form, 'job_id': id})
+    return render(request, "report/single-job-edit.html", 
+        {'job_form': job_form, 'job_id': id, 'job': job})
 
 
 def single_report_api(request, jobid):
@@ -369,20 +377,30 @@ def single_report_api(request, jobid):
         job_dict['email'] = job.email
         job_dict['printer'] = None
         job_dict['fax'] = None
+        job_dict['pdf'] = None
     elif job.que_type == 'printer':
         job_dict['email'] = None
         job_dict['printer'] = job.printer.printer_id
         job_dict['fax'] = None
+        job_dict['pdf'] = None
     elif job.que_type == 'fax':
         job_dict['email'] = None
         job_dict['printer'] = None
+        job_dict['pdf'] = None
         job_dict['fax'] = job.fax
+    # elif job.que_type == 'pdf':
+    #     job_dict['email'] = None
+    #     job_dict['printer'] = None
+    #     job_dict['fax'] = None
+    #     job_dict['pdf'] = job.pdf
 
     job_dict['current_job_status'] = job.current_job_status
     job_dict['date_submitted'] = job.date_submitted
     job_dict['time_submitted'] = job.time_submitted
     job_dict['date_finished'] = job.date_finished
     job_dict['time_finished'] = job.time_finished
+
+    job_dict['filepath'] = job.filepath
 
     job_dict['search_start_date'] = job.search_start_date
     job_dict['search_end_date'] = job.search_end_date
@@ -584,6 +602,7 @@ def list_recuring_job(request):
     return HttpResponse(data, mimetype='application/json')
 
 def list_single_job(request):
+    # import pdb; pdb.set_trace();
     user = request.user
     from django.core.serializers.json import DjangoJSONEncoder
     import json
