@@ -3,11 +3,16 @@
 {% block content %}
 
 <div class="container shadow4 main-body">
-
+<section class="row">
+	<div class="col-md-8 col-md-offset-2">
+		<a href="#" class="btn btn-primary delivery-choice-add">Add Shipping Method</a>
+	</div>
+</section>
+<br />
 <section class="row"  id="delivery-choice-list">
 	
 
-	<div class="col-md-6 col-md-offset-3">
+	<div class="col-md-8 col-md-offset-2">
 		<div class="panel panel-primary">
 			<div class="panel-heading">
 		    	<h4>Delivery Choices List</h4>
@@ -18,7 +23,8 @@
 			  			<td> ID </td>
 			  			<td>Delivery Choice</td>
 			  			<td>Total Use</td>
-			  			<td>Action</td>
+			  			<td colspan="2">Action</td>
+
 			  			
 			  		</tr>
 			  		{% for delivery_choice in delivery_choices %}
@@ -27,7 +33,7 @@
 				  			<td> {{ delivery_choice.delivery_choice }} </td>
 				  			<td> {{ delivery_choice.contactprofile_set.all.count }} </td>
 				  			<td>
-				  				<a class="delivery-choice-delete" href="#" data-dcid="{{ delivery_choice.id }}">delete</a>
+				  				<a class="delivery-choice-delete" href="#" data-dcid="{{ delivery_choice.id }}">delete</a> / <a class="delivery-choice-edit" href="/contacts/delivery-choice/edit/{{delivery_choice.id}}/">Edit</a>
 				  			</td>
 				  			
 				  		</tr>
@@ -66,6 +72,44 @@
 	});
 
 })(jQuery)
+
+</script>
+{% include "modals/edit-modal.html" %}
+
+
+<script type="text/javascript">
+	(function(){
+
+		$("a.delivery-choice-add").on("click", function(e){
+			e.preventDefault();
+			// com_id = $(this).data("id");
+		    url = "/contacts/delivery-choice/add/"
+			mdal = $('#editModal');
+			mdal.on("shown.bs.modal", function(){
+				$("#editModal .modal-content").load(url);
+				console.log(url);
+			}).modal();
+
+			return false;
+		});
+
+		$("a.delivery-choice-edit").on("click", function(e){
+			e.preventDefault();
+			// com_id = $(this).data("id");
+		    url = $(this).attr("href");
+			mdal = $('#editModal');
+			mdal.on("shown.bs.modal", function(){
+				$("#editModal .modal-content").load(url);
+				console.log(url);
+			}).modal();
+
+			return false;
+		});
+
+		
+
+	})(jQuery)
+
 
 </script>
 </div>

@@ -966,7 +966,7 @@ def add_delivery_choices(request):
         delivery_choices = DeliveryChoice.objects.all()
         delivery_choice_form = DeliveryChoiceForm()
 
-        return render_to_response("contacts/list-delivery-choice.html",
+        return render_to_response("contacts/add-delivery-choice.html",
             {'delivery_choices': delivery_choices, 'delivery_choice_form': delivery_choice_form, 'page_title': 'Add Delivery Choice'}, 
             context_instance=RequestContext(request))
 
@@ -981,8 +981,7 @@ def edit_delivery_choices(request, dcid):
         delivery_choice_form = DeliveryChoiceForm(request.POST, instance=delivery_choice)
         if delivery_choice_form.is_valid():
             delivery_choice = delivery_choice_form.save()
-            return render_to_response("contacts/partials/add-delivery-choice-partial.html",
-            {'delivery_choice': delivery_choice}, context_instance=RequestContext(request))
+            return HttpResponse("Done")
     elif request.method == "GET":
         
         delivery_choice = DeliveryChoice.objects.get(id=dcid)
