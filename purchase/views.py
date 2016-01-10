@@ -2089,9 +2089,9 @@ def search_packing_list(request):
 def search_shiping_list(request):
     query = request.GET.get('q','')
     if request.GET.get('q'):
-        sls = SearchQuerySet().using('sl').filter(content=AutoQuery(query)).load_all()[:3]
+        sls = SearchQuerySet().using('sl').filter(content=AutoQuery(query)).load_all()[:20]
     else:
-        sls = SearchQuerySet().using('sl').all().load_all()[:10]
+        sls = SearchQuerySet().using('sl').all()[:20]
 
     sl_list = []
     if sls:
@@ -2208,7 +2208,7 @@ def search_shiping_list(request):
         page = int(request.GET.get('page','1'))
     except ValueError:
         page = 1
-    paginator = Paginator(sl_list, 10)
+    paginator = Paginator(sl_list, 20)
     try:
         pages = paginator.page(page)
     except (EmptyPage, InvalidPage):

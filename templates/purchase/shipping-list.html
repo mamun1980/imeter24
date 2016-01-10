@@ -152,6 +152,7 @@
 			$http({method: 'GET', url: url}).
 	            success(function(data, status, headers, config) {
 	                console.log(data);
+	                // console.log("SL Fetched.");
 	                $scope.shipping_list = data;
 	            });
 
@@ -164,14 +165,14 @@
 	            url = "/purchase/sl/search/?q=" + q
 	            $http({method: 'GET', url: url}).
 	                success(function(data, status, headers, config) {
-	                    console.log(data);
+	                    // console.log(data);
 	                    $scope.shipping_list = data;
 	                });            
 	        } else {
 	            url = "/purchase/sl/search/"
 	            $http({method: 'GET', url: url}).
 	                success(function(data, status, headers, config) {
-	                    console.log(data);
+	                    // console.log(data);
 	                    $scope.shipping_list = data;
 	                });  
 	        }

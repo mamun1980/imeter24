@@ -109,6 +109,7 @@ class ShippingListIndex(indexes.SearchIndex, indexes.Indexable):
         if sold_to:
             sold_to_dict = {}
             sold_to_dict['id'] = sold_to.id
+            sold_to_dict['contact_name'] = sold_to.contact_name
             sold_to_dict['attention_to'] = sold_to.attention_to
             sold_to_dict['address_1'] = sold_to.address_1
             sold_to_dict['address_2'] = sold_to.address_2
@@ -141,6 +142,7 @@ class ShippingListIndex(indexes.SearchIndex, indexes.Indexable):
         if ship_to:
             ship_to_dict = {}
             ship_to_dict['id'] = ship_to.id
+            ship_to_dict['contact_name'] = ship_to.contact_name
             ship_to_dict['attention_to'] = ship_to.attention_to
             ship_to_dict['address_1'] = ship_to.address_1
             ship_to_dict['address_2'] = ship_to.address_2

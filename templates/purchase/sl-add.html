@@ -519,7 +519,12 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
         if(sl.sold_to){
             $("#sold_to_contact_details").show();
             $scope.sold_to_contact = sl.sold_to;
-            $scope.search_sold_to = sl.sold_to.attention_to;
+            if(sl.sold_to.attention_to){
+                $scope.search_sold_to = sl.sold_to.attention_to;    
+            } else {
+                $scope.search_sold_to = sl.sold_to.contact_name;
+            }
+            
             $("#id_sold_to").val(sl.sold_to.id);  
             $scope.add_sl_form.search_sold_to.$setViewValue($scope.add_sl_form.search_sold_to.$viewValue);    
         }
@@ -527,7 +532,12 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
         if(sl.ship_to){
             $("#ship_to_contact_details").show();
             $scope.ship_to_contact = sl.ship_to;
-            $scope.search_ship_to = sl.ship_to.attention_to;
+            if(sl.ship_to.attention_to){
+                $scope.search_ship_to = sl.ship_to.attention_to;    
+            } else {
+                $scope.search_ship_to = sl.ship_to.contact_name;
+            }
+            
             $("#id_ship_to").val(sl.ship_to.id);    
         }
         

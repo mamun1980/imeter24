@@ -146,7 +146,15 @@
 				
 				<tr>
 					<th width="150">Contact Name</th>
-					<td colspan="2">{[{ sold_to_contact.attention_to }]}</td>
+					<td colspan="2">
+						<span ng-if="sold_to_contact.attention_to != ''">
+							{[{ sold_to_contact.attention_to }]}, 
+						</span>
+						<span ng-if="sold_to_contact.contact_name != ''">
+							{[{ sold_to_contact.contact_name }]}
+						</span>
+						
+					</td>
 				</tr>
 				<tr>
 					<th>Address</th>
@@ -210,7 +218,14 @@
 		<table class="table table-bordered" id="ship_to_contact_details">
 			<tr>
 				<th width="150">Contact Name</th>
-				<td colspan="2">{[{ ship_to_contact.attention_to }]}</td>
+				<td colspan="2">
+					<span ng-if="ship_to_contact.attention_to != ''">
+						{[{ ship_to_contact.attention_to }]}, 
+					</span>
+					<span ng-if="ship_to_contact.contact_name != ''">
+						{[{ ship_to_contact.contact_name }]}
+					</span>
+				</td>
 			</tr>
 			<tr>
 				<th>Address</th>
