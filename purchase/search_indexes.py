@@ -98,6 +98,7 @@ class ShippingListIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.CharField(document=True, use_template=True)
     sl_number = indexes.CharField(model_attr='sl_number', boost=2)
     date_required = indexes.CharField(model_attr='date_required', indexed=False, null=True)
+    ordered_date = indexes.DateField(model_attr='ordered_date', indexed=False, null=True)
     job_number = indexes.CharField(model_attr='job_number__job_number', indexed=False, null=True)
 
     def get_model(self):

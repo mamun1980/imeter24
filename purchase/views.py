@@ -1122,9 +1122,10 @@ def po_list(request):
         po_dict = {}
         po_dict['po_number'] = po.po_number
         po_dict['po_status'] = po.po_status
-        po_dict['po_created_by'] = po.po_created_by.id
-        if po.po_created_by.id == request.user.id or request.user.is_superuser == True:
-            po_dict['can_edit'] = True
+        if po.po_created_by:
+            po_dict['po_created_by'] = po.po_created_by.id
+            if po.po_created_by.id == request.user.id or request.user.is_superuser == True:
+                po_dict['can_edit'] = True
         else:
             po_dict['can_edit'] = False
 
@@ -2089,9 +2090,9 @@ def search_packing_list(request):
 def search_shiping_list(request):
     query = request.GET.get('q','')
     if request.GET.get('q'):
-        sls = SearchQuerySet().using('sl').filter(content=AutoQuery(query)).load_all()[:20]
+        sls = SearchQuerySet().using('sl').filter(content=AutoQuery(query)).all().order_by('-ordered_date')[:20]
     else:
-        sls = SearchQuerySet().using('sl').all()[:20]
+        sls = SearchQuerySet().using('sl').all().order_by('-ordered_date')[:20]
 
     sl_list = []
     if sls:
@@ -2175,31 +2176,32 @@ def search_shiping_list(request):
                     else:
                         item_dict['ordered'] = None
 
-                    if item.shipped:
-                        item_dict['shipped'] = item.shipped.to_eng_string()
-                    else:
-                        item_dict['shipped'] = None
+                    # if item.shipped:
+                    #     item_dict['shipped'] = item.shipped.to_eng_string()
+                    # else:
+                    #     item_dict['shipped'] = None
 
                     if item.shipped_total_to_date:
                         item_dict['shipped_total_to_date'] = item.shipped_total_to_date.to_eng_string()
                     else:
                         item_dict['shipped_total_to_date'] = None
-                    if item.shipped_by:
-                        item_dict['shipped_by'] = {}
-                        item_dict['shipped_by']['id'] = item.shipped_by.id
-                        item_dict['shipped_by']['username'] = item.shipped_by.username
-                    else:
-                        item.shipped_by = None
+                    # if item.shipped_by:
+                    #     item_dict['shipped_by'] = {}
+                    #     item_dict['shipped_by']['id'] = item.shipped_by.id
+                    #     item_dict['shipped_by']['username'] = item.shipped_by.username
+                    # else:
+                    #     item.shipped_by = None
 
-                    if item.last_shipped:
-                        item_dict['last_shipped_date'] = item.last_shipped.isoformat()
-                    else:
-                        item_dict['last_shipped_date'] = None
+                    # if item.last_shipped:
+                    #     item_dict['last_shipped_date'] = item.last_shipped.isoformat()
+                    # else:
+                    #     item_dict['last_shipped_date'] = None
                     if item.backordered:
                         item_dict['backordered'] = item.backordered.to_eng_string()
-                    if item.filled:
-                        item_dict['filled'] = item.filled.to_eng_string()
-                    item_dict['item_ship_status'] = item.item_ship_status_verbose()
+                    # if item.filled:
+                    #     item_dict['filled'] = item.filled.to_eng_string()
+                    # item_dict['item_ship_status'] = item.item_ship_status_verbose()
+
                     items.append(item_dict)
 
                 sl_dict['items'] = items
@@ -3058,7 +3060,7 @@ def add_shipping_list(request):
                         sl_sold_contact.save()
 
 
-                # ============= add contacts for ship_to ==========
+                    # ============= add contacts for ship_to ==========
                     # import pdb; pdb.set_trace();
                     ship_to_contact_ids = request.POST.getlist("sl_ship_to_contact_id")
                     ship_to_phone_numbers = request.POST.getlist("sl_ship_to_phone_number", "")
@@ -3099,6 +3101,10 @@ def add_shipping_list(request):
                         sl_sold_contact = SLShipToContact.objects.get(id=extra_contact_id)
                         sl_sold_contact.sl = sl
                         sl_sold_contact.save()
+
+                    sl.sl_status = 0
+
+                    
                 
                 else:
                     sl_soldto_extra_contacts = request.POST.getlist("sl_soldto_extra_contacts", "")
@@ -3154,8 +3160,8 @@ def add_shipping_list(request):
                 #     shipping_item.backordered = item_backordered[i]
                 
                 # item_ship_status value will only be changed in PL after actual shipment.
-                shipping_item.item_ship_status = 0
-                shipping_item.shipped_by = user
+                # shipping_item.item_ship_status = 0
+                # shipping_item.shipped_by = user
                 shipping_item.save()
             
             # sl.search_string = sl.sl_number + " " + sl.customer_po_number + sl.customer_job_number
@@ -3168,7 +3174,8 @@ def add_shipping_list(request):
             # if sl.ship_via:
             #     sl.search_string += sl.ship_via.delivery_choice
 
-            sl.sl_status = 0
+            
+            # sl.ordered_date = datetime.now().strftime('%Y-%m-%d')
             sl.save()
 
             

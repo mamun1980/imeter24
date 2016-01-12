@@ -304,22 +304,22 @@ class ShippingItem(models.Model):
 	item = models.ForeignKey(Item, related_name='shipping-item')
 	description = models.TextField(null=True, blank=True)
 	ordered = models.DecimalField(max_digits=10,decimal_places=4, blank=True, null=True, default=0.0)
-	shipped = models.DecimalField(max_digits=10,decimal_places=4, blank=True, null=True, default=0.0, verbose_name='Shipped today')
+	# shipped = models.DecimalField(max_digits=10,decimal_places=4, blank=True, null=True, default=0.0, verbose_name='Shipped today')
 	shipped_total_to_date = models.DecimalField(max_digits=10,decimal_places=4, blank=True, null=True, default=0.0)
-	shipped_by = models.ForeignKey(User, blank=True, null=True, related_name='item_shipped_by')
-	last_shipped = models.DateField(blank=True, null=True)
+	# shipped_by = models.ForeignKey(User, blank=True, null=True, related_name='item_shipped_by')
+	# last_shipped = models.DateField(blank=True, null=True)
 	backordered = models.DecimalField(max_digits=10,decimal_places=4, blank=True, null=True, default=0.0)
-	filled = models.DecimalField(max_digits=10,decimal_places=4, blank=True, null=True, default=0.0)
+	# filled = models.DecimalField(max_digits=10,decimal_places=4, blank=True, null=True, default=0.0)
 	# price = models.DecimalField(max_digits=10,decimal_places=4, blank=True, null=True, default=0.0)
 	shipping_list = models.ForeignKey(ShippingList, related_name='sl-item')
-	item_ship_status = models.CharField(max_length=10, blank=True, null=True)
+	# item_ship_status = models.CharField(max_length=10, blank=True, null=True)
 	search_string = models.TextField(null=True, blank=True, verbose_name='Search String')
 
 	def __unicode__(self):
 		return str(self.id)
 
-	def item_ship_status_verbose(self):
-		return dict(SL_ITEM_STATUS)[int(self.item_ship_status)]
+	# def item_ship_status_verbose(self):
+	# 	return dict(SL_ITEM_STATUS)[int(self.item_ship_status)]
 
 	class Meta:
 		verbose_name = u"Shipping Item"

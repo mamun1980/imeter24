@@ -72,9 +72,10 @@ PL_STATUS = (
 )
 SL_STATUS = (
 	(0, 'New'),
-	(1, 'Partial Shipped'),
-	(2, 'All Shipped'),
-	(3, 'Archived'),
+	(1, 'Printed'),
+	(2, 'Partial Shipped'),
+	(3, 'All Shipped'),
+	(4, 'Closed'),
 )
 SL_ITEM_STATUS = (
 	(0, 'Pending'),
