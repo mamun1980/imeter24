@@ -290,7 +290,10 @@ class ShippingList(models.Model):
 
 
 	def status_verbose(self):
-		return dict(SL_STATUS)[int(self.sl_status)]
+		if self.sl_status:
+			return dict(SL_STATUS)[int(self.sl_status)]
+		else:
+			return None
 
 	class Meta:
 		verbose_name = u"Shipping List"
@@ -312,6 +315,7 @@ class ShippingItem(models.Model):
 	# filled = models.DecimalField(max_digits=10,decimal_places=4, blank=True, null=True, default=0.0)
 	# price = models.DecimalField(max_digits=10,decimal_places=4, blank=True, null=True, default=0.0)
 	shipping_list = models.ForeignKey(ShippingList, related_name='sl-item')
+	unit_measure = models.CharField(max_length=20, blank=True, null=True)
 	# item_ship_status = models.CharField(max_length=10, blank=True, null=True)
 	search_string = models.TextField(null=True, blank=True, verbose_name='Search String')
 
@@ -358,19 +362,19 @@ class PackingList(models.Model):
 	date_issued = models.DateField(blank=True, null=True)
 	date_shipped = models.DateField(blank=True, null=True)
 	shipped_by = models.ForeignKey(User, blank=True, null=True, related_name='shipped_by')
-	nel_packing_slip = models.BooleanField(default=False)
 	job_number = models.ForeignKey(Job, blank=True, null=True)
 	generated_by = models.ForeignKey(User, blank=True, null=True, related_name='generated_by')
 	order_type = models.CharField(max_length=50, blank=True, null=True)
 	ship_via = models.ForeignKey(DeliveryChoice, blank=True, null=True, related_name='ship_via')
+	shipping_bl_number = models.CharField(max_length=20, blank=True, null=True)
 	hold_at_dept_for_pickup = models.BooleanField(default=False)
 	customer_broker = models.ForeignKey(Contact, blank=True, null=True, related_name='pl_customer_broker')
 	customer_po_number = models.CharField(max_length=50, blank=True, null=True)
 	freight_charges = models.DecimalField(max_digits=10,decimal_places=4, blank=True, null=True, default=0.0)
 	status = models.CharField(max_length=20, blank=True, null=True)
-	invoiced_on = models.DateField(blank=True, null=True)
-	# items = models.ManyToManyField(PackingItem, blank=True, null=True)
-	search_string = models.TextField(null=True, blank=True, verbose_name='Search String')
+	invoiced_on_date = models.DateField(blank=True, null=True)
+	invoiced_on = models.CharField(max_length=50, blank=True, null=True)
+	shipping_comment = models.TextField(null=True, blank=True, verbose_name='Search String')
 
 	def __unicode__(self):
 		return self.pl_number
@@ -379,7 +383,7 @@ class PackingList(models.Model):
 		return dict(PL_STATUS)[int(self.status)]
 
 	def order_type_verbose(self):
-		return dict(PL_TYPE)[int(self.order_type)]
+		return dict(PL_ORDER_TYPE)[int(self.order_type)]
 
 	class Meta:
 		verbose_name = u"Packing List"
@@ -391,16 +395,13 @@ class PackingList(models.Model):
 
 class PackingItem(models.Model):
 	sl_item = models.ForeignKey(ShippingItem, blank=True, null=True)
-	# item = models.ForeignKey(Item, blank=True, null=True)
+	item = models.ForeignKey(Item, blank=True, null=True)
 	description = models.TextField(blank=True, null=True)
 	unit = models.CharField(max_length=20, blank=True, null=True)
 	qty_ordered = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
-	qty_bo = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
-	qty_shipped = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)	
-	# price = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
-	status = models.BooleanField(default=0)
+	qty_shipped = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True, default=0.0)
 	pl = models.ForeignKey(PackingList, blank=True, null=True, related_name='pl_items')
-	search_string = models.TextField(null=True, blank=True, verbose_name='Search String')
+	line_comments = models.TextField(null=True, blank=True, verbose_name='Search String')
 
 	def __unicode__(self):
 		return str(self.id)

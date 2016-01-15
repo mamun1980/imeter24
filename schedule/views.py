@@ -792,7 +792,7 @@ def search_job(request):
         for job in jobs:
             if job != None:
                 job_dict = {}
-                job_dict['job_id'] = job.job_id
+                job_dict['job_id'] = job.object.id
                 job_dict['job_number'] = job.job_number
                 job_dict['job_name'] = job.job_name
                 job_dict['cab_designation'] = job.cab_designation

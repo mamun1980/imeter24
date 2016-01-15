@@ -63,10 +63,17 @@ PL_TYPE = (
 	(3, 'Mod Parts Order Std'),
 	(4, 'Mod Parts Order Eng'),
 )
+
+PL_ORDER_TYPE = (
+	(0, 'Prepaid'),
+	(1, 'Prepaid & Charge'),
+	(2, 'Collect'),
+	(3, '3rd Party Billing'),
+)
+
 PL_STATUS = (
 	(0, 'New'),
-	(1, 'Partial Shipped'),
-	(2, 'All Shipped'),
+	(1, 'Printed'),
 	(3, 'Invoiced'),
 	(4, 'Archived'),
 )

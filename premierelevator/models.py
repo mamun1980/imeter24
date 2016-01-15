@@ -103,6 +103,23 @@ class SystemVariable(models.Model):
 
 		
 		return next_sl_number
+
+	@property
+	def get_next_pl_number(self):
+		got_value = False
+		while not got_value:
+			try:
+				next_pl_number = 'PL'+str(self.next_pl_number)
+				pl = PackingList.objects.get(pl_number=next_pl_number)
+			except PackingList.DoesNotExist:
+				got_value = True
+				next_pl_number = 'PL' + str(self.next_pl_number)
+
+			self.next_pl_number = self.next_pl_number + 1
+			self.save()
+
+		
+		return next_pl_number
 			
 
 	class Meta:

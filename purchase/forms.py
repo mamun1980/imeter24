@@ -342,18 +342,6 @@ class PackingListForm(forms.ModelForm):
     def save(self, commit=True):
         # import pdb; pdb.set_trace();
         pl = super(PackingListForm, self).save(commit=False)
-        sv = SystemVariable.objects.get(id=1)
-        # pl.generated_by = self.request.user
-        if self.action == 'new':
-            # pl_number = re.sub(r"[A-Za-z]+","",self.request.POST['pl_number_search'])
-            pl_number = sv.next_pl_number
-            pl.pl_number = 'PL'+str(pl_number)
-            sv.next_pl_number = int(pl_number) + 1
-            pl.status = 0
-            # po_number = re.sub(r"[^\w]+","",po.po_number)
-            # po.po_number = 'P'+str(po_number)
-            # sv.next_po_number = int(po_number) + 1
-        sv.save()
         pl.save()
         return pl
 

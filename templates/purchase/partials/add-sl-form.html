@@ -12,18 +12,38 @@
 					<thead>
 						<tr>
 							<td>SL Number</td>
+							<td>Order Date</td>
+							<td>Required Date</td>
 							<td>Sold To</td>
 							<td>Ship To</td>
 							<td>Job Number</td>
+							<td>Status</td>
 						</tr>
 						
 					</thead>
 					<tbody>
 						<tr ng-repeat="sl in sls | filter:search_sl" ng-click="selectSL(sl)">
 							<td>{[{sl.sl_number}]}</td>
-							<td>{[{sl.sold_to.attention_to}]}</td>
-							<td>{[{sl.ship_to.attention_to}]}</td>
+							<td>{[{sl.ordered_date}]}</td>
+							<td>{[{sl.date_required}]}</td>
+							<td>
+								<div class="sl_contact">
+									<p><b>{[{sl.sold_to.attention_to}]}</b> {[{sl.sold_to.contact_name}]}</p>
+									<p>{[{sl.sold_to.address_1}]}</p>
+									<p>{[{sl.sold_to.city}]} {[{sl.sold_to.province}]}</p>
+									<p>Phone: {[{ sl.sold_to.phones[0]['number'] }]}</p>
+								</div>
+							</td>
+							<td>
+								<div class="sl_contact">
+									<p><b>{[{sl.ship_to.attention_to}]}</b> {[{sl.ship_to.contact_name}]}</p>
+									<p>{[{sl.ship_to.address_1}]}</p>
+									<p>{[{sl.ship_to.city}]} {[{sl.ship_to.province}]}</p>
+									<p>Phone: {[{ sl.ship_to.phones[0]['number'] }]}</p>
+								</div>
+							</td>
 							<td>{[{sl.job_number}]}</td>
+							<td>{[{sl.sl_status}]}</td>
 						</tr>
 						
 					</tbody>
@@ -185,7 +205,7 @@
 				<tr class='bg-primary'><td>Contact Type</td><td>Contact Details</td><td>Contact Name</td><td>Action</td></tr>
 			</thead>
 			<tbody>
-				<tr ng-repeat="ph in sold_to_contact.phones">
+				<tr ng-repeat="ph in sold_to_contact.phones" class="new_contact">
 					<td>{[{ ph.type}]}</td>
 					<td>{[{ ph.number}]}<span ng-if="ph.ext != ''"> Ext: ({[{ph.ext}]})</span></td>
 					<td ng-show="ph.contact_name">{[{ ph.contact_name }]}</td>
@@ -196,9 +216,10 @@
 						<input type="hidden" name='sl_sold_to_phone_number'  value="{[{ ph.number }]}">
 						<input type="hidden" name='sl_sold_to_phone_ext'  value="{[{ ph.ext }]}">
 						<input type="hidden" name='sl_sold_to_phone_attention'  value="{[{ sold_to_contact.attention_to }]}">
+						<input type="hidden" name='sl_sold_to_contact_id'  value="{[{ ph.id }]}">
 					</td>
 				</tr>
-				<tr ng-repeat="em in sold_to_contact.emails">
+				<tr ng-repeat="em in sold_to_contact.emails" class="new_contact">
 					<td>{[{ em.email_type}]}</td>
 					<td>{[{ em.email_address }]} </td>
 					<td>{[{ sold_to_contact.attention_to }]}</td>
@@ -256,7 +277,7 @@
 			<tr class='bg-primary'><td>Contact Type</td><td>Contact Details</td><td>Contact Name</td><td>Action</td></tr>
 		</thead>
 		<tbody>
-			<tr ng-repeat="ph in ship_to_contact.phones">
+			<tr ng-repeat="ph in ship_to_contact.phones" class="new_contact">
 				<td>{[{ ph.type}]}</td>
 				<td>{[{ ph.number}]}<span ng-if="ph.ext != ''"> Ext: ({[{ph.ext}]})</span></td>
 				<td ng-show="ph.contact_name">{[{ ph.contact_name }]}</td>
@@ -270,7 +291,7 @@
 					<input type="hidden" name='sl_ship_to_contact_id'  value="{[{ ph.id }]}">
 				</td>
 			</tr>
-			<tr ng-repeat="em in ship_to_contact.emails">
+			<tr ng-repeat="em in ship_to_contact.emails" class="new_contact">
 				<td>{[{ em.email_type}]}</td>
 				<td>{[{ em.email_address }]} </td>
 				<td>{[{ ship_to_contact.attention_to }]}</td>
@@ -326,7 +347,7 @@
 <td><label for="id_job_number">Job number:</label></td>
 	<td>
 		<div style="position: relative">		
-			<input type='text' class='form-control item-job-number' placeholder='Start typing to search job' ng-model="search_job" ng-change="searchJob(search_job)" autocomplete="off">
+			<input type='text' class='form-control item-job-number' placeholder='Start typing to search job' ng-model="search_job" ng-change="searchJob(search_job)" autocomplete="off" id='job_number'>
 			<input type='hidden' name='job_number' id='id_job_number'>
 			<div id="job_list" ng-show="jobs.length && show_job_list">
 				<table class="table">
@@ -354,7 +375,19 @@
 	</td>
 </tr>
 
-
+<tr>
+		<td><label for="sl_status">SL Status:</label></td>
+		<td>
+			<select name="sl_status" class="form-control" id="id_sl_status">
+				<option value="0">New</option>
+				<option value="1">Printed</option>
+				<option value="2">Partial Shipped</option>
+				<option value="3">All Shipped</option>
+				<option value="4">Closed</option>
+			</select>
+		</td>
+		<td colspan="2"></td>
+</tr>
 <tr class="bg-hello">
 	<td colspan="4" style="text-align: center; font-size: 16px;" ng-class="{'item_error ng-pristine': !item_added, 'bg-primary': item_added }">
 		<label for="id_items_total"><b>Add items here for this Shipping list</b></label>
@@ -370,13 +403,12 @@
 			<thead>
 				<tr>
 					<th width="120">Item Number</th>
-					<th width="180">Description</th>
+					<th width="280">Description</th>
+					<th>Unit Measure</th>
 					<th>Ordered</th>
 					<th>shipped today</th>
-					<th>shippeed total to date</th>
+					<th>shipped total to date</th>
 					<th>backordered</th>
-					<th>Last shipped</th>
-					<th>On packing list number</th>
 					<th></th>
 				</tr>
 			</thead>
@@ -396,7 +428,6 @@
 								<th>Primary Supplier</th>
 								<th>QTY on hand</th>
 								<th>Qty on Order</th>
-								<th>Last Ordered</th>
 								<th><a href="" class="close">x</a></th>
 							</tr>
 						</thead>
@@ -410,7 +441,6 @@
 								<td>{[{item.primary_supplier.contact_name}]}</td>
 								<td>{[{item.quantity_on_hand}]}</td>
 								<td>{[{item.quantity_on_order}]}</td>
-								<td>{[{item.last_ordered}]}</td>
 								<td></td>								
 							</tr>
 
@@ -424,9 +454,12 @@
 					<textarea rows="1" class="form-control demo_box" readonly=""></textarea>
 				</td>
 				<td>
-					<input type='number' class='form-control demo_box' placeholder='Ordered'>
+					<input type='number' class='form-control demo_box' placeholder='Unit Measure' readonly>
 				</td>
 				
+				<td>
+					<input type='number' class='form-control demo_box' placeholder='Ordered' readonly>
+				</td>
 				<td>
 					<input type='number' class='form-control demo_box' placeholder='Shipped today' readonly>
 				</td>
@@ -437,12 +470,7 @@
 					
 					<input type='text' class='form-control demo_box' placeholder='Backordered' autocomplete='off' readonly>
 				</td>
-				<td>
-					<input type='text' class='form-control demo_box' placeholder='Last shipped' autocomplete='off' readonly>
-				</td>
-				<td>
-					<input type='text' class='form-control' placeholder='PL Number' readonly='readonly' >
-				</td>
+				
 				<td></td>
 				
 				</tr>				

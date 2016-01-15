@@ -93,6 +93,7 @@ urlpatterns = patterns('',
     url(r'^delete-invoice/$', 'purchase.views.delete_invoice', name='delete-invoice'),
 
     url(r'^add-sl/$', 'purchase.views.add_shipping_list', name='add-shipping-list'),
+    url(r'^generate-pl-from-sl/$', 'purchase.views.generate_pl_from_sl'),
     url(r'^delete-sl-soldto-contact/$', 'purchase.views.delete_soldto_contact'),
     url(r'^delete-sl-shipto-contact/$', 'purchase.views.delete_shipto_contact'),
 

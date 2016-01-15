@@ -2090,7 +2090,7 @@ def search_packing_list(request):
 def search_shiping_list(request):
     query = request.GET.get('q','')
     if request.GET.get('q'):
-        sls = SearchQuerySet().using('sl').filter(content=AutoQuery(query)).all().order_by('-ordered_date')[:20]
+        sls = SearchQuerySet().using('sl').filter(content=AutoQuery(query)).order_by('-ordered_date')[:20]
     else:
         sls = SearchQuerySet().using('sl').all().order_by('-ordered_date')[:20]
 
@@ -2100,7 +2100,12 @@ def search_shiping_list(request):
             if sl != None:
                 sl_dict = {}
                 sl_dict['sl_number'] = sl.sl_number
-                sl_dict['job_number'] = sl.job_number
+                if sl.job_number:
+                    sl_dict['job_number'] = sl.job_number
+                    sl_dict['job_number_id'] = sl.object.job_number.id
+                else:
+                    sl_dict['job_number'] = None
+                # sl_dict['job_number'] = sl.object.job_number.id
                 # import pdb; pdb.set_trace();
                 if sl.sold_to:
                     slsoldtocontacts = SLSoldToContact.objects.filter(sl=sl.object)
@@ -2156,12 +2161,18 @@ def search_shiping_list(request):
 
                 sl_dict['customer_po_number'] = sl.object.customer_po_number
                 sl_dict['customer_job_number'] = sl.object.customer_job_number
+
                 if sl.object.ship_via:
                     sl_dict['ship_via'] = sl.object.ship_via.delivery_choice
+                    sl_dict['ship_via_id'] = sl.object.ship_via.id
                 else:
                     sl_dict['ship_via'] = None
-                if sl.sl_status:
-                    sl_dict['sl_status'] = sl.status_verbose()
+                    sl_dict['ship_via_id'] = None
+
+                # import pdb; pdb.set_trace();
+
+                # if sl.object.sl_status:
+                sl_dict['sl_status'] = sl.status
                 items = []
                 sl_items = ShippingItem.objects.filter(shipping_list=sl.object)
                 for item in sl_items:
@@ -2185,27 +2196,14 @@ def search_shiping_list(request):
                         item_dict['shipped_total_to_date'] = item.shipped_total_to_date.to_eng_string()
                     else:
                         item_dict['shipped_total_to_date'] = None
-                    # if item.shipped_by:
-                    #     item_dict['shipped_by'] = {}
-                    #     item_dict['shipped_by']['id'] = item.shipped_by.id
-                    #     item_dict['shipped_by']['username'] = item.shipped_by.username
-                    # else:
-                    #     item.shipped_by = None
-
-                    # if item.last_shipped:
-                    #     item_dict['last_shipped_date'] = item.last_shipped.isoformat()
-                    # else:
-                    #     item_dict['last_shipped_date'] = None
+                    
                     if item.backordered:
                         item_dict['backordered'] = item.backordered.to_eng_string()
-                    # if item.filled:
-                    #     item_dict['filled'] = item.filled.to_eng_string()
-                    # item_dict['item_ship_status'] = item.item_ship_status_verbose()
-
+                    
                     items.append(item_dict)
 
                 sl_dict['items'] = items
-                sl_list.append(sl_dict)
+            sl_list.append(sl_dict)
     try:
         page = int(request.GET.get('page','1'))
     except ValueError:
@@ -2219,6 +2217,8 @@ def search_shiping_list(request):
     results = pages.object_list
 
     data = json.dumps(results)
+
+    # import pdb; pdb.set_trace();
     return HttpResponse(data)
 
 def add_packing_list(request):
@@ -2545,7 +2545,7 @@ def add_packing_list(request):
 
 def pl_list(request):
     # import pdb; pdb.set_trace()
-    packing_list = PackingList.objects.filter(status__lte=2)
+    packing_list = PackingList.objects.all()[:100]
     pl_list = []
     for pl in packing_list:
         pack = {}
@@ -2655,11 +2655,7 @@ def pl_list(request):
             pack['shipped_by'] = pl.shipped_by.username
         else:
             pack['shipped_by'] = None
-        if pl.nel_packing_slip:
-            pack['nel_packing_slip'] = pl.nel_packing_slip
-        else:
-            pack['nel_packing_slip'] = None
-        
+                
         if pl.job_number:
             job = {}
             job['job_number'] = pl.job_number.job_number
@@ -2682,10 +2678,11 @@ def pl_list(request):
             pack['ship_via'] = None
 
         pack['hold_at_dept_for_pickup'] = pl.hold_at_dept_for_pickup
-        
-        pack['status'] = pl.status_verbose()
+        if pl.status:
+            pack['status'] = pl.status
         if pl.invoiced_on:
-            pack['invoiced_on'] = pl.invoiced_on.isoformat()
+            pack['invoiced_on'] = pl.invoiced_on
+            # pack['invoiced_on'] = pl.invoiced_on.isoformat()
         else:
             pack['invoiced_on'] = None
         pack['order_type'] = pl.order_type
@@ -2694,12 +2691,12 @@ def pl_list(request):
         else:
             pack['freight_charges'] = None
 
-        pack['search_string'] = pl.search_string
+        pack['shipping_comment'] = pl.shipping_comment
 
         pl_items = PackingItem.objects.filter(pl=pl)
         items=[]
         for it in pl_items:
-            # import pdb; pdb.set_trace()
+            
             item = {}
             if it.sl_item:
                 item['sl_item_id'] = it.sl_item.id
@@ -2708,13 +2705,12 @@ def pl_list(request):
             item['unit'] = it.unit
             if it.qty_ordered:
                 item['qty_ordered'] = float(it.qty_ordered)
-            if it.qty_bo:
-                item['qty_bo'] = float(it.qty_bo)
+            
             if it.qty_shipped:
                 item['qty_shipped'] = float(it.qty_shipped)
-            item['status'] = it.status
+            
             # item['pl'] = it.pl.id
-            item['search_string'] = it.search_string
+            item['line_comments'] = it.line_comments
             items.append(item)
         pack['items'] = items
 
@@ -2795,7 +2791,7 @@ def get_packing_list(request, pl_number):
     packing_list = {}
     packing_list['pl_number'] = pl.pl_number
     if pl.sl:
-        packing_list['sl'] = pl.sl.id
+        packing_list['sl'] = pl.sl
     else:
         packing_list['sl'] = None
 
@@ -2989,8 +2985,184 @@ def packing_list(request):
 
 
 @csrf_exempt
+def generate_pl_from_sl(request):
+    if request.method == 'POST':
+        # import pdb; pdb.set_trace();
+        form_data = json.loads(request.body)       
+
+        # recreate POST
+        request.POST._mutable = True
+        request.POST['sl_number'] = form_data.get("sl_number","")
+        request.POST['sold_to'] = form_data.get("sold_to","")
+        request.POST['customer_po_number'] = form_data.get("customer_po_number","")
+        request.POST['ordered_date'] = form_data.get("ordered_date","")
+        request.POST['ship_via'] = form_data.get("ship_via","")
+        request.POST['ship_to'] = form_data.get("ship_to","")
+        request.POST['job_number'] = form_data.get("job_number","")
+        request.POST['sl_status'] = form_data.get("sl_status","")
+        request.POST['date_required'] = form_data.get("date_required","")
+        request.POST['customer_job_number'] = form_data.get("customer_job_number","")
+
+        sl_number = request.POST['sl_number']
+
+        # ============= create the sl =====================
+
+        if sl_number != "":
+            try:
+                sl = ShippingList.objects.get(sl_number=sl_number)
+                sl_form = ShippingListForm(request.POST, request=request, instance=sl, action='update')  
+            except Exception, e:
+                
+                sv = SystemVariable.objects.get(id=1)
+                request.POST['sl_number'] = sv.get_next_sl_number
+                
+                sl_form = ShippingListForm(request.POST, request=request, action='new')
+        else:
+            
+            
+            sv = SystemVariable.objects.get(id=1)
+            request.POST['sl_number'] = sv.get_next_sl_number
+            
+
+            sl_form = ShippingListForm(request.POST, request=request, action='new')
+
+
+        # Save SL Form
+        if sl_form.is_valid():
+            sl = sl_form.save()
+
+            # add sl new items
+            if form_data.has_key("new_items"):
+                new_items = form_data['new_items']
+            else:
+                new_items = []
+
+            pl_items = []
+
+            for item in new_items:
+                item_number = item['item_number']
+                i_item = Item.objects.get(item_number=item_number)
+
+                sl_item = ShippingItem.objects.create(item=i_item, shipping_list=sl)
+                sl_item.ordered = item['item_ordered']
+                sl_item.unit_measure = item['item_unit']
+                if item.has_key("search_string"):
+                    sl_item.search_string = item['search_string']
+
+                if item.has_key("ship_today"):
+                    pli = PackingItem.objects.create(item=i_item, sl_item=sl_item)
+                    pli.qty_shipped = item['ship_today']
+                    pli.qty_ordered = item['item_ordered']
+                    pli.unit = item['item_unit']
+                    pli.description = i_item.description
+                    pli.line_comments = sl_item.search_string
+                    pli.save()
+                    pl_items.append(pli)
+
+                
+                sl_item.save()
+
+            # Update sl item
+            if form_data.has_key("update_items"):
+                update_items = form_data['update_items']
+            else:
+                update_items = []
+
+            for item in update_items:
+                item_number = item['item_number']
+                i_item = Item.objects.get(item_number=item_number)
+
+                sl_item = ShippingItem.objects.get(id=item['sl_item_id'])
+                sl_item.ordered = item['item_ordered']
+                sl_item.unit_measure = item['item_unit']
+                if item.has_key("search_string"):
+                    sl_item.search_string = item['search_string']
+                
+                sl_item.save()
+
+                if item.has_key("ship_today"):
+                    pli = PackingItem.objects.create(item=i_item, sl_item=sl_item)
+                    pli.qty_shipped = item['ship_today']
+                    pli.qty_ordered = item['item_ordered']
+                    pli.unit = item['item_unit']
+                    pli.description = i_item.description
+                    pli.line_comments = sl_item.search_string
+                    pli.save()
+                    pl_items.append(pli)
+
+            
+
+            # import pdb; pdb.set_trace();
+            if form_data['form_action'] == 'new':
+
+                # Add sold to contacts
+                soldto_contacts = form_data['soldto_contact']
+                
+                for stc in soldto_contacts:
+                    slc = SLSoldToContact.objects.create(sl=sl, contact_type=stc['sl_sold_to_phone_type'])
+                    slc.contact = stc['sl_sold_to_phone']
+                    slc.contact_name = stc['sl_sold_to_phone_attention']
+                    slc.save()
+
+                # Add ship to contacts
+                shipto_contacts = form_data['shipto_contact']
+                
+                for stc in shipto_contacts:
+                    slc = SLShipToContact.objects.create(sl=sl, contact_type=stc['sl_ship_to_phone_type'])
+                    slc.contact = stc['sl_ship_to_phone']
+                    slc.contact_name = stc['sl_ship_to_phone_attention']
+                    slc.save()
+
+            # Add extra contacts
+            soldto_extra_contacts = form_data['soldto_extra_contact']
+            shipto_extra_contacts = form_data['shipto_extra_contact']
+
+            for esc in soldto_extra_contacts:
+                slc = SLSoldToContact.objects.get(id=esc)
+                slc.sl = sl
+                slc.save()
+
+            for esc in shipto_extra_contacts:
+                slc = SLShipToContact.objects.get(id=esc)
+                slc.sl = sl
+                slc.save()
+
+        messages.success(request, 'New SL is created with pl number '+ sl.sl_number)
+
+            
+        
+
+        # ============= generate the pl ===================
+
+        if(pl_items):
+            # Pl only created if any item have value for ship_today.
+            request.POST['pl_number'] = sv.get_next_pl_number
+
+            pl_form = PackingListForm(request.POST, request=request)
+            if pl_form.is_valid():
+                pl = pl_form.save()
+                pl.sl = sl
+                pl.date_shipped = datetime.now().strftime('%Y-%m-%d')
+                # pl.order_type // what will be the defaul order type for creating pl from sl
+                pl.status = '0'
+                pl.save()
+
+                for plitem in pl_items:
+                    plitem.pl = pl
+                    plitem.save()
+
+                messages.success(request, 'New PL is created with pl number '+ pl.pl_number)
+        
+        # import pdb; pdb.set_trace()
+        return HttpResponse(True,content_type="application/json") 
+        # return HttpResponseRedirect("/purchase/shipping-list/")   
+
+
+
+@csrf_exempt
 def add_shipping_list(request):
     ship_vias = DeliveryChoice.objects.filter(is_active=True)
+    units = ItemUnitMeasure.objects.all()
     # sv = SystemVariable.objects.get(id=1)
     # next_sl_number = sv.next_sl_number
     if request.method == 'POST':
@@ -3003,6 +3175,8 @@ def add_shipping_list(request):
                 sl = ShippingList.objects.get(sl_number=sl_number)
                 sl_form = ShippingListForm(request.POST, request=request, instance=sl, action='update')    
             except ShippingList.DoesNotExist:
+                sv = SystemVariable.objects.get(id=1)
+                request.POST['sl_number'] = sv.get_next_sl_number
                 sl_form = ShippingListForm(request.POST, request=request, action='new')
         else:
             try:
@@ -3186,12 +3360,12 @@ def add_shipping_list(request):
         
         sl_form = ShippingListForm()
         return render(request, "purchase/sl-add.html", 
-            {'sl_form': sl_form, 'ship_vias': ship_vias})
+            {'sl_form': sl_form, 'ship_vias': ship_vias, 'units':units})
 
 def get_sl_json(request):
     # import pdb; pdb.set_trace()
     cuser = request.user
-    all_sl = ShippingList.objects.filter(sl_status__lt=2)
+    all_sl = ShippingList.objects.all()
     sl_list = []
     for sl in all_sl:
         sl_dict = {}
@@ -3464,9 +3638,9 @@ def get_sl_json_by_id(request, sl_id):
 
 def get_sl_item_json(request, sl_number=None):
     if sl_number:
-        sl_items = ShippingItem.objects.filter(item_ship_status__lt = 2, shipping_list__sl_number=sl_number)
+        sl_items = ShippingItem.objects.filter(shipping_list__sl_number=sl_number)
     else:
-        sl_items = ShippingItem.objects.filter(item_ship_status__lt = 2)
+        sl_items = ShippingItem.objects.all()
 
     sl_item_list = []
     for sl_item in sl_items:

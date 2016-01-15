@@ -363,6 +363,14 @@
 					<input class="form-control" id="id_freight_charges" maxlength="20" name="freight_charges" placeholder="freight charges" type="number">
 				</td>
 			</tr>
+			<tr>
+				<th>
+					<label for="id_shipping_comment">Comment:</label>
+				</th>
+				<td>
+					<input class="form-control" id="id_shipping_comment" name="shipping_comment" placeholder="" type="textarea">
+				</td>
+			</tr>
 		</table>
 	</td>
 	<td class="bg-info">
@@ -571,13 +579,10 @@
 			</tr>
 			<tr>
 				<td>
-					<label for="id_nel_packing_slip">Premier Packing Slip:</label>
+					<label for="id_shipping_bl_number">Shipping B/L Number:</label>
 				</td>
 				<td>
-					<select class="form-control" name="nel_packing_slip" id="id_nel_packing_slip">
-						<option value="1">Yes</option>
-						<option value="0">No</option>
-					</select>
+					<input class="form-control" id="id_shipping_bl_number" maxlength="200" name="shipping_bl_number" placeholder="" type="text">
 				</td>
 			</tr>
 			<tr>
@@ -590,15 +595,24 @@
 			</tr>
 			<tr>
 				<th width="150">
+					<label for="id_invoiced_on_date">Invoiced On Date:</label>
+				</th>
+				<td>
+					<input class="form-control datepicker" id="id_invoiced_on_date" name="invoiced_on_date" placeholder="date issued" type="text" autocomplate="off">
+				</td>
+			</tr>
+			<tr>
+				<th width="150">
 					<label for="id_invoiced_on">Invoiced On:</label>
 				</th>
 				<td>
-					<input class="form-control datepicker" id="id_invoiced_on" name="invoiced_on" placeholder="date issued" type="text" autocomplate="off">
+					<input class="form-control" id="id_invoiced_on" name="invoiced_on" placeholder="" type="text" autocomplate="off">
 				</td>
 			</tr>
 		</table>
 	</td>
 </tr>
+
 <tr>
 	<td colspan="2"  ng-class="{'item_error ng-pristine': !item_added, 'bg-primary': item_added }" align="center">
 		<h4>Add items here for this packing list </h4>

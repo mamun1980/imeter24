@@ -171,6 +171,8 @@ class ShippingListIndex(indexes.SearchIndex, indexes.Indexable):
             ship_to_dict['emails'] = elist
 
             self.prepared_data['ship_to'] = ship_to_dict
+        self.prepared_data['status'] = obj.status_verbose()
+        
         return self.prepared_data
 
     def index_queryset(self, using=None):
@@ -238,7 +240,7 @@ class PackingListIndex(indexes.SearchIndex, indexes.Indexable):
             ship_to_dict['emails'] = elist
 
             self.prepared_data['ship_to'] = ship_to_dict
-        self.prepared_data['status'] = obj.status_verbose()
+        # self.prepared_data['status'] = obj.status_verbose()
         self.prepared_data['date_shipped'] = obj.date_shipped
         return self.prepared_data
 
