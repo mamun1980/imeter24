@@ -435,6 +435,11 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
                 $scope.pos = data;
             });
 
+        $http({method: 'GET', url: "/inventory/unit-measure-list/json/"}).
+            success(function(data, status, headers, config) {
+                $scope.units = data;
+            });
+
         $("#sold_to_contact_list").hide();
         $("#sold_to_contact_details").hide();
 
@@ -635,15 +640,23 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
     	str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+item_number+"' readonly><input type='hidden' name='new_item' value='yes'><input type='hidden' name='sl_item_seq' value='"+$scope.add_item_seq_no+"'></td>";
     	str += "<td><p class='bg-info item_desc'>"+item_description+"</p></td>";
     	
-    	str += "<td><select name='item_unit' class='form-control'><option value='0'>New</option><option value='1'>Printed</option><option value='2'>Partial Shipped</option><option value='3'>All Shipped</option><option value='4'>Closed</option></select></td>";
+    	str += "<td><select name='item_unit' class='form-control'>";
+
+        for(var k=0; k<$scope.units.length; k++) {
+            var uv = $scope.units[k].id;
+            var ut = $scope.units[k].unit_name;
+            str += "<option value='"+uv+"'>"+ut+"</option>";
+        }
+
+        str += "</select></td>";
 
         str += "<td><input type='number' name='item_ordered' class='form-control demo_box' placeholder='Ordered' required autofocus></td>";
 
     	str += "<td><input type='number' name='ship_today' class='form-control demo_box' placeholder='Ship today'></td>";
 
-        str += "<td><input type='number' name='shipped_total_to_date' class='form-control demo_box' placeholder='Shipped total to date' readonly></td>";
+        str += "<td><input type='number' name='shipped_total_to_date' class='form-control demo_box' placeholder='Shipped total to date' ></td>";
 
-    	str += "<td><input type='text' name='item_backordered' class='form-control demo_box' placeholder='Backordered' autocomplete='off' readonly></td>";
+    	str += "<td><input type='text' name='item_backordered' class='form-control demo_box' placeholder='Backordered' autocomplete='off' ></td>";
 
     	str += "<td><a class='' data-toggle='modal' data-seq='"+$scope.add_item_seq_no+"' data-target='#slCommentModal'><i class='glyphicon glyphicon-pencil'></i></a><a class='remove-item btn' ng-click='removeField($event)'><span class='glyphicon glyphicon-remove'></span></a></td>";
     	str += "</tr>";
@@ -757,21 +770,37 @@ slApp.controller('AddSLController',['$scope', '$http','$compile', function ($sco
         if(items.length > 0){
             $scope.item_added = true;
         };
+        
         var myitem = $("tbody#add_item_list tr.add_item");
+        
         for(i=0; i< items.length ; i++) {
             var str = "<tr class='add_item'>";
             str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+items[i].item_number+"' readonly><input type='hidden' name='update_item' value='yes'><input type='hidden' name='sl_item_id' value='"+items[i].sl_item_id+"'><input type='hidden' name='sl_item_seq' value='"+i+"'></td>";
             str += "<td><p class='bg-info item_desc'>"+items[i].description+"</p></td>";
 
-            str += "<td><select name='item_unit' class='form-control'><option value='0'>New</option><option value='1'>Printed</option><option value='2'>Partial Shipped</option><option value='3'>All Shipped</option><option value='4'>Closed</option></select></td>";
+            str += "<td><select name='item_unit' class='form-control'>";
+
+            for(var k=0; k<$scope.units.length; k++) {
+                var uv = $scope.units[k].id;
+                var ut = $scope.units[k].unit_name;
+                
+                if( uv == items[i].unit_measure) {
+                    str += "<option value='"+uv+"' selected='selected'>"+ut+"</option>";
+                } else {
+                    str += "<option value='"+uv+"'>"+ut+"</option>";
+                }
+                
+            }
+
+            str += "</select></td>";
             
             str += "<td><input type='number' name='item_ordered' class='form-control demo_box' placeholder='Ordered' value='"+items[i].ordered+"'></td>";
 
             str += "<td><input type='number' name='ship_today' class='form-control demo_box' placeholder='Shipped today' value=''></td>";
 
-            str += "<td><input type='number' name='shipped_total_to_date' class='form-control demo_box' placeholder='Shipped total to date' readonly value='"+items[i].shipped_total_to_date+"'></td>";
+            str += "<td><input type='number' name='shipped_total_to_date' class='form-control demo_box' placeholder='Shipped total to date'  value='"+items[i].shipped_total_to_date+"'></td>";
 
-            str += "<td><input type='text' name='item_backordered' class='form-control demo_box' placeholder='Backordered' value='"+items[i].backordered+"' autocomplete='off' readonly></td>";
+            str += "<td><input type='text' name='item_backordered' class='form-control demo_box' placeholder='Backordered' value='"+items[i].backordered+"' autocomplete='off' ></td>";
 
             str += "<td><a class='remove-item btn' data-item-id='"+items[i].sl_item_id+"' ng-click='deleteField($event)'><span class='glyphicon glyphicon-remove'></span></a></td>";
             

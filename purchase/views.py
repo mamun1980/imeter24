@@ -2175,6 +2175,10 @@ def search_shiping_list(request):
                 sl_dict['sl_status'] = sl.status
                 items = []
                 sl_items = ShippingItem.objects.filter(shipping_list=sl.object)
+                
+                # if sl_items:
+                #     import pdb; pdb.set_trace();
+
                 for item in sl_items:
                     item_dict = {}
                     item_dict['item_number'] = item.item.item_number
@@ -2187,10 +2191,10 @@ def search_shiping_list(request):
                     else:
                         item_dict['ordered'] = None
 
-                    # if item.shipped:
-                    #     item_dict['shipped'] = item.shipped.to_eng_string()
-                    # else:
-                    #     item_dict['shipped'] = None
+                    if item.unit_measure:
+                        item_dict['unit_measure'] = item.unit_measure
+                    else:
+                        item_dict['unit_measure'] = None
 
                     if item.shipped_total_to_date:
                         item_dict['shipped_total_to_date'] = item.shipped_total_to_date.to_eng_string()
