@@ -3,7 +3,6 @@ from contacts.models import *
 from scomuser.models import *
 from inventory.choices import *
 # from purchase.models import DeliverInternal
-from django_fsm import FSMField, transition
 # Create your models here.
 
 class DeliverInternal(models.Model):
@@ -155,7 +154,6 @@ class Item(models.Model):
 	deliver_internal = models.ForeignKey(DeliverInternal, blank=True, null=True)
 	terms = models.ForeignKey(PaymentTerm, blank=True, null=True, related_name='item_payment_terms')
 	search_string 	  = models.TextField(null=True, blank=True, verbose_name='Search String')
-	state = FSMField(default='new')
 
 	def __unicode__(self):
 		return self.item_number

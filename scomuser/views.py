@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView
 
-from premierelevator.helper_functions import *
+from imeter24.helper_functions import *
 
 from scomuser.forms import *
 from scomuser.models import *

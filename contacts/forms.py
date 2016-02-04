@@ -1,8 +1,6 @@
 from django import forms
 from contacts.models import *
-from contacts.lookups import ContactsLookup, PhoneLookup
 from contacts.choices import *
-import selectable
 
 class PaymentTermForm(forms.ModelForm):
     term = forms.CharField( max_length=25,
@@ -272,21 +270,3 @@ class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         exclude = ['contact', 'comment_date', 'staff']
-
-class ContactsLookupForm(forms.Form):
-    autocomplete = forms.CharField(
-        label='Type for auto suggession',
-        widget=selectable.forms.AutoCompleteWidget(ContactsLookup, 
-        attrs={"class": "form-control", 'placeholder': "Filter contacts", 'name': 'contact-autocomplete-filter'}),
-        required=False,
-
-    )
-
-class ContactPhoneLookupForm(forms.Form):
-    autocomplete = forms.CharField(
-          label='Type for auto suggession',
-          widget=selectable.forms.AutoCompleteWidget(PhoneLookup, 
-          attrs={"class": "form-control", 'placeholder': "Filter phone by contacts", 'name': 'phone-autocomplete-filter'}),
-          required=False,
-
-      )

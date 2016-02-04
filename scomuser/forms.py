@@ -2,8 +2,6 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from scomuser.models import *
-from scomuser.lookups import UserLookup
-import selectable
 from report.models import Printer
 
 
@@ -168,11 +166,6 @@ class DepartmentForm(forms.ModelForm):
         model = Department
         exclude = ['is_active', ]
 
-
-class UserLookupForm(forms.Form):
-    autocomplete = forms.CharField( label='Type for auto suggession', widget=selectable.forms.AutoCompleteWidget(UserLookup, 
-      attrs={"class": "form-control", 'placeholder': "Find User", 'name': 'userlookup-autocomplete'}),
-      required=False, )
 
 class MassMailForm(forms.ModelForm):
     email_id = forms.CharField( max_length=20, required=False, label="Email Token",
