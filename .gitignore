@@ -13,5 +13,4 @@ data/*
 .rhosts
 .shrc
 .ssh/*
-.ssh
-imeter24/settings.py
+imeter24/local_settings.py
