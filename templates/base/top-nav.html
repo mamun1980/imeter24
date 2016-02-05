@@ -8,7 +8,7 @@
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand scom" href="/">PREMIER ONLINE</a>
+			<a class="navbar-brand scom" href="/">IMETER24 CS</a>
 		</div>
 		<div class="navbar-collapse collapse">
 			<ul class="nav navbar-nav">
@@ -236,176 +236,6 @@
 						</li>
 					{% endif %}
 
-					<!--  Start of Purchase menu -->
-					{% if perms.purchase.view_purchase_order %}
-						<li class="dropdown">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown">PO's <b class="caret"></b></a>
-							<ul class="dropdown-menu">
-								
-								{% if perms.purchase.view_purchase_order %}
-								<li class="dropdown-submenu">
-									<a href="">Purchase Order (PO)</a>
-									<ul class="dropdown-menu">
-										{% if perms.purchase.add_purchaseorder %}
-										<li>
-											<a href="/purchase/add-po/">
-												Add PO
-											</a>
-
-										</li>
-										{% endif %}
-										
-										
-										<li>
-											<a href="/purchase/list-purchase-orders/">PO List</a>
-										</li>
-										
-
-										{% if perms.purchase.cancel_purchase_order %}
-										
-										<li>
-											<a href="/purchase/po-change/">Change PO Status</a>
-										</li>
-										{% endif %}
-										
-									</ul>
-								</li>
-								{% endif %}
-
-								{% if perms.purchase.view_purchase_request %}
-								<li class="divider"></li>
-								<li class="dropdown-submenu">
-									<a href="">Purchase Request (PR)</a>
-									<ul class="dropdown-menu">
-										{% if perms.purchase.add_purchaserequest %}
-										<li>
-											<a href="/purchase/add-pr/">
-												Add PR
-											</a>
-
-										</li>
-										{% endif %}
-										
-										
-										<li>
-											<a href="/purchase/list-purchase-requests/">PR List</a>
-										</li>
-										<li>
-											<a href="/purchase/list-approved-pr/">Approved PR List</a>
-										</li>
-										
-										
-									</ul>
-								</li>
-								{% endif %}
-
-								{% if perms.purchase.view_purchase_request %}
-								<li class="divider"></li>
-								<li class="dropdown-submenu">
-									<a href="">Purchased Items</a>
-									<ul class="dropdown-menu">
-										{% if perms.purchase.add_purchaserequest %}
-										<li>
-											<a href="/purchase/pending-list/">
-												Pending List
-											</a>
-
-										</li>
-										{% endif %}
-										
-										
-										<li>
-											<a href="/purchase/received-list/">
-												Received List
-											</a>
-										</li>
-
-
-										
-										
-									</ul>
-								</li>
-								{% endif %}
-
-								
-								
-							</ul>
-						</li>
-					{% endif %}
-
-
-						<li class="dropdown">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Job control <b class="caret"></b></a>
-						<ul class="dropdown-menu">
-							<li>
-								<a href="/schedule/job-control/add/">
-									Add Job Control
-								</a>
-							</li>
-							<li>
-								<a href="/schedule/job-control/list/">
-									List Job Control
-								</a>
-							</li>
-							<li class="divider"></li>
-							<li class="dropdown-submenu">
-								<a href="/schedule/elevetor-type-list/">Elevetor type</a>
-								<ul class="dropdown-menu">
-									<li>
-										<a href="/schedule/elevetor-type/add/">
-											Add Elevetor type
-										</a>
-									</li>
-									<li>
-										<a href="/schedule/elevetor-type/list/">
-											View Elevetor type List 
-										</a>
-									</li>
-								</ul>
-							</li>
-							{% if perms.schedule.view_job or perms.schedule.view_customer_job %}
-								<li class="divider"></li>
-								<li class="dropdown-submenu">
-								<a href="#" class="dropdown-toggle" data-toggle="dropdown">Schedule</a>
-								<ul class="dropdown-menu">
-									{% if perms.schedule.add_job %}
-										<li>
-											<a href="/schedule/job/add/">
-												Add Schedule Job
-											</a>
-										</li>
-									{% endif %}
-									<li class="dropdown-submenu">
-									<a href="/schedule/jobs/">Show Scheduled Jobs</a>
-										<ul class="dropdown-menu">
-											{% if perms.schedule.view_job %}
-											<li>
-												<a href="/schedule/jobs/#/schedule/all-jobs">
-													All Jobs
-												</a>
-											</li>
-
-											<li>
-												<a href="/schedule/jobs/#/schedule/current-jobs">
-													Current Jobs
-												</a>
-											</li>
-											{% endif %}
-											
-											<li>
-												<a href="/schedule/jobs/#/schedule/my-jobs">
-													My Jobs
-												</a>
-											</li>
-										</ul>
-									</li>
-								</ul>
-								</li>
-							{% endif %}
-
-							
-						</ul>
-						</li>
 
 
 					<!--  Start of Order Control menu -->
@@ -413,42 +243,8 @@
 						<li class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Order Control<b class="caret"></b></a>
 							<ul class="dropdown-menu">
-								{% if perms.purchase.view_shipping_list %}
-								<li class="dropdown-submenu">
-									<a href="/purchase/shipping-list/">SL</a>
-									<ul class="dropdown-menu">
-										<li>
-											<a href="/purchase/add-sl/">
-												Add Shipping List
-											</a>
-										</li>
-										<li>
-											<a href="/purchase/shipping-list/">
-												View Shipping List 
-											</a>
-										</li>
-									</ul>
-								</li>
-								{% endif %}
+								
 
-								{% if perms.purchase.view_packing_list %}
-								<li class="divider"></li>
-								<li class="dropdown-submenu">
-									<a href="/purchase/packing-list/">PL</a>
-									<ul class="dropdown-menu">
-										<li>
-											<a href="/purchase/add-pl/">
-												Add Packing List
-											</a>
-										</li>
-										<li>
-											<a href="/purchase/packing-list/">
-												View Packing List 
-											</a>
-										</li>
-									</ul>
-								</li>
-								{% endif %}
 
 								{% if perms.purchase.view_invoice %}
 								<li class="divider"></li>
