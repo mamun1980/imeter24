@@ -1,7 +1,7 @@
 import sys
 
 sys.path.append('/usr/home/www/')
-sys.path.append('/usr/home/www/test.imeter24.com/')
+sys.path.append('/usr/home/www/www.imeter24.com/')
 
 import os
 

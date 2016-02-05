@@ -17,6 +17,8 @@ TEMPLATE_DEBUG = True
 ALLOWED_HOSTS = []
 
 SITE_ID = 1 
+SITE_NAME = 'IMETER24'
+
 ANONYMOUS_USER_ID = -1
 
 PROJECT_LINK = 'localhost'
@@ -74,9 +76,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'imeter24',                      # Or path to database file if using sqlite3.
-        'USER': 'postgres',                      # Not used with sqlite3.
-        'PASSWORD': 'qweqwe',                  # Not used with sqlite3.
-        'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
+        'USER': 'scom_test',                      # Not used with sqlite3.
+        'PASSWORD': 'Testxxyy',                  # Not used with sqlite3.
+        'HOST': '10.220.0.41',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '5432',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
