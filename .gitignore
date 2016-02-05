@@ -1,3 +1,17 @@
 *.pyc
 *.*~
 data/*
+.bash_history
+.bash_profile
+.bashrc
+.cshrc
+.login
+.login_conf
+.mail_aliases
+.mailrc
+.profile
+.rhosts
+.shrc
+.ssh/*
+.ssh
+imeter24/settings.py
