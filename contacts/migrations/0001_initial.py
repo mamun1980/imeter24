@@ -52,14 +52,6 @@ class Migration(SchemaMigration):
             ('country', self.gf('django.db.models.fields.CharField')(default='Canada', max_length=40, null=True)),
             ('postal_code', self.gf('django.db.models.fields.CharField')(max_length=15, null=True, blank=True)),
             ('webpage', self.gf('django.db.models.fields.URLField')(max_length=200, null=True, blank=True)),
-            ('search_string', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-        ))
-        db.send_create_signal(u'contacts', ['Contact'])
-
-        # Adding model 'ContactProfile'
-        db.create_table(u'contacts_contactprofile', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('contact', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['contacts.Contact'], unique=True)),
             ('gst_number', self.gf('django.db.models.fields.CharField')(max_length=17, null=True, blank=True)),
             ('gst_tax_exempt', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('hst_number', self.gf('django.db.models.fields.CharField')(max_length=17, null=True, blank=True)),
@@ -79,7 +71,7 @@ class Migration(SchemaMigration):
             ('record_created', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
             ('last_activity', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
         ))
-        db.send_create_signal(u'contacts', ['ContactProfile'])
+        db.send_create_signal(u'contacts', ['Contact'])
 
         # Adding model 'PhoneType'
         db.create_table(u'contacts_phonetype', (
@@ -168,9 +160,6 @@ class Migration(SchemaMigration):
         # Deleting model 'Contact'
         db.delete_table(u'contacts_contact')
 
-        # Deleting model 'ContactProfile'
-        db.delete_table(u'contacts_contactprofile')
-
         # Deleting model 'PhoneType'
         db.delete_table(u'contacts_phonetype')
 
@@ -238,14 +227,31 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Contact'},
             'address_1': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True', 'blank': 'True'}),
             'address_2': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True', 'blank': 'True'}),
+            'ap_contact': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'attention_to': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True', 'blank': 'True'}),
+            'bv_ap_account': ('django.db.models.fields.CharField', [], {'max_length': '50', 'null': 'True', 'blank': 'True'}),
+            'bv_ar_account': ('django.db.models.fields.CharField', [], {'max_length': '50', 'null': 'True', 'blank': 'True'}),
             'city': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True', 'blank': 'True'}),
             'contact_name': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True', 'blank': 'True'}),
             'country': ('django.db.models.fields.CharField', [], {'default': "'Canada'", 'max_length': '40', 'null': 'True'}),
+            'currency': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contacts.Currency']", 'null': 'True', 'blank': 'True'}),
+            'fob': ('django.db.models.fields.CharField', [], {'default': "'Oshawa, Ontario, Canada'", 'max_length': '50', 'null': 'True', 'blank': 'True'}),
+            'foreign_account': ('django.db.models.fields.CharField', [], {'max_length': '30', 'null': 'True', 'blank': 'True'}),
+            'gst_number': ('django.db.models.fields.CharField', [], {'max_length': '17', 'null': 'True', 'blank': 'True'}),
+            'gst_tax_exempt': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'hst_number': ('django.db.models.fields.CharField', [], {'max_length': '17', 'null': 'True', 'blank': 'True'}),
+            'hst_tax_exempt': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'last_activity': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
+            'mail_list': ('django.db.models.fields.CharField', [], {'max_length': '15', 'null': 'True', 'blank': 'True'}),
             'postal_code': ('django.db.models.fields.CharField', [], {'max_length': '15', 'null': 'True', 'blank': 'True'}),
             'province': ('django.db.models.fields.CharField', [], {'default': "'Ontario'", 'max_length': '64', 'blank': 'True'}),
-            'search_string': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'pst_number': ('django.db.models.fields.CharField', [], {'max_length': '11', 'null': 'True', 'blank': 'True'}),
+            'pst_tax_exempt': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'record_created': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
+            'ship_collect': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'shipping_method': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contacts.DeliveryChoice']", 'null': 'True', 'blank': 'True'}),
+            'terms': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contacts.PaymentTerm']", 'null': 'True', 'blank': 'True'}),
             'webpage': ('django.db.models.fields.URLField', [], {'max_length': '200', 'null': 'True', 'blank': 'True'})
         },
         u'contacts.contactcontacttype': {
@@ -276,29 +282,6 @@ class Migration(SchemaMigration):
             'phone': ('django.db.models.fields.CharField', [], {'max_length': '15', 'null': 'True', 'blank': 'True'}),
             'phone_ext': ('django.db.models.fields.CharField', [], {'max_length': '10', 'null': 'True', 'blank': 'True'}),
             'phone_type': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contacts.PhoneType']", 'null': 'True', 'blank': 'True'})
-        },
-        u'contacts.contactprofile': {
-            'Meta': {'object_name': 'ContactProfile'},
-            'ap_contact': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
-            'bv_ap_account': ('django.db.models.fields.CharField', [], {'max_length': '50', 'null': 'True', 'blank': 'True'}),
-            'bv_ar_account': ('django.db.models.fields.CharField', [], {'max_length': '50', 'null': 'True', 'blank': 'True'}),
-            'contact': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['contacts.Contact']", 'unique': 'True'}),
-            'currency': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contacts.Currency']", 'null': 'True', 'blank': 'True'}),
-            'fob': ('django.db.models.fields.CharField', [], {'default': "'Oshawa, Ontario, Canada'", 'max_length': '50', 'null': 'True', 'blank': 'True'}),
-            'foreign_account': ('django.db.models.fields.CharField', [], {'max_length': '30', 'null': 'True', 'blank': 'True'}),
-            'gst_number': ('django.db.models.fields.CharField', [], {'max_length': '17', 'null': 'True', 'blank': 'True'}),
-            'gst_tax_exempt': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'hst_number': ('django.db.models.fields.CharField', [], {'max_length': '17', 'null': 'True', 'blank': 'True'}),
-            'hst_tax_exempt': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'last_activity': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'mail_list': ('django.db.models.fields.CharField', [], {'max_length': '15', 'null': 'True', 'blank': 'True'}),
-            'pst_number': ('django.db.models.fields.CharField', [], {'max_length': '11', 'null': 'True', 'blank': 'True'}),
-            'pst_tax_exempt': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'record_created': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'ship_collect': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'shipping_method': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contacts.DeliveryChoice']", 'null': 'True', 'blank': 'True'}),
-            'terms': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contacts.PaymentTerm']", 'null': 'True', 'blank': 'True'})
         },
         u'contacts.contacttype': {
             'Meta': {'object_name': 'ContactType'},

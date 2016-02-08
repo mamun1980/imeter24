@@ -1,0 +1,78 @@
+<form name="pocontact" action="/contacts/email-add/" method="POST" enctype="multipart/form-data">{% csrf_token %}
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h4 class="modal-title" id="myModalLabel">Add Contact Email</h4>
+</div>
+
+
+<div class="modal-body">
+	<table class="table add-user-table">
+		<tr>
+			<td>Email Type</td>
+			<td>
+				<select class="form-control" name="email_type">
+				{% for pt in etypes %}
+					<option value="{{pt.id}}">{{pt.email_type}}</option>
+				{% endfor %}
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>Email Address</td>
+			<td>
+				<input type="text" class="form-control" name="email_address">
+				<input type="hidden" name="contact_id" id="contact_id" value="{{cid}}">
+			</td>
+		</tr>
+		
+	</table>
+</div>
+
+
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-default close-modal" data-dismiss="modal">Close</button>
+    <button type="submit" class="btn btn-primary">Add Email</button>
+</div>
+</form>
+<script type="text/javascript">
+	(function(){
+
+		$("form[name='pocontact']").on("submit", function(e){
+			e.preventDefault();
+			form_data = $(this).serialize();
+			// console.log($(this).attr('action'));
+			$.ajax({
+				type: "POST",
+				url: $(this).attr('action'),
+				data: form_data,
+				success: function(rdata) {
+					console.log(rdata);
+	                $( "button.close-modal" ).trigger( "click" );
+	                // var em = "<li> mamun@gmali.com</li>";
+	                var extraContactPlaceHolder = $("#contact_emails");
+	                var contacts = extraContactPlaceHolder.find("tr");
+	                var header = "<tr class='bg-primary'><td>Email Type</td><td>Email Address</td><td>Action</td></tr>";
+	                
+	                
+	                if (contacts.length > 0) {
+	                	extraContactPlaceHolder.append(rdata);
+					} else {
+						extraContactPlaceHolder.html(header);
+						extraContactPlaceHolder.append(rdata);
+					}
+	                
+	                // window.location.reload(false);
+	                // win = window.open("",'_blank');
+	                // win.location.href = "/contacts/edit/" + rdata + "/";
+
+	            }
+			});
+
+		});
+
+		
+
+	})(jQuery)
+
+</script>

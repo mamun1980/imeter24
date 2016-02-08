@@ -1,38 +1,332 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container shadow4 main-body" ng-app="contactApp">
-<section class="row ">
-	
-	<div class="col-md-6 col-md-offset-3">
+<style type="text/css">
+.contact_list {
+	position: relative;
+}
+table#contact_details, table#ship_to_contact_details, table#customer_broker_contact_details {
+	margin-top: 10px;
+}
+table#contact_details th, table#ship_to_contact_details th, table#customer_broker_contact_details th{
+	background-color: #83AD9E;
+}
+table > thead {
+	background-color: #333;
+    color: #FF0;
+}
+table > tbody {
+	background-color: #FFF;
+}
+#contact_list thead, #ship_to_contact_list thead, #customer_broker_contact_list thead {
+    background-color: #ed791a;
+    color: #FFF;
+    font-size: 14px;
+}
+#contact_list tbody, #ship_to_contact_list tbody, #customer_broker_contact_list tbody {
+    background-color: #333;
+    color: #FFF;
+}
+#contact_list, #sold_to_contact_list, #items_list, #customer_broker_contact_list, #job_list {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+    width: 980px;
+	background-color: #DDD;
+	z-index: 1000;
+	/*border: 1px solid #000;*/
+	-webkit-box-shadow: 0px 0px 10px 0px rgba(50, 50, 50, 0.75);
+	-moz-box-shadow:    0px 0px 10px 0px rgba(50, 50, 50, 0.75);
+	box-shadow:         0px 0px 10px 0px rgba(50, 50, 50, 0.75);
+}
+
+.contact tbody tr:hover, .ship_to_contact tbody tr:hover, .customer_broker_contact tbody tr:hover {
+	background-color: #616183;
+}
+</style>
+<div class="container-fluid shadow4 main-body" ng-app="contactApp">
+
+<section class="row " ng-controller="ContactController">
+<form name="contact" action="/contacts/add/" method="POST" enctype="multipart/form-data">{% csrf_token %}
+	<div class="col-md-6">
 		<div class="panel panel-primary" ng-controller="ContactController">
 			<div class="panel-heading">
-		    	<h4>ADD CONTACT</h4>
+		    	<h2 style="display:inline;">Add Contact</h2>
 		  	</div>
 		  	<div class="panel-body">
-			  	<form name="contact" action="/contacts/add/" method="POST" enctype="multipart/form-data">{% csrf_token %}
+			  	
 			  	
 			  	{% include "contacts/partials/add-contact-form.html" %}
-				</form>
+				
 			</div>
 		</div>
 	</div>
+
+	<div class="col-md-6">
+		<div class="panel panel-primary" >
+			<div class="panel-heading">
+		    	<h2 style="display:inline;">Contact Phones</h2>
+		    	<a class="btn btn-danger pull-right" ng-click="addContactPhone()">+</a>
+		  	</div>
+		  	<div class="panel-body">
+		  	
+			  	<table class="table bordered" id="contact_phones">
+			  		
+			  	</table>
+			</div>
+		</div>
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h2 style="display:inline;">Contact Emails</h2>
+		    	<a class="btn btn-danger pull-right" ng-click="addContactEmail()">+</a>
+		  	</div>
+		  	<div class="panel-body">
+			  	<table class="table bordered" id="contact_emails">
+			  		
+			  	</table>
+			</div>
+		</div>
+		
+	</div>
+</form>
 </section>
 </div>
 
+{% include "modals/add-modal.html" %}
+
 <script type="text/javascript">
-var contactApp = angular.module("contactApp", [], function ($interpolateProvider) {
-        $interpolateProvider.startSymbol("{[{");
-        $interpolateProvider.endSymbol("}]}");
-});
-contactApp.controller('ContactController',['$scope', '$http', function ($scope, $http) {
-	$scope.init = function(){
+(function(){
+
+
+	var contactApp = angular.module("contactApp", [], function ($interpolateProvider) {
+	        $interpolateProvider.startSymbol("{[{");
+	        $interpolateProvider.endSymbol("}]}");
+	});
+	contactApp.controller('ContactController',['$scope', '$http', function ($scope, $http) {
+		$scope.init = function(){
+	        console.log("Hello world!");
+	        $scope.show_contact_list = false;
+	        $scope.contact_details = false;
+	        
+	        // $scope.gst_tax_exempt = true;
+	    }
+	    $scope.init();
+	    
+	    $scope.hideContactList = function() {
+	    	$scope.show_contact_list = false;
+	    	// $scope.contact_name = '';
+	    }
+
+	    $scope.setContact = function(contact) {
+	    	console.log(contact);
+	    	// $scope.contact_details = true;
+	    	$scope.show_contact_list = false;
+	    	$scope.contact_name = contact.contact_name;
+	    	$("#contact_id").val(contact.id);
+	    	$("#id_attention_to").val(contact.attention_to);
+	    	$("#id_address_1").val(contact.address_1);
+	    	$("#id_address_2").val(contact.address_2);
+	    	$("#id_city").val(contact.city);
+	    	$("#id_province").val(contact.province);
+	    	$("#id_country").val(contact.country);
+	    	$("#id_postal_code").val(contact.postal_code);
+	    	$("#id_webpage").val(contact.webpage);
+	    	if(contact.gst_tax_exempt) {
+	    		$scope.gst_tax_exempt = true;
+	    		$("#id_gst_number").val(contact.gst_number);
+	    	}
+	    	if(contact.hst_tax_exempt) {
+	    		$scope.hst_tax_exempt = true;
+	    		$("#id_hst_number").val(contact.hst_number);
+	    	}
+	    	if(contact.pst_tax_exempt) {
+	    		$scope.pst_tax_exempt = true;
+	    		$("#id_pst_number").val(contact.pst_number);
+	    	}
+	    	$("#id_foreign_account").val(contact.foreign_account);
+	    	
+	    	if(contact.terms){
+	    		$("#id_terms").val(contact.terms.id);	
+	    	}
+	    	
+
+	    	if(contact.shipping_method){
+	    		$("#id_shipping_method").val(contact.shipping_method.id);	
+	    	}
+	    	
+	    	$("#id_ship_collect").val(contact.ship_collect);
+	    	if(contact.currency){
+	    		$("#id_currency").val(contact.currency.id);	
+	    	}
+	    	
+	    	$("#id_fob").val(contact.fob);
+	    	$("#id_ap_contact").val(contact.ap_contact);
+	    	$("#id_bv_ap_account").val(contact.bv_ap_account);
+	    	$("#id_bv_ar_account").val(contact.bv_ar_account);
+
+	    	if(contact.phones.length > 0) {
+	    		var header = "<tr class='bg-primary'><td>Phone Type</td><td>Phone Number</td><td>Phone Ext.</td><td>Action</td></tr>";
+	    		
+	    		$("#contact_phones").html(header);
+
+	    		for(var i=0; i<contact.phones.length; i++){
+	    			var tr = '<tr class="bg-info">';
+	    			tr += "<td>"+contact.phones[i].type+"</td>";
+	    			tr += "<td>"+contact.phones[i].number+"</td>";
+	    			tr += "<td>"+contact.phones[i].ext+"</td>";
+	    			tr += "<td>";
+	    			tr += "<a class='contact-phone-delete' href='#' data-id='"+contact.phones[i].id+"'>delete</a>";
+	    			tr += '<input type="hidden" name="contact_phones" value="'+contact.phones[i].id+'">';
+	    			tr += "</td>";
+	    			tr += "</tr>";
+	    			$("#contact_phones").append(tr);
+	    		}
+	    		
+	    	}
+
+	    	if(contact.emails.length > 0) {
+	    		var header = "<tr class='bg-primary'><td>Email Type</td><td>Email Address</td><td>Action</td></tr>";
+	    		
+	    		$("#contact_emails").html(header);
+
+	    		for(var i=0; i<contact.emails.length; i++){
+	    			var tr = '<tr class="bg-info">';
+	    			tr += "<td>"+contact.emails[i].email_type+"</td>";
+	    			tr += "<td>"+contact.emails[i].email_address+"</td>";
+	    			tr += "<td>";
+	    			tr += "<a class='contact-email-delete' href='#' data-id='"+contact.emails[i].id+"'>delete</a>";
+	    			tr += '<input type="hidden" name="contact_emails" value="'+contact.emails[i].id+'">';
+	    			tr += "</td>";
+	    			tr += "</tr>";
+	    			$("#contact_emails").append(tr);
+	    		}
+	    		
+	    	}
+
+	    };
+
+	    $scope.searchContact = function(name) {
+	    	// console.log(name);
+	    	if(name != undefined){
+		    	if(name.length > 1) {
+		    		var url = "/contacts/search/?q=" + name;
+
+		    		$http({method: 'GET', url: url}).
+		                success(function(data, status, headers, config){
+		                $scope.contacts = data;
+		                if(data.length > 0 ){
+		                	$scope.show_contact_list = true;	
+		                } else {
+		                	$scope.show_contact_list = false;
+		                }
+		                
+		            });
+		            // $("#po_list").show();
+		            
+		    	} else {
+		    		$scope.show_contact_list = false;
+		    	}
+		    }
+	    };
+
+	    $scope.addContactPhone = function() {
+			console.log("testing..");
+			mdal = $('#addModal');
+			var cid = $("#contact_id").val();
+			console.log(cid);
+			url = "/contacts/phone-add/?q="+cid;;
+			mdal.on("shown.bs.modal", function(e){
+				$("#addModal .modal-content").load(url);
+				// $(e.currentTarget).find('#contact_id').val(cid);
+				// console.log(url);
+			}).modal();
+			return false;
+	    };
+
+	    $scope.addContactEmail = function() {
+			console.log("testing..");
+			mdal = $('#addModal');
+			var cid = $("#contact_id").val();
+			console.log(cid);
+			url = "/contacts/email-add/?q="+cid;;
+			mdal.on("shown.bs.modal", function(e){
+				$("#addModal .modal-content").load(url);
+				// $(e.currentTarget).find('#contact_id').val(cid);
+				// console.log(url);
+			}).modal();
+			return false;
+	    };
+
+	    $scope.addDistributionMethod = function() {
+			console.log("testing..");
+			mdal = $('#addModal');
+			var cid = $("#contact_id").val();
+			console.log(cid);
+			url = "/contacts/phone-add/?q="+cid;;
+			mdal.on("shown.bs.modal", function(e){
+				$("#addModal .modal-content").load(url);
+				// $(e.currentTarget).find('#contact_id').val(cid);
+				// console.log(url);
+			}).modal();
+			return false;
+	    };
+
+
+
+	}]);
+
+	$(document).on("click", "a.contact-phone-delete", function(e){
+        e.preventDefault();
         
-    }
-    $scope.init();
+        var row = $(this).closest("tr");
+        row.remove();
+        var cpid = $(this).data("id");
+        if(cpid != ""){
+            var url = "/contacts/phone/delete/";
 
-}]);
+            $.ajax({
+                type: "POST",
+                url: url,
+                
+                data: {
+                    'cpid': cpid,
+                },
+                success: function(rdata) {
 
+                }
+            });    
+        }
+
+        return false;
+        
+    });
+
+    $(document).on("click", "a.contact-email-delete", function(e){
+        e.preventDefault();
+        
+        var row = $(this).closest("tr");
+        row.remove();
+        var cpid = $(this).data("id");
+        if(cpid != ""){
+            var url = "/contacts/email/delete/";
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                
+                data: {
+                    'ceid': cpid,
+                },
+                success: function(rdata) {
+
+                }
+            });    
+        }
+
+        return false;
+        
+    });
+})(jQuery)
 </script>
 {% endblock content %}
 	

@@ -41,15 +41,16 @@ def contact_test(request):
 
 
 def autocomplete(request):
+    # import pdb; pdb.set_trace();
     query = request.GET.get('q', '')
     if request.GET.get('q'):
-        sqs = SearchQuerySet().using('default').filter(content=query)[:10]
+        contacts = SearchQuerySet().using('default').filter(content=AutoQuery(query))[:10]
     else:
-        sqs = SearchQuerySet().using('default').filter(content=query)[:10]
+        contacts = SearchQuerySet().using('default').all()[:10]
         
     suggestions = []
     
-    for con in sqs:
+    for con in contacts:
         if con is not None:
             contact_dict = {}
             contact_dict['id'] = con.pk
@@ -102,7 +103,26 @@ def search_contact(request):
                 contact_dict['province'] = con.province
                 contact_dict['country'] = con.country
                 contact_dict['postal_code'] = con.postal_code
+                contact_dict['hst_tax_exempt'] = con.hst_tax_exempt
+                contact_dict['hst_number'] = con.hst_number
+                contact_dict['pst_tax_exempt'] = con.pst_tax_exempt
+                contact_dict['pst_number'] = con.pst_number
+                contact_dict['gst_tax_exempt'] = con.gst_tax_exempt
+                contact_dict['gst_number'] = con.gst_number
+
+                contact_dict['webpage'] = con.webpage
+                contact_dict['foreign_account'] = con.foreign_account
+                contact_dict['mail_list'] = con.mail_list
+                contact_dict['ship_collect'] = con.ship_collect
+                contact_dict['fob'] = con.fob
+                contact_dict['ap_contact'] = con.ap_contact
+                contact_dict['bv_ap_account'] = con.bv_ap_account
+                contact_dict['bv_ar_account'] = con.bv_ar_account
                 # contact_dict['search_string'] = con.search_string
+                contact_dict['temrs'] = con.terms
+                contact_dict['currency'] = con.currency
+                contact_dict['shipping_method'] = con.shipping_method
+
                 contact_dict['phones'] = con.phones
                 contact_dict['emails'] = con.emails
 
@@ -208,8 +228,68 @@ def sc_contact_view(request, cid):
 @login_required
 @permission_required('contacts.add_contact')
 @csrf_exempt
+def contact_add_update (request):
+    payment_terms = PaymentTerm.objects.all()
+    shipping_methods = DeliveryChoice.objects.all()
+    currencies = Currency.objects.all()
+
+    if request.method == 'POST':
+        # import pdb; pdb.set_trace();
+        cid = request.POST.get("contact_id", "")
+        if cid:
+            con = Contact.objects.get(id=cid)
+            contact_form = ContactForm(request.POST, instance=con)
+        else:
+            contact_form = ContactForm(request.POST)
+               
+
+        if contact_form.is_valid():
+            try:
+                contact = contact_form.save()
+
+                phones = request.POST.getlist("contact_phones", "")
+                emails = request.POST.getlist("contact_emails", "")
+                distribution_methods = request.POST.getlist("distribution_methods", "")
+                
+                if phones:
+                    for ph in phones:
+                        pc = ContactPhone.objects.get(id=ph)
+                        pc.contact = contact
+                        pc.save()
+
+
+                if emails:
+                    for em in emails:
+                        ce = ContactEmailAddress.objects.get(id=em)
+                        ce.contact = contact
+                        ce.save()
+
+                contact.save();
+
+                messages.info(request, "Contact added successfully.")
+                return HttpResponseRedirect("/contacts/")    
+            except Exception, e:
+                messages.error(request, "An error occured. Please check log.")
+                return HttpResponseRedirect("/contacts/add/")
+        else:
+            contact_form = ContactForm(request.POST)
+            return render_to_response("contacts/add-contact.html", 
+                {'contact_form': contact_form, 'page_title': 'Add Contact', 'currencies': currencies, 
+            'shipping_methods': shipping_methods, 'payment_terms': payment_terms})
+    else:
+        return render_to_response("contacts/add-contact.html", 
+            {'page_title': 'Add Contact', 'currencies': currencies, 
+            'shipping_methods': shipping_methods, 'payment_terms': payment_terms})
+            
+
+
+
+@login_required
+@permission_required('contacts.add_contact')
+@csrf_exempt
 def sc_contact_add(request):
     if request.method == "POST":
+        # import pdb; pdb.set_trace();
         CForm = ContactForm(request.POST)
         if CForm.is_valid():
             try:
@@ -439,8 +519,44 @@ def contact_phone_add(request):
         profile.save()
         
         return render_to_response("contacts/partials/contact-phone-item-partial.html",
-            {"contact_phone": contact_phone},
-            context_instance=RequestContext(request))
+            {"contact_phone": contact_phone},context_instance=RequestContext(request))
+    else:
+        return render_to_response("contacts/partials/contact-phone-add-form.html",
+            {},context_instance=RequestContext(request))
+
+
+@login_required
+@csrf_exempt
+def contact_phoneadd(request):
+
+    if request.method == 'POST':
+        # import pdb; pdb.set_trace();
+        phone_type_id = request.POST.get("phone_type")
+        phone_type = PhoneType.objects.get(id=phone_type_id)
+        phone = request.POST.get("phone_number")
+        phone_ext = request.POST.get("phone_ext")
+        cid = request.POST.get("contact_id", "")
+        
+        if cid:
+            profile = Contact.objects.get(id=cid)
+            contact_phone = ContactPhone(contact=profile,phone_type=phone_type, phone=phone, phone_ext=phone_ext)
+            profile.save()
+        else:
+            contact_phone = ContactPhone(phone_type=phone_type, phone=phone, phone_ext=phone_ext)
+        
+        contact_phone.save()
+        
+
+        
+        return render_to_response("contacts/partials/contact-phone-row.html",
+            {"contact_phone": contact_phone},context_instance=RequestContext(request))
+    else:
+        phone_types = PhoneType.objects.all()
+        cid = request.GET.get("q", "")
+        return render_to_response("contacts/partials/contact-phone-add-form.html",
+            {'phone_types': phone_types, 'cid': cid},context_instance=RequestContext(request))
+
+
 
 @login_required
 @csrf_exempt
@@ -604,6 +720,40 @@ def contact_email_add(request):
         return render_to_response("contacts/partials/email-item-tmpl.html", {"contact_email": contact_email_address},
             context_instance=RequestContext(request))
 
+
+
+@login_required
+@csrf_exempt
+@permission_required("contacts.add_contactemailaddress")
+def contact_emailadd(request):
+    if request.method == "POST":
+        # import pdb; pdb.set_trace();
+        cid = request.POST.get("cid")
+        etype_id = request.POST.get("email_type")
+        email_add = request.POST.get("email_address")
+        email_type = EmailAddressType.objects.get(id=etype_id)
+
+        if cid:
+            contact = Contact.objects.get(id=cid)
+            contact_email_address = ContactEmailAddress(contact=contact, email_address_type=email_type, email_address=email_add)
+            contact_email_address.save()
+            contact.save()
+        else:
+            contact_email_address = ContactEmailAddress(email_address_type=email_type, email_address=email_add)
+            contact_email_address.save()
+
+        
+        
+        return render_to_response("contacts/partials/email-item-tmpl.html", 
+            {"contact_email": contact_email_address},
+            context_instance=RequestContext(request))
+    else:
+        etypes = EmailAddressType.objects.all()
+        return render_to_response("contacts/partials/contact-email-add-form.html", 
+            {"etypes": etypes},
+            context_instance=RequestContext(request))
+
+
 @login_required
 @csrf_exempt
 @permission_required("contacts.change_contactemailaddress")
@@ -637,7 +787,7 @@ def contact_email_edit(request, eid):
 def sc_email_delete(request):
 
     if request.method == 'POST':
-        email_id = request.POST.get("email_id")
+        email_id = request.POST.get("ceid")
         email = ContactEmailAddress.objects.get(id=email_id)
         contact = email.contact
         try:
@@ -672,7 +822,7 @@ def sc_phone_delete(request):
     if request.method == 'POST':
         # import pdb; pdb.set_trace()
         
-        phone_id = request.POST.get("phone_id")
+        phone_id = request.POST.get("cpid")
         phone = ContactPhone.objects.get(id=phone_id)
         try:
             contact = phone.contact

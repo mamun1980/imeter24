@@ -14,7 +14,9 @@ urlpatterns = patterns('',
 
     url(r'^add/rel/$', 'contacts.views.sc_contact_add_rel', name='sc-contact-add'),
     url(r'^add/rel_item/$', 'contacts.views.sc_contact_add_rel_item', name='sc-contact-add-item'),
-    url(r'^add/$', 'contacts.views.sc_contact_add', name='sc-contact-add'),
+    
+    url(r'^add/$', 'contacts.views.contact_add_update', name='contact-add-update'),
+
     url(r'^edit/(?P<pk>\d+)/$', 'contacts.views.contact_edit', name='sc-contact-edit'),
     url(r'^edit/basic/(?P<pk>\d+)/$', 'contacts.views.contact_edit_basic', name='sc-contact-edit-basic'),
     url(r'^get-contact/(?P<pk>\d+)/$', 'contacts.views.get_contact', name='get-contact'),
@@ -32,6 +34,7 @@ urlpatterns = patterns('',
     # url(r'^update/$', 'contacts.views.sc_update', name='sc-update'),
     
     url(r'^phone/$', 'contacts.views.sc_phone_list', name='sc-phone-list'),
+    url(r'^phone-add/$', 'contacts.views.contact_phoneadd', name='sc-phone-add-ajax'),
     url(r'^phone/add/$', 'contacts.views.contact_phone_add', name='sc-phone-add-ajax'),
     url(r'^phone/edit/(?P<pid>\d+)/$', 'contacts.views.contact_phone_edit', name='sc-phone-edit'),
     url(r'^phone/delete/$', 'contacts.views.sc_phone_delete', name='sc-phone-delete'),
@@ -43,6 +46,7 @@ urlpatterns = patterns('',
     url(r'^term/delete/$', 'contacts.views.term_delete', name='sc-term-delete-ajax'),
 
     url(r'^email/add/$', 'contacts.views.contact_email_add', name='sc-email-add-ajax'),
+    url(r'^email-add/$', 'contacts.views.contact_emailadd', name='sc-emailadd-ajax'),
     url(r'^email/edit/(?P<eid>\d+)/$', 'contacts.views.contact_email_edit', name='sc-email-edit'),
     url(r'^email/delete/$', 'contacts.views.sc_email_delete', name='sc-email-delete'),
 

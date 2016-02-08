@@ -86,22 +86,7 @@ class Contact(models.Model):
 	country           = models.CharField(max_length=40, verbose_name='Country', null=True, blank=False, default="Canada")
 	postal_code       = models.CharField(max_length=15, verbose_name='Postal Code or ZIP', null=True, blank=True)
 	webpage           = models.URLField(max_length=200, null=True, blank=True)
-	search_string 	  = models.TextField(null=True, blank=True, verbose_name='Search String')
 
-	class Meta:
-		verbose_name = "Contact"
-		verbose_name_plural = "Contacts"
-
-		permissions = (
-    		('view_contact', 'Can View Contact'),
-    	)
-
-	def __unicode__(self):
-		return self.contact_name
-
-
-class ContactProfile(models.Model):	
-	contact           = models.OneToOneField(Contact,  null=False, on_delete=models.CASCADE)
 	gst_number        = models.CharField(max_length=17, verbose_name='GST number', null=True, blank=True)
 	gst_tax_exempt    = models.BooleanField(verbose_name='GST Tax Exempt?', blank=False, default=False)
 	hst_number        = models.CharField(max_length=17, verbose_name='HST number', null=True, blank=True)
@@ -125,15 +110,17 @@ class ContactProfile(models.Model):
 	last_activity     = models.DateTimeField(auto_now=True, blank=True)
 
 	class Meta:
-		verbose_name = "ContactProfile"
-		verbose_name_plural = "ContactProfiles"
+		verbose_name = "Contact"
+		verbose_name_plural = "Contacts"
 
 		permissions = (
-    		('view_contactprofile', 'Can View Contact Profile'),
+    		('view_contact', 'Can View Contact'),
     	)
 
 	def __unicode__(self):
-		return self.contact.contact_name + "'s profile"
+		return self.contact_name
+
+
 
 class PhoneType(models.Model):
 	phone_type = models.CharField(max_length=15, verbose_name='Phone Type', null=True, blank=True)
