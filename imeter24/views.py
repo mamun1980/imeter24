@@ -273,7 +273,7 @@ def update_group(request):
 
 @login_required
 def dashboard(request):
-
+    # import pdb; pdb.set_trace();
     return render_to_response("base/dashboard.html", 
         {'page_title': 'Dashboard' },
 

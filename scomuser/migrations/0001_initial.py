@@ -39,6 +39,16 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal(u'scomuser', ['Department'])
 
+        # Adding model 'UserReport'
+        db.create_table(u'scomuser_userreport', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, blank=True)),
+            ('report_type', self.gf('django.db.models.fields.CharField')(max_length=50)),
+            ('report_fax', self.gf('django.db.models.fields.CharField')(max_length=50, null=True, blank=True)),
+            ('report_email', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
+        ))
+        db.send_create_signal(u'scomuser', ['UserReport'])
+
         # Adding model 'PayType'
         db.create_table(u'scomuser_paytype', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
@@ -82,6 +92,9 @@ class Migration(SchemaMigration):
 
         # Deleting model 'Department'
         db.delete_table(u'scomuser_department')
+
+        # Deleting model 'UserReport'
+        db.delete_table(u'scomuser_userreport')
 
         # Deleting model 'PayType'
         db.delete_table(u'scomuser_paytype')
@@ -186,6 +199,14 @@ class Migration(SchemaMigration):
             'province': ('django.db.models.fields.CharField', [], {'max_length': '30', 'null': 'True', 'blank': 'True'}),
             'search_string': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['auth.User']", 'unique': 'True'})
+        },
+        u'scomuser.userreport': {
+            'Meta': {'object_name': 'UserReport'},
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'report_email': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'report_fax': ('django.db.models.fields.CharField', [], {'max_length': '50', 'null': 'True', 'blank': 'True'}),
+            'report_type': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'null': 'True', 'blank': 'True'})
         }
     }
 

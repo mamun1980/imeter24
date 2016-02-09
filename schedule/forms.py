@@ -1,9 +1,8 @@
 from django import forms
 from schedule.models import *
 from schedule.choices import *
-from schedule.lookups import JobLookup
-import selectable
-from premierelevator.models import SystemVariable
+
+from imeter24.models import SystemVariable
 # from schedule.custom_field import MultiEmailField
 from django.core.validators import validate_email
 from datetime import datetime
@@ -303,16 +302,6 @@ class JobEditForm(JobForm):
     pass
 
 
-# =========== Lookup forms
-
-class JobLookupForm(forms.Form):
-    autocomplete = forms.CharField(
-          label='Type for auto suggession',
-          widget=selectable.forms.AutoCompleteWidget(JobLookup, 
-          attrs={"class": "form-control", 'placeholder': "Filter jobs by address, customer and description", 'name': 'job-autocomplete-filter'}),
-          required=False,
-
-      )
 
 class JobControlForm(forms.ModelForm):
     class Meta:

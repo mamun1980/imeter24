@@ -3,7 +3,7 @@ from django.http import HttpRequest, HttpResponseRedirect, HttpResponse
 from django.contrib import messages
 from purchase.forms import *
 from purchase.models import *
-from premierelevator.models import SystemVariable
+from imeter24.models import SystemVariable
 # Create your views here.
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.contrib.auth.decorators import login_required
@@ -13,7 +13,7 @@ from decimal import Decimal
 import datetime
 from django.template.loader import get_template, render_to_string
 from django.template import Context
-import ho.pisa as pisa
+
 import cStringIO as StringIO
 import logging
 import sys

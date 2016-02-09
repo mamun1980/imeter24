@@ -2,7 +2,7 @@ from django import forms
 from purchase.models import *
 from purchase.choices import *
 from contacts.models import *
-from premierelevator.models import SystemVariable
+from imeter24.models import SystemVariable
 import datetime
 import re
 

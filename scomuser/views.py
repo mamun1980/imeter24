@@ -374,11 +374,7 @@ def sc_login(request):
         
         user = auth.authenticate(username=username, password=password)
         if user is not None:
-            if user.is_active and not user.is_staff:
-                auth.login(request, user)
-                return HttpResponseRedirect("/dashboard/")
-
-            elif user.is_active and user.is_staff:
+            if user.is_active and user.is_staff:
                 auth.login(request, user)
                 return HttpResponseRedirect("/dashboard/")
 

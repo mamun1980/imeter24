@@ -30,15 +30,15 @@ urlpatterns = patterns('',
     url(r'^group/update/$', 'imeter24.views.update_group', name='update-group'),
     url(r'^scomuser/', include('scomuser.urls')),
     url(r'^contacts/', include('contacts.urls')),
-    url(r'^inventory/', include('inventory.urls')),
-    url(r'^report/', include('report.urls')),
-    url(r'^events/', include('events.urls')),
-    url(r'^purchase/', include('purchase.urls')),
+    # url(r'^inventory/', include('inventory.urls')),
+    # url(r'^report/', include('report.urls')),
+    # url(r'^events/', include('events.urls')),
+    # url(r'^purchase/', include('purchase.urls')),
 
     url(r'^controllers/', include('controllers.urls')),
 
 
-    url(r'^schedule/', include('schedule.urls')),
+    # url(r'^schedule/', include('schedule.urls')),
 
     url(r'^statics/(?P<path>.*)$', 'django.views.static.serve',
          {'document_root': settings.STATIC_ROOT}),

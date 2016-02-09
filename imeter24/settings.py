@@ -47,6 +47,14 @@ PROJECT_HTTP = 'http://www.imeter24.com/'
 #Project Link (without http) - Used for cache setup etc
 PROJECT_LINK = 'www.imeter24.com'
 
+CACHE_MIDDLEWARE_SECONDS = 300
+SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
+SESSION_SAVE_EVERY_REQUEST = True
+CACHE_MIDDLEWARE_KEY_PREFIX = 'IMETER24'
+
+SESSION_COOKIE_AGE = 60 * 60
+SESSION_COOKIE_DOMAIN = '%s' %PROJECT_LINK
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 
 # Application definition
@@ -61,8 +69,8 @@ INSTALLED_APPS = (
     # 'imeter24',
     'contacts',
     'controllers',
-    # 'scomuser',
-    # 'report',
+    'scomuser',
+    'report',
     # 'schedule',
     # 'inventory',
     # 'events',
@@ -130,6 +138,10 @@ USE_TZ = True
 MEDIA_ROOT = PROJECT_BASE_DIR+ '/media/'
 
 MEDIA_URL = ''
+
+
+SESSION_COOKIE_AGE = 60 * 60
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
