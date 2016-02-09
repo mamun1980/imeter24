@@ -33,6 +33,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     # 'imeter24',
     'contacts',
+    'controllers',
     # 'scomuser',
     # 'report',
     # 'schedule',
