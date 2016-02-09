@@ -38,6 +38,10 @@
 </head>
 <body>
 
+{% block logo %}
+	{% include "logo.html" %}
+{% endblock logo %}
+
 {% block top-navigation %}
 	{% include "base/top-nav.html" %}
 {% endblock %}
