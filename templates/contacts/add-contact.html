@@ -49,9 +49,9 @@ table > tbody {
 <section class="row " ng-controller="ContactController">
 <form name="contact" action="/contacts/add/" method="POST" enctype="multipart/form-data">{% csrf_token %}
 	<div class="col-md-6">
-		<div class="panel panel-primary" ng-controller="ContactController">
+		<div class="panel panel-primary">
 			<div class="panel-heading">
-		    	<h2 style="display:inline;">Add Contact</h2>
+		    	<h2 style="display:inline;font-family: 'Courgette', cursive;">Add Contact</h2>
 		  	</div>
 		  	<div class="panel-body">
 			  	
@@ -65,7 +65,7 @@ table > tbody {
 	<div class="col-md-6">
 		<div class="panel panel-primary" >
 			<div class="panel-heading">
-		    	<h2 style="display:inline;">Contact Phones</h2>
+		    	<h2 style="display:inline;font-family: 'Courgette', cursive;">Contact Phones</h2>
 		    	<a class="btn btn-danger pull-right" ng-click="addContactPhone()">+</a>
 		  	</div>
 		  	<div class="panel-body">
@@ -77,7 +77,7 @@ table > tbody {
 		</div>
 		<div class="panel panel-primary">
 			<div class="panel-heading">
-		    	<h2 style="display:inline;">Contact Emails</h2>
+		    	<h2 style="display:inline;font-family: 'Courgette', cursive;">Contact Emails</h2>
 		    	<a class="btn btn-danger pull-right" ng-click="addContactEmail()">+</a>
 		  	</div>
 		  	<div class="panel-body">

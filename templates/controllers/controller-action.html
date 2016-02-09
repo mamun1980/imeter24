@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}{{site_name}}{% endblock title %}
+
+{% block content %}
+<div class="container main-body shadow4">
+	
+	<div class="row">
+	    <div class="col-md-6 col-md-offset-3">
+	    <div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h2 style="display:inline;font-family: 'Courgette', cursive;">Controller</h2>
+		    	
+		  	</div>
+		  	<div class="panel-body">
+			  	<table class="table bordered">
+			    	<tbody>
+			    		<tr>
+			    			<td>Controller ID</td>
+			    			<td>
+			    				<input type="text" class="form-control" name="controllerid">
+			    			</td>
+			    		</tr>
+			    		<tr>
+			    			<td>Relay ID</td>
+			    			<td>
+			    				<input type="text" class="form-control" name="relayid">
+			    			</td>
+			    		</tr>
+			    		<tr>
+			    			<td>Status</td>
+			    			<td>
+			    				<input type="text" class="form-control" name="status">
+			    			</td>
+			    		</tr>
+			    		<tr>
+			    			<td colspan="2">
+			    				<button class="btn btn-primary">Add Controller</button>
+			    			</td>
+			    		</tr>
+			    	</tbody>
+			    	
+			    </table>
+			</div>
+		</div>
+		    
+		</div>
+
+	</div>
+		
+</div>
+
+{% endblock content %}

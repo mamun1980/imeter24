@@ -226,7 +226,6 @@ def sc_contact_view(request, cid):
         context_instance=RequestContext(request))
 
 @login_required
-@permission_required('contacts.add_contact')
 @csrf_exempt
 def contact_add_update (request):
     payment_terms = PaymentTerm.objects.all()
@@ -256,7 +255,6 @@ def contact_add_update (request):
                         pc = ContactPhone.objects.get(id=ph)
                         pc.contact = contact
                         pc.save()
-
 
                 if emails:
                     for em in emails:

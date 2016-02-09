@@ -34,6 +34,7 @@ urlpatterns = patterns('',
     url(r'^report/', include('report.urls')),
     url(r'^events/', include('events.urls')),
     url(r'^purchase/', include('purchase.urls')),
+    url(r'^controllers/', include('controllers.urls')),
 
     url(r'^schedule/', include('schedule.urls')),
 

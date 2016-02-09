@@ -14,132 +14,137 @@
 			<ul class="nav navbar-nav">
 				<li class="active"><a href="/">Home</a></li>
 
-				{% if user.is_authenticated %}
-					{% if perms.contacts.view_contact %}
-						<li class="dropdown">
-						<a href="/contacts/add/" class="dropdown-toggle" data-toggle="dropdown">Contact <b class="caret"></b></a>
-						<ul class="dropdown-menu">
-							{% if perms.contacts.add_contact %}
-								<li><a href="/contacts/add/">Add Contact</a></li>
-							{% endif %}						
-							<li><a href="/contacts/">Contact List</a></li>
+				
+				<li class="dropdown">
+					<a href="/contacts/add/" class="dropdown-toggle" data-toggle="dropdown">Contact <b class="caret"></b></a>
+					<ul class="dropdown-menu">
+						
+						<li><a href="/contacts/add/">Add Contact</a></li>
+						
+						<li><a href="/contacts/">Contact List</a></li>
 
-							{% if perms.contacts.view_contacttype %}
-								<li class="divider"></li>
-								<li class="dropdown-submenu">
-								<a href="/contacts/contact-type/">Contact Type</a>
-									<ul class="dropdown-menu">
-										{% if perms.contacts.add_contacttype %}
-										<li>
-											<a href="/contacts/contact-type/add/">
-												Add Contact Type
-											</a>
-										</li>
-										{% endif %}
-										<li>
-											<a href="/contacts/contact-type/">
-												Contact Type List
-											</a>
-										</li>
-										
-									</ul>
+						<li class="divider"></li>
+						<li class="dropdown-submenu">
+							<a href="/contacts/contact-type/">Contact Type</a>
+							<ul class="dropdown-menu">
+								
+								<li>
+									<a href="/contacts/contact-type/add/">
+										Add Contact Type
+									</a>
 								</li>
-							{% endif %}
-
-							{% if perms.contacts.view_paymentterm %}
-								<li class="divider"></li>
-								<li class="dropdown-submenu">
-								<a href="/contacts/terms/">Payment Terms</a>
-									<ul class="dropdown-menu">
-										{% if perms.contacts.add_paymentterm %}
-										<li><a href="/contacts/term/add/">Add Terms</a></li>
-										{% endif %}
-										<li><a href="/contacts/terms/">Term List</a></li>
-										
-									</ul>
+								
+								<li>
+									<a href="/contacts/contact-type/">
+										Contact Type List
+									</a>
 								</li>
-							{% endif %}
-
-							{% if perms.contacts.view_emailtype %}
-								<li class="divider"></li>
-								<li class="dropdown-submenu">
-								<a href="/contacts/email-type/">Email Types</a>
-									<ul class="dropdown-menu">
-										{% if perms.contacts.add_emailtype %}
-										<li><a href="/contacts/email-type/add/">Add Email Type</a></li>
-										{% endif %}
-										<li><a href="/contacts/email-type/">Email Type List</a></li>
-										
-									</ul>
-								</li>
-							{% endif %}
-
-							{% if perms.contacts.view_deliverychoice %}
-								<li class="divider"></li>
-								<li class="dropdown-submenu">
-								<a href="/contacts/delivery-choice/">Shippling Method</a>
-									<ul class="dropdown-menu">
-										
-										<li><a href="/contacts/delivery-choice/">Shippling Method List</a></li>
-										
-									</ul>
-								</li>
-							{% endif %}
-
-							{% if perms.contacts.view_distributionmethod %}
-								<li class="divider"></li>
-								<li class="dropdown-submenu">
-								<a href="/contacts/distribution-method/">Distribution Method</a>
-									<ul class="dropdown-menu">
-										{% if perms.contacts.add_distributionmethod %}
-										<li>
-											<a href="/contacts/distribution-method/add/">
-												Add Distribution Method
-											</a>
-										</li>
-										{% endif %}
-										<li>
-											<a href="/contacts/distribution-method/">
-												Distribution Method List
-											</a>
-										</li>
-										
-									</ul>
-								</li>
-							{% endif %}
-
-
-							{% if perms.contacts.view_currency %}
-								<li class="divider"></li>
-								<li class="dropdown-submenu">
-								<a href="/contacts/currency/">Currency</a>
-									<ul class="dropdown-menu">
-										{% if perms.contacts.add_currency %}
-										<li><a href="/contacts/currency/add/">Add Currency</a></li>
-										{% endif %}
-										<li><a href="/contacts/currency/">Currency List</a></li>
-										
-									</ul>
-								</li>
-							{% endif %}
-
-							{% if perms.contacts.view_phonetype %}
-								<li class="divider"></li>
-								<li class="dropdown-submenu">
-								<a href="/contacts/phone-type/">Phone Type</a>
-									<ul class="dropdown-menu">
-										{% if perms.contacts.add_currency %}
-										<li><a href="/contacts/phone-type/add/">Add Phone Type</a></li>
-										{% endif %}
-										<li><a href="/contacts/phone-type/">Phone Type List</a></li>
-										
-									</ul>
-								</li>
-							{% endif %}
-							
-						</ul>
+								
+							</ul>
 						</li>
-					{% endif %}
+						
+						<li class="divider"></li>
+						<li class="dropdown-submenu">
+							<a href="/contacts/terms/">Payment Terms</a>
+							<ul class="dropdown-menu">
+								
+								<li><a href="/contacts/term/add/">Add Terms</a></li>
+								
+								<li><a href="/contacts/terms/">Term List</a></li>
+								
+							</ul>
+						</li>
+						
+
+						
+						<li class="divider"></li>
+						<li class="dropdown-submenu">
+							<a href="/contacts/email-type/">Email Types</a>
+							<ul class="dropdown-menu">
+								
+								<li><a href="/contacts/email-type/add/">Add Email Type</a></li>
+								
+								<li><a href="/contacts/email-type/">Email Type List</a></li>
+								
+							</ul>
+						</li>
+						
+
+					
+						<li class="divider"></li>
+						<li class="dropdown-submenu">
+							<a href="/contacts/delivery-choice/">Shippling Method</a>
+							<ul class="dropdown-menu">
+								
+								<li><a href="/contacts/delivery-choice/">Shippling Method List</a></li>
+								
+							</ul>
+						</li>
+					
+
+					
+						<li class="divider"></li>
+						<li class="dropdown-submenu">
+							<a href="/contacts/distribution-method/">Distribution Method</a>
+							<ul class="dropdown-menu">
+								
+								<li>
+									<a href="/contacts/distribution-method/add/">
+										Add Distribution Method
+									</a>
+								</li>
+								
+								<li>
+									<a href="/contacts/distribution-method/">
+										Distribution Method List
+									</a>
+								</li>
+								
+							</ul>
+						</li>
+					
+
+
+						
+						<li class="divider"></li>
+						<li class="dropdown-submenu">
+							<a href="/contacts/currency/">Currency</a>
+							<ul class="dropdown-menu">
+								
+								<li><a href="/contacts/currency/add/">Add Currency</a></li>
+							
+								<li><a href="/contacts/currency/">Currency List</a></li>
+								
+							</ul>
+						</li>
+						
+
+						
+						<li class="divider"></li>
+						<li class="dropdown-submenu">
+						<a href="/contacts/phone-type/">Phone Type</a>
+							<ul class="dropdown-menu">
+								
+								<li><a href="/contacts/phone-type/add/">Add Phone Type</a></li>
+								
+								<li><a href="/contacts/phone-type/">Phone Type List</a></li>
+								
+							</ul>
+						</li>
+						
+						
+						</ul>
+				</li>
+				<li class="dropdown">
+					<a href="/controllers/" class="dropdown-toggle" data-toggle="dropdown">Controllers <b class="caret"></b></a>
+					<ul class="dropdown-menu">
+						<li>
+							<li><a href="/controllers/add/">Add Controller</a></li>
+						</li>
+					</ul>
+					
+				</li>
+				
 
 					{% if perms.inventory.view_item %}
 						<li class="dropdown">
@@ -506,8 +511,6 @@
 							</ul>
 						</li>
 					{% endif %}
-
-				{% endif %}
 
 			</ul>
 
