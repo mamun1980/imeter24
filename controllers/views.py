@@ -10,4 +10,5 @@ class ControllerFormAction(TemplateView):
 	def get(self, request):
 		return render(request, self.template_name, {})
 		
-class ControllerList(ListView)
+class ControllerList(ListView):
+	pass
