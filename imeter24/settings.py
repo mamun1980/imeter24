@@ -127,7 +127,7 @@ USE_L10N = True
 USE_TZ = True
 
 
-MEDIA_ROOT = '/home/mamun/django/imeter24/media'
+MEDIA_ROOT = PROJECT_BASE_DIR+ '/media/'
 
 MEDIA_URL = ''
 
