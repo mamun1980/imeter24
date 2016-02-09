@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style type="text/css">
+#supplier-contact {
+	width: 400px;
+	border: 2px solid black;
+	background-color: #FFF;
+	height: auto;
+}
+.list {
+	margin-top: 10px;
+}
+
+</style>
+<div class="container-fluid shadow4 main-body" ng-app="premierApp" ng-controller='SLListController'>
+<section class="row">
+	<div class="col-md-6">
+		<input type='text' class="form-control" ng-model="search" placeholder="Filter SL" ng-change="searchSL(search)">
+	</div>
+</section>
+<section class="row list" >
+	<div class="col-md-12">
+		
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Shipping List</h4>
+		  	</div>
+		  	
+				<table class='table table-bordered table-striped'>
+					<thead>
+						<tr class='info'>
+							<th>SL Number</th>
+							<th>Sold To</th>
+							<th>Ship To</th>
+							<th>Ordered Date</th>
+							<th>Job Number</th>
+							<th>Customer PO Number</th>
+							<th>Customer Job Number</th>
+							
+							<th width='220'>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="sl in shipping_list | filter:status">
+							<td>{[{ sl.sl_number }]}</td>
+							<td>
+								<p><b>{[{ sl.sold_to.contact_name }]}</b></p>
+								<div class="bg-info" ng-show="sl.sold_to.phones.length">
+									<p ng-repeat="ph in sl.sold_to.phones">
+
+										({[{ ph.type }]}): {[{ ph.number }]}-{[{ ph.ext }]}
+									</p>
+								</div>
+								<div class="bg-warning">
+									<p ng-repeat="em in sl.sold_to.emails">
+										{[{ em.email_address_type }]}: {[{ em.email_address }]}
+									</p>
+								</div>
+							</td>
+							<td>
+								<p><b>{[{ sl.ship_to.contact_name }]}</b></p>
+								<div class="bg-info">
+									<p ng-repeat="ph in sl.ship_to.phones">
+
+										({[{ ph.type }]}): {[{ ph.number }]}-{[{ ph.ext }]}
+									</p>
+								</div>
+								<div class="bg-warning">
+									<p ng-repeat="em in sl.ship_to.emails">
+										{[{ em.email_address_type }]}: {[{ em.email_address }]}
+									</p>
+								</div>
+							</td>
+							<td>{[{ sl.ordered_date }]}</td>
+							<td>{[{ sl.job_number }]}</td>
+							<td>{[{ sl.customer_po_number }]}</td>
+							<td>{[{ sl.customer_job_number }]}</td>
+							
+							<td width="320">
+							<div class="btn-group btn-group-sm">
+								<a class="btn btn-default" href="/purchase/view-sl/{[{sl.sl_number}]}/">View</a> 
+								<a class="sl-edit btn btn-default" data-slid="{[{sl.sl_number}]}" href="/purchase/edit-sl/{[{sl.sl_number}]}/">Edit</a>
+								<a class="sl-delete btn btn-default" data-slid="{[{sl.sl_number}]}" href="">Delete</a>
+
+								<a class="btn btn-default" data-pid="{[{sl.id}]}" href="/purchase/generate-sl/{[{sl.sl_number}]}/" target="_blank">Generate SL(create pdf)</a>
+							</div>
+							</td>
+						</tr>
+						<tr ng-show="!shipping_list.length">
+							<td colspan="8">No Items</td>
+						</tr>
+						
+					</tbody>
+				</table>
+			
+		</div>
+	</div>
+
+
+</section>
+
+<div id="delete-job-confirm" style="display:none;" title="Do you want to delete?">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;">
+  </span>This will delete the job from your system?</p>
+</div>
+
+{% include "modals/add-modal.html" %}
+
+
+<script type="text/javascript">
+(function(){
+	$(document).on("click","a.sl-delete", function(e){
+		e.preventDefault();
+		id = $(this).data("slid");
+		console.log(id);
+
+		$( "#delete-job-confirm" ).dialog({
+			resizable: false,
+			height:200,
+			modal: true,
+			buttons: {
+				"Delete User": function() {
+									
+					$( this ).dialog( "close" );
+					$.ajax({
+						type: "POST",
+						url: "/purchase/sl-delete/",
+						data: {
+							'sl_id': id,
+						},
+						success: function(rdata) {
+							console.log(rdata);
+							$("a[data-slid='"+rdata+"']").closest("tr").remove();
+						}
+					})
+				},
+				Cancel: function() {
+					$( this ).dialog( "close" );
+				}
+			}
+		});
+
+	});
+})(jQuery)
+</script>
+<script type="text/javascript">
+	premierApp.controller('SLListController',['$scope', '$http', function ($scope, $http) {
+	
+		$scope.init = function() {
+			url = "/purchase/sl/search/"
+			$http({method: 'GET', url: url}).
+	            success(function(data, status, headers, config) {
+	                console.log(data);
+	                // console.log("SL Fetched.");
+	                $scope.shipping_list = data;
+	            });
+
+		};
+
+		$scope.init();
+
+		$scope.searchSL = function(q) {
+			if(q.length > 1) {
+	            url = "/purchase/sl/search/?q=" + q
+	            $http({method: 'GET', url: url}).
+	                success(function(data, status, headers, config) {
+	                    // console.log(data);
+	                    $scope.shipping_list = data;
+	                });            
+	        } else {
+	            url = "/purchase/sl/search/"
+	            $http({method: 'GET', url: url}).
+	                success(function(data, status, headers, config) {
+	                    // console.log(data);
+	                    $scope.shipping_list = data;
+	                });  
+	        }
+		}
+	}]);
+</script>
+{% endblock content %}

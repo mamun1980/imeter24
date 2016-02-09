@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="containerfluid main-body">
+	<div class="row"  style="margin-top: 20px;">
+	    <div class="col-md-8 col-md-offset-2">
+	    	<div class="panel panel-primary">
+				<div class="panel-heading">
+			    	<h6>Group Details ( {{ group.name }} )</h6>
+			  	</div>
+			  	
+			  	<div class="panel-body">
+
+			  		<table class="table">
+			  			<tr>
+			  				<th><b>Users belong to this group</b></th>
+			  				<th><b>Group Permissions</b></th>
+			  			</tr>
+			  			<tr>
+			  				<td>
+			  					<ul class="list-group">
+				  					{% for user in group.user_set.all %}
+				  						<li class="list-group-item">{{user.username}}</li>
+				  					{% endfor %}
+			  					</ul>
+
+			  				</td>
+			  				<td>
+			  					<ul class="list-group">
+				  					{% for perm in group.permissions.all %}
+				  						<li class="list-group-item">{{perm.name}}</li>
+				  					{% endfor %}
+			  					</ul>
+			  				</td>
+			  			</tr>
+
+
+			  		</table>
+
+			  	</div>
+			  	
+			</div>
+	    	
+		</div>
+	</div>
+</div>
+
+
+{% endblock content %}

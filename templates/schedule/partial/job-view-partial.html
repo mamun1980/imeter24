@@ -1,0 +1,96 @@
+<div class="panel panel-primary">
+		<div class="panel-heading">
+	    	<h4>Job details {% if perms.schedule.change_job %} <a href="/schedule/job/edit/{{job.id}}/"><span class="glyphicon glyphicon-edit"></span></a>{% endif %}</h4>
+	  	</div>
+		<div class="panel-body">
+
+<table class="table table-bordered table-hover job">
+	<tr>
+		<th width=40%>Job ID</th>
+		<td>{{job.id}}</td>
+	</tr>
+	<tr>
+		<th>Job Number</th>
+		<td>{{job.job_number}}</td>
+	</tr>
+	<tr>
+		<th>Cab Designation</th>
+		<td>{{job.cab_designation}}</td>
+	</tr>
+	<tr>
+		<th>Date Opened</th>
+		<td>{{job.date_opened}}</td>
+	</tr>
+	<tr>
+		<th>Date Required</th>
+		<td>{{job.date_required}}</td>
+	</tr>
+	<tr>
+		<th>Job Status</th>
+		<td>{{job.status}}</td>
+	</tr>
+
+	<tr>
+		<th>Job Name</th>
+		<td>{{job.job_name}}</td>
+	</tr>
+
+	<tr>
+		<th>Address 1</th>
+		<td>{{job.address_1}}</td>
+	</tr>
+	
+	<tr>
+		<th>Customer</th>
+		<td>{{job.customer}}</td>
+	</tr>
+	<tr>
+		<th>Customer Contact Name</th>
+		<td>{{job.customer_contact_name}}</td>
+	</tr>
+	<tr>
+		<th>Customer Contact Phone Number</th>
+		<td>{{job.customer_contact_phone_number}}</td>
+	</tr>
+	<tr>
+		<th>Contact Email</th>
+		<td>{{job.contact_email}}</td>
+	</tr>
+	<tr>
+		<th>Number of Cabs</th>
+		<td>{{job.number_of_cabs}}</td>
+	</tr>
+	<tr>
+		<th>Description</th>
+		<td>{{job.description}}</td>
+	</tr>
+	<tr>
+		<th>PO Number</th>
+		<td>{{job.po_number}}</td>
+	</tr>
+	<tr>
+		<th>Status Notes</th>
+		<td>{{job.status_notes}}</td>
+	</tr>
+	<tr>
+		<th>Drawing req date</th>
+		<td>{{job.drawing_req_date}}</td>
+	</tr>
+	<tr>
+		<th>Drawing sent to customer date</th>
+		<td>{{job.drawing_sent_to_customer_date}}</td>
+	</tr>
+	<tr>
+		<th>Drawing approved date</th>
+		<td>{{job.drawing_approved_date}}</td>
+	</tr>
+	<tr>
+		<th>Engineer Comments</th>
+		<td>{{job.eng_comment }}</td>
+	</tr>
+
+</table>
+
+
+	</div>
+</div>

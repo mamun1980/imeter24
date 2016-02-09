@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+
+{% block angular %}
+	<script type="text/javascript" src="/statics/js/angular.min.js"></script>
+	<script type="text/javascript" src="/statics/js/angular-route.min.js"></script>	
+{% endblock angular %}
+
+{% block content %}
+<style type="text/css">
+#supplier-contact {
+	width: 400px;
+	border: 2px solid black;
+	background-color: #FFF;
+	height: auto;
+}
+.list {
+	margin-top: 10px;
+}
+
+</style>
+<div class="container-fluid shadow4 main-body" ng-app="premierApp" ng-controller='POListController'>
+<section class="row">
+	<div class="col-md-6">
+		<input type='text' class="form-control" ng-model="search" placeholder="Filter PO">
+	</div>
+	<div class='col-md-3 btn btn-primary btn-lg'>Filter By Status</div>
+	<div class='col-md-3'>
+		<select id='status' class='form-control' ng-model='status'>
+			<option value=''>All</option>
+			<option value='New'>New</option>
+			<option value='Printed / Emailed'>Printed / Emailed</option>
+			<option value='Partial Received'>Partial Received</option>
+			<option value='Received / Completed'>Received / Completed</option>
+			<option value='Accounting Confirmed'>Accounting Confirmed</option>
+			<option value='Closed'>Closed</option>
+			<option value='Canceled'>Canceled</option>
+		</select>
+	</div>
+</section>
+<section class="row list" >
+	<div class="col-md-12">
+		
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Purchase Order List</h4>
+		  	</div>
+		  	
+				<table class='table table-bordered table-striped'>
+					<thead>
+						<tr class='info'>
+							<th>PO Number</th>
+							<th>Date Issued</th>
+							<th>Date Expected</th>
+							<th>Status</th>
+							
+							<th>Supplier</th>
+							<th>items</th>
+							<th>Total PO Amount</th>
+							<th width='280'>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						
+						<tr ng-repeat="po in purchase_orders | filter:search | filter:status | orderBy: '-date_issued'" class="{[{po.status}]}">
+							<td>{[{ po.po_number }]}</td>
+							<td>{[{ po.date_issued }]}</td>
+							<td>{[{ po.date_expected }]}</td>
+							<td>{[{ po.status }]}</td>
+
+							<td><span class="show-contact" data-sid='{[{ po.supplier_id }]}'>{[{ po.supplier }]}</span></td>
+							<td>
+								
+								<li ng-repeat="item in po.items">{[{item.item_number}]} - {[{item.description}]} ({[{item.currency_icon}]} {[{item.sub_total}]} )</li>
+							</td>
+							<td>
+								{[{po.po_currency_icon}]} {[{po.total_po_amount}]}
+							</td>
+							<td>
+								
+								
+								<div class="btn-group btn-group-sm">
+									<a class="btn btn-default" href="/purchase/view/{[{po.po_number}]}/">View</a>
+									<a class="btn btn-default po-delete" data-pid="{[{po.po_number}]}">Delete</a>
+									<a class="btn btn-default po-cancel" data-pid="{[{po.po_number}]}">Cancel</a>
+									<a class="btn btn-default" data-pid="{[{po.po_number}]}" href="/purchase/generate-po/{[{po.po_number}]}/" target="_blank">Gererate PO</a>
+								</div>
+							</td>
+						</tr>
+						<tr ng-show="!purchase_orders.length">
+							<td colspan="8">No Items</td>
+						</tr>
+						
+					</tbody>
+				</table>
+			
+		</div>
+	</div>
+
+
+</section>
+
+<div id="delete-job-confirm" style="display:none;" title="Do you want to delete?">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;">
+  </span>This will delete the po from your system?</p>
+</div>
+
+</div>
+
+<div id='supplier-contact' class="bg-info">
+	
+	
+</div>
+
+{% include "modals/add-modal.html" %}
+
+<script type="text/javascript">
+
+(function(){
+	
+	$("#supplier-contact").hide();
+
+	$(document).on("click", "a.po-generate", function(){
+		console.log("generating po....");
+		var po_id = $(this).data("pid");
+		var url = "/purchase/generate-po/"+po_id+"/";
+		$.ajax({
+			url: url,
+			type: 'GET',
+			success: function(data){
+				console.log("po generated");
+			},
+			error: function(error) {
+				console.log(error);
+			}
+		})
+	});
+
+	$(document).on("hover", "span.show-contact", function(){
+		// e.preventDefault();
+		// alert('hello');
+		var that = $(this)
+		var supplier_id = $(this).data('sid');
+		url = "/contacts/get-contact/hover/"+supplier_id+"/",
+		mdal = $('#supplier-contact').load(url);
+		
+
+		$("#supplier-contact").show().position({
+					my: "left top-1",
+					at: "left bottom",
+					of:that,
+					collision: "fit"
+				});
+		console.log($(this).text());
+	}, function(){
+		$("#supplier-contact").hide();
+
+	});
+	
+	$(document).on("click","a.po-cancel", function(e){
+		e.preventDefault();
+		console.log("This is my world!");
+		var po_id = $(this).data('pid');
+		url = "/purchase/po-status-cancel/"+po_id+"/",
+		mdal = $('#addModal');
+		mdal.on("shown.bs.modal", function(){
+			$("#addModal .modal-content").load(url);
+			// console.log(url);
+		}).modal();
+		return false;
+	})
+
+	$(document).on("click","a.po-delete", function(e){
+		e.preventDefault();
+		id = $(this).data("pid");
+		console.log(id);
+
+		$( "#delete-job-confirm" ).dialog({
+			resizable: false,
+			height:200,
+			modal: true,
+			buttons: {
+				"Delete User": function() {
+									
+					$( this ).dialog( "close" );
+					$.ajax({
+						type: "POST",
+						url: "/purchase/po-delete/",
+						data: {
+							'po_id': id,
+						},
+						success: function(rdata) {
+							console.log(rdata);
+							$("a[data-pid='"+rdata+"']").closest("tr").remove();
+						}
+					})
+				},
+				Cancel: function() {
+					$( this ).dialog( "close" );
+				}
+			}
+		});
+
+	});
+
+})(jQuery)
+
+</script>
+
+<script type="text/javascript">
+	premierApp.controller('POListController',['$scope', '$http', function ($scope, $http) {
+	
+		$scope.init = function() {
+			$http({method: 'GET', url: "/purchase/get-purchase-orders/"}).
+	            success(function(data, status, headers, config) {
+	                // console.log(data);
+	                $scope.purchase_orders = data;
+	            });
+
+		};
+
+		$scope.init();
+	}]);
+</script>
+{% endblock content %}

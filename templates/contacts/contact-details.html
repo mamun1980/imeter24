@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+
+{% block message %}
+{% endblock message %}
+
+{% block content %}
+<style type="text/css">
+.header {
+	margin-bottom: 20px;
+}
+</style>
+<div class="container main-body">
+<section class="row ">
+	<article class="col-md-6">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h3 class="panel-title">Contact Profile Details
+		    	{% if perms.contacts.change_contact %}
+			  		<a href="/contacts/edit/{{ contact.id }}/"> <i class="glyphicon glyphicon-edit"></i></a>
+			  	{% endif %}
+		    	</h3>
+		    	
+		  	</div>
+			<div class="panel-body">
+				<table class="table">
+					<tr>
+						<th>ID</th>
+						<td>{{ contact.id }}</td>
+					</tr>
+					<tr>
+						<th>Contact Name</th>
+						<td>{{ contact.contact_name }}</td>
+					</tr>
+					<tr>
+						<th>Attention To</th>
+						<td>{{ contact.attention_to }}</td>
+					</tr>
+					<tr>
+						<th>Address 1</th>
+						<td>{{ contact.address_1 }}</td>
+					</tr>
+					<tr>
+						<th>Address 2</th>
+						<td>{{ contact.address_2 }}</td>
+					</tr>
+					<tr>
+						<th>City</th>
+						<td>{{ contact.city }}</td>
+					</tr>
+					<tr>
+						<th>Province</th>
+						<td>{{ contact.province }}</td>
+					</tr>
+					<tr>
+						<th>Country</th>
+						<td>{{ contact.country }}</td>
+					</tr>
+					<tr>
+						<th>Postal Code</th>
+						<td>{{ contact.postal_code }}</td>
+					</tr>
+					<tr>
+						<th>Web page</th>
+						<td>{{ contact.webpage }}</td>
+					</tr>
+					<tr>
+						<th>Contact Emails</th>
+						<td>
+							{% for cemail in contact_emails %}
+								<span class="items">{{ cemail.email_address }} ({{ cemail.email_address_type }})</span>
+							{% empty %}
+								<p><span class="items">No email address added</span></p>
+							{% endfor %}
+						</td>
+					</tr>
+					<tr>
+						<th>Contact Phone Numbers</th>
+						<td>
+						
+							{% for cphone in contact_phones %}
+								
+								<span class="items">
+									{{ cphone.phone_type }} : {{ cphone.phone }} ({{ cphone.phone_ext }})
+								</span>
+								
+							{% empty %}
+								<p><span class="items">No contact phone is added</span></p>
+							{% endfor %}
+						
+						</td>
+					</tr>
+					
+					<tr>
+						<th>GST Number</th>
+						<td>{{ contact_profile.gst_number }}</td>
+					</tr>
+					<tr>
+						<th>gst tax exempt</th>
+						<td>{{ contact_profile.gst_tax_exempt }}</td>
+					</tr>
+					<tr>
+						<th>HST Number</th>
+						<td>{{ contact_profile.hst_number }}</td>
+					</tr>
+					<tr>
+						<th>hst tax exempt</th>
+						<td>{{ contact_profile.hst_tax_exempt }}</td>
+					</tr>
+					<tr>
+						<th>PST Number</th>
+						<td>{{ contact_profile.pst_number }}</td>
+					</tr>
+					<tr>
+						<th>pst tax exempt</th>
+						<td>{{ contact_profile.pst_tax_exempt }}</td>
+					</tr>
+					<tr>
+						<th>Payment Terms</th>
+						<td>{{ contact_profile.terms }}</td>
+					</tr>
+					<tr>
+						<th>Shipping Method</th>
+						<td>{{ contact_profile.shipping_method }}</td>
+					</tr>
+					
+					<tr>
+						<th>Distribution Method</th>
+						<td>
+							{% for dm in distribution_methods %}
+								<span class="items">{{ dm.distribution_method }}</span>
+							{% empty %}
+							<p>No distribution method is selected</p>
+							{% endfor %}
+						</td>
+					</tr>
+
+					<tr>
+						<th>Ship Collect</th>
+						<td>{{ contact_profile.ship_collect }}</td>
+					</tr>
+					<tr>
+						<th>Currency</th>
+						<td>{{ contact_profile.currency.currency }}</td>
+					</tr>
+					<tr>
+						<th>FOB</th>
+						<td>{{ contact_profile.fob }}</td>
+					</tr>
+					<tr>
+						<th>AP Contact</th>
+						<td>{{ contact_profile.ap_contact }}</td>
+					</tr>
+					<tr>
+						<th>BV A/P Account</th>
+						<td>{{ contact_profile.bv_ap_account }}</td>
+					</tr>
+					<tr>
+						<th>BV A/R Account</th>
+						<td>{{ contact_profile.bv_ar_account }}</td>
+					</tr>
+					<tr>
+						<th>Record Created</th>
+						<td>{{ contact_profile.record_created }}</td>
+					</tr>
+					<tr>
+						<th>Last Activity</th>
+						<td>{{ contact_profile.last_activity }}</td>
+					</tr>
+					
+				</table>
+			</div>
+			
+		</div>
+
+		
+	</article>
+	<aside class="col-md-5 comment">
+	<div class="panel panel-danger">
+			<div class="panel-heading">
+				<p>Comments for this contact</p>
+			</div>
+			<div class="panel-body">
+				<div id="comment">
+				{% for comment in comments %}
+					{% include "contacts/partials/comment-partial.html" %}
+				{% endfor %}
+				</div>
+			</div>
+	</div>
+
+		
+	</aside>
+
+</section>
+</div>
+{% endblock content %}
+	

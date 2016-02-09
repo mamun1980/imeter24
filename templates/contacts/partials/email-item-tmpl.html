@@ -1,0 +1,9 @@
+<tr class="bg-info">
+	<td>{{ contact_email.email_address_type }}</td>
+	<td>{{ contact_email.email_address }}</td>
+	
+	<td>
+		<a class='email-delete' href='#' data-id="{{ contact_email.id }}">delete</a>
+		<input type="hidden" name="contact_emails" value="{{ contact_email.id }}">
+	</td>
+</tr>

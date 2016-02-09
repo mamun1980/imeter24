@@ -1,0 +1,60 @@
+<style type="text/css">
+
+.add-user-table td{
+	vertical-align: top;
+}
+</style>
+<form name="contact" action="/contacts/add/rel_item/" method="POST" enctype="multipart/form-data">{% csrf_token %}
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h4 class="modal-title" id="myModalLabel">Add Another Contact</h4>
+</div>
+
+
+<div class="modal-body">
+	<table class="add-user-table">
+	<tr>
+		<td>
+			{{ contact_form.as_p }}
+		</td>
+		<td>
+			<div class="contact-phone-email">
+			{{ cpf.as_p }}
+			{{ cef.as_p }}
+			</div>
+		</td>
+	</tr>
+	
+	
+	</table>
+</div>
+
+
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-default close-modal" data-dismiss="modal">Close</button>
+    <button type="submit" class="btn btn-primary">Add Contact</button>
+</div>
+</form>
+<script type="text/javascript">
+(function(){
+	$("form[name='contact']").on("submit", function(e){
+		e.preventDefault();
+		form_data = $(this).serialize();
+		console.log(form_data);
+		$.ajax({
+			type: "POST",
+			url: "/contacts/add/rel_item/",
+			data: form_data,
+			success: function(rdata) {
+                $( "button.close-modal" ).trigger( "click" );
+                window.location.reload(false);
+                
+
+            }
+		});
+
+	})
+})(jQuery)
+</script>
+    

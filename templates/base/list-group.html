@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid main-body dashboard">
+	<div class="row ">
+	    <div class="col-md-12">
+	    	<div class="panel panel-primary group-list">
+				<div class="panel-heading">
+			    	<h6>Group List</h6>
+			  	</div>
+			  	
+			  	<div class="panel-body">
+			  		<table class="table">
+			  			<thead>
+			  				<tr>
+			  					<th>ID</th>
+			  					<th>Group Name</th>
+			  					<th>Action</th>
+			  				</tr>
+			  			</thead>
+			  			<tbody>
+			  				{% for group in groups %}
+			  					<tr>
+									<td>
+										{{ group.id }}
+									</td>
+									<td>
+										{{ group.name }}
+									</td>
+									<td>
+										
+										<a href="/group/view/{{group.id}}/">View</a>
+										
+
+										{%if perms.auth.change_group %} / 
+										<a href="/group/edit/{{group.id}}/">Edit</a>
+										{% endif %}
+
+										{%if perms.auth.delete_group %} / 
+										<a href="#" data-group-id={{group.id}} class="delete-group">Delete</a>
+										{% endif %}
+
+									</td>
+								</tr>
+			  				{% endfor %}
+			  			</tbody>
+					
+					</table>
+			    	
+
+				</div>
+
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+(function(){
+	$("a.delete-group").on("click", function(e){
+		e.preventDefault();
+		group_id = $(this).data("group-id");
+
+		$.ajax({
+			type: "POST",
+			url: "/group/delete/",
+			data: {
+				'group_id': group_id,
+			},
+			success: function(rdata){
+				$("a[data-group-id='"+rdata+"']").closest("tr").remove();
+				alert("group deleted.")
+			},
+			error: function(){
+
+			}
+		})
+
+	})
+})(jQuery)
+
+</script>
+{% endblock content %}
+
+
+
+
+

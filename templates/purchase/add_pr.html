@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+
+{% block angular %}
+	<script type="text/javascript" src="/statics/js/angular.min.js"></script>
+	<script type="text/javascript" src="/statics/js/angular-route.min.js"></script>	
+{% endblock angular %}
+
+{% block content %}
+<style type="text/css">
+	#feedback { font-size: 1.4em; }
+/*#selectable .ui-selecting { background: #FECA40; }*/
+#selectable .ui-selected, #item-selectable .ui-selected  { background: #F39814; color: white; }
+#selectable, #item-selectable { list-style-type: none; margin: 0; padding: 0px 2px 0px 0px; width: 100%; }
+#selectable thead tr, #item-selectable thead tr { margin: 0px 3px; padding: 0.4em; font-size: 1.4em; height: 35px; background-color: #ed791a; }
+#selectable tbody tr, #item-selectable tbody tr { margin: 0px 3px; padding: 0.4em; font-size: 1.4em; height: 35px; border-bottom: 1px solid #EEE; }
+#selectable tbody tr:hover, #item-selectable tbody tr:hover { background-color: #FECA40; color: #000; }
+#selectable td, #selectable th, #item-selectable td, #item-selectable th {
+	padding: 3px 10px;
+}
+
+
+#supplier-container, #item-container {
+	width: 430px;
+}
+#supplier-container .ui-widget-content-custom, #item-container .ui-widget-content-custom {
+	background-color: #333 !important;
+	color: #FF0;
+}
+
+table#items_list {
+	width: 100%;
+	margin-top: 2px;
+	/*display: none;*/
+	border: 2px solid #333;
+}
+
+table#items_list > thead {
+	background-color: #333 !important;
+	color: #FF0 !important;
+}
+table#items_list > tbody > tr:hover {
+	background-color: #EEE;
+}
+table#items_list > thead > tr > th > a.close {
+	color: red !important;
+}
+.glyphicon {
+	color: blue !important;
+	top: 10px;
+}
+
+#ordered-item {
+	position: fixed;
+	width: 560px;
+}
+#ordered-item .panel-body {
+	padding: 0px !important;
+
+}
+.item-desc {
+	margin: 5px 1px 2px;
+}
+input.ng-dirty.ng-invalid {
+	border:1px solid red;
+}
+</style>
+
+<div class="container shadow4 main-body" ng-app="premierApp">
+
+<section class="row"  id="add-pr" ng-controller="AddPRController">
+	
+	<div class="col-md-8 col-md-offset-2">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Add Purchase Request</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  	<form action="/purchase/add-pr/" name="pr_add_form" method="POST">{% csrf_token %}
+		  		
+		  		{% include "purchase/partials/add-pr-form.html" %}
+	    		  	<div class="col-md-4">
+						<button class="btn btn-primary btn-lg" type="submit" ng-disabled="!(pr_add_form.$valid && pr_add_form.$dirty)">Add PR</button>
+					</div>
+					
+		  	</form>
+			</div>
+		</div>
+	</div>
+
+	<div id="item-container">
+		<table id="item-selectable" class="ui-autocomplete ui-widget-content-custom ui-corner-all">
+			<thead>
+				<tr>
+					<th>#</th><th>Item Number</th><th>description</th><th>Qty on hand</th><th><a class="close">x</a></th>
+					
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="ui-menu-item" ng-repeat="item in items">
+					
+					<td class="select-item">
+						<input type='radio' name='item' value="{[{item.item_number}]}" data-order-restriction="{[{item.order_restriction}]}">
+					</td>
+					<td class="item_number">{[{item.item_number}]}</td>
+					<td class="item-description">{[{item.description}]}</td>
+					
+					<td class="qonh">{[{item.quantity_on_hand}]}</td>
+					<td class="supplier"></td>
+					
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+</section>
+</div>
+{% include "modals/add-modal.html" %}
+<script type="text/javascript">
+(function(){
+
+$(".datepicker").datepicker();
+$(document).on("change", "input.decimal", function(e){
+	var myval = parseFloat($(this).val())
+	$(this).val(myval.toFixed(2));
+})
+// Item google search ============
+
+$("select#id_item").hide();
+var str1 = "<input type=text name='item_demo' id='id_item_demo' class='form-control custom-form-control' ng-model='search_item' autocomplete='off' placeholder='search for item'>";
+var str2 = '<div id="item_info"></div>';
+$("select#id_item").closest("div").append(str1+str2);
+
+
+$(document).on("click", "a.close", function(e){
+	$("#item-selectable").hide();
+});
+// Item select ========
+
+$(document).on('change', 'input[type="radio"]', function(){
+	var item_number = $(this).val();
+	var max_value = $(this).data("order-restriction");
+	$("#id_item").val(item_number);
+	$("#id_item_demo").val(item_number);
+	$("#item-selectable").hide();
+
+	$("#id_order_qty").attr("max", max_value);
+	
+
+});
+
+UpdateRequestedUser =  function(){
+		var ru = $("select#id_user_req").val();
+		$("#id_user_requested").val(ru);
+		console.log(ru);
+	};
+
+
+})(jQuery)
+
+</script>
+
+<script type="text/javascript">
+
+premierApp.controller('AddPRController',['$scope', '$http', function ($scope, $http) {
+	
+	$scope.init = function() {
+		$http({method: 'GET', url: "/inventory/items/"}).
+            success(function(data, status, headers, config) {
+                // console.log(data);
+                $scope.items = data;
+            });
+
+        // $("#selectable").hide();
+        $("#item-selectable").hide();
+        $("#items_list").hide();
+	};
+
+	$scope.init();
+
+	// $scope.UpdateRequestedUser =  function(){
+	// 	var ru = $("select#id_user_req").val();
+	// 	// $("#id_user_requested").val(ru);
+	// 	console.log(ru);
+	// };
+    $scope.searchItem = function(q) {
+		if(q) {
+			if(q.length > 1) {
+				console.log(q);
+				var url = "/inventory/search/?q=" + q;
+	            $http({method: 'GET', url: url}).
+		            success(function(data, status, headers, config){
+		            $scope.items = data;
+		            
+		        });
+				$("#items_list").show();
+			} else {
+				$("#items_list").hide();
+			}
+		}
+		
+	}
+
+	$scope.selectItem =function(item) {
+		
+    	
+    	$("#items_list").hide();
+    	
+    	var item_number = item.item_number;
+    	$("#id_item").val(item_number);
+    	$scope.search_item = item_number;
+
+    	// var max_value = $(this).data("order-restriction");
+    	var max_value = item.order_restriction;
+    	// console.log(max_value);
+		// $("#id_order_qty").attr("max", max_value);
+		$scope.order_limit = max_value;
+
+    	
+	}
+	$scope.$watch("order_qty", function(a,b) {
+		// console.log(a);
+		console.log($scope.order_limit);
+		
+		if ($scope.order_limit == undefined) {
+			$scope.pr_add_form.order_qty.$setValidity("limitnotdefined", false)
+			
+		} else if(a > $scope.order_limit) {
+			$scope.pr_add_form.order_qty.$setValidity("maxlimit", false)
+			$scope.pr_add_form.order_qty.$setValidity("limitnotdefined", true)
+		} else {
+			$scope.pr_add_form.order_qty.$setValidity("maxlimit", true)
+			$scope.pr_add_form.order_qty.$setValidity("limitnotdefined", true)
+		}
+	});
+
+}]);
+</script>
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	

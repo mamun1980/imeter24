@@ -1,0 +1,8 @@
+<span class="label label-danger {{ distribution_method.id }}">
+	{{ distribution_method.distribution_method }}
+	{% if perms.contacts.change_emailaddresstype %}
+		<a class="distribution-method-edit" href="/contacts/distribution-method/edit/{{ distribution_method.id }}/" 
+			data-toggle="modal" data-target="#editModal"
+			data-id="{{ distribution_method.id }}"><i class="glyphicon glyphicon-edit"></i></a>
+	{% endif %}
+</span>

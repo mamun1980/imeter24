@@ -1,0 +1,157 @@
+<table class="table events-list" ng-show="controllers">
+	<tr>
+		<td>Controller Name</td>
+							
+		<td>Name</td>
+		<td>Door Current State</td>
+		<td >Card 1 Information</td>
+		
+
+		<td width="20%" >Input 3 Info</td>
+		
+		<td width="20%" >Input 4 Info</td>
+
+
+		
+		<td width="10%">Action</td>
+	</tr>
+
+	<tr ng-repeat="controller in controllers | googleSearchFilter:search">
+		<td>{[{ controller.controller_name }]}</td>
+		
+		
+		<td>{[{ controller.name }]}</td>
+		<td>{[{ controller.doorcurrentstatus }]}</td>
+		
+		<td style="width:200px;">
+			
+			<table ng-show="{[{controller.card_1}]}">
+				<tr>
+					<td style="width:80px;">name:</td> <td><b>{[{ controller.card_1_name }]}</b></td>
+				</tr>
+				<tr>
+					<td style="width:80px;">Type:</td> <td><b>{[{ controller.card_1_type }]}</b></td>
+				</tr>
+				<tr>
+					<td style="width:80px;">Last Date:</td> <td><b>{[{ controller.card_1_lastdate }]}</b></td>
+				</tr>
+				
+				<tr>
+					<td style="width:80px;">Last User:</td> <td><b>{[{ controller.card_1_lastuser }]}</b></td>
+				</tr>
+
+			</table>
+
+			<h5 ng-hide="{[{controller.card_1}]}"><i>Card 1 not configured</i></h5>
+		</td>
+		
+
+
+		<td style="width:200px;">
+			<table style="" ng-show="{[{controller.input_3}]}">
+				<tr>
+					<td style="width:80px;">name</td> <td><b>{[{ controller.input_3_name }]}</b></td>
+				</tr>
+				<tr>
+					<td style="width:80px;">Status</td> <td><b>{[{ controller.input_3_status }]}</b></td>
+				</tr>
+				<tr>
+					<td style="width:80px;">Last Date</td> <td><b>{[{ controller.input_3_lastdate }]}</b></td>
+				</tr>
+				<tr>
+					<td style="width:80px;">Last Time</td> <td><b>{[{ controller.input_3_lasttime }]}</b></td>
+				</tr>
+
+			</table>
+
+			<h5 ng-hide="{[{controller.input_3}]}"><i>Input 3 not configured</i></h5>
+		</td>
+		
+
+		<td style="width:200px;" ng-model="controller.input_4">
+			<table  ng-show="{[{controller.input_4}]}">
+				<tr>
+					<td style="width:80px;">name</td> <td><b>{[{ controller.input_4_name }]}</b></td>
+				</tr>
+				<tr>
+					<td style="width:80px;">Status</td> <td><b>{[{ controller.input_4_status }]}</b></td>
+				</tr>
+				<tr>
+					<td style="width:80px;">Last Date</td> <td><b>{[{ controller.input_4_lastdate }]}</b></td>
+				</tr>
+				<tr>
+					<td style="width:80px;">Last Time</td> <td><b>{[{ controller.input_4_lasttime }]}</b></td>
+				</tr>
+
+			</table>
+			
+			<h5 ng-hide="{[{controller.input_4}]}"><i>Input 4 not configured</i></h5>
+			
+		</td>
+			
+		<td>
+			<a href="/events/controllers/view/{[{controller.controller_name}]}/">View</a>
+
+			<span ng-show="{[{ controller.permission.can_change_controller }]}">
+			/ 
+				<a href="/events/controllers/edit/{[{controller.controller_name}]}/">Edit</a>
+			</span>
+
+			<span ng-show="{[{ controller.permission.can_delete_controller }]}">
+			
+			/ 
+			<a href="" data-id="{[{controller.controller_name}]}" class="delete-controller">Delete</a>
+			</span>
+
+
+		</td>
+	</tr>
+	
+</table>
+
+<h2 ng-hide="controllers">There is no controllers</h2>
+
+<div id="delete-contact-confirm" title="Do you want to delete?">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;">
+  </span>This will delete the controller from your system?</p>
+</div>
+<script type="text/javascript">
+
+(function(){
+	$(document).on("click", "a.delete-controller", function(e){
+		e.preventDefault();
+		name = $(this).data("id");
+		console.log(name);
+
+		$( "#delete-contact-confirm" ).dialog({
+			resizable: false,
+			height:200,
+			modal: true,
+			buttons: {
+				"Delete controller": function() {
+									
+					$( this ).dialog( "close" );
+					$.ajax({
+						type: "POST",
+						url: "/events/controllers/delete/",
+						data: {
+							'name': name,
+						},
+						success: function(rdata) {
+							
+							$("a[data-id='"+rdata+"'").closest("tr").remove();
+						},
+						error: function() {
+							alert("controller not deleted");
+						}
+					})
+				},
+				Cancel: function() {
+					$( this ).dialog( "close" );
+				}
+			}
+		});
+
+	});
+})(jQuery)
+</script>

@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+<section class="row"  id="currency-list">
+	
+
+	<div class="col-md-6 col-md-offset-3">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Currency List</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  	<table class="table">
+		  		<tr>
+		  			<td> ID </td>
+		  			<td>Currency Name</td>
+		  			<td>Total Use</td>
+		  			<td>Action</td>
+		  			
+		  		</tr>
+		  		{% for currency in currencies %}
+		  			<tr>
+			  			<td> {{ currency.id }} </td>
+			  			<td> {{ currency.currency }} </td>
+			  			<td> {{ currency.contactprofile_set.all.count }} </td>
+			  			<td>
+			  				<a class="currency-delete" href="#" data-curid="{{ currency.id }}">delete</a>
+			  			</td>
+			  			
+			  		</tr>
+			  	{% empty %}
+			  	<tr>
+		  			<td colspan='4'> No currency found. </td>
+		  		</tr>
+			  	{% endfor %}
+		  	</table>
+			</div>
+		</div>
+	</div>
+
+</section>
+<script type="text/javascript">
+(function(){
+	$("#currency-list a.currency-delete").on("click", function(e){
+		e.preventDefault();
+		curid = $(this).data("curid");
+		console.log(curid);
+
+		$.ajax({
+			type: "POST",
+			url: "/contacts/currency/delete/",
+			data: {
+				'curid': curid,
+			},
+			success: function(rdata) {
+				console.log(rdata);
+				$("a[data-curid='"+rdata+"']").closest("tr").remove();
+			}
+		})
+	});
+
+})(jQuery)
+
+</script>
+</div>
+
+
+{% endblock content %}
+	

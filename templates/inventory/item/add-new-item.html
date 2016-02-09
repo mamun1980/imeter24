@@ -1,0 +1,367 @@
+{% extends "base.html" %}
+{% block angular %}
+	<script type="text/javascript" src="/statics/js/angular.min.js"></script>
+	<script type="text/javascript" src="/statics/js/angular-route.min.js"></script>	
+{% endblock angular %}
+
+{% block content %}
+
+<style>
+#feedback { font-size: 1.4em; }
+/*#selectable .ui-selecting { background: #FECA40; }*/
+.selectable .ui-selected, #selectable-producer .ui-selected { background: #F39814; color: white; }
+.selectable,#selectable-producer { list-style-type: none; margin: 0; padding: 0px 2px 0px 0px; width: 100%; }
+.selectable thead tr, #selectable-producer thead tr { margin: 0px 3px; padding: 0.4em; font-size: 1.4em; height: 35px; background-color: #ed791a; }
+.selectable tbody tr, #selectable-producer tbody tr { margin: 0px 3px; padding: 0.4em; font-size: 1.4em; height: 35px; border-bottom: 1px solid #EEE; }
+.selectable tbody tr:hover, #selectable-producer tbody tr:hover { background-color: #FECA40; color: #000; }
+.selectable td, #selectable th, #selectable-producer td, #selectable-producer th {
+	padding: 3px 10px;
+}
+#supplier, #producer {
+	
+	position: relative;
+}
+#contact-list {
+	/*border: 2px solid #333;*/
+}
+#container, #container-producer {
+	width: 520px;
+	position: absolute;
+}
+.selectable {
+	position: absolute;
+	top: 32px;
+	border: 1px solid #000;
+	background-color: #333 !important;
+	color: #FFF;
+	z-index: 1000;
+}
+#container .ui-widget-content-custom, #container-producer .ui-widget-content-custom {
+	background-color: #333 !important;
+	color: #FFF;
+}
+.contact_info {
+	margin-top: 10px;
+}
+.contact_info p.bg-info {
+	background-color: #d9edf7;
+	padding: 5px;
+	margin: 0 0 2px;
+}
+#item-list {
+	border: 1px solid #333;
+	z-index: 1001;
+}
+#item-list table {
+	margin-bottom: 0px !important;
+}
+#item-list thead {
+	background-color: #000;
+	color: #FFF;
+	z-index: 1000;
+}
+#item-list tbody tr {
+	background-color: #EEE;
+}
+#item-list tbody tr:hover {
+	background-color: #FFF;
+}
+#item-list {
+	width: 90% !important;
+}
+a.close {
+	color: red !important;
+	opacity: 1 !important;
+}
+.bg-info {
+	padding: 5px 10px;
+	margin-top: 10px;
+}
+input.ng-dirty.ng-invalid, textarea.ng-dirty.ng-invalid {
+	border: 1px solid red;
+}
+</style>
+
+<div class="container-fluid shadow4 main-body" ng-app="inventoryApp">
+<section class="row">
+	<div class='col-md-12'>
+		{% for message in messages %}
+	      <p {% if message.tags %} class="col-md-6 col-md-offset-3 bg-warning login-{{ message.tags }}"{% endif %}>{{ message }}</p>
+	    {% endfor %}
+		
+	</div>
+</section>
+
+<section class="row"  id="add-inventory-item" ng-controller="AddItemController">
+	
+
+	<div class="col-md-12">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Add / Update Inventory Item</h4>
+		  	</div>
+		  	<div class="panel-body">
+
+		  	<form action="/inventory/item/add/" enctype="multipart/form-data" name="inventory_item_form" method="POST" novalidate>{% csrf_token %}
+		  		
+		  		{% include "inventory/item/add-new-item-form.html" %}
+    		  	<div class="btn btn-lg">
+					<button class="btn btn-primary btn-lg" type="submit" ng-hide="show_update_button" ng-disabled="!(inventory_item_form.$valid && inventory_item_form.$dirty)">Add Inventory Item</button>
+					<button class="btn btn-primary btn-lg" type="submit" ng-show="show_update_button">Update Inventory Item</button>
+				</div>
+					
+		  	</form>
+			</div>
+		</div>
+	</div>
+
+
+</section>
+</div>
+{% include "modals/add-modal.html" %}
+<link href="/statics/css/bootstrap-toggle.min.css" rel="stylesheet">
+<script src="/statics/js/bootstrap-toggle.min.js"></script>
+<script type="text/javascript">
+(function(){
+
+	$(document).on("change", "input.decimal", function(e){
+		var myval = parseFloat($(this).val())
+		$(this).val(myval.toFixed(2));
+	})
+
+	$("select#id_primary_supplier").hide();
+
+	$("a#add_id_primary_supplier").on("click", function(e){
+		e.preventDefault();
+		url = "/contacts/add/rel/",
+		mdal = $('#addModal');
+		mdal.on("shown.bs.modal", function(){
+			$("#addModal .modal-content").load(url);
+			// console.log(url);
+		}).modal();
+		return false;
+	});
+	$("a.close").on("click", function(){
+		$(".selectable").hide();
+	});
+
+	$(document).on("click", "#selectable a.edit-contact", function(e){
+		e.preventDefault();
+		var cid = $(this).data("id");
+
+		e.preventDefault();
+		url = "/contacts/edit/basic/" + cid + "/",
+		mdal = $('#addModal');
+		mdal.on("shown.bs.modal", function(){
+			$("#addModal .modal-content").load(url);
+			console.log(url);
+		}).modal();
+		return false;
+	
+	})
+
+
+})(jQuery)
+
+</script>
+
+<script type="text/javascript">
+(function(){
+$("select#id_producer_of_item").hide();
+// $("a.close").on("click", function(){
+// 	$(this).closest('div').hide();
+// });
+/*
+$(document).on("click", "#producer input[type='radio']", function(e){
+	var id = $(this).val();
+	var c_n = $(this).closest('tr').find("td.contact_name").text();
+	$("#id_producer_of_item_demo").val('');
+	$("select#id_producer_of_item option[value='"+ id.trim()+"']").prop("selected", true);
+	
+	$("#selectable-producer").hide();
+	$("#id_producer_of_item").val(id);
+});
+*/
+
+$("#producer > .selectable > a.close").on("click", function(){
+	$("#producer .selectable").hide();
+});
+
+})(jQuery)
+</script>
+
+<script type="text/javascript">
+var inventoryApp = angular.module("inventoryApp", [], function ($interpolateProvider) {
+        $interpolateProvider.startSymbol("{[{");
+        $interpolateProvider.endSymbol("}]}");
+});
+
+inventoryApp.controller('AddItemController',['$scope', '$http', function ($scope, $http) {
+	
+	$scope.init = function() {
+
+        $(".selectable").hide();
+        $scope.submit_add = false;
+        $scope.show_item_list = false;
+        $scope.item_checked = false;
+        $scope.show_producer = false;
+        $scope.show_update_button = false;
+
+        // $scope.quantity_on_hand = 0.00;
+        // $scope.minimum_qty_on_hand = 0.00;
+        // $scope.max_order_qty = 0.00;
+        // $scope.max_single_order_qty = 0.00;
+
+	};
+
+	$scope.init();
+
+	$scope.addInventoryItem = function() {
+		return false;
+	}
+
+
+	$scope.searchContact = function (q) {
+		// console.log(q);
+    	if(q.length > 1) {
+    		url = "/contacts/auto/?q=" + q
+    		$http({method: 'GET', url: url}).
+	            success(function(data, status, headers, config) {
+	                // console.log(data.results);
+	                $scope.suppliers = data.results;
+	            });
+	        $("#supplier .selectable").show();
+	        
+    		
+    	} else {
+    		$("#supplier .selectable").hide();
+    	}
+    };
+
+    $scope.selectPriSupplier = function(con){
+    	$("#supplier .selectable").hide();
+    	$("#id_primary_supplier").val(con.id);
+    	$scope.supplier = con;
+    	$scope.show_supplier = true;
+    	$scope.search_supplier = con.contact_name;
+    	
+
+    }
+
+    $scope.searchProducer = function (q) {
+		console.log(q);
+    	if(q.length > 1) {
+    		url = "/contacts/auto/?q=" + q
+    		$http({method: 'GET', url: url}).
+	            success(function(data, status, headers, config) {
+	                console.log(data.results);
+	                $scope.producers = data.results;
+	            });
+	        $("#producer .selectable").show();
+	        
+    		
+    	} else {
+    		$("#producer .selectable").hide();
+    	}
+    };
+    $scope.selectProducer = function(con) {
+    	console.log(con.id);
+    	$("#producer .selectable").hide();
+    	$("#id_producer_of_item").val(con.id);
+    	$scope.producer = con;
+    	$scope.show_producer = true;
+    	$scope.search_producer = '';
+    }
+ 
+    $scope.searchItem = function(q) {
+    	console.log(q);
+		if(q.length > 1) {
+			
+			var url = "/inventory/search/?q=" + q;
+            $http({method: 'GET', url: url}).
+	            success(function(data, status, headers, config){
+	            $scope.items = data;
+	        });
+			// $("#items_list").show();
+			$scope.show_item_list = true;
+		} else {
+			// $("#items_list").hide();
+			$scope.show_item_list = false;
+		}
+		// $scope.$apply();
+		
+	};
+	
+	$scope.uncheck = function() {
+		console.log("hello...")
+	}
+	$scope.closeMe = function() {
+		$scope.show_item_list = false;
+	}
+
+	$scope.selectItem = function(item) {
+		$("#item-list").hide();
+		$scope.show_update_button = true;
+		var item_number = item.item_number
+		var item_url = "/inventory/get-item/"+item_number+"/"
+		$scope.hello = false;
+		$http({method: 'GET', url: item_url}).
+        	success(function(data, status, headers, config){
+        	
+        	$scope.show_item_list = false;
+        	$scope.item_checked = true;
+
+        	// $("#items_list").hide();
+        	$scope.submit_add = true;
+        	$("#id_item_number").val(data.item_number);
+        	$("#id_item_number_search").val(data.item_number);
+        	$("#id_description").val(data.description);
+        	$("#id_minimum_qty_on_hand").val(data.minimum_qty_on_hand);
+        	$("#id_max_order_qty").val(data.max_order_qty);
+        	$("#id_max_single_order_qty").val(data.max_single_order_qty);
+        	
+        	if(data.primary_supplier){
+        		console.log(data.primary_supplier);
+        		$scope.supplier = data.primary_supplier;
+        		$scope.search_supplier = data.primary_supplier.contact_name;
+        		$scope.show_supplier = true;
+        		$("#id_primary_supplier").val(data.primary_supplier.id);
+        	}
+        	
+
+        	$("#id_wholesale_cost").val(data.wholesale_cost);
+        	$("#id_currency").val(data.currency_id);
+        	$("#id_terms").val(data.terms_id);
+        	$("#id_department").val(data.department_id);
+        	$("#id_item_unit_measure").val(data.item_unit_measure_id);
+        	$("#id_warehouse_location").val(data.warehouse_location_id);
+        	$("#id_estimated_wholesale_cost").val(data.estimated_wholesale_cost);
+        	$("#id_retail_price").val(data.retail_price);
+        	$("#id_production_type").val(data.production_type_id);
+        	$("#id_catalog_number").val(data.catalog_number);
+        	$("#id_country_of_origin").val(data.country_of_origin);
+        	$("#id_lead_time").val(data.lead_time);
+        	$("#id_customs_designation").val(data.customs_designation);
+        	$("#id_customer_tariff_number").val(data.customer_tariff_number);
+        	$("#id_preference_criteria").val(data.preference_criteria);
+        	if(data.producer_of_item){
+        		$("#id_producer_of_item").val(data.producer_of_item.id);
+        		$("#id_producer_of_item_demo").val('');
+        		$scope.producer = data.producer_of_item;
+        		$scope.show_producer = true;
+        	}
+        	
+        	$("#id_shipping_weight").val(data.shipping_weight);
+
+        	$("#id_duty_percentage").val(data.duty_percentage);
+        	$("#id_website").val(data.website);
+        	$("#item_image").attr("src", "/media/"+data.item_image);
+        });
+		// $scope.$apply();
+		// alert(item.item_number);
+	}
+
+
+}]);
+</script>
+{% endblock content %}

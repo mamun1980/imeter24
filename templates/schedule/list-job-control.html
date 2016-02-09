@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block angular %}
+	<script type="text/javascript" src="/statics/js/angular.min.js"></script>
+	<script type="text/javascript" src="/statics/js/angular-route.min.js"></script>	
+{% endblock angular %}
+
+{% block content %}
+<div class="container-fluid shadow4 main-body" ng-app="premierApp" ng-controller="JobControlController">
+
+<section class="row">
+	<div class="col-md-6">
+		<input type='text' class="form-control" ng-model="search" placeholder="Filter By job number, cab designaiton, job name and customers">
+	</div>
+	
+	
+</section>
+
+
+
+<section class="row" id="schedule-job-list">
+	
+	<div class="col-md-12">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Job Control list</h4>
+		  	</div>
+		  	
+		  		<table class="table table-bordered">
+		  		<thead>
+		  			<tr class="bg-info">
+		  				<th>Job number</th>
+		  				<th width="200">Sold to</th>
+		  				<th width="200">Ship to</th>
+		  				<th>Elevetor type</th>
+		  				<th>Customer PO Number</th>
+		  				<th>Delivery Date</th>
+		  				<th>Start Date</th>
+		  				<th>Installed By</th>
+		  				<th>Job Name</th>
+		  				<th>estimated price for job</th>
+		  				<th>Action</th>
+		  			</tr>
+		  		</thead>
+		  		<tbody>
+		  			<tr ng-repeat="jc in job_controls | filter:search">
+		  				<td>{[{jc.job_number}]}</td>
+		  				<td>{[{jc.sold_to}]}</td>
+		  				<td>{[{jc.ship_to}]}</td>
+		  				<td>{[{jc.elevetor_type}]}</td>
+		  				<td>{[{jc.customer_po_number}]}</td>
+		  				<td>{[{jc.delivery_date}]}</td>
+		  				<td>{[{jc.start_date}]}</td>
+		  				<td>{[{jc.installed_by}]}</td>
+		  				<td>{[{jc.job_name}]}</td>
+		  				<td>{[{jc.estimated_price_for_job}]}</td>
+		  				<td width="100">
+		  					<div class="btn-group" role="group">
+		  					<a class="btn btn-warning btn-xs" href="/schedule/job-control/edit/{[{jc.job_number}]}/">Edit</a>
+		  					<a class="btn btn-danger btn-xs" href="/schedule/job-control/delete/{[{jc.job_number}]}/">Delete</a>
+		  					</div>
+		  				</td>
+		  			</tr>
+		  			<tr ng-show="!job_controls.length">
+						<td colspan="11">No Items</td>
+					</tr>
+		  		</tbody>
+		  			
+		  		</table>
+		  	
+		</div>
+	</div>
+	
+</section>
+</div>
+<script type="text/javascript">
+var premierApp = angular.module("premierApp", [], function ($interpolateProvider) {
+        $interpolateProvider.startSymbol("{[{");
+        $interpolateProvider.endSymbol("}]}");
+});
+premierApp.filter('googleSearchFilter', function(){
+    return function(items, token) {
+        
+        if(token != undefined && token != "") {
+            var output=[];
+            var filter_output = [];
+            output = items;
+            // console.log(output);
+            
+            var searchArr = token.split(" ");
+
+            for(var j=0; j<searchArr.length; j++) {
+
+                for(var i=0; i<output.length; i++) {
+                    // console.log(output[i]);
+                    var search_str = output[i].search_string;
+                    // We can remove this if statement when all is updated.
+                    // console.log(search_str);
+                    if (search_str != null) {
+                        var n = search_str.search(new RegExp(searchArr[j], "i"));    
+                        // console.log('search_str is not null');
+                    }
+                    // console.log(n);
+                    if(n != -1) {
+                        filter_output.push(output[i]);
+                    }
+
+                }
+                output = filter_output;
+                filter_output = [];  
+            }
+            
+            return output;
+
+        } else {
+            return items;
+        }   
+    }
+});
+premierApp.controller('JobControlController',['$scope', '$http', function ($scope, $http) {
+
+	$scope.init = function() {
+		$http({method: 'GET', url: "/schedule/job-control/list/json/"}).
+            success(function(data, status, headers, config) {
+                console.log(data);
+                $scope.job_controls = data;
+            });
+
+	};
+
+	$scope.init();
+}]);
+
+</script>
+{% endblock content %}

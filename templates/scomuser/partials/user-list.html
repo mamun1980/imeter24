@@ -1,0 +1,113 @@
+<table class="table">
+	<thead>
+		<tr>
+			<th>User Name</th>
+			<th>First Name</th>
+			<th>Last Name</th>
+			<th>Email</th>
+			
+			<th>Is Superuser</th>
+			
+			<th>Last Login</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	<tbody>
+		
+		<tr ng-repeat="usr in users">
+			<td>{[{ usr.username }]}</td>
+			<td>{[{ usr.first_name }]}</td>
+			<td>{[{ usr.last_name }]}</td>
+			<td>{[{ usr.email }]}</td>
+			<td>{[{ usr.is_superuser }]}</td>
+			
+			<td>{[{ usr.last_login }]}</td>
+			<td>
+				<span ng-show="{{ perms.auth.can_view_user|lower }}">
+				<a href="/scomuser/viewuser/{[{ usr.id }]}/"> view</a>
+				</span>
+				
+				<span ng-show="{{ perms.auth.change_user|lower }}"> /
+				<a href="/scomuser/edituser/{[{ usr.id }]}/"> Edit</a>
+				</span>
+				
+				<span ng-show="{{ perms.auth.delete_user|lower }}"> /
+				<a class="deleteuser" data-uid="{[{ usr.id }]}" href="/scomuser/deleteuser/">delete</a>
+				</span>
+				
+				<span ng-show="{{ perms.auth.can_change_password|lower }}"> /
+				<a data-toggle="modal" data-target="#changePasswordModal" class="changepassword" data-uid="{[{ usr.id }]}" href="">Change Password</a>
+				</span>
+				
+			</td>
+		</tr>
+		
+	</tbody>
+</table>
+
+<h2 ng-hide="users">There is no users</h2>
+
+
+<div id="delete-job-confirm" style="display:none;" title="Do you want to delete?">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;">
+  </span>This will delete the job from your system?</p>
+</div>
+
+
+<script type="text/javascript">
+(function() {
+	$(document).on("click", "#user-list a.deleteuser", function(e){
+		e.preventDefault();
+		uid = $(this).data("uid");
+		console.log(uid);
+		$( "#delete-user-confirm" ).css("display:block;");
+		
+		$( "#delete-job-confirm" ).dialog({
+			resizable: false,
+			height:200,
+			modal: true,
+			buttons: {
+				"Delete User": function() {
+									
+					$( this ).dialog( "close" );
+					$.ajax({
+						type: "POST",
+						url: "/scomuser/deleteuser/",
+						data: {
+							'uid': uid,
+						},
+						success: function(rdata) {
+							console.log(rdata);
+							$("a[data-uid="+rdata+"]").closest("tr").remove();
+						}
+					})
+				},
+				Cancel: function() {
+					$( this ).dialog( "close" );
+				}
+			}
+		});
+
+	});
+
+	$(document).on("click", "#user-list a.changepassword", function(e){
+		e.preventDefault();
+		var uid = $(this).data("uid");
+		console.log(uid);
+		var url = "/scomuser/get-change-password-form/"+uid+"/";
+		mdal = $('#changePasswordModal');
+		mdal.on("shown.bs.modal", function(){
+			$("#changePasswordModal .modal-content").load(url);
+			console.log(url);
+		}).modal();
+		
+		return false;
+
+	});
+
+	
+
+})(jQuery)
+
+
+</script>

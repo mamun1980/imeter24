@@ -1,0 +1,12 @@
+<tr class="{{ contact_phone.id }}">
+	<td>{{ contact_phone.phone_type }}</td>
+	<td>{{ contact_phone.phone }}</td>
+	<td>{{ contact_phone.phone_ext }}</td>
+	<td>						
+		<a class="phone-delete" href="#" data-id="{{ contact_phone.id }}">delete</a> /
+		<a class="phone-edit" href="/contacts/phone/edit/{{ contact_phone.id }}/" 
+		data-toggle="modal" data-target="#editModal"
+		data-id="{{ contact_phone.id }}">edit</a>
+	
+	</td>
+</tr>

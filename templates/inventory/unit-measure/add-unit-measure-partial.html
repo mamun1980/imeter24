@@ -1,0 +1,8 @@
+<span class="label label-danger {{ unit_measure.id }}">
+	{{ unit_measure.unit_name }}
+	{% if perms.contacts.change_itemunitmeasure %}
+		<a class="unit-measure-edit" href="/inventory/unit-measure/edit/{{ unit_measure.id }}/" 
+			data-toggle="modal" data-target="#editModal"
+			data-unit-mes-id="{{ unit_measure.id }}"><i class="glyphicon glyphicon-edit"></i></a>
+	{% endif %}
+</span>

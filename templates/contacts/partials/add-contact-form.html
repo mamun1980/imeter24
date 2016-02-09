@@ -1,0 +1,251 @@
+<table class="add-user-table">
+	<tbody>
+						  		
+		<tr >
+			<td ng-class="{'ng-pristine': contact.contact_name.$pristine || contact.contact_name.$invalid}">
+				<label for="id_contact_name">Contact name:</label>
+			</td>
+			<td colspan="3">
+				<input class="form-control" ng-model='contact_name' id="id_contact_name" maxlength="64" name="contact_name"  placeholder="Contact Name" type="text" ng-change="searchContact(contact_name)" ng-required='true' autofocus autocomplate="off" >
+				<input type="hidden" name="contact_id" id="contact_id" value="">
+				<div class="contact_list" ng-show="show_contact_list">
+					<table class="table selectable" class="ui-autocomplete ui-widget-content-custom ui-corner-all" id="contact_list">
+						<thead>
+							<tr>
+								<th>Contact Name</th><th>Address</th><th> Primary Cont No.</th>
+								<th><a href="" class="close" ng-click="hideContactList()">x</a></th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="ui-menu-item" ng-repeat="contact in contacts" ng-click="setContact(contact)">
+								
+								
+								<td class="contact_name">{[{contact.contact_name}]}</td>
+								<td class="address_1">
+									<p ng-if="contact.address_1 != ''">{[{contact.address_1}]}</p>
+									<p ng-if="contact.city != ''">{[{contact.city}]}<span ng-if="contact.province != ''">, {[{contact.province}]}</span></p>
+									<p>
+									<span ng-if="contact.country != ''">{[{contact.country}]}</span>
+									
+										<span ng-if="contact.postal_code != ''">{[{ contact.postal_code }]}</span>
+									</p>
+									
+									
+								</td>
+								
+								<td class="city">
+									<div class='phone' ng-repeat="phon in contact.phones" ng-if="$first">
+										{[{phon.number}]} <span ng-if="phon.ext !=''"> (ext: {[{phon.ext}]})</span>
+									</div>
+								</td>
+								
+								<td>
+									
+								</td>
+							</tr>
+						</tbody>
+					</table>
+
+					<input type="hidden" name="contact" id="id_contact">
+				</div>
+				<span ng-show="contact.contact_name.$dirty && contact.contact_name.$error.required">
+					*This field is required.
+				</span>
+			</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td colspan="3">
+				<div class="contact_box">
+					<table class="table" id="contact_details" ng-show="contact_details">
+						<tr>
+							<th width="150">Contact Name</th>
+							<td colspan="2">{[{ contact.attention_to }]}</td>
+						</tr>
+						<tr>
+							<th>Address</th>
+							<td colspan="2">
+								<p ng-if="contact.address_1 != ''">
+									{[{contact.address_1}]}
+								</p>
+								<p ng-if="contact.address_2 != ''">
+									{[{contact.address_2}]}
+								</p>
+								<p>{[{contact.city}]}<span ng-if="contact.province != ''">, {[{contact.province}]}</span></p>
+								
+								<p>{[{contact.country}]}</p>
+								<p><span ng-if="contact.postal_code != ''">{[{ contact.postal_code }]}
+								</span></p>
+							</td>
+						</tr>
+
+					</table>
+										
+				</div>
+		
+			</td>
+			
+		</tr>
+		<tr>
+			<td><label for="id_attention_to">Attention to:</label></td>
+			<td colspan="3"><input class="form-control" id="id_attention_to" maxlength="64" name="attention_to" placeholder="Attention to" type="text"></td>
+		</tr>
+	
+		<tr>
+			<td><label for="id_address_1">Address 1:</label></td>
+			<td colspan="3"><input class="form-control" id="id_address_1" maxlength="64" name="address_1" placeholder="Address 1" type="text" value="1400 Phillip Murray Avenue"></td>
+		</tr>
+	
+		<tr>
+			<td><label for="id_address_2">Address 2:</label></td>
+			<td colspan="3"><input class="form-control" id="id_address_2" maxlength="64" name="address_2" placeholder="Address 2" type="text"></td>
+		</tr>
+	
+		<tr>
+			<td><label for="id_city">City:</label></td>
+			<td colspan="3"><input class="form-control" id="id_city" maxlength="64" name="city" placeholder="City" type="text" value="Oshawa"></td>
+		</tr>
+	
+		<tr>
+			<td><label for="id_province">Province:</label></td>
+			<td colspan="3"><input class="form-control" id="id_province" maxlength="64" name="province" placeholder="Province" type="text" value="Ontario"></td>
+		</tr>
+	
+		<tr>
+			<td><label for="id_country">Country:</label></td>
+			<td colspan="3"><input class="form-control" id="id_country" maxlength="40" name="country" placeholder="Country" type="text" value="Canada"></td>
+		</tr>
+	
+		<tr>
+			<td><label for="id_postal_code">Postal code:</label></td>
+			<td colspan="3"><input class="form-control" id="id_postal_code" maxlength="15" name="postal_code" placeholder="Postal Code" type="text" value="L1J 7E8"></td>
+		</tr>
+	
+		<tr>
+			<td><label for="id_webpage">Webpage:</label></td>
+			<td colspan="3"><input class="form-control" id="id_webpage" maxlength="200" name="webpage" placeholder="Webpage URL" type="url"></td>
+		</tr>
+	
+	
+		<tr>
+			<td><label for="id_gst_tax_exempt">Gst tax exempt:</label></td>
+			<td>
+				<input id="id_gst_tax_exempt" ng-model="gst_tax_exempt" name="gst_tax_exempt" type="checkbox">
+
+				<label class="pull-right" ng-show="gst_tax_exempt" for="id_gst_number">Gst number:</label>
+			</td>
+			<td><input class="form-control" id="id_gst_number" maxlength="17" name="gst_number" placeholder="gst number" ng-show="gst_tax_exempt" type="text"></td>
+		
+			
+		</tr>
+	
+		<tr>
+			<td><label for="id_hst_tax_exempt">Hst tax exempt:</label></td>
+			<td>
+				<input id="id_hst_tax_exempt" ng-model="hst_tax_exempt" name="hst_tax_exempt" type="checkbox">
+				<label class="pull-right" ng-show="hst_tax_exempt" for="id_hst_number">Hst number:</label>
+			</td>
+			<td><input class="form-control" id="id_hst_number" maxlength="17" name="hst_number" placeholder="hst number" ng-show="hst_tax_exempt" type="text"></td>
+
+			
+		</tr>
+	
+		<tr>
+
+			<td><label for="id_pst_tax_exempt">Pst tax exempt:</label></td>
+			<td>
+				<input id="id_pst_tax_exempt" ng-model="pst_tax_exempt" name="pst_tax_exempt" type="checkbox">
+
+				<label class="pull-right" ng-show="pst_tax_exempt" for="id_pst_number">Pst number:</label>
+			</td>
+			<td>
+				<input class="form-control" id="id_pst_number" maxlength="11" name="pst_number" placeholder="pst number" ng-show="pst_tax_exempt" type="text">
+			</td>
+
+		</tr>
+	
+		<tr>
+			<td><label for="id_foreign_account">Foreign account:</label></td>
+			<td colspan="3"><input class="form-control" id="id_foreign_account" maxlength="30" name="foreign_account" placeholder="foreign account" type="text"></td>
+		</tr>
+		  		
+		<tr>
+			<td>
+				<label for="id_terms">Terms:</label>
+			</td>
+			<td colspan="3">
+				<select class="form-control" id="id_terms" name="terms" placeholder="Terms">
+					{% for pt in payment_terms %}
+						<option value="{{pt.id}}">{{pt.term}}</option>
+					{% endfor %}
+				</select>
+			</td>
+		</tr>
+		  		
+		<tr>
+		  	<td>
+		  		<label for="id_shipping_method">Shipping method:</label>
+		  	</td>
+		  	<td colspan="3">
+		  		<select class="form-control" id="id_shipping_method" name="shipping_method" placeholder="delivery choice">
+					{% for sm in shipping_methods %}
+						<option value="{{sm.id}}">{{sm.delivery_choice}}</option>
+					{% endfor %}
+				</select>
+			</td>
+		</tr>
+		  		
+		<tr>
+			<td><label for="id_ship_collect">Ship collect:</label></td>
+			<td colspan="3"><input id="id_ship_collect" name="ship_collect" ng-model="ship_collect" type="checkbox"></td>
+		</tr>
+		  		
+		<tr>
+			<td><label for="id_currency">Currency:</label></td>
+			<td colspan="3">
+				<select class="form-control" id="id_currency" name="currency">
+					{% for cur in currencies %}
+					
+						<option value="{{cur.id}}">{{cur.get_currency_icon}} {{cur.currency}}</option>
+
+					{% endfor %}
+				</select>
+			</td>
+		</tr>
+		  		
+		<tr>
+			<td><label for="id_fob">Fob:</label></td>
+			<td colspan="3"><input class="form-control" id="id_fob" maxlength="50" name="fob" placeholder="FOB" type="text" value="Oshawa, Ontario, Canada"></td>
+		</tr>
+	
+		<tr>
+			<td><label for="id_ap_contact">Ap contact:</label></td>
+			<td colspan="3"><textarea class="form-control" cols="40" id="id_ap_contact" name="ap_contact" placeholder="ap contact" rows="5"></textarea></td>
+		</tr>
+	
+		<tr>
+			<td><label for="id_bv_ap_account">Bv ap account:</label></td>
+			<td colspan="3"><input class="form-control" id="id_bv_ap_account" maxlength="50" name="bv_ap_account" placeholder="BV A/P Account" type="text"></td>
+		</tr>
+	
+		<tr>
+			<td><label for="id_bv_ar_account">Bv ar account:</label></td>
+			<td colspan="3"><input class="form-control" id="id_bv_ar_account" maxlength="50" name="bv_ar_account" placeholder="BV A/R Account" type="text"></td>
+		</tr>
+		  		
+		  		
+		<tr>
+			<td colspan="4" class="submit">
+				<button type="submit" class="btn btn-primary btn-lg form-control login-btn">
+					Add Contact
+				</button>
+
+				<button type="submit" class="ng-hide btn btn-primary btn-lg form-control login-btn">
+					Update Contact
+				</button>
+
+			</td>
+		</tr>
+	
+	</tbody>
+</table>

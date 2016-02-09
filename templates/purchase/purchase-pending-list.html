@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block angular %}
+	<script type="text/javascript" src="/statics/js/angular.min.js"></script>
+	<script type="text/javascript" src="/statics/js/angular-route.min.js"></script>	
+{% endblock angular %}
+
+{% block content %}
+<style type="text/css">
+#supplier-contact {
+	width: 400px;
+	border: 2px solid black;
+	background-color: #FFF;
+	height: auto;
+}
+.list {
+	margin-top: 10px;
+}
+tr.PartialReceived td{
+	background-color: #70B870 !important;
+}
+tr.NotReceived td{
+	background-color: #FFF;
+}
+/*.table-striped>tbody>tr:nth-child(odd)>td {
+	background-color: none;
+}*/
+</style>
+<div class="container-fluid shadow4 main-body" ng-app="premierApp" 
+	ng-controller='PendingListController'>
+<section class="row">
+	<div class="col-md-6">
+		<input type='text' class="form-control" ng-model="search" placeholder="Filter PO">
+	</div>
+</section>
+<section class="row list" >
+	<div class="col-md-12">
+		
+		<div class="panel panel-danger">
+			<div class="panel-heading">
+		    	<h4>Pending Purchase Items</h4>
+		  	</div>
+		  	
+				<table class='table table-bordered table-striped'>
+					<thead>
+						<tr class='danger'>
+							<th width='80'>PO #</th>
+							<th width="200">Purchase Item</th>
+							<th>Job Number</th>
+							<th>Qty Ordered (Qty Received)</th>
+							
+							<th>Sub Total (Received)</th>
+							<th>Status</th>
+							
+							<th width='200'>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						
+						<tr ng-repeat="item in pending_items | googleSearchFilter:search" ng-class="getItemStatus({[{item}]})">
+							<td>	
+								{[{ item.po_number }]}
+							</td>
+							<td>{[{ item.item_number }]}</td>
+							<td>{[{ item.job_number }]}</td>
+							<td>{[{ item.qty_ordered.toFixed(4) }]} ({[{ item.total_item_received.toFixed(4) }]})</td>
+							<td> {[{ item.sub_total.toFixed(2) }]} ({[{ item.sub_total_received.toFixed(2) }]})</td>
+							<td>{[{ item.purchase_status }]}</td>
+							
+							<td>
+							{% if perms.purchase.receive_purchase_item %}
+								<a class="btn btn-primary btn-sm receive-item" data-id="{[{ item.purchase_item_id }]}" href="">Receive Item</a> 
+							{% else %}
+								No permission to receive item
+							{% endif %}
+								
+							</td>
+							
+							
+
+
+						</tr>
+						
+						<tr ng-show="!pending_items.length">
+							<td colspan="7">No Items</td>
+						</tr>
+						
+						
+					</tbody>
+				</table>
+			
+		</div>
+	</div>
+
+
+</section>
+</div>
+{% include "modals/add-modal.html" %}
+
+<script type="text/javascript">
+(function(){
+	$(document).on("change", "input.decimal", function(e){
+		var myval = parseFloat($(this).val())
+		$(this).val(myval.toFixed(2));
+	})
+	$(document).on("click", "a.receive-item", function(e){
+		e.preventDefault();
+		var item_id = $(this).data("id");
+
+		e.preventDefault();
+		url = "/purchase/receive-item/"+item_id+"/",
+		mdal = $('#addModal');
+		mdal.on("shown.bs.modal", function(){
+			$("#addModal .modal-content").load(url);
+			// console.log(url);
+		}).modal();
+		return false;
+	
+	})
+})(jQuery)
+
+</script>
+<script type="text/javascript">
+
+
+	premierApp.controller('PendingListController', ['$scope', '$http', function ($scope, $http) {
+	
+		$scope.init = function() {
+			$http({method: 'GET', url: "/purchase/get-pending-list/"}).
+	            success(function(data, status, headers, config) {
+	                // console.log(data);
+	                $scope.pending_items = data;
+	            });
+
+		};
+
+		$scope.init();
+
+		$scope.getItemStatus = function(item) {
+			return item.purchase_status;
+		};
+	}]);
+
+</script>
+{% endblock content %}

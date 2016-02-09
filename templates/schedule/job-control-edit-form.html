@@ -1,0 +1,203 @@
+<table class="table table-bordered">
+<tr class="bg-info">
+	<th colspan="1"><label for="id_job_number">Job Number:</label></th>
+	<td id="job" colspan="3">
+		<input class="form-control" id="id_job_number" name="job_number" type="text" value="{[{job_number}]}" autocomplete="off" readonly="readonly">
+	</td>
+	<th colspan="1"><label for="id_start_date">Start Date:</label></th>
+	<td colspan="3">
+		<input class="form-control datepicker" id="id_start_date" name="start_date" ng-model="start_date" type="text" value="{[{start_date}]}">
+	</td>
+</tr>
+<tr>
+	<th colspan="1"><label for="id_job_name">Job Name:</label></th>
+	<td colspan="3">
+		<input class="form-control" id="id_job_name" name="job_name" ng-model="job_name" type="text"  value="{[{job_name}]}" autocomplete="off">
+	</td>
+	<th colspan="1"><label for="id_elevetor_type">Elevetor Type:</label></th>
+	<td colspan="3">
+		<select class="form-control" id="id_elevetor_type" name="elevetor_type" value="{[{elevetor_type}]}">
+		{% for elt in elevetor_types %}
+			<option value="{{elt.id}}">{{elt.elevetor_type}}</option>
+		{% empty %}
+			<option value="">None</option>
+		{% endfor %}
+		</select>
+	</td>
+</tr>
+<tr class="bg-info">
+	<th>
+		<label for="id_sold_to">Sold to:</label>
+	</th>
+	<td colspan="3">
+		<div class="contact_box">
+			<input type="text" ng-model="search_sold_to" placeholder="start typing to search sold to contact" class="form-control" ng-change="searchSoldTo(search_sold_to)"  value="" autocomplete="off">
+			<input type="hidden" name="sold_to" value="{[{sold_to.id}]}">
+			<table class="table sold_to_contact" ng-show="show_sold_to_contact_list">
+				<thead>
+					<tr>
+						<th>Contact Name</th><th> City <a href="" class="close" ng-click="hideSoldToContact()">x</a></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="con in contacts" ng-click="selectSoldTo(con)">
+						
+						<td>{[{con.contact_name}]}</td>
+						<td>{[{con.city}]}</td>
+					</tr>
+				</tbody>
+			</table>
+			
+			<table class="table contact" ng-show="sold_to_contact_details">
+				<tr>
+					<th width="150">Contact Name</th>
+					<td>{[{ sold_to.contact_name }]}</td>
+				</tr>
+				<tr>
+					<th>Phone</th>
+					<td>
+						<li ng-repeat="phone in sold_to.phones">{[{ phone.type }]} {[{ phone.number }]} (ext: {[{phone.ext}]})</li>
+					
+					</td>
+				</tr>
+				<tr>
+					<th>Email</th>
+					<td><span class='bg-info email' ng-repeat="em in sold_to.emails">{[{ em.email_address}]}</span></td>
+				</tr>
+			</table>
+			
+		</div>
+
+	</td>
+	<th>
+		<label for="id_ship_to">Ship to:</label>
+	</th>
+	<td colspan="3">
+	<div class="contact_box">
+		
+	
+		<input type="text" ng-model="search_ship_to" placeholder="start typing to search ship to contact" class="form-control" ng-change="searchShipTo(search_ship_to)">
+		<input type="hidden" name="ship_to" value="{[{ship_to.id}]}">
+		<table class="table ship_to_contact" ng-show="show_ship_to_contact_list">
+			<thead>
+				<tr>
+					<th>Contact Name</th><th> City <a href="" class="close" ng-click="hideShipToContact()">x</a></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="con in contacts" ng-click="selectShipTo(con)">
+					
+					<td>{[{con.contact_name}]}</td>
+					<td>{[{con.city}]}</td>
+				</tr>
+			</tbody>
+		</table>
+		<table class="table contact" ng-show="ship_to_contact_details" autocomplete="off">
+		
+			<tr>
+				<th width="150">Contact Name</th>
+				<td>{[{ ship_to.contact_name }]}</td>
+			</tr>
+			<tr>
+				<th>Phone</th>
+				<td>
+					<li ng-repeat="phone in ship_to.phones">{[{ phone.type }]} {[{ phone.number }]} (ext: {[{phone.ext}]})</li>
+				</td>
+			</tr>
+			<tr>
+				<th>Email</th>
+				<td><span class='bg-info email' ng-repeat="em in ship_to.emails">{[{ em.email_address}]}</span></td>
+			</tr>
+		</table>
+		
+	</div>
+
+	</td>
+</tr>
+
+<tr class="bg-info">
+	<th><label for="id_number_of_cabs">Number of cabs:</label></th>
+	<td>
+		<input class="form-control" id="id_number_of_cabs" name="number_of_cabs" ng-model="number_of_cabs" type="text" value="{[{number_of_cabs}]}" autocomplete="off">
+	</td>
+	<th><label for="id_number_of_floors">Number of floors:</label></th>
+	<td>
+		<input class="form-control" id="id_number_of_floors" name="number_of_floors" ng-model="number_of_floors" type="text" value="{[{number_of_floors}]}" autocomplete="off">
+	</td>
+
+	<th><label for="id_front">Front:</label></th>
+	<td>
+		<input class="form-control" id="id_front" name="front" ng-model="front" type="text" value="{[{front}]}" autocomplete="off">
+	</td>
+
+	<th><label for="id_rear">Rear:</label></th>
+	<td>
+		<input class="form-control" id="id_rear" name="rear" ng-model="rear" placeholder="Rear" type="text" value="{[{rear}]}" autocomplete="off">
+	</td>
+</tr>
+
+<tr class="bg-info">
+	<th><label for="id_capacity">Capacity:</label></th>
+	<td colspan="3">
+		<input class="form-control" id="id_capacity" name="capacity" ng-model="capacity" placeholder="capacity" type="text" value="{[{capacity}]}" autocomplete="off">
+	</td>
+	<th><label for="id_rgw">RGW:</label></th>
+	<td colspan="3">
+		<input class="form-control" id="id_rgw" name="rgw" placeholder="RGW" ng-model="rgw" type="text" value="{[{rgw}]}" autocomplete="off">
+	</td>
+</tr>
+<tr>
+	<th colspan="2"><label for="id_customer_po_number">Customer PO Number:</label></th>
+	<td colspan="2">
+		<input class="form-control" id="id_customer_po_number" name="customer_po_number" ng-model="customer_po_number" placeholder="customer_po_number" type="text" value="{[{customer_po_number}]}" autocomplete="off">
+	</td>
+	<th colspan="2"><label for="id_delivery_date">Delivery date:</label></th>
+	<td colspan="2">
+		<input class="form-control datepicker" id="id_delivery_date" name="delivery_date" ng-model="delivery_date" type="text" value="{[{delivery_date}]}" autocomplete="off">
+	</td>
+</tr>
+<tr class="bg-info">
+	<th><label for="id_installed_by">Installed By:</label></th>
+	<td colspan="3">
+		<div class="contact_box">
+			<input type="text" ng-model="search_installed_by" placeholder="start typing to search installed by contact" class="form-control" ng-change="searchInstalledBy(search_installed_by)" autocomplete="off">
+			<input type="hidden" name="installed_by" value="{[{installed_by.id}]}">
+			<table class="table installed_by_contact" ng-show="show_installed_by_contact_list">
+				<thead>
+					<tr>
+						<th>Contact Name</th><th> City <a href="" class="close" ng-click="hideInstalledByContact()">x</a></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="con in contacts" ng-click="selectInstalledBy(con)">
+						
+						<td>{[{con.contact_name}]}</td>
+						<td>{[{con.city}]}</td>
+					</tr>
+				</tbody>
+			</table>
+			<table class="table contact" ng-show="installed_by_contact_details">
+				<tr>
+					<th width="150">Contact Name</th>
+					<td>{[{ installed_by.contact_name }]}</td>
+				</tr>
+				<tr>
+					<th>Phone</th>
+					<td>
+						<li ng-repeat="phone in installed_by.phones">{[{ phone.type }]} {[{ phone.number }]} (ext: {[{phone.ext}]})</li>
+					</td>
+				</tr>
+				<tr>
+					<th>Email</th>
+					<td><span class='bg-info email' ng-repeat="em in installed_by.emails">{[{ em.email_address}]}</span></td>
+				</tr>
+			</table>
+			
+		</div>
+	</td>
+	<th colspan="2"><label for="id_estimated_price_for_job">Estimated price for job:</label></th>
+	<td colspan="2">
+		<input class="form-control decimal" id="id_estimated_price_for_job" name="estimated_price_for_job" ng-model="estimated_price_for_job" type="text" value="{[{estimated_price_for_job}]}" autocomplete="off">
+	</td>
+</tr>
+</table>

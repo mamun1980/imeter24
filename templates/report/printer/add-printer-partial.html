@@ -1,0 +1,8 @@
+<span class="label label-danger {{ printer.id }}">
+	{{ printer.printer_name }}
+	{% if perms.report.change_printer %}
+		<a class="printer-edit" href="/report/printer/edit/{{ printer.id }}/" 
+			data-toggle="modal" data-target="#editModal"
+			data-printer-id="{{ printer.id }}"><i class="glyphicon glyphicon-edit"></i></a>
+	{% endif %}
+</span>

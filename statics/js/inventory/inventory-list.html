@@ -1,0 +1,88 @@
+<table class="table" ng-show="items">
+	<thead>
+	<tr>
+		<th>Item ID</th>
+		<th>Description</th>
+		<th>Quantity On Hand</th>
+		<th>Department</th>
+		<th>Item Unit Measure</th>
+		<th>Currency</th>
+		<th>Warehouse Location</th>
+		<th>Production Type</th>
+		
+		<th>Action</th>
+	</tr>
+	</thead>
+	
+	<tr ng-repeat="item in items | googleSearchFilter:search">
+		<td>{[{ item.item_number }]}</td>
+		<td>{[{ item.description }]}</td>
+		<td>{[{ item.quantity_on_hand }]}</td>
+		<td>{[{ item.department }]}</td>
+		<td>{[{ item.item_unit_measure }]}</td>
+		<td>{[{ item.currency }]}</td>
+		<td>{[{ item.warehouse_location }]}</td>
+		<td>{[{ item.production_type }]}</td>
+		
+		<td width="120">
+		<div class="btn-group btn-group-sm">
+			  				
+			<a class="btn btn-default" href="/inventory/item/view/{[{ item.item_number }]}/"> View </a>
+						
+			<a class="btn btn-default delete-item" data-item-id="{[{ item.item_number }]}" href="" ng-show="{[{ item.permission.can_delete_item }]}"> Delete </a>
+
+		</div>
+
+		</td>
+
+	</tr>
+	
+</table>
+
+<h2 ng-hide="items">There is no items</h2>
+
+
+<div id="delete-job-confirm" style="display:none;" title="Do you want to delete?">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;">
+  </span>This will delete the job from your system?</p>
+</div>
+
+<script type="text/javascript">
+(function() {
+	$(document).on("click", "#inventory-list a.delete-item", function(e){
+		e.preventDefault();
+		item_id = $(this).data("item-id");
+		console.log(item_id);
+		$( "#delete-user-confirm" ).css("display:block;");
+		
+		$( "#delete-job-confirm" ).dialog({
+			resizable: false,
+			height:200,
+			modal: true,
+			buttons: {
+				"Delete User": function() {
+									
+					$( this ).dialog( "close" );
+					$.ajax({
+						type: "POST",
+						url: "/inventory/item/delete/",
+						data: {
+							'itemid': item_id,
+						},
+						success: function(rdata) {
+							console.log(rdata);
+							$("a[data-item-id='"+ rdata + "']").closest("tr").remove();
+						}
+					})
+				},
+				Cancel: function() {
+					$( this ).dialog( "close" );
+				}
+			}
+		});
+
+	})
+})(jQuery)
+
+
+</script>

@@ -1,0 +1,53 @@
+<form name="postatusform" action="/purchase/po-status-cancel/{{po_id}}/" method="POST" enctype="multipart/form-data">{% csrf_token %}
+	<input type="hidden" name="purchase_order" value="{{po_number}}">
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h4 class="modal-title" id="myModalLabel">Cancel PO</h4>
+</div>
+
+
+<div class="modal-body">
+	<table class="add-user-table">
+	{% for fl in po_status_form %}
+		<tr>
+			<td>{{ fl.label_tag }}</td>
+			<td>{{ fl.errors }}{{ fl }}</td>
+		</tr>
+	{% endfor %}
+	</table>
+</div>
+
+
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-default close-modal" data-dismiss="modal">Close</button>
+    <button type="submit" class="btn btn-primary">Update Status</button>
+</div>
+</form>
+<script type="text/javascript">
+	(function(){
+		$("form[name='postatusform']").on("submit", function(e){
+			e.preventDefault();
+			form_data = $(this).serialize();
+			// console.log($(this).attr('action'));
+			$.ajax({
+				type: "POST",
+				url: $(this).attr('action'),
+				data: form_data,
+				success: function(rdata) {
+					console.log(rdata);
+	                $( "button.close-modal" ).trigger( "click" );
+	                // var em = "<li> mamun@gmali.com</li>";
+	                // $("table#extra-con-list").append(rdata);
+	                window.location.reload(false);
+	                // // win = window.open("",'_blank');
+	                // // win.location.href = "/contacts/edit/" + rdata + "/";
+
+	            }
+			});
+
+		})
+
+	})(jQuery)
+
+</script>

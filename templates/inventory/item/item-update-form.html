@@ -1,0 +1,419 @@
+<div class="row">
+	<div class="col-md-5">
+		<label for="id_item_number">Item number:</label>
+	</div>
+	<div class="col-md-7">
+		<input class="form-control" id="id_item_number" maxlength="25" name="item_number" readonly="readonly" type="text" value="{{item.item_number}}">
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-5">
+		<label for="id_description">Description:</label>
+	</div>
+	<div class="col-md-7">
+		<textarea class="form-control" cols="40" id="id_description" name="description" placeholder="Item Description" required="False" rows="2">{{item.description}}</textarea>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-5">
+		<label for="id_currency">Currency:</label>
+	</div>
+	<div class="col-md-7">
+		<select class="form-control" id="id_currency" name="currency">
+			{% for cur in currencies %}
+			<option value="{{cur.id}}" 
+				{% if cur.id == item.currency.id %} selected="selected" {% endif %}
+			>
+			{{cur.get_currency_icon}} {{cur.currency}}
+			</option>
+			{% endfor %}
+		</select>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-5  ">
+		<label for="id_wholesale_cost">Wholesale cost:</label>
+	</div>
+	<div class="col-md-7">
+	    <input class="form-control decimal" id="id_wholesale_cost" name="wholesale_cost" placeholder="Wholesale cost" step="0.01" type="number" value="{{item.wholesale_cost}}">
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-5  ">
+		<label for="id_quantity_on_hand">Quantity on hand:</label>
+	</div>
+	<div class="col-md-7">
+	    <input class="form-control decimal" id="id_quantity_on_hand" name="quantity_on_hand" placeholder="Quantity on hand" step="0.01" type="number" value="{{item.quantity_on_hand}}">
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-5  ">
+		<label for="id_quantity_on_order">Quantity on order:</label>
+	</div>
+	<div class="col-md-7">
+		<input class="form-control decimal" id="id_quantity_on_order" name="quantity_on_order" placeholder="Quantity on order" step="0.01" type="number" value="{{item.quantity_on_order}}">
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-5  ">
+		<label for="id_qty_on_request">Qty on request:</label>
+	</div>
+    <div class="col-md-7">
+        <input class="form-control decimal" id="id_qty_on_request" name="qty_on_request" step="0.0001" type="number" value="{{item.qty_on_request}}">
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-5  ">
+		<label for="id_department">Department:</label>
+	</div>
+	<div class="col-md-7">
+		<select class="form-control" id="id_department" name="department">
+			{% for department in departments %}
+			<option value="{{department.id}}"
+				{% if department.id == item.department.id %} selected="selected" {% endif %}
+			>
+			{{department.name}}
+			</option>
+			
+			{% endfor %}
+		</select>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-5  ">
+		<label for="id_primary_supplier">Primary supplier:</label>
+	</div>
+	<div class="col-md-7">
+	  
+		
+	<div class="contact_box">
+		<input type="text" ng-model="search_supplier" placeholder="start typing to search supplier" class="form-control custom-form-control" ng-change="searchSupplier(search_supplier)">
+		<a href="/admin/contacts/contact/add/" class="add-another" id="add_id_primary_supplier" onclick="return showAddAnotherPopup(this);"> <img src="/statics/admin/img/icon_addlink.gif" width="10" height="10" alt="Add Another"></a>
+
+		<table class="table supplier_contact" id="supplier_contact_list">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>Contact Name</th>
+					<th>Address 1</th>
+					<th> City <a href="" class="close">x</a></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="con in suppliers" ng-click="setSupplier(con)">
+					<td>{[{con.id}]}</td>
+					<td>{[{con.contact_name}]}</td>
+					<td>{[{con.address_1}]}</td>
+					<td>{[{con.city}]}</td>
+				</tr>
+				<tr ng-show="!suppliers.length">
+					<td colspan="4">No contacts</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<input type="hidden" name="primary_supplier" id="id_primary_supplier" value="{[{ supplier_contact.id }]}">
+		<input type="hidden" name="contact_id" value="{{contact_id}}">
+	</div>
+
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+		<table class="table" id="supplier_contact_details" ng-show="show_supplier_contact">
+			<tr>
+				<th width="150">Contact Name</th>
+				<td colspan="2">{[{ supplier_contact.contact_name }]}</td>
+			</tr>
+			<tr>
+				<th>City</th>
+				<td colspan="2">{[{ supplier_contact.city }]}</td>
+			</tr>
+			<tr>
+				<th>Province</th>
+				<td colspan="2">{[{ supplier_contact.province }]}</td>
+			</tr>
+			<tr>
+				<th>Country</th>
+				<td colspan="2">{[{ supplier_contact.country }]}</td>
+			</tr>
+			<tr>
+				<th>Emails</th>
+				<td colspan="2">
+					<li ng-repeat="em in supplier_contact.emails">
+						<span class='bg-info email'>{[{ em.email_address}]} ({[{em.email_type}]})</span>
+					</li>
+				</td>
+			</tr>
+			
+		</table>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-5  ">
+		<label for="id_item_unit_measure">Item Unit Measure:</label>
+	</div>
+	<div class="col-md-7">
+	    <select class="form-control" id="id_item_unit_measure" name="item_unit_measure">
+		{% for un in unit_measures %}
+			<option value="{{un.id}}"
+			{% if un.id == item.item_unit_measure.id %} selected="selected" {% endif %}
+			>{{un.unit_name}}</option>
+		{% endfor %}
+		</select>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-5  ">
+		<label for="id_warehouse_location">Warehouse location:</label>
+	</div>
+	<div class="col-md-7">
+		<select class="form-control" id="id_warehouse_location" name="warehouse_location">
+		{% for loc in locations %}
+			<option value="{{loc.id}}"
+			{% if loc.id == item.warehouse_location.id %} selected="selected" {% endif %}
+			>{{loc.warehouse_location}}</option>
+		{% endfor %}
+		</select>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-5  ">
+        <label for="id_max_order_qty">Max order qty:</label>
+    </div>
+    <div class="col-md-7  ">
+    	<input class="form-control decimal" id="id_max_order_qty" name="max_order_qty" placeholder="Maximum Order Quenty" step="0.01" type="number" value="{{item.max_order_qty}}">
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-5  ">
+	    <label for="id_max_single_order_qty">Max single order qty:</label>
+	</div>
+	<div class="col-md-7  ">
+		<input class="form-control decimal" id="id_max_single_order_qty" name="max_single_order_qty" placeholder="Maximum Single Order Quenty" step="0.01" type="number" value="{{item.max_single_order_qty}}">
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-5  ">
+		<label for="id_estimated_wholesale_cost">Estimated wholesale cost:</label>
+	</div>
+	<div class="col-md-7  ">
+		<input class="form-control decimal" id="id_estimated_wholesale_cost" name="estimated_wholesale_cost" placeholder="Estimated wholesale cost" step="0.01" type="number" value="{{item.estimated_wholesale_cost}}">
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-5  ">
+		<label for="id_retail_price">Retail price:</label>
+	</div>
+	<div class="col-md-7  ">
+		<input class="form-control decimal" id="id_retail_price" name="retail_price" placeholder="Retail Price" step="0.01" type="number" value="{{item.retail_price}}">
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-5  ">
+	    <label for="id_production_type">Production type:</label>
+	</div>
+	<div class="col-md-7  ">
+	    <select class="form-control" id="id_production_type" name="production_type">
+		{% for prt in production_types %}
+			<option value="{{prt.id}}"
+			{% if prt.id == item.production_type.id %} selected="selected" {% endif %}
+			>{{prt.production_type_name}}</option>
+		{% endfor %}
+		</select>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-5  ">
+		<label for="id_catalog_number">Catalog number:</label>
+	</div>
+	<div class="col-md-7  ">
+	    <input class="form-control" id="id_catalog_number" maxlength="25" name="catalog_number" placeholder="Catalog Number" type="text" value="{{item.catalog_number}}">
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-5  ">
+	    <label for="id_country_of_origin">Country of origin:</label>
+	</div>
+	<div class="col-md-7  ">
+	    <input class="form-control" id="id_country_of_origin" maxlength="25" name="country_of_origin" placeholder="Country of Origin" type="text" value="{{item.country_of_origin}}">
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-5  ">
+		<label for="id_lead_time">Lead time:</label>
+	</div>
+	<div class="col-md-7  ">
+	    <input class="form-control" id="id_lead_time" maxlength="25" name="lead_time" placeholder="Lead Time" type="text" value="{{item.lead_time}}">
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-5  ">
+	    <label for="id_customs_designation">Customs designation:</label>
+	</div>
+	<div class="col-md-7  ">
+	    <select class="form-control" id="id_customs_designation" name="customs_designation">
+			{% for designation in designations %}
+				<option value="{{designation.id}}"
+				{% if designation.id == item.customs_designation.id %} selected="selected" {% endif %}
+				>{{designation.designation}}</option>
+			{% endfor %}
+		</select>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-5  ">
+		<label for="id_customer_tariff_number">Customer tariff number:</label>
+	</div>
+	<div class="col-md-7  ">
+		<input class="form-control" id="id_customer_tariff_number" maxlength="25" name="customer_tariff_number" placeholder="Lead Time" type="text" value="{{item.customer_tariff_number}}">
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-5  ">
+	    <label for="id_preference_criteria">Preference criteria:</label>
+	</div>
+	<div class="col-md-7  ">
+		<input class="form-control" id="id_preference_criteria" maxlength="25" name="preference_criteria" placeholder="Preference Criteria" type="text" value="{{item.preference_criteria}}">
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-5  ">
+	    <label for="id_producer_of_item">Producer of item:</label>
+	</div>
+	<div class="col-md-7  ">
+			<div class="contact_box">
+				<input type="text" ng-model="search_producer" placeholder="start typing to search producer" class="form-control" ng-change="searchProducer(search_producer)">
+
+				<table class="table supplier_contact" id="producer_of_item_list">
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>Contact Name</th>
+							<th>Address 1</th>
+							<th> City <a href="" class="close">x</a></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="con in producers" ng-click="setProducer(con)">
+							<td>{[{con.id}]}</td>
+							<td>{[{con.contact_name}]}</td>
+							<td>{[{con.address_1}]}</td>
+							<td>{[{con.city}]}</td>
+						</tr>
+						<tr ng-show="!producers.length">
+							<td colspan="4">No contacts</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<input type="hidden" name="producer_of_item" id="id_producer_of_item" value="{[{ producer.id }]}">
+				<input type="hidden" name="producer" value="{{producer_of_item_id}}">
+			</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+		<table class="table" id="sproducer_details" ng-show="show_producer_contact">
+			<tr>
+				<th width="150">Contact Name</th>
+				<td colspan="2">{[{ producer.contact_name }]}</td>
+			</tr>
+			<tr>
+				<th>City</th>
+				<td colspan="2">{[{ producer.city }]}</td>
+			</tr>
+			<tr>
+				<th>Province</th>
+				<td colspan="2">{[{ producer.province }]}</td>
+			</tr>
+			<tr>
+				<th>Country</th>
+				<td colspan="2">{[{ producer.country }]}</td>
+			</tr>
+			<tr>
+				<th>Emails</th>
+				<td colspan="2">
+					<li ng-repeat="em in producer.emails">
+						<span class='bg-info email'>{[{ em.email_address}]} ({[{em.email_type}]})</span>
+					</li>
+				</td>
+			</tr>
+			
+		</table>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-5  ">
+		<label for="id_shipping_weight">Shipping weight:</label>
+	</div>
+	<div class="col-md-7  ">
+	    <input class="form-control" id="id_shipping_weight" name="shipping_weight" placeholder="Shipping weight" step="0.01" type="number" value="{{item.shipping_weight}}">
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-5  ">
+		<label for="id_minimum_qty_on_hand">Minimum qty on hand:</label>
+	</div>
+	<div class="col-md-7  ">
+		<input class="form-control decimal" id="id_minimum_qty_on_hand" name="minimum_qty_on_hand" placeholder="Minimum quantity on hand" step="0.01" type="number" value="{{item.minimum_qty_on_hand}}">
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-5  ">
+		<label for="id_duty_percentage">Duty percentage:</label>
+	</div>
+	<div class="col-md-7  ">
+		<input class="form-control decimal" id="id_duty_percentage" name="duty_percentage" placeholder="Duty percentage" step="0.01" type="number" value="{{item.duty_percentage}}">
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-5  ">
+		<label for="id_terms">HST Taxable:</label>
+	</div>
+	<div class="col-md-7  ">
+	    <input type="checkbox" {% if item.hst_taxable %} checked {% endif %} data-toggle="toggle" data-on="Yes" data-off="No" name="hst_taxable" style="margin-left: 10px; margin-right: 20px;">
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-5  ">
+		<label for="id_terms">PST Taxable:</label>
+	</div>
+	<div class="col-md-7  ">
+	    <input type="checkbox" {% if item.pst_taxable %} checked {% endif %} data-toggle="toggle" data-on="Yes" data-off="No" name="pst_taxable" style="margin-left: 10px; margin-right: 20px;">
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-5  ">
+		<label for="id_terms">Terms:</label>
+	</div>
+	<div class="col-md-7  ">
+	    <select class="form-control" id="id_terms" name="terms">
+	    {% for term in terms %}
+			<option value="{{term.id}}"
+			{% if term.id == item.terms.id %} selected="selected" {% endif %}
+			>{{term.term}}</option>
+		{% endfor %}
+		</select>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-5  ">
+		<label for="id_website">Website:</label>
+	</div>
+	<div class="col-md-7  ">
+	    <input class="form-control" id="id_website" maxlength="250" name="website" placeholder="product page url" type="url" value="{{item.website}}">
+	</div>
+</div>
+<div class="row" style="margin-top: 10px;">
+	<div class="col-md-5">
+		<label for="id_item_image">Item image:</label>
+	</div>
+	<div class="col-md-7  ">
+	    <input id="id_item_image" name="item_image" type="file" value="">
+	    {% if item.item_image %}
+	    	<img style="margin-top: 10px;" src="/media/{{item.item_image.url}}" class="img-thumbnail" width="100" height="100">
+	    {% endif %}
+	</div>
+</div>
+

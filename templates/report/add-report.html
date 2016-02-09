@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body" ng-app="demoApp">
+
+<section class="row"  id="report" ng-controller="AddReportController">
+	
+
+	<div class="col-md-6 col-md-offset-3">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Add Report Type</h4>
+		  	</div>
+		  	<div class="panel-body">
+			  	<form name="report-form" action="/report/add/" method="POST">{% csrf_token %}
+			  		<table class="add-user-table">
+				  		<tbody><tr>
+				  				<td><label for="id_report_type">Report type:</label></td>
+				  				<td><input class="form-control" id="id_report_type" maxlength="100" name="report_type" placeholder="Report Type" type="text"></td>
+				  			</tr>
+				  		
+				  		
+				  			<tr>
+				  				<td><label for="id_comments">Comments:</label></td>
+				  				<td><textarea class="form-control" cols="40" id="id_comments" name="comments" placeholder="Comments" rows="2"></textarea></td>
+				  			</tr>
+				  		
+				  			<tr>
+				  				<td><label for="id_python_script">Python script:</label></td>
+				  				<td><input class="form-control" id="id_python_script" maxlength="200" name="python_script" placeholder="Python script" type="text"></td>
+				  			</tr>
+				  		
+				  		
+					<tr>
+						<td colspan="2">
+							<button type="submit" class="btn btn-primary btn-lg form-control login-btn">Add Report Type</button>
+						</td>
+					</tr>
+					</tbody>
+				  	
+					</table>
+			  	</form>
+			</div>
+		</div>
+	</div>
+
+</section>
+</div>
+<script type="text/javascript">
+
+var demoApp = angular.module("demoApp", [], function ($interpolateProvider) {
+        $interpolateProvider.startSymbol("{[{");
+        $interpolateProvider.endSymbol("}]}");
+});
+demoApp.controller("AddReportController", ['$scope', '$http', function ($scope, $http){
+
+}]);
+
+
+(function(){
+	$(".datetimepicker").datepicker();
+})(jQuery)
+
+</script>
+
+{% endblock content %}
+	

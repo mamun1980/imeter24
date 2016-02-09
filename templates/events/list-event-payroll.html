@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+
+<section class="row"  id="inventory-list">
+	
+
+	<div class="col-md-12">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Event Entry List</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  		<table class="table events-list">
+					<tr>
+						<td>Serial ID</td>
+						<td>Event user name</td>						
+						<td>System User</td>
+						
+						<td>Action</td>
+					</tr>
+					{% for payroll in payrolls %}
+					<tr>
+						<td>{{ payroll.serial_id }}</td>
+						<td>{{ payroll.event_username }}</td>
+						
+						<td>{{ payroll.premier_user }}</td>
+						
+						<td>
+							{% if perms.events.change_eventpayroll %}
+							<a href="/events/payroll/edit/{{payroll.serial_id}}/">Edit</a>
+							{% endif %}
+							
+							{% if perms.events.delete_eventpayroll %}
+							/ 
+							<a href="" data-id="{{payroll.serial_id}}" class="delete-payroll">Delete</a>
+							{% endif %}
+							
+						</td>
+					</tr>
+					{% empty %}
+
+					<tr>
+						<td colspan="4"><h2>No payroll</h2></td>
+					</tr>
+					{% endfor %}
+					
+				</table>
+			</div>
+		</div>
+	</div>
+
+</section>
+</div>
+
+<div id="delete-contact-confirm" title="Do you want to delete?">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;">
+  </span>This will delete the evententry from your system?</p>
+</div>
+<script type="text/javascript">
+
+(function(){
+	$(document).on("click", "a.delete-payroll", function(e){
+		e.preventDefault();
+		serial_id = $(this).data("id");
+		console.log(serial_id);
+
+		$( "#delete-contact-confirm" ).dialog({
+			resizable: false,
+			height:200,
+			modal: true,
+			buttons: {
+				"Delete evententry": function() {
+									
+					$( this ).dialog( "close" );
+					$.ajax({
+						type: "POST",
+						url: "/events/payroll/delete/",
+						data: {
+							'serial_id': serial_id,
+						},
+						success: function(rdata) {
+							
+							$("a[data-id='"+rdata+"'").closest("tr").remove();
+						},
+						error: function() {
+							alert("payroll not deleted");
+						}
+					})
+				},
+				Cancel: function() {
+					$( this ).dialog( "close" );
+				}
+			}
+		});
+
+	});
+})(jQuery)
+</script>
+{% endblock content %}
+	

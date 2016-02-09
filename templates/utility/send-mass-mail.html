@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}{{site_name}}{% endblock title %}
+
+{% block content %}
+<div class="container main-body shadow4">
+	
+	<div class="row" >
+		<div class="col-md-8">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Mass Mail Form</h4>
+		  	</div>
+		  	<div class="panel-body">
+				<form action="/send-mass-mail/" method="post">{% csrf_token %}
+				    <div class="col-md-6 col-md-offset-3">
+				    	{{ mass_mail_form.as_p }}
+
+				    	<p><label for="id_to_all_users_0">Send To All:</label> </p>
+				    		<p>
+							<label for="id_to_all_users_0"><input class="form-control" id="id_to_all_users_0" name="to_all" placeholder="Name" type="radio" value="0"> No</label>
+						</p>
+						<p>
+							<label for="id_to_all_users_1"><input class="form-control" id="id_to_all_users_1" name="to_all"placeholder="Name" type="radio" value="1" checked> Yes</label>
+						</p>
+						
+						<p id="receivers">
+							<label for="id_reciever">Receiver list:</label> <textarea class="form-control" cols="40" id="id_reciever" name="reciever" placeholder="Write comma separated email id" rows="2"></textarea>
+						</p>
+					</div>
+					<div class="col-md-6 col-md-offset-3">
+						<button type="submit" class="btn btn-primary btn-lg form-control login-btn">Send Mail</button>
+					</div>
+				</form>
+			</div>
+		</div>
+		</div>
+		
+	</div>
+	
+</div>
+
+<script type="text/javascript">
+(function(){
+	$("#receivers").hide();
+	$('input:radio').click(function() {
+		if ($(this).val() === '1') {
+			console.log('all');
+			$("#receivers").hide();
+		} else if ($(this).val() === '0') {
+			console.log('not all');
+			$("#receivers").show();
+		} 
+	});
+})(jQuery)
+
+</script>
+{% endblock content %}

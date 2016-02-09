@@ -1,0 +1,841 @@
+{% extends "base.html" %}
+
+{% block angular %}
+	<script type="text/javascript" src="/statics/js/angular.min.js"></script>
+	<script type="text/javascript" src="/statics/js/angular-route.min.js"></script>	
+
+	<script type="text/javascript" src="/statics/js/bootstrap-multiselect.js"></script>
+	<link rel="stylesheet" href="/statics/css/bootstrap-multiselect.css" type="text/css"/>
+{% endblock angular %}
+
+{% block content %}
+<style>
+.contact_box, .item_box, .ship_to_box {
+	position: relative;
+}
+table#sold_to_contact_details, table#ship_to_contact_details {
+	margin-top: 10px;
+}
+table#sold_to_contact_details th, table#ship_to_contact_details th{
+	background-color: #83AD9E;
+}
+table > thead {
+	background-color: #333;
+    color: #FF2;
+    
+}
+table > tbody {
+	background-color: #FFF;
+}
+#sold_to_contact_list, #ship_to_contact_list {
+    width: 980px !important;
+    position: absolute;
+    top: 34px;
+    z-index: 1000;
+}
+#sold_to_contact_list {
+    
+    left: 0px;
+    /*background-color: #ed791a;*/
+    
+}
+#ship_to_contact_list {
+    right: 535px;
+}
+#ship_to_contact_list thead, #sold_to_contact_list thead {
+    color: #FFF;
+    background-color: #ed791a;
+    font-size: 16px;
+}
+#ship_to_contact_list tbody, #sold_to_contact_list tbody {
+    color: #FFF;
+    background-color: #333;
+    font-size: 14px;
+}
+
+#items_list{
+	position: absolute;
+	top: 45px;
+	left: 5px;
+	
+	z-index: 1000;
+	/*border: 1px solid #000;*/
+	-webkit-box-shadow: 0px 0px 10px 0px rgba(50, 50, 50, 0.75);
+	-moz-box-shadow:    0px 0px 10px 0px rgba(50, 50, 50, 0.75);
+	box-shadow:         0px 0px 10px 0px rgba(50, 50, 50, 0.75);
+}
+#items_list thead {
+    background-color: #000;
+    color: #FF0;
+}
+.sold_to_contact tbody tr:hover, .ship_to_contact tbody tr:hover {
+	background-color: #616183;
+}
+table#items_list {
+	width: 940px;
+}
+#items_list tbody tr:hover{
+	background-color: #CCC;
+}
+.bg-hello {
+	background-color: #777;
+}
+p.item_desc {
+	min-height: 34px;
+	margin-bottom: 0px;
+	padding: 5px;
+}
+.glyphicon {
+	color: red;
+}
+#sl_list, #job_list {
+    position: absolute;
+    width: 100%;
+    z-index: 100;
+}
+#sl_list table {
+    border: 1px solid #000;
+}
+#sl_list tbody tr:hover {
+    background-color: #CCC;
+}
+#sl_list thead {
+    background-color: #ed791a;
+    color: #FFF;
+    font-size: 16px;
+    font-style: bold;
+}
+#sl_list ul {
+    padding-left: 0px;
+    list-style: none;
+}
+a.close {
+    opacity: 1!important;
+    color: red !important;
+}
+.sl_contact p {
+    margin: 0 !important;
+}
+</style>
+<div class="container-fluid shadow4 main-body" ng-app="slApp">
+{% if messages %}
+<div class="messages row ">
+    {% for message in messages %}
+    <p {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+    {% endfor %}
+</div>
+{% endif %}
+
+<section class="row " ng-controller="AddSLController">
+	<form action="/purchase/add-new-sl/" name="add_sl_form" method="POST" enctype="multipart/form-data">{% csrf_token %}
+    <input type="hidden" id="form_action" name="form_action" value="">
+	
+	<div class="col-md-12">
+		
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Add Shipping List</h4>
+		  	</div>
+		  	
+
+				{% include "purchase/partials/add-sl-form.html" %}
+				
+			
+		</div>
+		
+	</div>
+	<div class="col-md-6">
+		<button class="btn btn-primary form-control" name='generate_pl' value="generate_pl">Generate Packing List</button>	
+	</div>
+    <div class="col-md-6">
+        <button type="submit" class="btn btn-primary form-control" name='save_sl' value="save_sl" ng-disabled="!(add_sl_form.$valid && add_sl_form.$dirty && item_added)">Add Shipping List</button>   
+    </div>
+	</form>
+	
+		
+</section>
+
+</div>
+{% include "modals/sl-comment-modal-form.html" %}
+{% include "modals/add-modal.html" %}
+<!-- SL Number -->
+<script type="text/javascript">
+
+(function(){
+	$(".datepicker").datepicker();
+	
+    $("a.close").on("click", function(){
+		$(this).closest('table').hide();
+
+	});
+
+	$("#form_action").val("new");
+
+    $("button[name='generate_pl']").click(function(event){
+        
+        event.preventDefault();
+        
+
+        var soldto = $("#id_sold_to").val();
+        if(soldto == '') {
+            alert("Please select contact for Sold To.");
+            return false;
+        }
+
+        var sl_new_items = [];
+        var i=0;
+        $("input[name='new_item']").each(function(e){
+            
+            var item_number = $(this).closest("tr").find("input[name='added_item_number']").val();
+            var ship_today = $(this).closest("tr").find("input[name='ship_today']").val();
+            var item_ordered = $(this).closest("tr").find("input[name='item_ordered']").val();
+            var item_unit = $(this).closest("tr").find("select[name='item_unit']").val();
+            var shipped_total_to_date = $(this).closest("tr").find("input[name='shipped_total_to_date']").val();
+
+            var line_comment = $(this).closest("table").find("textarea[name='comment_detail_"+i+"']").val();
+
+            i++;
+
+
+            var mi = {
+                'item_number': item_number,
+                'item_ordered': item_ordered,
+                'item_unit': item_unit,
+                'shipped_total_to_date': shipped_total_to_date,
+                'search_string': line_comment,
+                'ship_today': ship_today,
+            }
+
+            sl_new_items.push(mi);
+
+            
+            
+        });
+        
+        var sl_update_items = [];
+        var i=0;
+
+        $("input[name='update_item']").each(function(e){
+            
+            var item_number = $(this).closest("tr").find("input[name='added_item_number']").val();
+            var sl_item_id = $(this).closest("tr").find("input[name='sl_item_id']").val();
+            
+            var ship_today = $(this).closest("tr").find("input[name='ship_today']").val();
+            var item_ordered = $(this).closest("tr").find("input[name='item_ordered']").val();
+            var item_unit = $(this).closest("tr").find("select[name='item_unit']").val();
+            var shipped_total_to_date = $(this).closest("tr").find("input[name='shipped_total_to_date']").val();
+
+            var line_comment = $(this).closest("table").find("textarea[name='comment_detail_"+i+"']").val();
+
+            i++;
+
+
+            var mi = {
+                'item_number': item_number,
+                'item_ordered': item_ordered,
+                'item_unit': item_unit,
+                'shipped_total_to_date': shipped_total_to_date,
+                'ship_today': ship_today,
+                'search_string': line_comment,
+                'sl_item_id': sl_item_id
+            }
+
+            sl_update_items.push(mi);
+            
+        });
+        
+        // create contact for sold to ===================
+        var sold_to_contact = [];
+        var sold_to_extra_contact = [];
+
+        $("#sl_sold_to_extra_contact_list tbody tr").each(function(e){
+            var sold_to_ph_type = $(this).find("input[name='sl_sold_to_phone_type']").val();
+            var sold_to_ph_number = $(this).find("input[name='sl_sold_to_phone_number']").val();
+            var sold_to_ph_ext = $(this).find("input[name='sl_sold_to_phone_ext']").val();
+            var sold_to_ph_attention = $(this).find("input[name='sl_sold_to_phone_attention']").val();
+
+            var sold_to_extra_con = $(this).find("input[name='sl_soldto_extra_contacts']").val();
+            
+            
+            if(sold_to_ph_type){
+                var sold_to_contact_dict = {};
+                sold_to_contact_dict['sl_sold_to_phone_type'] = sold_to_ph_type;
+
+                if(sold_to_ph_ext){
+                    sold_to_contact_dict['sl_sold_to_phone'] = sold_to_ph_number + ":" + sold_to_ph_ext;    
+                } else {
+                    sold_to_contact_dict['sl_sold_to_phone'] = sold_to_ph_number;
+                }
+                
+                sold_to_contact_dict['sl_sold_to_phone_attention'] = sold_to_ph_attention;    
+                
+                sold_to_contact.push(sold_to_contact_dict)
+            } else if(sold_to_extra_con) {
+                sold_to_extra_contact.push(sold_to_extra_con)
+            }
+            
+
+        });
+
+        // create contact for ship to =======================
+        var ship_to_contact = [];
+        var ship_to_extra_contact = [];
+
+        $("#sl_ship_to_extra_contact_list tbody tr").each(function(e){
+            var ship_to_ph_type = $(this).find("input[name='sl_ship_to_phone_type']").val();
+            var ship_to_ph_number = $(this).find("input[name='sl_ship_to_phone_number']").val();
+            var ship_to_ph_ext = $(this).find("input[name='sl_ship_to_phone_ext']").val();
+            var ship_to_ph_attention = $(this).find("input[name='sl_ship_to_phone_attention']").val();
+
+            var ship_to_extra_con = $(this).find("input[name='sl_shipto_extra_contacts']").val();
+            
+            
+            if(ship_to_ph_type){
+                var ship_to_contact_dict = {};
+                ship_to_contact_dict['sl_ship_to_phone_type'] = ship_to_ph_type;
+
+                if(ship_to_ph_ext){
+                    ship_to_contact_dict['sl_ship_to_phone'] = ship_to_ph_number + ":" + ship_to_ph_ext;    
+                } else {
+                    ship_to_contact_dict['sl_ship_to_phone'] = ship_to_ph_number;
+                }
+                
+                ship_to_contact_dict['sl_ship_to_phone_attention'] = ship_to_ph_attention;    
+                
+                ship_to_contact.push(ship_to_contact_dict)
+            } else if(ship_to_extra_con) {
+                ship_to_extra_contact.push(ship_to_extra_con)
+            }
+            
+
+        });
+        
+        // console.log(sl_items);
+        if(sl_update_items.length < 1 && sl_new_items < 1) {
+            alert("At least one sl item must have ship today amount!");
+            return false;
+        } else {
+
+            varformData = {
+                'form_action': $('#form_action').val(),
+                'sl_number': $('#id_sl_number').val(),
+                'sold_to': $('#id_sold_to').val(),
+                'ship_to': $('#id_ship_to').val(),
+                'ordered_date': $('#id_ordered_date').val(),
+                'date_required': $('#id_date_required').val(),
+                'customer_po_number': $('#id_customer_po_number').val(),
+                'customer_job_number': $('#id_customer_job_number').val(),
+                'ship_via': $('#id_ship_via').val(),
+                'job_number': $('#id_job_number').val(),
+                'sl_status': $('#id_sl_status option:selected').val(),
+                'new_items': sl_new_items,
+                'update_items': sl_update_items,
+                'soldto_contact': sold_to_contact,
+                'soldto_extra_contact': sold_to_extra_contact,
+                'shipto_contact': ship_to_contact,
+                'shipto_extra_contact': ship_to_extra_contact,
+            };
+
+            console.log(varformData);
+
+            $.ajax({
+                url: "/purchase/generate-pl-from-sl/",
+                type: 'POST',
+                data: JSON.stringify(varformData),
+                success: function(data) {
+                    console.log(data)
+                },
+                error: function(err) {
+                    alert(err);
+                }
+            });
+            
+        }
+
+        // create pl 
+
+
+
+
+        return false;
+    });
+
+    
+
+    $(document).on("click", "a.delete-contact", function(e){
+        // console.log("Hello world!");
+        var row = $(this).closest("tr");
+        row.remove();
+        var poecid = $(this).data("contactid");
+        var type = $(this).data("contacttype");
+        if(poecid != ""){
+            if(type=='shipto') {
+                var url = "/purchase/delete-sl-shipto-contact/";
+            } else if(type=='soldto') {
+                var url = "/purchase/delete-sl-soldto-contact/";    
+            }
+            
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                
+                data: {
+                    'contactid': poecid,
+                },
+                success: function(rdata) {
+                    
+                    $("a[data-contactid='"+rdata+"']").closest("tr").remove();
+
+                }
+            });    
+        }
+        
+    });
+    $("a#add_id_primary_supplier").on("click", function(e){
+        e.preventDefault();
+        url = "/contacts/add/rel/",
+        mdal = $('#addModal');
+        mdal.on("shown.bs.modal", function(){
+            $("#addModal .modal-content").load(url);
+            // console.log(url);
+        }).modal();
+        return false;
+    });
+
+})(jQuery)
+</script>
+
+
+<script type="text/javascript">
+var slApp = angular.module("slApp", [], function ($interpolateProvider) {
+        $interpolateProvider.startSymbol("{[{");
+        $interpolateProvider.endSymbol("}]}");
+});
+
+slApp.controller('AddSLController',['$scope', '$http','$compile', function ($scope, $http, $compile) {
+	
+	$scope.init = function() {
+
+		$http({method: 'GET', url: "/inventory/items/"}).
+            success(function(data, status, headers, config) {
+                // console.log(data);
+                $scope.items = data;
+            });
+
+        $http({method: 'GET', url: "/schedule/all-jobs/"}).
+            success(function(data, status, headers, config) {
+                // console.log(data);
+                $scope.jobs = data;
+            });
+
+        $http({method: 'GET', url: "/purchase/list/"}).
+            success(function(data, status, headers, config) {
+                // console.log(data);
+                $scope.pos = data;
+            });
+
+        $http({method: 'GET', url: "/inventory/unit-measure-list/json/"}).
+            success(function(data, status, headers, config) {
+                $scope.units = data;
+            });
+
+        $("#sold_to_contact_list").hide();
+        $("#sold_to_contact_details").hide();
+
+        $("#ship_to_contact_list").hide();
+        $("#ship_to_contact_details").hide();
+
+        $("#items_list").hide();
+
+        $scope.show_sl_list = false;
+        $scope.show_job_list = false;
+        var items_count = $("input.added_item_number").length;
+        if(items_count < 2) {
+            $scope.item_added = false;
+        } else {
+            $scope.item_added = true;
+        }
+        // $scope.search_sl = 'new';
+        
+        // $("#ship-to-container").hide();
+        // $scope.sold_to_contact = false;
+        $scope.add_item_seq_no = 0;
+        var today = new Date();
+        var mm = parseInt(today.getMonth()) + 1;
+        var mydate = mm+"/"+today.getDate()+"/"+today.getFullYear();
+        console.log(mydate);
+        $("#id_ordered_date").val(mydate);
+	};
+
+	$scope.init();
+
+    $scope.addSoldToExtraContact = function() {
+        console.log("testing..");
+        mdal = $('#addModal');
+        url = "/purchase/add-sl-soldto-extra-contact/",
+        mdal.on("shown.bs.modal", function(){
+            $("#addModal .modal-content").load(url);
+            
+            // console.log(url);
+        }).modal();
+        return false;
+    };
+
+    $scope.addShipToExtraContact = function() {
+        console.log("testing..");
+        mdal = $('#addModal');
+        url = "/purchase/add-sl-shipto-extra-contact/",
+        mdal.on("shown.bs.modal", function(){
+            $("#addModal .modal-content").load(url);
+            
+            // console.log(url);
+        }).modal();
+        return false;
+    };
+
+    $scope.searchJob = function(q) {
+        if(q.length > 1) {
+            url = "/schedule/job/search/?q=" + q
+            $http({method: 'GET', url: url}).
+                success(function(data, status, headers, config) {
+                    console.log(data);
+                    $scope.jobs = data;
+                });            
+            $scope.show_job_list = true;
+            
+        } else {
+            $scope.show_job_list = false;
+        }
+    }
+
+    $scope.selectJob = function(job) {
+        console.log(job);
+        $("#id_job_number").val(job.job_id);
+        $scope.search_job = job.job_number;
+        $scope.show_job_list = false;
+    }
+
+    $scope.searchShipTo  = function(q) {
+        if(q.length > 1) {
+            url = "/contacts/auto/?q=" + q
+            $http({method: 'GET', url: url}).
+                success(function(data, status, headers, config) {
+                    console.log(data.results);
+                    $scope.shipto = data.results;
+                });
+            $("#ship_to_contact_list").show();
+            
+            
+        } else {
+            $("#ship_to_contact_list").hide();
+        }
+    }
+
+	$scope.selectShipTo = function(con) {
+		$("#ship_to_contact_list").hide();
+		$scope.search_ship_to = ""
+		$scope.ship_to_contact = con;
+        $scope.search_ship_to = con.contact_name;
+		$("#id_ship_to").val(con.id);
+		$("#ship_to_contact_details").show();
+
+
+	};
+
+    $scope.searchSoldTo  = function(q) {
+        if(q.length > 1) {
+            url = "/contacts/auto/?q=" + q
+            $http({method: 'GET', url: url}).
+                success(function(data, status, headers, config) {
+                    console.log(data.results);
+                    $scope.soldto = data.results;
+                });
+            $("#sold_to_contact_list").show();
+            
+            
+        } else {
+            $("#sold_to_contact_list").hide();
+        }
+    }
+
+    $scope.selectSoldTo = function(con) {
+		$("#sold_to_contact_list").hide();
+		$scope.search_sold_to = con.contact_name;
+		$scope.sold_to_contact = con;
+		$("#id_sold_to").val(con.id);
+		$("#sold_to_contact_details").show();
+
+
+	};
+
+    $scope.searchItem = function(q) {
+		if(q.length > 1) {
+			console.log(q);
+			$http({method: 'GET', url: "/inventory/items/"}).
+	        	success(function(data, status, headers, config){
+	        	$scope.items = data;
+	        });
+			$("#items_list").show();
+		} else {
+			$("#items_list").hide();
+		}
+		
+	}
+	$scope.selectItem = function(item) {
+    	$scope.search_item = '';
+        
+    	$("#items_list").hide();
+    	var myitem = $("tbody#add_item_list tr.add_item");
+    	var item_number = item.item_number;
+    	var item_description = item.description;
+    	var item_id = item.id;
+    	var currency_id = item.currency_id;
+        $scope.item_added = true;
+    	// console.log(unit_measure_id);
+    	// var item_qty_received = parseFloat(item.qty_received).toFixed(4);
+    	// var last_received_date = item.qty_received_date;
+
+    	var item_qty_received = 0.00;
+    	var last_received_date = null;
+    	// console.log(item.qty_received_date);
+    	var wholesale_cost = item.wholesale_cost;
+
+    	if($scope.first_currency_id === undefined){
+    		$scope.first_currency_id = currency_id;
+    		$("#id_po_currency").val(currency_id);
+    	}
+    	if($scope.first_currency_id != currency_id){
+    		alert("Currency not matched!");
+    		return;
+    	}
+    	
+
+    	var item_count = myitem.length;
+
+    	if(item_number == undefined) {
+    		alert("Please choose an item first.");
+    		return;
+    	}
+
+    	if(item_count > 0) {
+    		try{
+	    		myitem.each(function(index){
+	    			var myval = $(this).find("input[name='added_item_number']").val();
+	    			if(myval == item_number){
+	    				alert("This item already added.");
+	    				throw 'duplicate';
+	    			}
+	    			
+	    		});
+	    	} catch(e) {
+	    		console.log(e);
+	    		return;
+
+	    	}
+			
+    	}
+    	
+    	var str = "<tr class='add_item'>";
+    	str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+item_number+"' readonly><input type='hidden' name='new_item' value='yes'><input type='hidden' name='sl_item_seq' value='"+$scope.add_item_seq_no+"'></td>";
+    	str += "<td><p class='bg-info item_desc'>"+item_description+"</p></td>";
+    	
+    	str += "<td><select name='item_unit' class='form-control'>";
+
+        for(var k=0; k<$scope.units.length; k++) {
+            var uv = $scope.units[k].id;
+            var ut = $scope.units[k].unit_name;
+            str += "<option value='"+uv+"'>"+ut+"</option>";
+        }
+
+        str += "</select></td>";
+
+        str += "<td><input type='number' name='item_ordered' class='form-control demo_box' placeholder='Ordered' required autofocus></td>";
+
+    	str += "<td><input type='number' name='ship_today' class='form-control demo_box' placeholder='Ship today'></td>";
+
+        str += "<td><input type='number' name='shipped_total_to_date' class='form-control demo_box' placeholder='Shipped total to date' ></td>";
+
+    	str += "<td><input type='text' name='item_backordered' class='form-control demo_box' placeholder='Backordered' autocomplete='off' ></td>";
+
+    	str += "<td><a class='' data-toggle='modal' data-seq='"+$scope.add_item_seq_no+"' data-target='#slCommentModal'><i class='glyphicon glyphicon-pencil'></i></a><a class='remove-item btn' ng-click='removeField($event)'><span class='glyphicon glyphicon-remove'></span></a></td>";
+    	str += "</tr>";
+
+    	
+    	var element = $compile(str)($scope);
+
+    	$("tbody#add_item_list").prepend(element);
+
+        $scope.add_item_seq_no++;
+        
+
+	    
+    }
+
+    $scope.removeField = function (event) {
+        // $(event.target).closest('tr').remove();
+        var myitem = $("tbody#add_item_list tr.add_item");
+        var removed_item_id = event.currentTarget.attributes[1].value;
+        console.log(event.currentTarget.attributes[1].value);
+        
+		$(event.target).closest('tr').remove();
+
+        var items_count = $("input.added_item_number").length;
+        if(items_count < 2) {
+            $scope.item_added = false;
+        }
+    };
+
+    $scope.deleteField = function (event) {
+        // $(event.target).closest('tr').remove();
+        var myitem = $("tbody#add_item_list tr.add_item");
+        var removed_item_id = event.currentTarget.attributes[1].value;
+        console.log(event.currentTarget.attributes[1].value);
+        
+        $(event.target).closest('tr').remove();
+
+        var removed_item = "<input type='hidden' name='removed_item' value='"+removed_item_id+"'>";
+        $("#add_item_list tr.removed_item").append(removed_item);
+
+        var items_count = $("input.added_item_number").length;
+        if(items_count < 2) {
+            $scope.item_added = false;
+        }
+        
+    };
+
+    $scope.searchSl = function(q) {
+        if(q.length > 1) {
+            console.log(q);
+            var url = "/purchase/sl/search/?q=" + q;
+            $http({method: 'GET', url: url}).
+                success(function(data, status, headers, config){
+                $scope.sls = data;
+                console.log(data);
+            });
+            // $("#po_list").show();
+            $scope.show_sl_list = true;
+        } else {
+            // $("#po_list").hide();
+            $scope.show_sl_list = false;
+        }
+        
+    }
+    $scope.selectSL = function(sl){
+        // console.log(sl);
+        $("#form_action").val("update");
+        $scope.search_sl = sl.sl_number;
+        $scope.sl_checked = true;
+        $scope.show_sl_list = false;
+        
+        $("#id_sl_number").val(sl.sl_number);
+        // $("#id_item_job_number").val(sl.job_number);
+        $("#id_job_number").val(sl.job_number_id);
+        $("#job_number").val(sl.job_number);
+
+
+        if(sl.sold_to){
+            $("#sold_to_contact_details").show();
+            $scope.sold_to_contact = sl.sold_to;
+            if(sl.sold_to.attention_to){
+                $scope.search_sold_to = sl.sold_to.attention_to;    
+            } else {
+                $scope.search_sold_to = sl.sold_to.contact_name;
+            }
+            
+            $("#id_sold_to").val(sl.sold_to.id);  
+            $scope.add_sl_form.search_sold_to.$setViewValue($scope.add_sl_form.search_sold_to.$viewValue);    
+        }
+        
+        if(sl.ship_to){
+            $("#ship_to_contact_details").show();
+            $scope.ship_to_contact = sl.ship_to;
+            if(sl.ship_to.attention_to){
+                $scope.search_ship_to = sl.ship_to.attention_to;    
+            } else {
+                $scope.search_ship_to = sl.ship_to.contact_name;
+            }
+            
+            $("#id_ship_to").val(sl.ship_to.id);    
+        }
+        
+        $("#id_ordered_date").val(sl.ordered_date);
+        $("#id_date_required").val(sl.date_required);
+        $("#id_customer_po_number").val(sl.customer_po_number);
+        $("#id_customer_job_number").val(sl.customer_job_number);
+        $("#id_ship_via").val(sl.ship_via_id);
+        $("#id_sl_status").val(sl.sl_status);
+
+        var items = sl.items;
+        if(items.length > 0){
+            $scope.item_added = true;
+        };
+        
+        var myitem = $("tbody#add_item_list tr.add_item");
+        
+        for(i=0; i< items.length ; i++) {
+            var str = "<tr class='add_item'>";
+            str += "<td><input type='text' class='form-control added_item_number' name='added_item_number' value='"+items[i].item_number+"' readonly><input type='hidden' name='update_item' value='yes'><input type='hidden' name='sl_item_id' value='"+items[i].sl_item_id+"'><input type='hidden' name='sl_item_seq' value='"+i+"'></td>";
+            str += "<td><p class='bg-info item_desc'>"+items[i].description+"</p></td>";
+
+            str += "<td><select name='item_unit' class='form-control'>";
+
+            for(var k=0; k<$scope.units.length; k++) {
+                var uv = $scope.units[k].id;
+                var ut = $scope.units[k].unit_name;
+                
+                if( uv == items[i].unit_measure) {
+                    str += "<option value='"+uv+"' selected='selected'>"+ut+"</option>";
+                } else {
+                    str += "<option value='"+uv+"'>"+ut+"</option>";
+                }
+                
+            }
+
+            str += "</select></td>";
+            
+            str += "<td><input type='number' name='item_ordered' class='form-control demo_box' placeholder='Ordered' value='"+items[i].ordered+"'></td>";
+
+            str += "<td><input type='number' name='ship_today' class='form-control demo_box' placeholder='Shipped today' value=''></td>";
+
+            str += "<td><input type='number' name='shipped_total_to_date' class='form-control demo_box' placeholder='Shipped total to date'  value='"+items[i].shipped_total_to_date+"'></td>";
+
+            str += "<td><input type='text' name='item_backordered' class='form-control demo_box' placeholder='Backordered' value='"+items[i].backordered+"' autocomplete='off' ></td>";
+
+            str += "<td><a class='remove-item btn' data-item-id='"+items[i].sl_item_id+"' ng-click='deleteField($event)'><span class='glyphicon glyphicon-remove'></span></a></td>";
+            
+            str += "</tr>";
+            var newrow = "<tr class='bg-warning comment'>";
+            newrow += "<td colspan='2'><b>Comment</b></td>";
+            newrow += "<td colspan='6'><textarea class='form-control' name='comment_detail_"+i+"'>";
+            newrow += items[i].comment;
+            newrow += "</textarea></td>";
+            
+            newrow += "</tr>";
+
+            str = str+newrow;
+            
+            var element = $compile(str)($scope);
+
+            $("tbody#add_item_list").prepend(element);
+
+        }
+        
+    }
+
+
+
+
+$('#slCommentModal').on('show.bs.modal', function(e) {
+
+    //get data-id attribute of the clicked element
+    var bookId = $(e.relatedTarget).data('seq');
+
+    //populate the textbox
+    $(e.currentTarget).find('#item_seq').val(bookId);
+});
+
+}]);
+</script>
+{% endblock content %}
+	

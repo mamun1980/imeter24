@@ -1,0 +1,512 @@
+<table class='table'>
+<tr>
+	<th colspan="2">
+		<label for="id_item_number">Item number:</label>
+	</th>
+	<td colspan="12">
+		<div style="position: relative;">
+			<input class="form-control" ng-model='search_item' maxlength="25" id="id_item_number_search"  type="search" name="item_number_search" ng-change="searchItem(search_item)" ng-pattern="/^[a-zA-Z-~_0-9]+$/" placeholder="Search for Item by Customer Name, Address, Phone Number, Item Description, Item Number or leave blank for new MAT number"  ng-disabled="item_checked" autofocus autocomplete="off">
+			<span ng-show="inventory_item_form.item_number_search.$error.pattern">!Only string and number is allowed. No special character is allowed.</span>
+			<input type="hidden" name="item_number" id="id_item_number" value="{[{search_item}]}">
+			<div id="item-list" ng-show="show_item_list && !inventory_item_form.item_number_search.$error.pattern">
+				<table class="table">
+					<thead>
+						<th>Item Number</th>
+						<th>Description</th>
+						<th>Supplier</th>
+						<th>Terms</th>
+						<th>Cost</th>
+						<th><a class="close" ng-click="closeMe()">X</a></th>
+					</thead>
+					<tbody>
+						<tr ng-repeat="item in items" ng-click="selectItem(item)">
+							<td>{[{item.item_number}]}</td>
+							<td>{[{item.description}]}</td>
+							<td>{[{item.primary_supplier}]}</td>
+							<td>{[{item.terms}]}</td>
+							<td>{[{item.cost}]}</td>
+							<td></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div ng-show="!items.length && show_item_list && !inventory_item_form.item_number_search.$error.pattern" class="bg-info text-danger">No Items found!</div>
+	</td>
+</tr>
+<tr >
+	<th colspan="2" ng-class="{'ng-pristine': inventory_item_form.description.$pristine || inventory_item_form.description.$invalid}">
+		<label for="id_description">Description:</label>
+	</th>
+	<td colspan="12">
+		<textarea class="form-control" ng-model="description" cols="40" id="id_description" name="description" placeholder="Item Description" rows="2" ng-required='true' ></textarea>
+		<span ng-show="inventory_item_form.description.$dirty && inventory_item_form.description.$error.required">*This field is required.</span>
+	</td>
+</tr>
+<tr>
+	<th colspan="2">
+		<label for="id_quantity_on_hand">Qty on hand:</label>
+	</th>
+	<td colspan="2">
+		<input class="form-control decimal" id="id_quantity_on_hand" name="quantity_on_hand" placeholder="Quantity on hand" type="text" ng-model="quantity_on_hand" ng-pattern="/^[\d]+[.]{0,1}[\d]{1,4}$/" autocomplete="off">
+		<span ng-show="inventory_item_form.quantity_on_hand.$dirty && inventory_item_form.quantity_on_hand.$error.pattern">Not valid number!</span>
+		
+		
+	</td>
+
+	<th>
+		<label for="id_minimum_qty_on_hand">Minimum qty on hand:</label>
+	</th>
+	<td colspan="2">
+		<input class="form-control decimal" id="id_minimum_qty_on_hand" name="minimum_qty_on_hand" placeholder="Minimum quantity on hand" type="text" ng-model="minimum_qty_on_hand" ng-pattern="/^[\d]+[.]{0,1}[\d]{1,4}$/" autocomplete="off">
+		<span ng-show="inventory_item_form.minimum_qty_on_hand.$dirty && inventory_item_form.minimum_qty_on_hand.$error.pattern">Not valid number!</span>
+		
+		
+	</td>
+
+	<th>
+		<label for="id_max_order_qty">Max order qty:</label>
+	</th>
+	<td colspan="2">
+		<input class="form-control decimal" id="id_max_order_qty" name="max_order_qty" placeholder="Maximum Order Quenty" type="text" value="" ng-model="max_order_qty" ng-pattern="/^[\d]+[.]{0,1}[\d]{1,4}$/" autocomplete="off" >
+		<span ng-show="inventory_item_form.max_order_qty.$dirty && inventory_item_form.max_order_qty.$error.pattern">Not valid number!</span>
+		
+	</td>
+	<th colspan="2">
+		<label for="id_max_single_order_qty">Max single order qty:</label>
+	</th>
+	<td colspan="2">
+		<input class="form-control decimal" id="id_max_single_order_qty" name="max_single_order_qty" placeholder="Maximum Single Order Quenty" type="text" ng-model="max_single_order_qty" 
+		ng-pattern="/^[\d]+[.]{0,1}[\d]{1,4}$/" autocomplete="off">
+		<span ng-show="inventory_item_form.max_single_order_qty.$dirty && inventory_item_form.max_single_order_qty.$error.pattern">Not valid number!</span>
+		
+	</td>
+</tr>
+
+<tr>
+	<th colspan="2" ng-class="{'ng-pristine': inventory_item_form.primary_supplier_demo.$pristine || inventory_item_form.primary_supplier_demo.$invalid}">
+		<label for="id_primary_supplier">Primary supplier:</label>
+	</th>
+	<td colspan="12">
+		<div id="supplier">
+		{{ item_form.primary_supplier.errors }}
+		<input type="text" name="primary_supplier_demo" placeholder="Start typing to search for supplier" id="id_primary_supplier_demo" class="form-control custom-form-control" ng-model="search_supplier" autocomplete="off" ng-change="searchContact(search_supplier)" ng-required='true' style="width: 95%; display: inline;"><a href="/admin/contacts/contact/add/" class="add-another" id="add_id_primary_supplier" onclick="return showAddAnotherPopup(this);"> <img src="/statics/admin/img/icon_addlink.gif" width="10" height="10" alt="Add Another"></a>
+		<div>
+		<span ng-show="inventory_item_form.primary_supplier_demo.$dirty && inventory_item_form.primary_supplier_demo.$error.required">*This field is required.</span>
+		</div>
+		<div class="contact_info" ng-show="show_supplier">
+			<table class='table'>
+				<tr class="bg-info">
+					<th width="150">Contact Name</th>
+					<td colspan="2">{[{ supplier.attention_to }]}</td>
+				</tr>
+				<tr class="bg-warning">
+					<th>Address</th>
+					<td colspan="2">
+						<p ng-if="supplier.address_1 != ''">
+							{[{supplier.address_1}]}
+						</p>
+						<p ng-if="supplier.address_2 != ''">
+							{[{supplier.address_2}]}
+						</p>
+						<p>{[{supplier.city}]}<span ng-if="supplier.province != ''">, {[{supplier.province}]}</span></p>
+						
+						<p>{[{supplier.country}]}</p>
+						<p><span ng-if="supplier.postal_code != ''">{[{ supplier.postal_code }]}</span></p>
+					</td>
+				</tr>
+				<tr class="bg-info">
+					<th>Phones</th>
+					<td colspan="2">
+						<li ng-repeat="ph in supplier.phones">
+							<span class='bg-info phone'>{[{ ph.type}]}: {[{ ph.number}]} </span> <span ng-if="ph.ext != ''">Ext: ({[{ph.ext}]})</span>
+						</li>
+					</td>
+				</tr>
+				<tr class="bg-warning">
+					<th>Emails</th>
+					<td colspan="2">
+						<li ng-repeat="em in supplier.emails">
+							<span class='email'>{[{ em.email_address}]} ({[{em.email_type}]})</span>
+						</li>
+					</td>
+				</tr>
+			</table>
+		</div>
+			
+		
+			<table class="table selectable" class="ui-autocomplete ui-widget-content-custom ui-corner-all">
+				<thead>
+					<tr>
+						<th>Contact Name</th><th>Address</th><th> Primary Cont No.</th>
+						<th><a href="" class="close">x</a></th>
+					</tr>
+				</thead>
+				<tbody>
+					
+
+					<tr class="ui-menu-item" ng-repeat="contact in suppliers" ng-click="selectPriSupplier(contact)">
+						
+						
+						<td class="contact_name">{[{contact.contact_name}]}</td>
+						<td class="address_1">
+							<p ng-if="contact.address_1 != ''">{[{contact.address_1}]}</p>
+							<p ng-if="contact.city != ''">City / Province: {[{contact.city}]}<span ng-if="contact.province != ''">, {[{contact.province}]}</span></p>
+							<p>
+							<span ng-if="contact.postal_code !=''">Post code: {[{ contact.postal_code }]}, </span>
+							<span ng-if="contact.country != ''"> country: {[{contact.country}]}</span>
+							</p>
+						</td>
+						
+						<td class="city">
+							<div class='phone' ng-repeat="phon in contact.phones" ng-if="$first">
+								{[{phon.number}]} <span ng-if="phon.ext !=''"> (ext: {[{phon.ext}]})</span>
+							</div>
+						</td>
+						
+						<td>
+							<input type="hidden" data-phone-number="{[{phon.number}]}" data-ext="{[{phon.ext}]}" data-phone-type="{[{phon.type}]}">
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		
+		</div>
+		<input type="hidden" name="primary_supplier" ng-model="primary_supplier" id="id_primary_supplier" value="" >
+		
+	</td>
+</tr>
+<tr>
+	
+	<th>
+		<label for="id_wholesale_cost">Supplier cost:</label>
+	</th>
+	<td colspan="" width="210">
+		
+		<input class="form-control decimal" id="id_wholesale_cost" ng-model="wholesale_cost" name="wholesale_cost" placeholder="Wholesale cost" type="text" value="" ng-pattern="/^[\d]+[.]{0,1}[\d]{1,4}$/" autocomplete="off">
+		<span ng-show="inventory_item_form.wholesale_cost.$dirty && inventory_item_form.wholesale_cost.$error.pattern">Not valid number!</span>
+		
+	</td>
+
+	<th >
+		<label for="id_currency">Currency:</label>
+	</th>
+	<td width="210">
+		{{ item_form.currency.errors }}
+		<select class="form-control" id="id_currency" name="currency">
+		{% for currency in currencies %}
+			<option value="{{currency.id}}" {% if currency.id == 1 %} selected="selected" {% endif %}>
+				{{currency.get_currency_icon}} {{currency.currency}}
+			</option>
+		{% endfor %}
+		
+		</select>
+	</td>
+	<th>
+		<label for="id_item_unit_measure">Item Unit Measure:</label>
+	</th>
+	<td width="210">
+		{{ item_form.item_unit_measure.errors }}
+		<select class="form-control" id="id_item_unit_measure" name="item_unit_measure">
+		{% for unitmeasure in unit_measures %}
+			<option value="{{unitmeasure.id}}">{{unitmeasure.unit_name}}</option>
+		{% endfor %}
+		</select>
+		
+	</td>
+	<th>
+		<label for="id_terms">Terms:</label>
+	</th>
+	<td width="210">
+		
+		<select class="form-control" id="id_terms" name="terms">
+		{% for term in terms %}
+			<option value="{{term.id}}" {% if term.id == 2 %} selected="selected" {% endif %}>{{term.term}}</option>
+		{% endfor %}
+		</select>
+	</td>
+	<th colspan="1">
+		<label for="id_hst_taxable">HST Taxable:</label>
+	</th>
+	<td>
+		{{ item_form.hst_taxable.errors }}
+		<input type="checkbox" checked data-toggle="toggle" data-on="Yes" data-off="No" name="hst_taxable" style="margin-left: 10px; margin-right: 20px;">
+	</td>
+
+	<th>
+		<label for="id_duty_percentage">PST Taxable:</label>
+	</th>
+	<td >
+		{{ item_form.pst_taxable.errors }}
+		<input type="checkbox" data-toggle="toggle" data-on="Yes" data-off="No" name="pst_taxable" style="margin-left: 10px; margin-right: 20px;" value="No">
+	</td>
+
+	<th colspan="1">
+		<label for="id_lead_time">Lead time:</label>
+	</th>
+	<td colspan="1" width="210">
+		{{ item_form.lead_time.errors }}
+		<input class="form-control" id="id_lead_time" maxlength="25" name="lead_time" placeholder="Lead Time" type="text">
+	</td>
+</tr>
+<tr>
+	
+	<th colspan="2">
+		<label for="id_department">
+		Department that is Responsible <br> for Making this Item:</label>
+	</th>
+	<td colspan="2">
+		{{ item_form.department.errors }}
+		<select class="form-control" id="id_department" name="department">
+		{% for department in departments %}
+			<option value="{{department.id}}">{{department.name}}</option>
+		{% endfor %}
+		</select>
+	</td>
+	<th colspan="1">
+		<label for="id_deliver_internal">Deliver <br> Internal:</label>
+	</th>
+	<td colspan="2">
+		{{ item_form.deliver_internal.errors }}
+		<select name="deliver_internal" class="form-control">
+		{% for di in deliver_internals %}
+			<option value="{{di.id}}">{{di.department}}</option>
+		{% endfor %}
+		</select>
+	</td>
+	<th colspan="1" >
+		<label for="id_warehouse_location">Warehouse <br>location:</label>
+	</th>
+	<td colspan="3">
+		{{ item_form.warehouse_location.errors }}
+		<input type="text" class="form-control" id="id_warehouse_location" name="warehouse_location">
+		
+	</td>
+	<th colspan="1">
+		<label for="id_production_type">Production <br>type:</label>
+	</th>
+	<td colspan="2">
+		{{ item_form.production_type.errors }}
+		<select class="form-control" id="id_production_type" name="production_type">
+		{% for production_type in production_types %}
+			<option value="{{production_type.id}}">{{production_type.production_type_name}}</option>
+		{% endfor %}
+		</select>
+	</td>
+</tr>
+<tr>
+	
+	<th colspan="2">
+		<label for="id_retail_price">Retail price:</label>
+	</th>
+	<td colspan="3">
+		
+		<input class="form-control decimal" id="id_retail_price" ng-model="retail_price" name="retail_price" placeholder="Retail Price" type="text" ng-pattern="/^[\d]+[.]{0,1}[\d]{1,4}$/" autocomplete="off">
+		<span ng-show="inventory_item_form.retail_price.$dirty && inventory_item_form.retail_price.$error.pattern">Not valid number!</span>
+		
+	</td>
+	<th colspan="2">
+		<label for="id_estimated_wholesale_cost">Estimated wholesale cost:</label>
+	</th>
+	<td colspan="3">
+		
+		<input class="form-control decimal" id="id_estimated_wholesale_cost" name="estimated_wholesale_cost" placeholder="Estimated wholesale cost" type="text" value="0.00">
+	</td>
+	<th colspan="2">
+		<label for="id_wholesale_cost">Stock Status Type:</label>
+	</th>
+	<td colspan="2">
+		<select class="form-control" name="stock_status_type">
+			<option value="0">Normal tracking item</option>
+			<option value="1">Non-stock item</option>
+			<option value="2">Labour for shop specified</option>
+			<option value="3">NC labour</option>
+			<option value="4">Obsolete</option>
+			<option value="5">Production Hold</option>
+			
+		</select>
+		
+		
+	</td>
+</tr>
+<tr>
+	
+	<th colspan="2">
+		<label for="id_catalog_number">Supplier Catalouge Number:</label>
+	</th>
+	<td colspan="12">
+		{{ item_form.catalog_number.errors }}
+		<input class="form-control" id="id_catalog_number" maxlength="25" name="catalog_number" placeholder="Catalog Number" type="text">
+	</td>
+</tr>
+<tr>
+	<th colspan="2">
+		<label for="id_country_of_origin">Country of origin:</label>
+	</th>
+	<td colspan="12">
+		{{ item_form.country_of_origin.errors }}
+		<input class="form-control" id="id_country_of_origin" maxlength="25" name="country_of_origin" placeholder="Country of Origin" type="text" value="Canada">
+	</td>
+	
+</tr>
+<tr>
+	<th colspan="2">
+		<label for="id_customs_designation">Customs designation:</label>
+	</th>
+	<td colspan="5">
+		{{ item_form.customs_designation.errors }}
+		<select class="form-control" id="id_customs_designation" name="customs_designation">
+		{% for customdesignation in designations %}
+			<option value="{{customdesignation.id}}">{{customdesignation.designation}}</option>
+		{% endfor %}
+		</select>
+	</td>
+	<th colspan="2">
+		<label for="id_customer_tariff_number">Customer tariff number:</label>
+	</th>
+	<td colspan="5">
+		{{ item_form.customer_tariff_number.errors }}
+		<input class="form-control" id="id_customer_tariff_number" maxlength="25" name="customer_tariff_number" placeholder="Customer tariff number" type="text">
+	</td>
+</tr>
+<tr>
+	<th colspan="2">
+		<label for="id_preference_criteria">Preference criteria:</label>
+	</th>
+	<td colspan="12">
+		
+		<input class="form-control" id="id_preference_criteria" maxlength="25" name="preference_criteria" placeholder="Preference Criteria" type="text">
+		</select>
+	</td>
+
+	
+</tr>
+<tr>
+	<th colspan="2">
+		<label for="id_producer_of_item">Producer of item:</label>
+	</th>
+	<td colspan="12">
+		<div id="producer">
+			{{ item_form.producer_of_item_demo.errors }}
+			
+			<input type="hidden" name="producer_of_item">
+
+			<input type="text" name="producer_of_item_demo" placeholder="Start typing to search for producer" id="id_producer_of_item_demo" class="form-control ng-pristine ng-valid" ng-model="search_producer" autocomplete="off" ng-change="searchProducer(search_producer)">
+			<div class="contact_info" ng-show="show_producer">
+				<table class='table'>
+					<tr class="bg-info">
+						<th width="150">Contact Name</th>
+						<td colspan="2">{[{ producer.attention_to }]}</td>
+					</tr>
+					<tr class="bg-warning">
+						<th>Address</th>
+						<td colspan="2">
+							<p ng-if="producer.address_1 != ''">
+								{[{producer.address_1}]}
+							</p>
+							<p ng-if="producer.address_2 != ''">
+								{[{producer.address_2}]}
+							</p>
+							<p>{[{producer.city}]}<span ng-if="producer.province != ''">, {[{producer.province}]}</span></p>
+							
+							<p>{[{producer.country}]}</p>
+							<p>{[{ producer.postal_code }]}</p>
+						</td>
+					</tr>
+					<tr class="bg-info">
+						<th>Phones</th>
+						<td colspan="2">
+							<li ng-repeat="ph in producer.phones">
+								<span class='bg-info phone'>{[{ ph.type}]}: {[{ ph.number}]} </span> <span ng-if="ph.ext != ''">Ext: ({[{ph.ext}]})</span>
+							</li>
+						</td>
+					</tr>
+					<tr class="bg-warning">
+						<th>Emails</th>
+						<td colspan="2">
+							<li ng-repeat="em in producer.emails">
+								<span class='email'>{[{ em.email_address}]} ({[{em.email_type}]})</span>
+							</li>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<table class="table selectable" class="ui-autocomplete ui-widget-content-custom ui-corner-all">
+				<thead>
+					<tr>
+						<th>Contact Name</th><th>Address</th><th> Primary Cont No.</th>
+						<th><a href="" class="close">x</a></th>
+					</tr>
+				</thead>
+				<tbody>
+				
+
+				<tr class="ui-menu-item" ng-repeat="contact in producers" ng-click="selectProducer(contact)">
+					<td class="contact_name">{[{contact.contact_name}]}</td>
+					<td class="address_1">
+						<p ng-if="contact.address_1 != ''">{[{contact.address_1}]}</p>
+						<p ng-if="contact.city != ''">City / Province: {[{contact.city}]}<span ng-if="contact.province != ''">, {[{contact.province}]}</span></p>
+						<p>
+						<span ng-if="contact.postal_code !=''">Post code: {[{ contact.postal_code }]}, </span>
+						<span ng-if="contact.country != ''"> country: {[{contact.country}]}</span>
+						</p>
+					</td>
+					
+					<td class="city">
+						<div class='phone' ng-repeat="phon in contact.phones" ng-if="$first">
+							{[{phon.number}]} <span ng-if="phon.ext !=''"> (ext: {[{phon.ext}]})</span>
+						</div>
+					</td>
+					
+					<td>
+						<input type="hidden" data-phone-number="{[{phon.number}]}" data-ext="{[{phon.ext}]}" data-phone-type="{[{phon.type}]}">
+					</td>
+				</tr>
+				</tbody>
+			</table>
+			
+			<input type="hidden" name="producer_of_item" id="id_producer_of_item">
+		</div>
+	</td>
+</tr>
+
+<tr>
+	<th colspan="2">
+		<label for="id_shipping_unit">Shipping unit:</label>
+	</th>
+	<td colspan="2">
+		{{ item_form.shipping_unit.errors }}
+		
+		<select class="form-control" id="id_shipping_unit" name="shipping_unit">
+			<option value="kilogram">Kilograms</option>
+			<option value="pound">Pounds</option>
+		</select>
+	</td>
+	<th colspan="2">
+		<label for="id_shipping_weight">Shipping weight:</label>
+	</th>
+	<td colspan="3">
+		{{ item_form.shipping_weight.errors }}
+		
+		<input class="form-control decimal" id="id_shipping_weight" name="shipping_weight" placeholder="Shipping Weight" type="text">
+	</td>
+
+	<th colspan="2">
+		<label for="id_duty_percentage">Duty percentage:</label>
+	</th>
+	<td colspan="3">
+		{{ item_form.number.errors }}
+		<input class="form-control decimal" id="id_duty_percentage" name="duty_percentage" placeholder="Duty percentage" type="text">
+	</td>
+</tr>
+<tr>
+	<th colspan="2">
+		<label for="id_website">Website:</label>
+	</th>
+	<td colspan="12">
+		{{ item_form.website.errors }}
+		<input class="form-control" id="id_website" maxlength="250" name="website" placeholder="product page url" type="url">
+	</td>
+</tr>
+
+</table>

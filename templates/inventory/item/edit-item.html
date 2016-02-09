@@ -1,0 +1,298 @@
+{% extends "base.html" %}
+
+{% block angular %}
+	<script type="text/javascript" src="/statics/js/angular.min.js"></script>
+	<script type="text/javascript" src="/statics/js/angular-route.min.js"></script>
+	<link href="/statics/css/bootstrap-toggle.min.css" rel="stylesheet">
+	<script src="/statics/js/bootstrap-toggle.min.js"></script>	
+{% endblock angular %}
+
+{% block content %}
+<style>
+#feedback { font-size: 1.4em; }
+/*#selectable .ui-selecting { background: #FECA40; }*/
+#selectable .ui-selected { background: #F39814; color: white; }
+#selectable { list-style-type: none; margin: 0; padding: 0px 2px 0px 0px; width: 100%; }
+#selectable thead tr { margin: 0px 3px; padding: 0.4em; font-size: 1.4em; height: 35px; background-color: #ed791a; }
+#selectable tbody tr { margin: 0px 3px; padding: 0.4em; font-size: 1.4em; height: 35px; border-bottom: 1px solid #EEE; }
+#selectable tbody tr:hover { background-color: #FECA40; color: #000; }
+#selectable td, #selectable th {
+	padding: 3px 10px;
+}
+
+#contact-list {
+	/*border: 2px solid #333;*/
+}
+#container {
+	width: 450px;
+}
+#container .ui-widget-content-custom {
+	background-color: #333 !important;
+	color: #FFF;
+}
+.form-control {
+	margin-top: 5px; 
+}
+.contact_box {
+	position: relative;
+}
+.supplier_contact {
+	position: absolute;
+	z-index: 100;
+	width: 550px;
+	left: -100px;
+	border: 1px solid #000;
+}
+table#supplier_contact_details, table#sproducer_details {
+	margin-top: 10px;
+}
+table#supplier_contact_details th, table#sproducer_details th{
+	background-color: #83AD9E;
+}
+table.supplier_contact thead {
+	background-color: #000;
+	color: #FF0;
+}
+table.supplier_contact tbody tr {
+	background-color: #EEE;
+}
+table.supplier_contact tbody tr:hover {
+	background-color: #FFF;
+}
+</style>
+
+<div class="container shadow4 main-body" ng-app="premierApp">
+
+<section class="row"  id="add-inventory-item" ng-controller="EditItemController">
+	
+
+	<div class="col-md-6">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Edit Inventory Item</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  	<form action="/inventory/item/edit/{{itemid}}/" enctype="multipart/form-data" name="inventory-item-form" method="POST">{% csrf_token %}
+
+		  		{% include "inventory/item/item-update-form.html" %}
+		  		
+				<div class="row">
+					<div class="col-md-5  col-md-offset-3">
+					  	<div class="btn btn-lg">
+							<button class="btn btn-primary btn-lg" type="submit">Update Inventory Item</button>
+						</div>
+					</div>
+				</div>
+					
+		  	</form>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-md-6">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Add Comments</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  	<form action="/inventory/item/comment/add/" name="item-comment" method="POST">{% csrf_token %}
+		  	<input type="hidden" name="item_id" value="{{itemid}}">
+		  		{{ item_comment_form.as_p }}
+		  		<button class="btn btn-primary btn-lg" type="submit">Add Comment</button>
+		  	</form>
+			</div>
+			<table class="table" id="item-comments">
+			<thead>
+			<tr>
+				<th>Comment #</th><th width="150">Comment</th><th>Comment By</th><th>Comment Date</th>
+			</tr>
+			</thead>
+			<tbody>
+			{% for comment in item_comments %}
+				<tr>
+					<td>{{  comment.id }}</td>
+					<td>{{  comment.comment }}</td>
+					<td>{{  comment.comment_by }}</td>
+					<td>{{  comment.comment_date }}</td>
+				</tr>
+			{% empty %}
+			
+				<tr>
+					<td colspan="4">No comments</td>
+				</tr>
+			{% endfor %}
+			</tbody>	
+			</table>
+		</div>
+	</div>
+
+
+
+</section>
+</div>
+
+
+
+{% include "modals/add-modal.html" %}
+<script type="text/javascript">
+(function(){
+$(".datepicker").datepicker();
+$(document).on("change", "input.decimal", function(e){
+	var myval = parseFloat($(this).val())
+	$(this).val(myval.toFixed(2));
+})
+$("a.close").on("click", function(){
+	$(this).closest('table').hide();
+});
+
+	$("form[name='item-comment']").on("submit", function(e){
+		e.preventDefault();
+		form_data = $(this).serialize();
+		console.log($(this).attr('action'));
+		$.ajax({
+			type: "POST",
+			url: $(this).attr('action'),
+			data: form_data,
+			success: function(rdata) {
+				console.log(rdata);
+                $( "button.close-modal" ).trigger( "click" );
+                $("table#item-comments tbody").prepend(rdata);
+                
+                // window.location.reload(false);
+                // win = window.open("",'_blank');
+                // win.location.href = "/contacts/edit/" + rdata + "/";
+
+            }
+		});
+
+	})
+})(jQuery)
+</script>
+
+
+<script type="text/javascript">
+(function(){
+	
+
+	$("a#add_id_primary_supplier").on("click", function(e){
+		e.preventDefault();
+		url = "/contacts/add/rel/",
+		mdal = $('#addModal');
+		mdal.on("shown.bs.modal", function(){
+			$("#addModal .modal-content").load(url);
+			// console.log(url);
+		}).modal();
+		return false;
+	});
+	$("#selectable a.close").on("click", function(){
+		$("#selectable").hide();
+	});
+
+	
+
+	// $(document).on("click", "#selectable a.edit-contact", function(e){
+	// 	e.preventDefault();
+	// 	var cid = $(this).data("id");
+
+	// 	e.preventDefault();
+	// 	url = "/contacts/edit/basic/" + cid + "/",
+	// 	mdal = $('#addModal');
+	// 	mdal.on("shown.bs.modal", function(){
+	// 		$("#addModal .modal-content").load(url);
+	// 		// console.log(url);
+	// 	}).modal();
+	// 	return false;
+	
+	// })
+
+
+})(jQuery)
+
+</script>
+
+<script type="text/javascript">
+premierApp.controller('EditItemController',['$scope', '$http', function ($scope, $http) {
+	
+	$scope.init = function() {
+
+        var cid = $("input[name='contact_id']").val();
+
+        $("#supplier_contact_list").hide();
+        $("#producer_of_item_list").hide();
+        
+        if(cid != undefined) {
+        	var url = "/contacts/get-contact/"+cid+"/"
+	        $http({method: 'GET', url: url}).
+		            success(function(data, status, headers, config) {
+		                $scope.supplier_contact = data;
+		            });
+		    $scope.show_supplier_contact = true;
+        }
+
+	    var pid = $("input[name='producer']").val();
+	    console.log("producer of item"+pid);
+	    if(pid != undefined && pid != 'None') {
+	    	var url = "/contacts/get-contact/"+pid+"/"
+	    	$http({method: 'GET', url: url}).
+	            success(function(data, status, headers, config) {
+	                $scope.producer = data;
+	            });	
+	        $scope.show_producer_contact = true;
+	    }
+	    
+	};
+
+	$scope.init();
+
+
+	$scope.searchSupplier = function(q) {
+		if(q.length > 1) {
+    		url = "/contacts/auto/?q=" + q
+    		$http({method: 'GET', url: url}).
+	            success(function(data, status, headers, config) {
+	                console.log(data.results);
+	                $scope.suppliers = data.results;
+	            });
+	        $("#supplier_contact_list").show();
+	        
+    		
+    	} else {
+    		$("#supplier_contact_list").hide();
+    	}
+	}
+	$scope.setSupplier = function(con){
+		$scope.show_supplier_contact = true;
+		$("#supplier_contact_list").hide();
+		$scope.supplier_contact = con;
+		$scope.search_supplier = '';
+	}
+
+	$scope.searchProducer = function(q) {
+		if(q.length > 1) {
+    		url = "/contacts/auto/?q=" + q
+    		$http({method: 'GET', url: url}).
+	            success(function(data, status, headers, config) {
+	                console.log(data.results);
+	                $scope.producers = data.results;
+	            });
+	        $("#producer_of_item_list").show();
+	        
+    		
+    	} else {
+    		$("#producer_of_item_list").hide();
+    	}
+	}
+	$scope.setProducer = function(con){
+		$scope.show_producer_contact = true;
+		$("#producer_of_item_list").hide();
+		$scope.producer = con;
+		$scope.search_producer = '';
+
+
+	}
+
+}]);
+</script>
+
+{% endblock content %}
+	

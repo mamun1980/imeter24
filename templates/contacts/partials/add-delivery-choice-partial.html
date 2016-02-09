@@ -1,0 +1,8 @@
+<span class="label label-danger {{ delivery_choice.id }}">
+	{{ delivery_choice.delivery_choice }}
+	{% if perms.contacts.change_deliverychoice %}
+		<a class="delivery-choice-edit" href="/contacts/delivery-choice/edit/{{ delivery_choice.id }}/" 
+			data-toggle="modal" data-target="#editModal"
+			data-id="{{ delivery_choice.id }}"><i class="glyphicon glyphicon-edit"></i></a>
+	{% endif %}
+</span>

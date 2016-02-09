@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+<section class="row"  id="payment-term-list">
+	
+
+	<div class="col-md-6 col-md-offset-3">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Payment Term List</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  		<table class="table">
+			  		<tr>
+			  			<td> ID </td>
+			  			<td>Payment Terms</td>
+			  			<td>Total Use</td>
+			  			<td>Action</td>
+			  			
+			  		</tr>
+			  		{% for payment_term in payment_terms %}
+			  			<tr>
+				  			<td> {{ payment_term.id }} </td>
+				  			<td> {{ payment_term.term }} </td>
+				  			<td> {{ payment_term.contactprofile_set.all.count }} </td>
+				  			<td>
+				  				<a class="payment-term-delete" href="#" data-ptid="{{ payment_term.id }}">delete</a>
+				  			</td>
+				  			
+				  		</tr>
+				  	{% empty %}
+				  	<tr>
+			  			<td colspan='4'> No payment term found. </td>
+			  		</tr>
+				  	{% endfor %}
+			  	</table>
+		  	
+			</div>
+		</div>
+	</div>
+
+
+</section>
+
+
+<script type="text/javascript">
+(function(){
+	$("#payment-term-list a.payment-term-delete").on("click", function(e){
+		e.preventDefault();
+		ptid = $(this).data("ptid");
+		console.log(ptid);
+
+		$.ajax({
+			type: "POST",
+			url: "/contacts/term/delete/",
+			data: {
+				'ptid': ptid,
+			},
+			success: function(rdata) {
+				console.log(rdata);
+				$("a[data-ptid='"+rdata+"']").closest("tr").remove();
+			}
+		})
+	});
+
+})(jQuery)
+
+</script>
+</div>
+
+
+{% endblock content %}
+	

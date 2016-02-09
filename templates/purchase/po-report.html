@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>PO Report</title>
+<style type="text/css">
+@page {
+  size: a4 landscape;
+  margin: 0.5cm;
+  font-style: 16px;
+} 
+.logo {
+	display: inline-block;
+}
+.title {
+	display: inline-block;
+}
+table.con {
+	border: 2px solid #777;
+	margin-right: 5px;
+}
+table tr th {
+	background-color: #EEE;
+}
+table thead th {
+	background-color: #333;
+	color: #FFF;
+}
+
+ul {
+    list-style-type: none !important;
+    padding: 0px;
+    margin: 0px;
+}
+
+</style>
+</head>
+<body>
+<table width="100%" cellpadding="10">
+	<tr>
+		<td width="80%">
+			<img src="{{resource_directory}}/statics/images/PremierLogo.jpeg" width="150" height="100">
+		</td>
+		<td align="right">
+			<table>
+				<tr><td><h1>Purchase Order</h1></td></tr>
+			</table>
+			<table border="1" width="100" cellpadding="10">
+
+				<tr>
+					<td align="center">
+						{{po.po_number}}
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td style="text-align: left;">
+			1400 Phillip Murray Avenue, Oshawa, Ontario (Canada) - L1J7E8
+		</td>
+		<td>
+			<span>Tel: (416) 773-1400</span>
+			<span>Fax: (416) 847-5284</span>
+		</td>
+	</tr>
+
+	<tr style="outline: thin solid">
+		<td colspan="2" width="100%">
+			<table width="100%">
+				<tr>
+					<td>
+						<table width="100%" height="200" cellpadding="1" style="background-color:#CCC; color:#000;">
+							<thead>
+								<tr >
+									<th colspan="2" cellspacing="2">Supplier</th>
+								</tr>
+							</thead>
+							<tr>
+								<td colspan="2">
+								<ul>
+									<li></li>
+								</ul>
+									
+								</td>
+							</tr>
+							<tr>
+								<td width="100">Contact Name</td>
+								<td>
+									{{po.supplier.contact_name}}
+								</td>
+							</tr>
+							<tr>
+								<td width="100">Address</td>
+								<td>
+									{{po.supplier.address_1}}, {{po.supplier.city}}, {{po.ship_to.postal_code}}
+								</td>
+							</tr>
+														
+							<tr>
+								<td width="100">Phones</td>
+								<td>
+									<ul>
+									{% for ph in po.supplier.contact_phone.all %}
+										<li><b>{{ph.phone_type}}</b>: {{ph.phone}} ({{ph.phone_ext}})</li>
+									{% endfor %}
+									</ul>
+								</td>
+							</tr>
+							<tr>
+								<td width="100">Emails</td>
+								<td>
+									<ul>
+									{% for em in po.supplier.contact_emails.all %}
+										<li><b>{{em.email_address_type}}</b>: {{em.email_address}}</li>
+									{% endfor %}
+									</ul>
+								</td>
+							</tr>
+						</table>
+					</td>
+					<td>
+						<table width="100%" height="200" cellpadding="1" style="background-color:#EEE; color:#000;">
+							<thead>
+								<tr>
+									<th colspan="2">Ship To</th>
+								</tr>
+							</thead>
+							<tr>
+								<td colspan="2">
+								<ul>
+									<li></li>
+								</ul>
+									
+								</td>
+							</tr>
+							<tr>
+								<td width="100">Contact Name</td>
+								<td>
+									{{po.ship_to.contact_name}}
+								</td>
+							</tr>
+							<tr>
+								<td width="100">Address</td>
+								<td>
+									{{po.ship_to.address_1}}, {{po.ship_to.city}}, {{po.ship_to.postal_code}}			
+								</td>
+							</tr>
+							
+							<tr>
+								<td width="100">Phones</td>
+								<td>
+									<ul>
+									{% for ph in po.ship_to.contact_phone.all %}
+										<li><b>{{ph.phone_type}}</b>: {{ph.phone}} ({{ph.phone_ext}})</li>
+									{% endfor %}
+									</ul>
+								</td>
+							</tr>
+							<tr>
+								<td width="100">Emails</td>
+								<td>
+									<ul>
+									{% for em in po.ship_to.contact_emails.all %}
+										<li><b>{{em.email_address_type}}</b>: {{em.email_address}}</li>
+									{% endfor %}
+									</ul>
+								</td>
+							</tr>
+						</table>
+					</td>
+					<td>
+						<table width="100%" height="200" cellpadding="1" style="background-color:#CCC;">
+							<thead>
+								<tr >
+									<th colspan="2" cellspacing="2">Issued By</th>
+								</tr>
+							</thead>
+							<tr>
+								<td colspan="2">
+								<ul>
+									<li></li>
+								</ul>
+									
+								</td>
+							</tr>
+							<tr>
+								<td width="100">First Name</td>
+								<td>
+									{{po.purchasing_agent.first_name}}
+								</td>
+							</tr>
+							<tr>
+								<td width="100">Last Name</td>
+								<td>
+									{{po.purchasing_agent.last_name}}
+								</td>
+							</tr>
+							
+							<tr>
+								<td width="100">Email</td>
+								<td>
+								<ul>
+									<li><b>{{po.purchasing_agent.email}}</b></li>
+									</ul>
+								</td>
+							</tr>
+							
+							<tr>
+								<td width="100">Date Time</td>
+								<td>
+								<ul>
+									<li><b>{{po.datetime}}</b></li>
+									</ul>
+									
+								</td>
+							</tr>
+							<tr>
+								<td colspan="2"></td>
+							</tr>
+							
+							
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+		
+	</tr>
+	<tr>
+		<td colspan="2" width="100%">
+			<table width="100%" cellpadding="1">
+				<thead>
+					<tr>
+						<th>Date Issued</th>
+						<th>Date Expected</th>
+						<th>Ship Via</th>
+						<th>Shipping Instructions</th>
+						<th>F.O.B</th>
+						<th>Terms</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>{{po.date_issued}}</td>
+						<td>{{po.date_expected}}</td>
+						<td>{{po.ship_via.delivery_choice}}</td>
+						<td>{{po.shipping_inst}}</td>
+						<td>{{po.fob}}</td>
+						<td>{{po.terms.term}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<table width="100%" cellpadding="1">
+				<thead>
+					<tr>
+						<th>Item Number</th>
+						<th>Qty Ordered</th>
+						<th>Cost / Item</th>
+						<th>Comment</th>
+						<th>Job number</th>
+						<th>Sub Total</th>
+					</tr>
+				</thead>
+				<tbody>
+				{% for item in purchase_items %}
+					<tr>
+						<td>{{item.item.item_number}}</td>
+						<td>{{item.qty}}</td>
+						<td>{{item.cost}}</td>
+						<td>{{item.comment}}</td>
+						<td>{{item.job_number.job_number}}</td>
+						<td>{{item.sub_total}}</td>
+					</tr>
+				{% endfor %}
+				</tbody>
+				<tfoot>
+					<tr>
+						<th colspan="5">Total This Purchase Order</th>
+						<th>{{po.total_po_amount}}</th>
+					</tr>
+				</tfoot>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2" width="100%">
+			<table>
+				<tr>
+					<td>
+						<ol>
+							<li>Please send two copies of your invoice</li>
+							<li>Enter this order in accordance with the price, term, delivery method and specifications listed above</li>
+							<li>Please notify us immediately if you are unable to ship as specified.</li>
+							<li>
+								Send all coresponance to:<br>
+								Dino Mele<br>
+								Premier Elevator Interiors<br>
+								1400 Phillip Murray Avenue<br>
+								Oshawa, Ontario L1J 7E8<br>
+								Tel: 416-773-1400<br>
+								Fax: 416-847-5284
+							</li>
+							
+						</ol>
+					</td>
+				</tr>
+				<tr>
+					<td width="80%" align="right">
+						<b>Authorized By</b>
+					</td>
+					<td align="right">
+						<b>Date</b>
+					</td>
+				</tr>
+			</table>
+				
+		</td>
+	</tr>
+</table>
+
+</body>
+</html>

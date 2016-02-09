@@ -1,0 +1,47 @@
+<table class="table events-list" ng-show="events">
+	<tr>
+		<td>Event Id</td>
+		<td>Event Date</td>
+		<td>Event Time</td>
+		<td>Name</td>
+		<td>Category</td>
+		<td>Door Name</td>
+		<td>Card Number</td>
+		<td>Event</td>
+		<td>Action</td>
+		<td>Zone Name</td>
+		<td>Action</td>
+	</tr>
+
+	<tr ng-repeat="event in events | googleSearchFilter:search ">
+		<td>{[{ event.eventid }]}</td>
+		<td>{[{ event.eventdate }]}</td>
+		<td>{[{ event.eventtime }]}</td>
+		<td>{[{ event.name }]}</td>
+		<td>{[{ event.category }]}</td>
+		<td>{[{ event.doorname }]}</td>
+		<td>{[{ event.cardnumber }]}</td>
+		<td>{[{ event.event }]}</td>
+		<td>{[{ event.action }]}</td>
+		<td>{[{ event.zonename }]}</td>
+		<td>
+			<a href="/events/view/{[{event.eventid}]}/">View</a>
+
+			<span ng-show="{[{ event.permission.can_change_event }]}">
+			/ 
+			<a href="/events/edit/{[{event.eventid}]}/">Edit</a>
+			</span>
+
+			<span ng-show="{[{ event.permission.can_delete_event }]}">
+			
+			/ 
+			<a href="" data-id="{[{event.eventid}]}" class="delete-event">Delete</a>
+			</span>
+			
+
+		</td>
+	</tr>
+	
+</table>
+
+<h2 ng-hide="events">There is no events </h2>

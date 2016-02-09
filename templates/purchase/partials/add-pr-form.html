@@ -1,0 +1,104 @@
+		  		
+		  		
+		  		
+<div class="col-md-3 topmargin">
+<label for="id_user_requested">User requested:</label> 
+</div>
+<div class="col-md-9 topmargin">
+
+<select class="form-control" id="id_user_req" name="user_req" {% if lock_requested_user %} disabled="True" {% endif %} onchange="UpdateRequestedUser()">
+	{% for u in users %}
+		<option value="{{u.id}}" {% if u.id == request.user.id %} selected="selected" {% endif %}>{{ u.get_full_name }}</option>
+	{% endfor %}
+</select>
+<input type="hidden" name="user_requested" id="id_user_requested" value="{{request.user.id}}">
+</div>
+
+
+
+
+<div class="col-md-3 topmargin" ng-class="{'ng-pristine': pr_add_form.item_demo.$pristine || pr_add_form.item_demo.$invalid}">
+<label for="id_item" >Item:</label> 
+<p ng-show="pr_add_form.item_demo.$dirty && pr_add_form.item_demo.$error.required">*This field is required.</p>
+</div>
+<div class="col-md-9 topmargin" style="position:relative">
+
+<input type="text" name="item_demo" id="id_item_demo" class="form-control custom-form-control ng-pristine ng-valid" ng-model="search_item" autocomplete="off" placeholder="search for item" required ng-change="searchItem(search_item)"><div id="item_info"></div>
+
+<input type="hidden" id="id_item" name="item">
+<div style="position:absolute; z-index:1000;">
+	<table class="table supplier_contact" id="items_list">
+		<thead>
+			<tr>
+				<th width="110">Item Number</th>
+				<th>Primary Supplier</th>
+				<th>QTY on hand</th>
+				<th>Qty on Order</th>
+				<th>Last Ordered</th>
+				<th><a href="" class="close" ng-click="hideItemList()">x</a></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="it in po_items">
+				<td>{[{item.item_number}]}</td>
+				<td colspan="9">{[{item.description}]}</td>
+			</tr>
+			<tr ng-repeat="item in items" data-order-restriction="{[{item.order_restriction}]}"  ng-click="selectItem(item)">
+				<td>{[{item.item_number}]}</td>
+				<td>{[{item.primary_supplier.contact_name}]}</td>
+				<td>{[{item.quantity_on_hand}]}</td>
+				<td>{[{item.quantity_on_order}]}</td>
+				<td>{[{item.last_ordered}]}</td>
+				<td></td>
+				
+				
+			</tr>
+
+			<tr ng-show="!items.length">
+				<td colspan="10">No Items</td>
+			</tr>
+		</tbody>
+
+	</table>
+</div>
+</div>
+
+
+
+
+<div class="col-md-3 topmargin">
+<label for="id_description">Description:</label> 
+</div>
+<div class="col-md-9 topmargin">
+	
+    <textarea class="form-control" cols="40" id="id_description" name="description" placeholder="Describe why needed.." rows="3"></textarea>
+</div>
+
+
+
+
+<div class="col-md-3 topmargin" ng-class="{'ng-pristine': pr_add_form.order_qty.$pristine || pr_add_form.order_qty.$invalid}">
+<label for="id_order_qty">Order qty:</label> 
+<p ng-show="pr_add_form.order_qty.$dirty && pr_add_form.order_qty.$error.required">*This field is required.</p>
+<p ng-show="pr_add_form.order_qty.$dirty && pr_add_form.order_qty.$error.pattern">!Not a valid number.</p>
+<p ng-show="pr_add_form.order_qty.$dirty && pr_add_form.order_qty.$error.limitnotdefined">Please choose your item first!!</p>
+
+<p ng-show="pr_add_form.order_qty.$dirty && pr_add_form.order_qty.$error.maxlimit">Your maximum limit {[{ order_limit }]}</p>
+</div>
+<div class="col-md-9 topmargin">
+	
+    <input class="form-control decimal" id="id_order_qty" ng-model="order_qty" name="order_qty" placeholder="qty" step="0.01" type="text" ng-pattern="/^\d+$/" ng-required="true" ng-change="checklimit({[{order_qty}]})">
+    
+</div>
+
+
+
+
+<div class="col-md-3 topmargin">
+<label for="id_item_require_before">Item require before:</label> 
+</div>
+<div class="col-md-9 topmargin">
+	
+    <input class="form-control datepicker" id="id_item_require_before" name="item_require_before" placeholder="Item Require Before" type="text">
+
+</div>

@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block message %}
+{% endblock message %}
+
+{% block content %}
+<style type="text/css">
+.header {
+	margin-bottom: 20px;
+}
+</style>
+<div class="container main-body">
+
+<section class="row ">
+	
+	<div class="col-md-6">
+		<div class="panel-group" id="accordion">
+			
+			{% include "contacts/partials/edit-contact-partial.html" %}
+
+		</div>
+		<!-- Commetns -->
+		
+	</div> 
+
+	<div class="col-md-6">
+		<div class="row">
+			{% if perms.contacts.view_contactphone %}
+			
+				{% include "contacts/partials/contact-phone-partial.html" %}
+
+			{% endif %}
+
+			{% if perms.contacts.view_contactemailaddress %}
+				{% include "contacts/partials/contact-email-partial.html" %}
+			{% endif %}
+
+			{% if perms.contacts.view_distributionmethod %}
+
+				{% include "contacts/partials/contact-distribution-method-partial.html" %}
+			{% endif %}
+
+			{% if perms.contacts.view_contactemailaddress %}
+				{% include "contacts/partials/contact-contact-type-partial.html" %}
+			{% endif %}
+			
+		</div>	
+		
+	</div>
+</section>
+{% if perms.contacts.view_comment %}
+<section class="row ">
+	<div class="col-md-6">
+		<div class="row">
+		{% if perms.contacts.add_comment %}
+			<div class="col-md-12">
+
+				{% include "contacts/partials/comment-add-form-partial.html" %}
+				
+			</div>
+		{% endif %}
+
+			<div class="col-md-12">
+				
+				<div id="comment" style="margin-top: 20px;">
+				{% for comment in comments %}
+					{% include "contacts/partials/comment-partial.html" %}
+
+				{% endfor %}
+				</div>
+				
+
+			</div>
+		</div>
+	</div>
+</section>
+
+{% endif %}
+
+{% include "modals/edit-modal.html" %}
+
+</div>
+<script type="text/javascript">
+	(function(){
+setTimeout(function() {
+      $('.message').fadeOut();
+    }, 3000);
+
+	})(jQuery)
+</script>
+{% endblock content %}
+	

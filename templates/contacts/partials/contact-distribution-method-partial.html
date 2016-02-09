@@ -1,0 +1,157 @@
+<div class="col-md-12">
+
+	<section class="panel panel-primary">
+		<div class="panel-heading"><h4>Contact Distribution Method</h4></div>
+		<div class="panel-body">
+			{% if perms.contacts.add_distributionmethod %}
+			
+				<table>
+				<tr>
+				{% for field in CDMForm %}
+					<td>
+					{{ field.label_tag }}
+					</td>
+				{% endfor %}
+				<td></td>
+				</tr>
+				<form name="contact-distribution-method" action="/contacts/contact-distribution-method/add/" method="post">
+					{% csrf_token %}
+					<input type="hidden" name="cid" value="{{ cid }}">
+					<tr>
+
+					{% for field in CDMForm %}
+						<td>
+						{{ field }}
+						</td>
+					{% endfor %}
+						<td>
+						
+				        	<button class="btn btn-primary btn-lg" type="submit">Add</button>
+				      	
+				      	</td>
+					</tr>
+				</form>
+				</table>
+				
+			{% endif %}
+		
+		
+			<table class="table table-hover table-bordered">
+				<thead>
+					<tr class="danger">
+						<th> ID </th>
+						<th>Distribution Method</th>
+						<th>Description</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody id='contact-distribution-method-list'>
+					{% for contact_distribution_method in contact_distribution_methods %}
+					<tr class="{{ contact_distribution_method.id }}">
+						<td>{{ contact_distribution_method.id }}</td>
+						<td>{{ contact_distribution_method.distribution_method }}</td>
+						<td>{{ contact_distribution_method.description }}</td>
+						<td>						
+							<a class="contact-distribution-method-edit" href="/contacts/contact-distribution-method/edit/{{ contact_distribution_method.id }}/" 
+							data-toggle="modal" data-target="#editModal"
+							data-id="{{ contact_distribution_method.id }}">edit</a> / 
+
+							<a class="contact-distribution-method-delete" href="#" data-id="{{ contact_distribution_method.id }}">delete</a>
+						
+						</td>
+					</tr>
+					{% empty %}
+						<tr class="warning">
+							<td colspan="4"> No distribution method availabe
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		
+		</div>			
+	</section>
+
+
+{% include "modals/edit-modal.html" %}
+
+<script type="text/javascript">
+	(function(){
+
+
+	$("a.contact-distribution-method-edit").on("click", function(e){
+		
+		e.preventDefault();
+		cdmid = $(this).data("id");
+	    url = $(this).attr("href");
+		mdal = $('#editModal');
+		mdal.on("shown.bs.modal", function(){
+			$("#editModal .modal-content").load(url);
+			console.log(url);
+		}).modal();
+
+		return false;
+	})
+
+	$("a.contact-distribution-method-delete").on("click", function(e){
+		cdmid = $(this).data("id");
+		$( "#delete-contact-distribution-method-confirm" ).dialog({
+			resizable: false,
+			height:200,
+			modal: true,
+			buttons: {
+				"Delete Phone": function() {
+									
+					$( this ).dialog( "close" );
+					$.ajax({
+						type: 'post',
+						url: "/contacts/contact-distribution-method/delete/",
+						data: {
+							'cdmid': cdmid,
+						},
+
+						success: function(data){
+							console.log(data);
+							$("a[data-id='"+data+"']").closest("tr").remove();
+						},
+						errors: function(data){
+							alert("Phone is not deleted.");
+						}
+					})
+				},
+				Cancel: function() {
+					$( this ).dialog( "close" );
+				}
+			}
+		});
+
+	});
+
+
+	$("form[name='contact-distribution-method']").on("submit", function(e){
+		e.preventDefault();
+
+		form_data = $(this).serialize()
+		
+		console.log(form_data);
+		$.ajax({
+			type: "post",
+			url: "/contacts/contact-distribution-method/add/",
+			data: form_data,
+			success: function(data){
+				$("tbody#contact-distribution-method-list tr.warning").remove()
+				$("tbody#contact-distribution-method-list").append(data)
+				console.log(data);
+			}
+		});
+	});
+	})()
+</script>
+
+
+<div id="delete-contact-distribution-method-confirm" title="Do you want to delete?">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;">
+  </span>This will delete the Distribution method from your system?</p>
+</div>
+</div>
+

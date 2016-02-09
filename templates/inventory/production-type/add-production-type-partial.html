@@ -1,0 +1,8 @@
+<span class="label label-danger {{ production_type.id }}">
+	{{ production_type.production_type_name }}
+	{% if perms.inventory.change_productiontype %}
+		<a class="production-type-edit" href="/inventory/production-type/edit/{{ production_type.id }}/" 
+			data-toggle="modal" data-target="#editModal"
+			data-prod-type-id="{{ production_type.id }}"><i class="glyphicon glyphicon-edit"></i></a>
+	{% endif %}
+</span>

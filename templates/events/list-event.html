@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block message %}
+{% endblock message %}
+
+{% block angular %}
+	<script type="text/javascript" src="/statics/js/angular.min.js"></script>
+	<script type="text/javascript" src="/statics/js/angular-route.min.js"></script>
+{% endblock angular %}
+
+{% block content %}
+<div class="container-fluid shadow4 main-body" ng-app="premierApp" ng-controller="EventController">
+
+<section class="row">
+	<div class="col-md-6">
+		<input type='text' class="form-control" ng-model="search" placeholder="Filter By Event ID, name, category, doorname">
+	</div>
+	
+</section>
+
+<section class="row" id="event-list">
+	
+	<div class="col-md-12">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h3 class="panel-title">Events List
+		    	</h3>
+		    	
+		  	</div>
+			<div class="panel-body">
+				{% include "events/partials/event-list.html" %}
+			</div>
+		</div>
+		
+	</div> 
+
+</section>
+</div>
+
+<script type="text/javascript">
+
+premierApp.controller('EventController', ['$scope', '$http',  function ($scope, $http) {
+	
+	$scope.init = function() {
+		url = "/events/search/";
+		console.log(url);
+		$http({method: 'GET', url: url}).
+        	success(function(data, status, headers, config){
+        	$scope.events = data;
+        	console.log(data);
+        });
+	}
+
+	$scope.init();
+
+	$scope.searchProducer = function (q) {
+		console.log(q);
+    	if(q.length > 1) {
+    		url = "/events/search/?q=" + q
+    		$http({method: 'GET', url: url}).
+	            success(function(data, status, headers, config) {
+	                console.log(data.results);
+	                $scope.events = data.results;
+	            });
+	        
+	        
+    		
+    	} else {
+    		
+    	}
+    };
+
+    
+}]);
+
+(function() {
+	$(document).on("click", "#event-list a.delete-event", function(e){
+			e.preventDefault();
+			id = $(this).data("id");
+			console.log(id);
+			$.ajax({
+				type : "POST",
+				url : "/events/delete/",
+				data : {
+					'id': id,
+				},
+				success: function(rdata){
+					$("a[data-id='"+rdata+"']").closest("tr").remove();
+					alert('event deleted succcessfully');
+					//alert(rdata);
+
+				}
+
+			})
+
+		})
+
+})(jQuery)
+</script>
+{% endblock content %}
+	

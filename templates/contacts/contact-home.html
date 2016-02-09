@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block angular %}
+	<script type="text/javascript" src="/statics/js/angular.min.js"></script>
+	<script type="text/javascript" src="/statics/js/angular-route.min.js"></script>
+	
+	
+{% endblock angular %}
+
+{% block content %}
+
+<div class="container-fluid shadow4 main-body" ng-app="premierApp" ng-controller="ContactController">
+
+	<section class="row">
+		<div class="col-md-6">
+			<input type="search" ng-model='search' name="q" class="form-control" ng-change="searchContact(search)" autocomplete="off" placeholder="start typing to filter contact">
+		</div>
+	</section>
+
+
+<section class="row"  id="contact-list">
+<style type="text/css">
+.show_phone_numbers {
+	display: block;
+	width: 200px;
+}
+</style>
+	<div class="col-md-12">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>CONTACT LIST</h4>
+		  	</div>
+		  	<div class="panel-body" >
+		  		<table class="table">
+		  			<thead>
+		  				<tr>
+		  					<th>
+		  						{% include "contacts/partials/pagination.html" %}
+		  					</th>
+		  				</tr>
+		  			</thead>
+		  		</table>
+			  	<table class="table">
+					<thead>
+						<tr>
+							<th width="5%"> ID </th>
+							<th>Contact Name</th>
+							<th>Attention To</th>
+							<th>Address</th>
+							<th>City</th>
+							<th>Province</th>
+							<th>Contact Numbers</th>
+							<th width="120">Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="contact-list-item" ng-repeat="contact in contacts">
+							<td>{[{ contact.id }]}</td>
+							<td>{[{ contact.contact_name }]}</td>
+							<td>{[{ contact.attention_to }]}</td>
+							<td>{[{ contact.address_1 }]}</td>
+							<td>{[{ contact.city }]}</td>
+							<td>{[{ contact.province }]}</td>
+							<td>
+								<ul>
+									<li ng-repeat="phone in contact.phones">
+									<a href="" class="call-contact" data-number="{[{phone.number}]}" data-ext="{[{phone.ext}]}">
+										{[{phone.type}]}-{[{phone.number}]}({[{phone.ext}]})
+									</a>
+									</li>
+								</ul>
+								<ul>
+									<li ng-repeat="email in contact.emails">
+										<a href="mailto:{[{email.email_address}]}">
+											<b>{[{ email.email_type }]}</b>: {[{ email.email_address }]}
+										</a>
+									</li>
+								</ul>
+								
+							</td>
+							
+							
+							<td>
+							
+								<a href="/contacts/{[{ contact.id }]}/"> view</a>
+							 / 
+								<a href="/contacts/edit/{[{ contact.id }]}/"> Edit</a>
+							 /
+							 	<a class="contact-delete" href="/contacts/delete/{[{ contact.id }]}/" data-cid="{[{ contact.id }]}"> delete</a>
+							
+							</td>
+						</tr>
+						
+
+					</tbody>
+				</table>
+			  	
+			</div>
+		</div>
+	</div>
+</section>
+</div>
+<div id="delete-contact-confirm" title="Do you want to delete?">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;">
+  </span>This will delete the contact from your system?</p>
+</div>
+<script type="text/javascript">
+(function(){
+$.widget("ui.tooltip", $.ui.tooltip, {
+    options: {
+        content: function () {
+            return $(this).prop('title');
+        }
+    }
+});
+
+
+$('span.cnp').attr('title', function(){
+    return $(this).next('.show_phone_numbers').remove().html()
+})
+$(document).tooltip();
+
+
+	$(document).on("click", "a.call-contact", function(e){
+		e.preventDefault();
+		var number = $(this).data("number");
+		var ext = $(this).data("ext");
+		$.ajax({
+			type: 'POST',
+			url: "/contacts/make-call/",
+			data: {
+				'phone_number': number,
+				'extension': ext
+			},
+			success: function(rdata) {
+				console.log(rdata);
+				alert("you just called "+rdata);
+			}
+		})
+	});
+
+	$(document).on("click","a.contact-delete", function(e){
+		e.preventDefault();
+		cid = $(this).data("cid");
+
+		$( "#delete-contact-confirm" ).dialog({
+			resizable: false,
+			height:200,
+			modal: true,
+			buttons: {
+				"Delete Contact": function() {
+									
+					$( this ).dialog( "close" );
+					$.ajax({
+						type: "POST",
+						url: "/contacts/delete/",
+						data: {
+							'cid': cid,
+						},
+						success: function(rdata) {
+							
+							$('a[data-cid="'+rdata+'"]').closest("tr").remove();
+							$( this ).dialog( "close" );
+						},
+						error: function() {
+							alert("contact not deleted");
+						}
+					})
+				},
+				Cancel: function() {
+					$( this ).dialog( "close" );
+				}
+			}
+		});
+
+	})
+})(jQuery)
+var premierApp = angular.module("premierApp", [], function ($interpolateProvider) {
+        $interpolateProvider.startSymbol("{[{");
+        $interpolateProvider.endSymbol("}]}");
+});
+
+premierApp.controller('ContactController',['$scope', '$http', function ($scope, $http) {
+    $scope.init = function(){
+        $http.get("/contacts/search/").success(function(data){  
+        	console.log(data);
+          	$scope.contacts = data;
+          	$scope.full_contact = data;
+        })
+    }
+    $scope.init();
+
+
+    $scope.searchContact = function(q) {
+        if(q.length > 1) {
+            var url = "/contacts/search/?q=" + q;
+            $http({method: 'GET', url: url}).
+	            success(function(data, status, headers, config){
+	            $scope.contacts = data;
+	        });
+            
+        } else {
+            $scope.contacts = $scope.full_contact;
+        }
+        
+        
+    }
+
+}]);
+
+</script>
+
+{% endblock content %}
+	

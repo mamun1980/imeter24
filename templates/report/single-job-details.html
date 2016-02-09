@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+
+<section class="row"  id="recuring-job">
+	
+
+	<div class="col-md-8 col-md-offset-2">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>
+		    		Recuring job details
+		    		{% if perms.report.change_recuringreport %}
+			  			<a href="/report/singlejob/edit/{{ job.id }}/"> <i class="glyphicon glyphicon-edit"></i></a>
+			  		{% endif %}
+		    	</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  		<table class="table">
+		  			<tr>
+		  				<td width="25%">Job Id</td>
+		  				<td>{{ job.id }}</td>
+		  			</tr>
+		  			<tr>
+		  				<td width="25%">Job Description</td>
+		  				<td>{{ job.report_description }}</td>
+		  			</tr>
+		  			<tr>
+		  				<td width="25%">Script Name</td>
+		  				<td>{{ job.script_name }}</td>
+		  			</tr>
+		  			<tr>
+		  				<td width="25%">Que type</td>
+		  				<td>{{ job.que_type }}</td>
+		  			</tr>
+		  			{% if job.que_type == 'email' %}
+		  			<tr>
+		  				<td width="25%">Email</td>
+		  				<td>{{ job.email }}</td>
+		  			</tr>
+		  			{% elif job.que_type == 'printer' %}
+		  			<tr>
+		  				<td width="25%">Printer Id</td>
+		  				<td>{{ job.printer }}</td>
+		  			</tr>
+		  			{% elif job.que_type == 'fax' %}
+		  			<tr>
+		  				<td width="25%">Fax number</td>
+		  				<td>{{ job.fax }}</td>
+		  			</tr>
+		  			{% endif %}
+		  			<tr>
+		  				<td width="25%">Date submitted</td>
+		  				<td>{{ job.date_submitted }}</td>
+		  			</tr>
+		  			<tr>
+		  				<td width="25%">Time submitted</td>
+		  				<td>{{ job.time_submitted }}</td>
+		  			</tr>
+		  			<tr>
+		  				<td width="25%">Date finished</td>
+		  				<td>{{ job.date_finished }}</td>
+		  			</tr>
+		  			<tr>
+		  				<td width="25%">Time finished</td>
+		  				<td>{{ job.time_finished }}</td>
+		  			</tr>
+		  			<tr>
+		  				<td width="25%">Search start date</td>
+		  				<td>{{ job.search_start_date }}</td>
+		  			</tr>
+		  			<tr>
+		  				<td width="25%">Search end date</td>
+		  				<td>{{ job.search_end_date }}</td>
+		  				
+		  			</tr>
+		  			
+		  			<tr>
+		  				<td width="25%">Search String</td>
+		  				<td>{{ job.search_string }}</td>
+		  			</tr>
+		  			
+		  			<tr>
+		  				<td width="25%">Search string status</td>
+		  				<td>{{ job.search_status_type }}</td>
+		  			</tr>
+		  			
+
+
+		  		</table>
+			  	
+			</div>
+		</div>
+	</div>
+
+</section>
+</div>
+
+
+{% endblock content %}
+	

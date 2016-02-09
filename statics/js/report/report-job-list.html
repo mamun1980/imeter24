@@ -1,0 +1,40 @@
+<table class="table" ng-show="reports">
+	<tr>
+		<td> ID </td>
+		<td> Report Type </td>
+		
+		
+		<td>Python Script</td>
+		<td>Comments</td>
+		
+		
+		<td>Action</td>
+		
+	</tr>
+	
+		<tr ng-repeat="report in reports | googleSearchFilter:search">
+			<td> {[{ report.id }]} </td>
+			<td> {[{ report.report_type }]} </td>
+			
+			<td> {[{ report.python_script }]} </td>
+			<td> {[{ report.comments }]} </td>
+			
+			
+			<td>
+				<a href="/report/view/{[{report.id}]}/" >View</a>
+				<span ng-show="{[{ report.permission.can_change_report }]}">
+				 / 
+				<a href="/report/edit/{[{report.id}]}/" >Edit</a>
+				</span>
+
+				<span ng-show="{[{ report.permission.can_delete_report }]}">
+				 / 
+				<a class="report-delete" href="#" data-id="{[{ report.id }]}">Delete</a>
+				</span>
+				
+			</td>
+			
+		</tr>
+</table>
+
+<h2 ng-hide="reports">There's no report job</h2>

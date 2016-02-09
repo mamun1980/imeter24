@@ -1,0 +1,83 @@
+<form name="pocontact" action="/contacts/phone-add/" method="POST" enctype="multipart/form-data">{% csrf_token %}
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h4 class="modal-title" id="myModalLabel">Add Contact Phone</h4>
+</div>
+
+
+<div class="modal-body">
+	<table class="table add-user-table">
+		<tr>
+			<td>Phone Type</td>
+			<td>
+				<select class="form-control" name="phone_type">
+				{% for pt in phone_types %}
+					<option value="{{pt.id}}">{{pt.phone_type}}</option>
+				{% endfor %}
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>Phone Number</td>
+			<td>
+				<input type="text" class="form-control" name="phone_number">
+			</td>
+		</tr>
+		<tr>
+			<td>Phone Ext</td>
+			<td>
+				<input type="text" class="form-control" name="phone_ext" value="">
+				<input type="hidden" name="contact_id" id="contact_id" value="{{cid}}">
+			</td>
+		</tr>
+	</table>
+</div>
+
+
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-default close-modal" data-dismiss="modal">Close</button>
+    <button type="submit" class="btn btn-primary">Add Phone</button>
+</div>
+</form>
+<script type="text/javascript">
+	(function(){
+
+		$("form[name='pocontact']").on("submit", function(e){
+			e.preventDefault();
+			form_data = $(this).serialize();
+			// console.log($(this).attr('action'));
+			$.ajax({
+				type: "POST",
+				url: $(this).attr('action'),
+				data: form_data,
+				success: function(rdata) {
+					console.log(rdata);
+	                $( "button.close-modal" ).trigger( "click" );
+	                // var em = "<li> mamun@gmali.com</li>";
+	                var extraContactPlaceHolder = $("#contact_phones");
+	                var contacts = extraContactPlaceHolder.find("tr");
+	                var header = "<tr class='bg-primary'><td>Phone Type</td><td>Phone Number</td><td>Phone Ext.</td><td>Action</td></tr>";
+	                
+	                
+	                if (contacts.length > 0) {
+	                	extraContactPlaceHolder.append(rdata);
+					} else {
+						extraContactPlaceHolder.html(header);
+						extraContactPlaceHolder.append(rdata);
+					}
+	                
+	                // window.location.reload(false);
+	                // win = window.open("",'_blank');
+	                // win.location.href = "/contacts/edit/" + rdata + "/";
+
+	            }
+			});
+
+		});
+
+		
+
+	})(jQuery)
+
+</script>

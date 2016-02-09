@@ -1,0 +1,8 @@
+<span class="label label-danger {{ pay_type.id }}">
+	{{ pay_type.pay_type }}
+	{% if perms.scomuser.change_paytype %}
+		<a class="pay-type-edit" href="/scomuser/pay-type/edit/{{ pay_type.id }}/" 
+			data-toggle="modal" data-target="#editModal"
+			data-id="{{ pay_type.id }}"><i class="glyphicon glyphicon-edit"></i></a>
+	{% endif %}
+</span>

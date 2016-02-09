@@ -1,0 +1,8 @@
+<span class="label label-danger {{ payment_term.id }}">
+	{{ payment_term.term }}
+	{% if perms.contacts.change_paymentterm %}
+		<a class="payment-term-edit" href="/contacts/term/edit/{{ payment_term.id }}/" 
+			data-toggle="modal" data-target="#editModal"
+			data-id="{{ payment_term.id }}"><i class="glyphicon glyphicon-edit"></i></a>
+	{% endif %}
+</span>

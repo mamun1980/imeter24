@@ -1,0 +1,8 @@
+<span class="label label-danger {{ phone_type.id }}">
+	{{ phone_type.phone_type }}
+	{% if perms.contacts.change_currency %}
+		<a class="phone-type-edit" href="/contacts/phone-type/edit/{{ phone_type.id }}/" 
+			data-toggle="modal" data-target="#editModal"
+			data-id="{{ phone_type.id }}"><i class="glyphicon glyphicon-edit"></i></a>
+	{% endif %}
+</span>

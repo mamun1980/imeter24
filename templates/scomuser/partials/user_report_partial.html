@@ -1,0 +1,18 @@
+<tr>
+	<td>
+		{{ user_report.report_type }}
+	</td>
+	{%  if user_report.report_type == 'email' %}
+		<td>{{ user_report.report_email }}</td>
+	{%  elif user_report.report_type == 'fax' %}
+		<td>{{ user_report.report_fax }}</td>
+	{%  elif user_report.report_type == 'print' %}
+		<td>{{ user_report.report_printer }}</td>
+	{%  elif user_report.report_type == 'pdf' %}
+		<td>{{ user_report.report_pdf }}</td>
+	{% endif %}
+	<td>						
+		<a class="user_report_delete" href="#" data-id="{{ user_report.id }}">delete</a>
+	
+	</td>
+</tr>

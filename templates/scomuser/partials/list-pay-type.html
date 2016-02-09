@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+<section class="row"  id="pay-type">
+	
+
+	<div class="col-md-6 col-md-offset-3">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Pay Type List</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  	<form name="pay-type-form">
+		  		<div class="input-group">
+				  	{% for field in pay_type_form %}
+				  		{{ field }}
+				  	{% endfor %}
+				  	<div class="input-group-btn">
+						<button class="btn btn-primary" type="submit">Add Pay Type</button>
+					</div>
+				</div>
+		  	</form>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-md-6 col-md-offset-3">
+		<div class="panel panel-primary">
+			<div class="panel-body">
+				<div id="pay-type-list">
+				{% for pay_type in pay_types %}
+					{% include "scomuser/partials/add-pay-type-partial.html" %}
+				{% endfor %}
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+{% include "modals/edit-modal.html" %}
+
+
+<script type="text/javascript">
+	(function(){
+
+		$("a.pay-type-edit").on("click", function(e){
+			e.preventDefault();
+			// com_id = $(this).data("id");
+		    url = $(this).attr("href");
+			mdal = $('#editModal');
+			mdal.on("shown.bs.modal", function(){
+				$("#editModal .modal-content").load(url);
+				console.log(url);
+			}).modal();
+
+			return false;
+		});
+
+		$("form[name='pay-type-form']").on("submit", function(e){
+			e.preventDefault();
+			form_data = $(this).serialize();
+
+			$.ajax({
+				type: "POST",
+				url: "/scomuser/pay-type/add/",
+				data: form_data,
+				success: function(rdata) {
+					$("#pay-type-list").append(rdata);
+					console.log(rdata);
+				},
+				errors: function() {
+
+				}
+			})
+
+		})
+
+	})(jQuery)
+
+
+</script>
+
+
+
+</section>
+</div>
+
+
+{% endblock content %}
+	

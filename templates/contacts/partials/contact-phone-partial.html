@@ -1,0 +1,153 @@
+<div class="col-md-12">
+	<section class="panel panel-primary">
+		<div class="panel-heading"><h4>Contact phones</h4></div>
+		<div class="panel-body">
+		{% if perms.contacts.add_contactphone %}
+			<form name="contact-phone" action="/contacts/phone/add/" method="post">{% csrf_token %}
+			<input type="hidden" name="cid" value="{{ cid }}">
+				<table>
+				<tr>
+				{% for ufield in cphform %}
+					<td>
+					{{ ufield.label_tag }}
+					</td>
+				{% endfor %}
+				<td></td>
+				</tr>
+				<tr>
+
+				{% for ufield in cphform %}
+					<td>
+					{{ ufield }}
+					</td>
+				{% endfor %}
+					<td>
+					
+			        	<button class="btn btn-primary" type="submit">Add</button>
+			      	
+			      	</td>
+				</tr>
+				</table>
+				
+			</form>
+		{% endif %}
+		
+			<table class="table table-hover table-bordered">
+				<thead>
+					<tr class="danger">
+						<th>Phone Type</th>
+						<th>Phone Number</th>
+						<th>Phone Ext</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody id='contact-phone-list'>
+					{% for contact_phone in contact_phones %}
+					<tr class="{{ contact_phone.id }}">
+						<td>{{ contact_phone.phone_type }}</td>
+						<td>{{ contact_phone.phone }}</td>
+						<td>{{ contact_phone.phone_ext }}</td>
+						<td>						
+							<a class="phone-edit" href="/contacts/phone/edit/{{ contact_phone.id }}/" 
+							data-toggle="modal" data-target="#editModal"
+							data-id="{{ contact_phone.id }}">edit</a> / 
+
+							<a class="phone-delete" href="#" data-id="{{ contact_phone.id }}">delete</a>
+						
+						</td>
+					</tr>
+					{% empty %}
+						<tr class="warning">
+							<td colspan="4"> No phone availabe
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		
+		</div>			
+	</section>
+
+
+{% include "modals/edit-modal.html" %}
+
+<script type="text/javascript">
+	(function(){
+
+
+	$("a.phone-edit").on("click", function(e){
+		
+		e.preventDefault();
+		pid = $(this).data("id");
+	    url = $(this).attr("href");
+		mdal = $('#editModal');
+		mdal.on("shown.bs.modal", function(){
+			$("#editModal .modal-content").load(url);
+			console.log(url);
+		}).modal();
+
+		return false;
+	})
+
+	$("a.phone-delete").on("click", function(e){
+		phone_id = $(this).data("id");
+		$( "#delete-phone-confirm" ).dialog({
+			resizable: false,
+			height:200,
+			modal: true,
+			buttons: {
+				"Delete Phone": function() {
+									
+					$( this ).dialog( "close" );
+					$.ajax({
+						type: 'post',
+						url: "/contacts/phone/delete/",
+						data: {
+							'phone_id': phone_id,
+						},
+
+						success: function(data){
+							console.log(data);
+							$("a[data-id='"+data+"'").closest("tr").remove();
+						},
+						errors: function(data){
+							alert("Phone is not deleted.");
+						}
+					})
+				},
+				Cancel: function() {
+					$( this ).dialog( "close" );
+				}
+			}
+		});
+
+	});
+
+
+	$("form[name='contact-phone']").on("submit", function(e){
+		e.preventDefault();
+
+		form_data = $(this).serialize()
+		
+		// console.log(phone_type + " "+ phone + " "+ phone_ext);
+		$.ajax({
+			type: "post",
+			url: "/contacts/phone/add/",
+			data: form_data,
+			success: function(data){
+				$("tbody#contact-phone-list tr.warning").remove()
+				$("tbody#contact-phone-list").append(data)
+				console.log(data);
+			}
+		});
+	});
+	})()
+</script>
+
+
+<div id="delete-phone-confirm" title="Do you want to delete?">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;">
+  </span>This will delete the contact phone from your system?</p>
+</div>
+</div>
+

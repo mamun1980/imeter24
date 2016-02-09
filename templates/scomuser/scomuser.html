@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+{{ ulform.media.css }}
+{{ ulform.media.js }}
+
+<div class="container shadow4 main-body">
+<section class="row">
+	<aside class="col-md-3 col-md-offset-3">
+	<form name="scomuser-filter" action="/scomuser/userlist/" method="post">{% csrf_token %}
+		<div class="input-group">
+			{% for field in ulform %}
+				{{ field }}
+			{% endfor %}
+			<span class="input-group-btn">
+				<button class="btn btn-default" type="submit">Filter</button>
+	      	</span>
+      	</div>
+	</form>
+		
+	</aside>
+	
+</section>
+
+<section class="row" id="user-list">
+	<aside class="col-md-3">
+		{% include "scomuser/user-left-menu.html" %}
+	</aside>
+
+
+
+	<div class="col-md-9">
+	<div class="panel panel-primary">
+		<div class="panel-heading">
+	    	<h4>USER LIST</h4>
+	  	</div>
+	  	<div class="panel-body">
+	  	
+
+		<table class="table">
+			<thead>
+				<tr>
+					<th>User Name</th>
+					<th>First Name</th>
+					<th>Last Name</th>
+					<th>Email</th>
+					<th>Staff</th>
+					<th>Active</th>
+					<th>Action</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for usr in user_list %}
+				<tr>
+					<td>{{ usr.username }}</td>
+					<td>{{ usr.first_name|default:"Not available" }}</td>
+					<td>{{ usr.last_name|default:"Not available" }}</td>
+					<td>{{ usr.email }}</td>
+					<td>{{ usr.is_staff }}</td>
+					<td>{{ usr.is_active }}</td>
+					<td>
+						<a href="/scomuser/viewuser/{{ usr.id }}/"> view</a> / 
+						<a href="/scomuser/edituser/{{ usr.id }}/"> Edit</a> / 
+						<a href="/scomuser/deleteuser/{{ usr.id }}/">delete</a>
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+		</div>
+	</div>
+
+</section>
+</div>
+{% endblock content %}

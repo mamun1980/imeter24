@@ -1,0 +1,9 @@
+<tr class="bg-info">
+	<td>{{ contact_phone.phone_type }}</td>
+	<td>{{ contact_phone.phone }}</td>
+	<td>{{ contact_phone.phone_ext }}</td>
+	<td>
+		<a class='contact-phone-delete' href='#' data-id="{{ contact_phone.id }}">delete</a>
+		<input type="hidden" name="contact_phones" value="{{ contact_phone.id }}">
+	</td>
+</tr>

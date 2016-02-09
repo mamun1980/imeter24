@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style type="text/css">
+
+#sold_to_contact_details, #ship_to_contact_list, #sold_to_contact_list, #ship_to_contact_list {
+	display: none;
+}
+</style>
+<div class="container-fluid shadow4 main-body">
+
+<section class="row" >
+	
+
+	<div class="col-md-8 col-md-offset-2">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>System Variables</h4>
+		  	</div>
+			<div class="panel-body">
+				<form action="/system-variable/" method="POST" enctype="multipart/form-data">{% csrf_token %}
+					{% include "base/sys-variable-form.html" %}
+
+					<input type="submit" class="btn btn-primary btn-lg" value="Submit">
+				</form>
+			</div>
+		</div>
+	</div>
+</section>
+</div>
+
+<script type="text/javascript">
+
+(function(){
+	$(".datepicker").datepicker();
+})(jQuery)
+
+</script>
+{% endblock content %}

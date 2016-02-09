@@ -1,0 +1,23 @@
+<table class="table" id="massmail">
+	<tr class="table-head">
+		<th>Email ID</th>
+		<th>Sender</th>
+		<th>Subject</th>
+		<th>Reciever</th>
+		<th>Send Datetime</th>
+		<th>Devered Datetime</th>
+		<th>Status</th>
+	</tr>
+	
+		<tr ng-repeat="massmail in massmails | googleSearchFilter:search" ng-class="massmail.mail_status">
+			<td>{[{massmail.email_id}]}</td>
+			<td>{[{massmail.sender}]}</td>
+			<td>{[{massmail.subject}]}</td>
+			
+			<td>{[{massmail.reciever}]}</td>
+			<td>{[{massmail.request_datetime}]}</td>
+			<td>{[{massmail.delivered_datetime}]}</td>
+			<td>{[{massmail.mail_status}]}</td>
+		</tr>
+	
+</table>

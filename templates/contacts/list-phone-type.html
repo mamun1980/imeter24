@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+<section class="row"  id="contact-list">
+	
+
+	<div class="col-md-6 col-md-offset-3">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Phone Type List</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  	<form name="phone-type-form">
+		  		<div class="input-group">
+				  	{% for field in ptform %}
+				  		{{ field }}
+				  	{% endfor %}
+				  	<div class="input-group-btn">
+						<button class="btn btn-primary" type="submit">Add Phone Type</button>
+					</div>
+				</div>
+		  	</form>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-md-6 col-md-offset-3">
+		<div class="panel panel-primary">
+			<div class="panel-body">
+				<div id="phone-type-list">
+				{% for phone_type in phone_types %}
+					{% include "contacts/partials/add-phone-type-partial.html" %}
+				{% endfor %}
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+{% include "modals/edit-modal.html" %}
+
+
+<script type="text/javascript">
+	(function(){
+
+		$("a.phone-type-edit").on("click", function(e){
+			e.preventDefault();
+			// com_id = $(this).data("id");
+		    url = $(this).attr("href");
+			mdal = $('#editModal');
+			mdal.on("shown.bs.modal", function(){
+				$("#editModal .modal-content").load(url);
+				console.log(url);
+			}).modal();
+
+			return false;
+		});
+
+		$("form[name='phone-type-form']").on("submit", function(e){
+			e.preventDefault();
+			form_data = $(this).serialize();
+
+			$.ajax({
+				type: "POST",
+				url: "/contacts/phone-type/add/",
+				data: form_data,
+				success: function(rdata) {
+					$("#phone-type-list").append(rdata);
+					console.log(rdata);
+				},
+				errors: function() {
+
+				}
+			})
+
+		})
+
+	})(jQuery)
+
+
+</script>
+
+
+
+</section>
+</div>
+
+
+{% endblock content %}
+	

@@ -1,0 +1,9 @@
+<tr class='bg-info'>
+	<td>{{plcontact.contact_type}}</td>
+	<td>{{plcontact.contact}}</td>
+	<td>{{plcontact.contact_name}}</td>
+	<td width="">
+		<a href='' data-contactid='{{plcontact.id}}' data-contacttype="soldto" class='delete-contact'>Delete</a>
+		<input type='hidden' name='pl_soldto_extra_contacts' value='{{plcontact.id}}'>
+	</td>
+</tr>

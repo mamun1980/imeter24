@@ -1,0 +1,233 @@
+<div class="panel panel-primary">
+		<div class="panel-heading">
+	    	<h4>Job status details
+	    	{% if perms.schedule.change_jobstatus %} <a href="/schedule/job-status/edit/{{job_status.id}}/"><span class="glyphicon glyphicon-edit"></span></a> {% endif %}</h4>
+	  	</div>
+		<div class="panel-body">
+<table class="table table-bordered table-hover job-status">
+	<tr>
+		<th>fixtures req by</th>
+		<th>fixtures status</th>
+		<th>fixtures comments</th>
+	</tr>
+	<tr>
+		<td>{{job_status.fixtures_req_by}}</td>
+		<td>{{job_status.fixtures_is_done}}</td>
+		<td>{{job_status.fixtures_comment}}</td>
+	</tr>
+
+	<tr>
+		<th>wood shop req by</th>
+		<th>wood shop status</th>
+		<th>wood shop comments</th>
+	</tr>
+	<tr>
+		<td>{{job_status.wood_shop_req_by}}</td>
+		<td>{{job_status.wood_shop_is_done}}</td>
+		<td>{{job_status.wood_shop_req_by_comment}}</td>
+	</tr>
+
+	<tr>
+		<th>machine shop req by</th>
+		<th>machine shop status</th>
+		<th>machine shop comments</th>
+	</tr>
+	<tr>
+		<td>{{job_status.machine_shop_req_by}}</td>
+		<td>{{job_status.machine_shop_is_done}}</td>
+		<td>{{job_status.machine_shop_req_by_comment}}</td>
+	</tr>
+
+	<tr>
+		<th>welding</th>
+		<th>welding status</th>
+		<th>welding comments</th>
+	</tr>
+	<tr>
+		<td>{{job_status.welding}}</td>
+		<td>{{job_status.welding_is_done}}</td>
+		<td>{{job_status.welding_comment}}</td>
+	</tr>
+
+	<tr>
+		<th>lacquer</th>
+		<th>lacquer status</th>
+		<th>lacquer comments</th>
+	</tr>
+	<tr>
+		<td>{{job_status.lacquer}}</td>
+		<td>{{job_status.lacquer_is_done}}</td>
+		<td>{{job_status.lacquer_comment}}</td>
+	</tr>
+
+	<tr>
+		<th>trim shop req by</th>
+		<th>trim shop status</th>
+		<th>trim shop comments</th>
+	</tr>
+	<tr>
+		<td>{{job_status.trim_shop_req_by}}</td>
+		<td>{{job_status.trim_shop_is_done}}</td>
+		<td>{{job_status.trim_shop_req_by_comment}}</td>
+	</tr>
+
+	<tr>
+		<th>cab assemply req by</th>
+		<th>cab assemply status</th>
+		<th>cab assemply comments</th>
+	</tr>
+	<tr>
+		<td>{{job_status.cab_assemply_req_by}}</td>
+		<td>{{job_status.cab_assemply_is_done}}</td>
+		<td>{{job_status.cab_assemply_req_by_comment}}</td>
+	</tr>
+
+	<tr>
+		<th>install date</th>
+		<th>install status</th>
+		<th>install comments</th>
+	</tr>
+	<tr>
+		<td>{{job_status.install_date}}</td>
+		<td>{{job_status.install_is_done}}</td>
+		<td>{{job_status.install_date_comment}}</td>
+	</tr>
+
+	<tr>
+		<th>premier glass</th>
+		<th>premier glass status</th>
+		<th>premier glass comments</th>
+	</tr>
+	<tr>
+		<td>{{job_status.premier_glass}}</td>
+		<td>{{job_status.premier_glass_is_done}}</td>
+		<td>{{job_status.premier_glass_comment}}</td>
+	</tr>
+
+	<tr>
+		<th>tile installer</th>
+		<th>tile installer status</th>
+		<th>tile installer comments</th>
+	</tr>
+	<tr>
+		<td>{{job_status.tile_installer}}</td>
+		<td>{{job_status.tile_installer_is_done}}</td>
+		<td>{{job_status.tile_installer_comment}}</td>
+	</tr>
+
+	<tr>
+		<th>misc del</th>
+		<th>misc del status</th>
+		<th>misc del comments</th>
+	</tr>
+	<tr>
+		<td>{{job_status.misc_del}}</td>
+		<td>{{job_status.misc_del_is_done}}</td>
+		<td>{{job_status.misc_del_comment}}</td>
+	</tr>
+
+	<tr>
+		<th>bill</th>
+		<th>bill status</th>
+		<th>bill comments</th>
+	</tr>
+	<tr>
+		<td>{{job_status.bill}}</td>
+		<td>{{job_status.bill_is_done}}</td>
+		<td>{{job_status.bill_comment}}</td>
+	</tr>
+
+	<tr>
+		<th>hayward</th>
+		<th>hayward status</th>
+		<th>hayward comments</th>
+	</tr>
+	<tr>
+		<td>{{job_status.hayward}}</td>
+		<td>{{job_status.hayward_is_done}}</td>
+		<td>{{job_status.hayward_comment}}</td>
+	</tr>
+
+	<tr>
+		<th>glenn</th>
+		<th>glenn status</th>
+		<th>glenn comments</th>
+	</tr>
+	<tr>
+		<td>{{job_status.glenn}}</td>
+		<td>{{job_status.glenn_is_done}}</td>
+		<td>{{job_status.glenn_comment}}</td>
+	</tr>
+
+	<tr>
+		<th>suren</th>
+		<th>suren status</th>
+		<th>suren comments</th>
+	</tr>
+	<tr>
+		<td>{{job_status.suren}}</td>
+		<td>{{job_status.suren_is_done}}</td>
+		<td>{{job_status.suren_comment}}</td>
+	</tr>
+
+	<tr>
+		<th>roger</th>
+		<th>roger status</th>
+		<th>roger comments</th>
+	</tr>
+	<tr>
+		<td>{{job_status.roger}}</td>
+		<td>{{job_status.roger_is_done}}</td>
+		<td>{{job_status.roger_comment}}</td>
+	</tr>
+
+	<tr>
+		<th>matt</th>
+		<th>matt status</th>
+		<th>matt comments</th>
+	</tr>
+	<tr>
+		<td>{{job_status.matt}}</td>
+		<td>{{job_status.matt_is_done}}</td>
+		<td>{{job_status.matt_comment}}</td>
+	</tr>
+
+	<tr>
+		<th>third party install</th>
+		<th>third party install status</th>
+		<th>third party install comments</th>
+	</tr>
+	<tr>
+		<td>{{job_status.third_party_install}}</td>
+		<td>{{job_status.third_party_install_is_done}}</td>
+		<td>{{job_status.third_party_install_comment}}</td>
+	</tr>
+
+	<tr>
+		<th>TSSA Submitted Date</th>
+		<th>TSSA Submition status</th>
+		<th>TSSA comments</th>
+	</tr>
+	<tr>
+		<td>{{job_status.tssa_submitted_date}}</td>
+		<td>{{job_status.tssa_submitted_date_is_done}}</td>
+		<td>{{job_status.tssa_submitted_date_comment}}</td>
+	</tr>
+
+	<tr>
+		<th>Safety Test Schedule date</th>
+		<th>Who will test</th>
+		<th>Test comments</th>
+	</tr>
+	<tr>
+		<td>{{job_status.safety_test_schedule_date}}</td>
+		<td>{{job_status.who_will_test}}</td>
+		<td>{{job_status.test_comment}}</td>
+	</tr>
+
+
+</table>
+
+
+	</div>
+</div>

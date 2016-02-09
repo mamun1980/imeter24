@@ -1,0 +1,85 @@
+<table class="table events-list" ng-show="entries">
+	<tr>
+		<td>Entry ID</td>
+		<td>Date of Transaction</td>						
+		<td>Time of Transaction</td>
+		<td>Transaction Username</td>
+		<td>Transactin Processed Status</td>
+		
+		
+		<td>Action</td>
+	</tr>
+
+	<tr ng-repeat="entry in entries | googleSearchFilter:search">
+		<td>{[{ entry.entryid }]}</td>
+		<td>{[{ entry.date_of_transaction }]}</td>
+		
+		<td>{[{ entry.time_of_transaction }]}</td>
+		<td>{[{ entry.transaction_username }]}</td>
+		<td>{[{ entry.transaction_processed }]}</td>
+		
+		
+		<td>
+			
+			<span ng-show="{[{ entry.permission.can_change_evententry }]}">
+				<a href="/events/evententry/edit/{[{entry.entryid}]}/">Edit</a>
+			</span>
+
+			<span ng-show="{[{ entry.permission.can_delete_evententry }]}">
+			
+			/ 
+			<a href="" data-id="{[{entry.entryid}]}" class="delete-evententry">Delete</a>
+			</span>
+
+
+		</td>
+	</tr>
+	
+</table>
+
+<h2 ng-hide="entries">There is no controllers</h2>
+
+<div id="delete-contact-confirm" title="Do you want to delete?">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;">
+  </span>This will delete the evententry from your system?</p>
+</div>
+<script type="text/javascript">
+
+(function(){
+	$(document).on("click", "a.delete-evententry", function(e){
+		e.preventDefault();
+		id = $(this).data("id");
+		console.log(id);
+
+		$( "#delete-contact-confirm" ).dialog({
+			resizable: false,
+			height:200,
+			modal: true,
+			buttons: {
+				"Delete evententry": function() {
+									
+					$( this ).dialog( "close" );
+					$.ajax({
+						type: "POST",
+						url: "/events/evententry/delete/",
+						data: {
+							'entryid': id,
+						},
+						success: function(rdata) {
+							
+							$("a[data-id='"+rdata+"'").closest("tr").remove();
+						},
+						error: function() {
+							alert("evententry not deleted");
+						}
+					})
+				},
+				Cancel: function() {
+					$( this ).dialog( "close" );
+				}
+			}
+		});
+
+	});
+})(jQuery)
+</script>

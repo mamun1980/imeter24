@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}{{site_name}}{% endblock title %}
+
+{% block angular %}
+	<script type="text/javascript" src="/statics/js/angular.min.js"></script>
+	<script type="text/javascript" src="/statics/js/angular-route.min.js"></script>	
+{% endblock angular %}
+
+{% block content %}
+<div class="container main-body shadow4" ng-app="premierApp">
+<section class="row">
+<div class="col-md-6">
+	<input type='text' class="form-control" ng-model="search" placeholder="Filter mails">
+</div>
+
+
+</section>
+	<div class="row" id="schedule-job-list">
+		
+	    <div class="col-md-12">
+	    	<div class="panel panel-primary">
+				<div class="panel-heading">
+			    	<h4>Mail list</h4>
+			  	</div>
+			  	<div class="panel-body">
+			  		
+			  		<div ng-view></div>
+			  		
+			  	</div>
+			</div>
+
+	    	
+	    	
+		</div>
+		
+	</div>
+	
+</div>
+
+<script type="text/javascript">
+premierApp.controller('MassMailController',['$scope', '$http', 'MassMailService', 'massmails', 
+	function ($scope, $http, MassMailService, massmails) {
+	$scope.massmails = massmails;
+
+}]);
+
+</script>
+{% endblock content %}

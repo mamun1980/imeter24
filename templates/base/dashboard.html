@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid main-body dashboard">
+{% if messages %}
+<section id="message">
+	{% for message in messages %}
+    	<li {% if message.tags %} class="bg-{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</section>
+{% endif %}
+
+	<div class="row">
+	    <div class="col-md-12">
+	    
+		</div>
+	</div>
+</div>
+
+{% endblock content %}

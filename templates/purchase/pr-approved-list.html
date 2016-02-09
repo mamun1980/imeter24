@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style type="text/css">
+#supplier-contact {
+	width: 400px;
+	border: 2px solid black;
+	background-color: #FFF;
+	height: auto;
+}
+.list {
+	margin-top: 10px;
+}
+.pr-view, .dropdown {
+	display: inline-block;
+}
+
+</style>
+<div class="container shadow4 main-body">
+
+<section class="row list" >
+	<div class="col-md-12">
+		
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Request Items List</h4>
+		  	</div>
+		  	<div class="panel-body">
+				<table class='table table-bordered table-striped'>
+					<thead>
+						<tr class='info'>
+							<th>PR ID</th>
+							<th>Item ID</th>
+							<th>Description</th>
+							<th width="200">Approved qty (Ordered Qty)</th>
+							<th>Approved date</th>
+							<th>Added PO</th>
+							<th>Total PO Qty</th>
+							<th>Status</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for pr in pr_list %}
+							{% if pr.status == 0 %}
+								<tr class="danger">
+							{% elif pr.status == 1 %}
+								<tr class="success">
+							{% else %}
+								<tr>
+							{% endif %}
+							<td>{{ pr.pr.id }}</td>
+							<td>{{ pr.item }}</td>
+							<td>{{ pr.pr.description }}</td>
+							<td>{{ pr.approved_qty }} ({{pr.pr.order_qty}})</td>
+							<td>{{ pr.approved_date }}</td>
+							<td>{{ pr.po }}</td>
+							<td>{{ pr.total_po_qty }}</td>
+							<td>{{ pr.status }}</td>
+							{%if perms.purchase.delete_request_item %}
+							<td>
+								<a href="#" class="ri-delete" data-ri-id="{{pr.id}}">Delete</a>
+							</td>
+							{% endif %}
+
+						</tr>
+						{% empty %}
+							<tr>
+								<td colspan="9">No PR</td>
+							</tr>
+						{% endfor %}
+						
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+
+</section>
+
+{% include "modals/add-modal.html" %}
+
+<script type="text/javascript">
+(function(){
+
+	$(document).on("click", "a.ri-delete", function(e){
+		e.preventDefault();
+		var ri_id = $(this).data("ri-id");
+
+		$.ajax({
+			type: "POST",
+			url: "/purchase/request-item/delete/",
+			data: {
+				'id': ri_id
+			},
+			success: function(rdata){
+				if(rdata == 'delete'){
+					alert('Request Item deleted');	
+				} else {
+					alert(rdata);
+				}
+				
+				window.location.reload(true);
+			}
+		})
+	
+	});
+
+	$(document).on("click", "a.pr-on-hold", function(e){
+		e.preventDefault();
+		var pr_id = $(this).data("id");
+
+		$.ajax({
+			type: "POST",
+			url: "/purchase/onhold-pr/",
+			data: {
+				'pr_id': pr_id
+			},
+			success: function(rdata){
+				alert('PR On Hold');
+				window.location.reload(true);
+			}
+		})
+	
+	})
+})(jQuery)
+
+</script>
+
+<script type="text/javascript">
+
+</script>
+{% endblock content %}

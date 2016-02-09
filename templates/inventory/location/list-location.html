@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+<section class="row"  id="list-location">
+	
+
+	<div class="col-md-8 col-md-offset-2">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Location List</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  	<table class="table">
+		  		<thead>
+		  		<tr>
+		  			<th>Location ID</th>
+		  			<th width="60%">Description</th>
+		  			<th>Action</th>
+		  		</tr>
+		  		</thead>
+		  		{% for location in locations %}
+		  		<tr>
+		  			<td>{{ location.id }}</td>
+		  			<td>{{ location.description }}</td>
+		  			<td>
+		  				
+		  				{%if perms.inventory.change_location %}
+
+		  				<a href="/inventory/location/edit/{{ location.id }}/"> Edit </a>
+
+		  				{% endif %}
+
+		  				{%if perms.inventory.delete_location %}
+
+		  				/ <a class="delete-location" data-location-id="{{ location.id }}" href=""> Delete </a>
+
+		  				{% endif %}
+
+		  			</td>
+
+		  		</tr>
+		  		{% empty %}
+		  			<tr>
+		  				<td colspan="3">No locations</td>
+		  			</tr>
+		  		{% endfor %}
+		  	</table>
+			</div>
+		</div>
+	</div>
+
+</section>
+</div>
+<script type="text/javascript">
+(function(){
+	$("#list-location a.delete-location").on("click", function(e){
+		e.preventDefault();
+		loc_id = $(this).data("location-id");
+		
+		$.ajax({
+			type: "POST",
+			url: "/inventory/location/delete/",
+			data: {
+				'loc_id': loc_id,
+			},
+			success: function(rdata) {
+				
+				$("a[data-location-id='"+rdata+"']").closest("tr").remove();
+				alert('Location is deleted');
+			}
+		})
+	});
+
+})(jQuery)
+
+</script>
+
+{% endblock content %}
+	

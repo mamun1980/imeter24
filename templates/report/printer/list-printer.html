@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+<section class="row"  id="printer-list">
+	
+
+	<div class="col-md-8 col-md-offset-2">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4> Printer List</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  		<table class="table">
+			  		<tr>
+			  			<td> ID </td>
+			  			
+			  			<td> Printer Network Que Location </td>
+			  			
+			  			<td>Total Use</td>
+			  			<td>Action</td>
+			  			
+			  		</tr>
+			  		{% for printer in printers %}
+			  			<tr>
+				  			<td> {{ printer.printer_id }} </td>
+				  			
+				  			<td> {{ printer.network_que_location }} </td>
+				  			<td> {{ printer.report_set.all.count }} </td>
+				  			<td>
+				  				{% if perms.report.change_printer %}
+				  				<a class="printer-edit" href="/report/printer/edit/{{printer.printer_id}}/">Edit</a> 
+				  				{% endif %}
+
+				  				{% if perms.report.delete_printer %}
+				  				/ <a class="printer-delete" href="#" data-id="{{ printer.printer_id }}">delete</a>
+				  				{% endif %}
+				  			</td>
+				  			
+				  		</tr>
+				  	{% empty %}
+				  	<tr>
+			  			<td colspan='4'> No printer found. </td>
+			  		</tr>
+				  	{% endfor %}
+			  	</table>
+		  	
+			</div>
+		</div>
+	</div>
+
+{% include "modals/edit-modal.html" %}
+
+<script type="text/javascript">
+(function(){
+
+	$("a.printer-edit").on("click", function(e){
+		e.preventDefault();
+		// com_id = $(this).data("id");
+	    url = $(this).attr("href");
+	    newurl = url.replace(" ","%20"); 
+		mdal = $('#editModal');
+		console.log(url);
+		mdal.on("shown.bs.modal", function(){
+			$("#editModal .modal-content").load(newurl);
+			
+		}).modal();
+
+		return false;
+	});
+
+	
+	$("#printer-list a.printer-delete").on("click", function(e){
+		e.preventDefault();
+		id = $(this).data("id");
+		console.log(id);
+
+		$.ajax({
+			type: "POST",
+			url: "/report/printer/delete/",
+			data: {
+				'printer_id': id,
+			},
+			success: function(rdata) {
+				console.log(rdata);
+				$("a[data-id='"+rdata+"']").closest("tr").remove();
+			}
+		})
+	});
+
+})(jQuery)
+
+</script>
+</section>
+</div>
+
+
+{% endblock content %}

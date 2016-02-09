@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="row ">
+	<div class="col-md-6 col-md-offset-3">
+		<section class="home">
+	    	
+	    	<div class="jumbotron shadow4" id="login-jumbo">
+			<form action="/scomuser/login/" method="POST">{% csrf_token %}
+				{% for field in lform %}
+					{{ field.label }}
+					{{ field }}
+					
+				{% endfor %}
+				
+				<button type="submit" class="btn btn-primary btn-lg form-control login-btn">Login</button>
+			</form>
+			</div>
+	    </section>
+	</div>
+</section>
+
+{% endblock content %}

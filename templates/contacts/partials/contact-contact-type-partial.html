@@ -1,0 +1,161 @@
+
+
+<div class="col-md-12">
+	<section class="panel panel-primary">
+		<div class="panel-heading"><h4>Contact Type</h4></div>
+		<div class="panel-body">
+		{% if perms.contacts.add_contactcontacttype %}
+			<form name='contact-contact-type' method="POST">{% csrf_token %}
+				<input type="hidden" name="cid" value="{{ cid }}">
+				<table>
+					<tr>
+						{% for field in cctform %}
+							<td>
+							{{ field.label_tag }}
+							</td>
+						{% endfor %}
+							<td></td>
+					</tr>
+					<tr>
+						
+						{% for field in cctform %}
+						<td>
+							
+							
+							{{ field }}
+						</td>		
+						{% endfor %}
+						<td>
+							<div class="input-group-btn">
+								<button class="btn btn-primary btn-lg" type="submit">Add</button>
+							</div>
+						</td>
+					</tr>
+					
+				</table>
+
+
+			</form>
+		{% endif %}
+
+			
+			<table class="table table-hover table-bordered email-list">
+				<thead>
+					<tr class="danger">
+						<th> ID </th>
+						<th>Contact Type</th>
+						<th>Description</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody id='contact-contact-type-list'>
+					{% for contact_contact_type in contact_contact_types %}
+					<tr class="{{ contact_contact_type.id }}">
+						<td>{{ contact_contact_type.id }}</td>
+						<td>{{ contact_contact_type.contact_type }}</td>
+						<td>{{ contact_contact_type.description }}</td>
+						
+						<td>
+							<a class="contact-contact-type-edit" href="/contacts/contact-contact-type/edit/{{ contact_contact_type.id }}/" 
+							data-toggle="modal" data-target="#editModal"
+							data-id="{{ contact_contact_type.id }}">edit</a> / 
+						
+							<a class="contact-contact-type-delete" href="#" data-id="{{ contact_contact_type.id }}">delete</a>
+						
+						</td>
+					</tr>
+					{% empty %}
+						<tr class="warning">
+							<td colspan="4"> No contact type availabe
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+			
+		</div>
+	</section>				
+
+{% include "modals/edit-modal.html" %}
+
+
+<script type="text/javascript">
+	(function(){
+
+		$("a.contact-contact-type-edit").on("click", function(e){
+		
+			e.preventDefault();
+			pid = $(this).data("id");
+		    url = $(this).attr("href");
+			mdal = $('#editModal');
+			mdal.on("shown.bs.modal", function(){
+				$("#editModal .modal-content").load(url);
+				console.log(url);
+			}).modal();
+
+			return false;
+		})
+
+		$("form[name='contact-contact-type']").on("submit", function(e){
+			e.preventDefault();
+
+			form_data = $(this).serialize()
+			
+			// console.log(phone_type + " "+ phone + " "+ phone_ext);
+			$.ajax({
+				type: "post",
+				url: "/contacts/contact-contact-type/add/",
+				data: form_data,
+				success: function(data){
+					$("tbody#contact-contact-type-list tr.warning").remove()
+					$("tbody#contact-contact-type-list").append(data)
+					console.log(data);
+				}
+			});
+		});
+
+		$("a.contact-contact-type-delete").on("click", function(e){
+			e.preventDefault();
+			cctid = $(this).data("id");
+
+			$( "#delete-contact-contact-type-confirm" ).dialog({
+				resizable: false,
+				height:200,
+				modal: true,
+				buttons: {
+					"Delete Email": function() {
+										
+						$( this ).dialog( "close" );
+						$.ajax({
+							type: 'post',
+							url: "/contacts/contact-contact-type/delete/",
+							data: {
+								'cctid': cctid,
+							},
+
+							success: function(data){
+								console.log(data);
+								$("a[data-id='"+data+"'").closest("tr").remove();
+							},
+							errors: function(data){
+								alert("Phone is not deleted.");
+							}
+						})
+					},
+					Cancel: function() {
+						$( this ).dialog( "close" );
+					}
+				}
+			});
+
+		});
+
+	})(jQuery)
+</script>
+
+
+<div id="delete-contact-contact-type-confirm" title="Do you want to delete?">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;">
+  </span>This will delete the contact type from contact ?</p>
+</div>
+</div>

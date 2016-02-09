@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid shadow4 main-body">
+	
+	<section class="row">
+		
+				<div class="col-md-4 ">
+					{% include "schedule/partial/job-view-partial.html" %}
+				</div>
+				<div class="col-md-8 ">
+					{% include "schedule/partial/job-status-view-partial.html" %}
+				</div>
+
+	</section>
+	
+<section class="row">
+	<article class="col-md-8 col-md-offset-4">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				<h4 class="panel-title">
+			        
+			          Add Comments
+			        
+			    </h4>
+		  	</div>
+
+		  	
+		  	<div class="panel-body">
+		  			
+				<form name="job_comment">{% csrf_token %}
+					<input type="hidden" name="job_number" value="{{job_number}}" >
+					<input type="hidden" name="comment_by" value="{{request.user.username}}" >
+					<div class="input-group">
+						<textarea class="form-control" ng-model="comment" cols="40" id="id_job_comment" name="job_comment" rows="2"></textarea>
+						<span class="input-group-btn">
+						<button type="submit" class="btn btn-primary btn-lg" style="padding: 15px;">Add Comment</button>
+						</span>
+					</div>
+						
+					
+				</form>
+					
+		  	</div>
+
+		  	<table class="table">
+		  		<thead>
+		  			<tr><th>Comments</th><th>Comment By / Date Time</th><th>Action</th></tr>
+		  		</thead>
+				<tbody id='add-comment'>
+				{% for comment in comments %}
+					<tr data-id="{{comment.id}}">
+						<td width="50%">{{ comment.job_comment }}</td>
+						<td width="30%">{{ comment.comment_by }} / {{ comment.datetime }}</td>
+						<td>
+							{% if perms.schedule.change_comment %} <a data-toggle="modal" data-target="#editModal" href="/schedule/comment/edit/{{comment.id}}/" class="edit-comment" data-id="{{comment.id}}">Edit</a> {% endif %}
+							{% if perms.schedule.delete_comment %} / <a href="" class="delete-comment" data-id="{{comment.id}}">Delete</a> {% endif %}
+						</td>
+					</tr>
+				{% empty %}
+					<tr>
+						<td colspan="3"> No Comments </td>
+					</tr>
+				{% endfor %}
+				</tbody>
+			</table>
+		</div>
+
+
+	</article>
+
+{% include "modals/edit-modal.html" %}
+</section>
+
+</div>
+
+
+<div id="delete-job-confirm" style="display:none;" title="Do you want to delete?">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;">
+  </span>This will delete the job from your system?</p>
+</div>
+
+<script type="text/javascript">
+(function(){
+	$(".datetimepicker").datepicker();
+
+	$("form[name='job_comment']").on('submit', function(e){
+		e.preventDefault();
+		console.log($(this).serialize());
+
+		var form_data = $(this).serialize();
+        $.ajax({
+            type: "POST",
+            url: "/schedule/comment/add/",
+            data: form_data,
+            success: function(rdata) {
+                if(rdata != 'no_permission') {
+                	$("#add-comment").prepend(rdata);	
+                } else {
+                	alert('No permission');
+                }
+                
+            }
+        })
+	});
+
+	$("#add-comment a.edit-comment").on("click", function(){
+		// e.preventDefault();
+			// com_id = $(this).data("id");
+	    var url = $(this).attr("href");
+		var mdal = $('#editModal');
+		mdal.on("shown.bs.modal", function(){
+			$("#editModal .modal-content").load(url);
+			console.log(url);
+		}).modal();
+
+		return false;
+	});
+
+	$("#add-comment a.delete-comment").on("click", function(e){
+		e.preventDefault();
+		// url = $(this).attr("href");
+		// mdal = $('#editModal');
+		// mdal.on("shown.bs.modal", function(){
+		// 	$("#editModal .modal-content").load(url);
+		// 	console.log(url);
+		// }).modal();
+
+		// return false;
+		var com_id = $(this).data("id");
+		console.log(com_id);
+		$( "#delete-user-confirm" ).css("display:block;");
+		
+		$( "#delete-job-confirm" ).dialog({
+			resizable: false,
+			height:200,
+			modal: true,
+			buttons: {
+				"Delete User": function() {
+									
+					$( this ).dialog( "close" );
+					$.ajax({
+						type: "POST",
+						url: "/schedule/comment/delete/",
+						data: {
+							'com_id': com_id,
+						},
+						success: function(rdata) {
+							console.log(rdata);
+							$("a[data-id='"+ rdata + "']").closest("tr").remove();
+						}
+					})
+				},
+				Cancel: function() {
+					$( this ).dialog( "close" );
+				}
+			}
+		});
+	})
+	
+})(jQuery)
+
+</script>
+{% endblock content %}

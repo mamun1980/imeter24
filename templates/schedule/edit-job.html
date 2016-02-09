@@ -1,0 +1,464 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style type="text/css">
+.no-resize {
+	resize:none;
+}
+</style>
+<div class="container-fluid shadow4 main-body" ng-app="scheduleApp">
+
+<section class="row" ng-controller="EditJobController">
+	
+
+	<div class="col-md-4">
+		
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				<h4 class="panel-title">
+			        
+			          Update Job <span class="glyphicon glyphicon-chevron-down"></span>
+			        
+			    </h4>
+		  	</div>
+
+		  	
+		  	<div class="panel-body">
+		  		<form action="/schedule/job/edit/{{jobid}}/" name="jobform" method="POST" enctype="multipart/form-data">{% csrf_token %}
+					<input type="hidden" name="jobid" value="{{jobid}}">
+				  	<article class="row job">
+				  		<section class="col-md-12">
+						  	<table class="add-user-table">
+						  		{% for field in jobform %}
+						  			<tr>
+						  				<td>{{ field.label_tag }}</td>
+						  				<td>{{ field.errors }}{{ field }}</td>
+						  			</tr>
+						  		{% endfor %}
+							</table>
+						</section>
+
+
+					</article>
+
+					<article class="row">
+						<section class="col-md-6">
+						  	<table class="add-user-table">
+						  		<tr>
+									<td colspan="2">
+										<button type="submit" ng-click="updateJob($event, jobform)" class="btn btn-primary btn-lg form-control login-btn">Update Job</button>
+									</td>
+								</tr>
+							</table>
+						</section>
+					</article>
+				</form>		
+			</div>
+			
+
+		</div>
+	</div>
+
+	<div class="col-md-8">
+
+			<div class="panel panel-primary">
+				<div class="panel-heading">
+					<h4 class="panel-title">
+				        
+				          Update Job Status <span class="glyphicon glyphicon-chevron-down"></span>
+				        
+				    </h4>
+			  	</div>
+
+			  	
+			  	<div class="panel-body">
+			  		<article ng-show="noValidJob" class="no-valid-job">
+						<h4>You have no valid job. Please set job oppened date, drawring require date first.</h4>
+
+					</article>
+			  		<form action="/schedule/job-status/edit/{{jsid}}/" name="jobStatusForm" method="POST" enctype="multipart/form-data">{% csrf_token %}
+						<input type="hidden" name="jsid" value="{{jsid}}">
+					  	<article class="row job-status">
+					  		<section class="col-md-12">
+							  	<section class="row">
+
+							  		{% for field in job_status_form %}
+							  		<article class="col-md-4" style="margin-bottom: 10px;">
+
+							  			{{ field.label_tag }}
+							  			{{ field.errors }}
+							  			{{ field }}
+							  		</article>
+							  		{% endfor %}
+							  		
+								</section>
+							</section>
+						</article>
+
+						<article class="row">
+							<section class="col-md-6">
+							  	<table class="add-user-table">
+							  		<tr>
+										<td colspan="2">
+											<div ng-if="showSubmit" class="animate-if" class="add-user-table">	
+												<button type="submit" ng-click="updateStatus($event, jobStatusForm)" class="btn btn-primary btn-lg form-control login-btn">Update Job Status</button>
+												
+											</div>
+										</td>
+									</tr>
+								</table>
+							</section>
+						</article>
+					</form>		
+				
+				</div>
+				
+			</div>
+
+
+	</div>
+
+
+
+<div class="col-md-12">
+<section class="row">
+	<article class="col-md-8 col-md-offset-4">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				<h4 class="panel-title">
+			        
+			          Add Comments
+			        
+			    </h4>
+		  	</div>
+
+		  	
+		  	<div class="panel-body">
+		  			
+				<form name="job_comment">{% csrf_token %}
+					<input type="hidden" name="job_number" value="{{job_number}}" >
+					<input type="hidden" name="comment_by" value="{{request.user.username}}" >
+					<div class="input-group">
+						<textarea class="form-control" ng-model="comment" cols="40" id="id_job_comment" name="job_comment" rows="2"></textarea>
+						<span class="input-group-btn">
+						<button type="submit" class="btn btn-primary btn-lg" style="padding: 15px;">Add Comment</button>
+						</span>
+					</div>
+						
+					
+				</form>
+					
+		  	</div>
+
+		  	<table class="table">
+		  		<thead>
+		  			<tr><th>Comments</th><th>Comment By / Date Time</th><th>Action</th></tr>
+		  		</thead>
+				<tbody id='add-comment'>
+				{% for comment in comments %}
+					<tr data-id="{{comment.id}}">
+						<td width="50%">{{ comment.job_comment }}</td>
+						<td width="30%">{{ comment.comment_by }} / {{ comment.datetime }}</td>
+						<td>
+							{% if perms.schedule.change_comment %} <a data-toggle="modal" data-target="#editModal" href="/schedule/comment/edit/{{comment.id}}/" class="edit-comment" data-id="{{comment.id}}">Edit</a> {% endif %}
+							{% if perms.schedule.delete_comment %} / <a href="" class="delete-comment" data-id="{{comment.id}}">Delete</a> {% endif %}
+						</td>
+					</tr>
+				{% empty %}
+					<tr>
+						<td colspan="3"> No Comments </td>
+					</tr>
+				{% endfor %}
+				</tbody>
+			</table>
+		</div>
+
+
+	</article>
+
+{% include "modals/edit-modal.html" %}
+</section>
+</div>
+
+
+</section>
+
+</div>
+<div id="delete-job-confirm" style="display:none;" title="Do you want to delete?">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;">
+  </span>This will delete the job from your system?</p>
+</div>
+
+
+
+<script type="text/javascript">
+'use strict';
+
+var scheduleApp = angular.module("scheduleApp", ['ngRoute'], function ($interpolateProvider) {
+        $interpolateProvider.startSymbol("{[{");
+        $interpolateProvider.endSymbol("}]}");
+});
+
+scheduleApp.controller("EditJobController", ['$scope', '$http', function($scope, $http) {
+	$scope.statusform = {};
+	$scope.init = function() {
+		var path = window.location.pathname;
+		var segments = path.split("/");
+		$scope.job_id = segments[(segments.length-2)];
+		
+		var joburl = "/schedule/job/view/api/"+$scope.job_id+"/";
+		var jobstatusurl = "/schedule/job-status/view/api/" + $scope.job_id + "/";
+		
+
+	    $http.get(joburl).success(function(data){
+          	$scope.job = data;
+          	// console.log(data);
+          	$scope.date_opened = data.date_opened;
+          	$scope.date_required = data.date_required;
+          	$scope.drawing_req_date = data.drawing_req_date;
+          	$scope.drawing_sent_to_customer_date = data.drawing_sent_to_customer_date;
+          	$scope.job_status_id = data.status_id
+          	if (data.date_opened == null) {
+          		$scope.noValidJob = true;
+          		$scope.showSubmit = false;
+          		$scope.formDisable = true;
+          	} else {
+          		$scope.noValidJob = false;
+          		$scope.showSubmit = true;
+          		$scope.formDisable = false;
+          	}
+          	$scope.drawing_approved_date = data.drawing_approved_date;
+        });
+
+        
+
+        $http.get(jobstatusurl).success(function(data){
+        	console.log('this is status value:')
+        	console.log(data);
+        	$scope.statusform.fixtures_req_by = data.fixtures_req_by;
+        	$scope.statusform.fixtures_comment = data.fixtures_comment;
+
+        	$scope.statusform.wood_shop_req_by = data.wood_shop_req_by;
+        	$scope.statusform.wood_shop_req_by_comment = data.wood_shop_req_by_comment;
+
+        	$scope.statusform.machine_shop_req_by = data.machine_shop_req_by;
+        	$scope.statusform.machine_shop_req_by_comment = data.machine_shop_req_by_comment;
+
+        	$scope.statusform.welding = data.welding;
+        	$scope.statusform.welding_comment = data.welding_comment;
+
+        	$scope.statusform.lacquer = data.lacquer;
+        	$scope.statusform.lacquer_comment = data.lacquer_comment;
+
+        	$scope.statusform.trim_shop_req_by = data.trim_shop_req_by;
+        	$scope.statusform.trim_shop_req_by_comment = data.trim_shop_req_by_comment;
+
+        	$scope.statusform.cab_assemply_req_by = data.cab_assemply_req_by;
+        	$scope.statusform.cab_assemply_req_by_comment = data.cab_assemply_req_by_comment;
+
+        	$scope.statusform.install_date = data.install_date;
+        	$scope.statusform.install_date_comment = data.install_date_comment;
+
+        	$scope.statusform.premier_glass = data.premier_glass;
+        	$scope.statusform.premier_glass_comment = data.premier_glass_comment;
+
+
+        	$scope.statusform.tile_installer = data.tile_installer;
+        	$scope.statusform.tile_installer_comment = data.tile_installer_comment;
+
+        	$scope.statusform.misc_del = data.misc_del;
+        	$scope.statusform.misc_del_comment = data.misc_del_comment;
+
+        	$scope.statusform.bill = data.bill;
+        	$scope.statusform.bill_comment = data.bill_comment;
+
+        	$scope.statusform.hayward = data.hayward;
+        	$scope.statusform.hayward_comment = data.hayward_comment;
+
+        	$scope.statusform.suren = data.suren;
+        	$scope.statusform.suren_comment = data.suren_comment;
+
+        	$scope.statusform.glenn = data.glenn;
+        	$scope.statusform.glenn_comment = data.glenn_comment;
+
+        	$scope.statusform.roger = data.roger;
+        	$scope.statusform.roger_comment = data.roger_comment;
+
+        	$scope.statusform.matt = data.matt;
+        	$scope.statusform.matt_comment = data.matt_comment;
+
+        	$scope.statusform.third_party_install = data.third_party_install;
+        	$scope.statusform.third_party_install_comment = data.third_party_install_comment;
+
+        	$scope.statusform.safety_test_schedule_date = data.safety_test_schedule_date;
+        	$scope.statusform.safety_test_schedule_date_comment = data.test_comment;
+
+        	console.log('This is the date for welding:');
+        	console.log($scope.safety_test_schedule_date);
+        });
+    }
+
+    $scope.init();
+/*
+    $scope.updateJob = function(event, jobForm) {
+    	
+    	
+    	jobForm.$invalid = true;
+
+    	var date_opened = new Date($scope.date_opened);
+
+    	var new_date = new Date();
+		new_date.setDate(date_opened.getDate()+7);
+
+    	var drawring_date = new Date($scope.drawing_req_date);
+    	
+    	
+    	if($scope.drawing_req_date && !(new_date <= drawring_date)) {
+    		// console.log(new_date);
+    		jobForm.drawing_req_date.$invalid = true;
+    		event.preventDefault();
+    	}
+
+    }
+
+    $scope.updateStatus = function(event, frm) {
+    	// event.preventDefault();
+    	// console.log(frm);
+    	// console.log($scope.date_opened);
+    	// event.preventDefault();
+		frm.$invalid = false;
+		var date_opened = new Date($scope.date_opened);
+		var new_oppened_date = new Date();
+		new_oppened_date.setDate(date_opened.getDate()+7);
+
+		
+		var frms = $scope.statusform;
+		
+
+		if(frm.$dirty){
+			console.log('form is dirty');
+			
+			angular.forEach(frm, function(val, key){
+				if(key in frms){
+
+					if(frms[key]) {
+						// console.log("Form Value: valid.");
+						// console.log(frms[key]);
+						var mydate = new Date(frms[key]);
+
+						if(mydate < new_oppened_date){
+							
+							val.$invalid = true;
+							frm.$invalid = true;
+							// console.log(val.$invalid);
+						}	
+					}
+					
+				}
+			});	
+		
+		}
+		//  else {
+		// 	frm.$invalid = true;
+		// }
+
+		if(frm.$invalid) {
+			console.log('Form is invalid.');
+			event.preventDefault();
+		} else {
+			console.log("form submitted.");
+		}
+
+    }
+    */
+
+}]);
+
+(function(){
+	$(".datetimepicker").datepicker();
+
+	$("form[name='job_comment']").on('submit', function(e){
+		e.preventDefault();
+		console.log($(this).serialize());
+
+		var form_data = $(this).serialize();
+        $.ajax({
+            type: "POST",
+            url: "/schedule/comment/add/",
+            data: form_data,
+            success: function(rdata) {
+                // alert(rdata);
+                $("#add-comment").prepend(rdata);
+            }
+        })
+	});
+
+	$("#add-comment a.edit-comment").on("click", function(){
+		// e.preventDefault();
+			// com_id = $(this).data("id");
+	    var url = $(this).attr("href");
+		var mdal = $('#editModal');
+		mdal.on("shown.bs.modal", function(){
+			$("#editModal .modal-content").load(url);
+			console.log(url);
+		}).modal();
+
+		return false;
+	});
+
+	$("#add-comment a.delete-comment").on("click", function(e){
+		e.preventDefault();
+		// url = $(this).attr("href");
+		// mdal = $('#editModal');
+		// mdal.on("shown.bs.modal", function(){
+		// 	$("#editModal .modal-content").load(url);
+		// 	console.log(url);
+		// }).modal();
+
+		// return false;
+		var com_id = $(this).data("id");
+		console.log(com_id);
+		$( "#delete-user-confirm" ).css("display:block;");
+		
+		$( "#delete-job-confirm" ).dialog({
+			resizable: false,
+			height:200,
+			modal: true,
+			buttons: {
+				"Delete User": function() {
+									
+					$( this ).dialog( "close" );
+					$.ajax({
+						type: "POST",
+						url: "/schedule/comment/delete/",
+						data: {
+							'com_id': com_id,
+						},
+						success: function(rdata) {
+							console.log(rdata);
+							$("a[data-id='"+ rdata + "']").closest("tr").remove();
+						}
+					})
+				},
+				Cancel: function() {
+					$( this ).dialog( "close" );
+				}
+			}
+		});
+	})
+	
+})(jQuery)
+
+</script>
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+

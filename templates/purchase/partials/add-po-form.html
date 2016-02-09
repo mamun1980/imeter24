@@ -1,0 +1,642 @@
+<table class="table add-po-form">
+<tr class="bg-success">
+	<th width="150">
+		<label for="id_po_number">PO Number:</label>
+	</th>
+	<td colspan="11">
+		<div style="position: relative;">
+			<input class="form-control" ng-model='search_po' maxlength="25" id="id_po_number_search"  type="search" name="po_number_search" ng-change="searchPo(search_po)" placeholder="Search for PO by Customer Name, Address, Phone Number, Item Description, PO Number or leave Blank for New PO" autocomplete="off" ng-disabled="po_checked">
+			
+			<div id="po_list" ng-show="show_po_list">
+				<table class="table">
+					<thead>
+						<tr>
+							<th>PO Number</th>
+							<th>Supplier</th>
+							<th>Contact Number</th>
+							<th>PO Status</th>
+							<th width="50%" align="center">PO Items</th>	
+							<th>
+								<a class="close" ng-click="closeMe()">X</a>
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="po in pos | filter:search_po" ng-class-odd="'odd'">
+							<td ng-click="selectPo(po)">{[{po.po_number}]}</td>
+							
+							<td>
+								<a href="/contacts/edit/{[{po.supplier.id}]}/">
+									{[{po.supplier.contact_name}]}
+								</a>
+							</td>
+							<td>
+								<a href="#" data-call="/purchase/call-contact/{[{po.supplier.phones[0].number}]}/extension/{[{po.supplier.phones[0].ext || 0 }]}/" class="call_number">
+									{[{po.supplier.phones[0].number}]}
+								</a>
+							</td>
+							<td>{[{po.po_status}]}</td>
+							<td>
+								<table class="table" border="1">
+									<thead>
+										<tr style="background-color:#000; color: #FFF;">
+											<th>Item Number</th>
+											<th>Description</th>
+											<th>Qty Ordered</th>
+											<th>Qty Received</th>
+											<th>Item Cost</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr ng-repeat="item in po.items" >
+											<td>{[{ item.item_number }]}</td>
+											<td>{[{ item.description }]}</td>
+											<td>{[{ item.qty_ordered }]}</td>
+											<td>{[{ item.item_recv }]}</td>
+											<td>{[{ item.sub_total }]}</td>
+										</tr>
+										<tr ng-show="!po.items.length">
+											<td colspan="5">
+												No Items
+											</td>
+										</tr>
+									</tbody>
+								</table>	
+							</td>
+							<td></td>
+						</tr>
+						<tr ng-show="!pos.length">
+							<td colspan="6">
+								No PO found!
+							</td>
+						</tr>
+						
+					</tbody>
+					
+				</table>
+				
+			</div>
+			<div ng-show="!pos.length && show_po_list">
+				No Purchase Order Found!
+			</div>
+		</div>
+		<input id="id_po_number" name="po_number" type="hidden">
+		
+		<input class="form-control" id="id_next_number" name="next_number" type="hidden" value="{{next_po_number}}">
+	</td>
+</tr>
+<tr class="bg-info">
+	<th width="150">
+		<label for="id_date_issued">Date issued:</label>
+	</th>
+	<td colspan="4">
+		<input ng-model="dateIssued" class="form-control datepicker" id="id_date_issued" name="date_issued" value="{[{dateIssued}]}" placeholder="date issued" type="text" >
+	</td>
+	<th width="150">
+		<label for="id_date_expected">Date expected:</label>
+	</th>
+	<td colspan="4">
+
+
+		<input class="form-control datepicker" id="id_date_expected" name="date_expected" placeholder="date expected" type="text">
+	</td>
+	
+</tr>
+
+<tr class="bg-success">
+	<th width="150" ng-class="{'ng-pristine': purchase_add_form.search_supplier.$pristine || purchase_add_form.search_supplier.$invalid}">
+		<label for="id_supplier">Supplier:</label>
+	</th>
+	<td colspan="4">
+		<input type="text" ng-model="search_supplier" placeholder="start typing to search supplier" class="form-control" name="search_supplier" ng-required='true' ng-change="searchSupplier(search_supplier)" style="width: 95%; display: inline;" ><a href="/admin/contacts/contact/add/" class="add-another" id="add_id_primary_supplier" onclick="return showAddAnotherPopup(this);"> <img src="/statics/admin/img/icon_addlink.gif" width="10" height="10" alt="Add Another"></a>
+		<span ng-show="purchase_add_form.search_supplier.$dirty && purchase_add_form.search_supplier.$error.required">*This field is required.</span>
+		<div class="contact_list">
+			<table class="table selectable" class="ui-autocomplete ui-widget-content-custom ui-corner-all" id="supplier_contact_list">
+				<thead>
+					<tr>
+						<th>Contact Name</th><th>Address</th><th> Primary Cont No.</th>
+						<th><a href="" class="close" ng-click="hideSupplierContact()">x</a></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="ui-menu-item" ng-repeat="contact in suppliers" ng-click="setSupplier(contact)">
+						
+						
+						<td class="contact_name">{[{contact.contact_name}]}</td>
+						<td class="address_1">
+							<p ng-if="contact.address_1 != ''">{[{contact.address_1}]}</p>
+							<p ng-if="contact.city != ''">{[{contact.city}]}<span ng-if="contact.province != ''">, {[{contact.province}]}</span></p>
+							<p>
+							<span ng-if="contact.country != ''">{[{contact.country}]}</span>
+							</p>
+							<p ng-if="contact.postal_code != ''">{[{ contact.postal_code }]}</p>
+							
+							
+						</td>
+						
+						<td class="city">
+							<div class='phone' ng-repeat="phon in contact.phones" ng-if="$first">
+								{[{phon.number}]} <span ng-if="phon.ext !=''"> (ext: {[{phon.ext}]})</span>
+							</div>
+						</td>
+						
+						<td>
+							
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<input type="hidden" name="supplier" id="id_supplier">
+		</div>
+		
+	</td>
+	<th width="150">
+		<label for="id_ship_to">Ship to:</label>
+	</th>
+	<td colspan="4">
+		<input type="text" ng-model="search_ship_to" placeholder="start typing to search ship to contact" class="form-control" ng-change="searchShipTo(search_ship_to)" style="width: 95%; display: inline;"><a href="/admin/contacts/contact/add/" class="add-another" id="add_id_primary_supplier" onclick="return showAddAnotherPopup(this);"> <img src="/statics/admin/img/icon_addlink.gif" width="10" height="10" alt="Add Another"></a>
+		<div class="contact_list">
+			<table class="table selectable" class="ui-autocomplete ui-widget-content-custom ui-corner-all" id="ship_to_contact_list">
+				<thead>
+					<tr>
+						<th>Contact Name</th><th>Address</th><th> Primary Cont No.</th>
+						<th><a href="" class="close" ng-click="hideShiptoContact()">x</a></th>
+					</tr>
+				</thead>
+				<tbody>
+				
+				</tr>
+					<tr class="ui-menu-item" ng-repeat="contact in shipto" ng-click="selectShipTo(contact)">
+						
+						
+						<td class="contact_name">{[{contact.contact_name}]}</td>
+						<td class="address_1">
+							<p ng-if="contact.address_1 != ''">{[{contact.address_1}]}</p>
+							<p ng-if="contact.city != ''">{[{contact.city}]}<span ng-if="contact.province != ''">, {[{contact.province}]}</span></p>
+							<p>
+							<span ng-if="contact.country != ''">{[{contact.county}]}</span>
+							<span ng-if="contact.postal_code !=''">, {[{ contact.postal_code }]}</span>
+							
+							</p>
+						</td>
+						
+						<td class="city">
+							<div class='phone' ng-repeat="phon in contact.phones" ng-if="$first">
+								{[{phon.number}]} <span ng-if="phon.ext !=''"> (ext: {[{phon.ext}]})</span>
+							</div>
+						</td>
+						
+						<td>
+							
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		
+
+			<input id="id_ship_to" name="ship_to" type="hidden">
+		</div>
+
+	</td>
+</tr>
+<tr>
+	<td colspan="5">
+		<div class="contact_box">
+			<table class="table" id="supplier_contact_details" ng-show="supplier_contact">
+				<tr>
+					<th width="150">Contact Name</th>
+					<td colspan="2">{[{ supplier_contact.attention_to }]}</td>
+				</tr>
+				<tr>
+					<th>Address</th>
+					<td colspan="2">
+						<p ng-if="supplier_contact.address_1 != ''">
+							{[{supplier_contact.address_1}]}
+						</p>
+						<p ng-if="supplier_contact.address_2 != ''">
+							{[{supplier_contact.address_2}]}
+						</p>
+						<p>{[{supplier_contact.city}]}<span ng-if="supplier_contact.province != ''">, {[{supplier_contact.province}]}</span></p>
+						
+						<p>{[{supplier_contact.country}]}</p>
+						<p><span ng-if="supplier_contact.postal_code != ''">{[{ supplier_contact.postal_code }]}
+						</span></p>
+					</td>
+				</tr>
+				
+				<tr>
+					<th colspan="3">
+						<a class="btn btn-info" ng-click="addExtraContact()">
+							Add Extra Contact
+						</a>
+					</th>
+				</tr>
+							
+				
+			</table>
+			<table class="table" id="extra_contact_list" ng-show="supplier_contact">
+				<thead>
+					<tr class='bg-primary'><td>Contact Type</td><td>Contact Details</td><td>Contact Name</td><td>Action</td></tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="ph in supplier_contact.phones">
+						<td>{[{ ph.type}]}</td>
+						<td>{[{ ph.number}]}<span ng-if="ph.ext != ''"> Ext: ({[{ph.ext}]})</span></td>
+						<td>{[{ supplier_contact.attention_to }]}</td>
+						<td>
+							<a href="" class='delete-contact'>Delete</a>
+							<input type="hidden" name='po_contact_phone_type'  value="{[{ ph.type }]}">
+							<input type="hidden" name='po_contact_phone_number'  value="{[{ ph.number }]}">
+							<input type="hidden" name='po_contact_phone_ext'  value="{[{ ph.ext }]}">
+							<input type="hidden" name='po_contact_phone_attention'  value="{[{ supplier_contact.attention_to }]}">
+						</td>
+					</tr>
+					<tr ng-repeat="em in supplier_contact.emails">
+						<td>{[{ em.email_type}]}</td>
+						<td>{[{ em.email_address }]} </td>
+						<td>{[{ supplier_contact.attention_to }]}</td>
+						<td>
+							<a href="" class='delete-contact'>Delete</a>
+							<input type="hidden" name='po_contact_email_type' value
+							="{[{ em.email_type}]}" >
+							<input type="hidden" name='po_contact_email' value="{[{ em.email_address}]}" >
+							<input type="hidden" name='po_contact_email_attention' value="{[{ supplier_contact.attention_to}]}" >
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			
+		</div>
+		
+		
+	</td>
+	<td colspan="5">
+		<div class="contact_box">
+			<table class="table" id="ship_to_contact_details">
+				<tr>
+					<th width="150">Contact Name</th>
+					<td>{[{ ship_to_contact.attention_to }]}</td>
+				</tr>
+				<tr>
+					<th>Address</th>
+					<td colspan="2">
+						<p ng-if="ship_to_contact.address_1 != ''">
+							{[{ship_to_contact.address_1}]}
+						</p>
+						<p ng-if="ship_to_contact.address_2 != ''">
+							{[{ship_to_contact.address_2}]}
+						</p>
+						<p>{[{ship_to_contact.city}]}<span ng-if="ship_to_contact.province != ''">, {[{ship_to_contact.province}]}</span></p>
+						
+						<p>{[{ship_to_contact.country}]}</p>
+						<p><span ng-if="ship_to_contact.postal_code != ''">{[{ ship_to_contact.postal_code }]}</span></p>
+					</td>
+				</tr>
+				
+				<tr>
+					<th colspan="3">
+						<a class="btn btn-info" ng-click="addShipToExtraContact()">
+							Add Extra Contact
+						</a>
+					</th>
+				</tr>
+			</table>
+			<table class="table" id="ship_to_extra_contact_list">
+				<thead>
+					<tr class='bg-primary'><td>Contact Type</td><td>Contact Details</td><td>Contact Name</td><td>Action</td></tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="ph in ship_to_contact.phones">
+						<td>{[{ ph.type}]}</td>
+						<td>{[{ ph.number}]}<span ng-if="ph.phone_ext != ''"> Ext: ({[{ph.phone_ext}]})</span></td>
+						<td>{[{ ship_to_contact.attention_to }]}</td>
+						<td>
+							<a href="" class='delete-contact'>Delete</a>
+							<input type="hidden" name='po_shipto_contact_phone_type'  value="{[{ ph.type }]}">
+							<input type="hidden" name='po_shipto_contact_phone_number'  value="{[{ ph.number }]}">
+							<input type="hidden" name='po_shipto_contact_phone_ext'  value="{[{ ph.ext }]}">
+							<input type="hidden" name='po_shipto_contact_phone_attention'  value="{[{ ship_to_contact.attention_to }]}">
+						</td>
+					</tr>
+					<tr ng-repeat="em in ship_to_contact.emails">
+						<td>{[{ em.email_type}]}</td>
+						<td>{[{ em.email_address }]} </td>
+						<td>{[{ ship_to_contact.attention_to }]}</td>
+						<td>
+							<a href="" class='delete-contact'>Delete</a>
+							<input type="hidden" name='po_shipto_contact_email_type' value="{[{ em.email_type}]}" >
+							<input type="hidden" name='po_shipto_contact_email' value="{[{ em.email_address }]}" >
+							<input type="hidden" name='po_shipto_contact_email_attention' value="{[{ ship_to_contact.attention_to}]}" >
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		
+	</td>
+</tr>
+<tr class="bg-info">	
+	<th width="150">
+		<label for="id_ship_via">Ship via:</label>
+	</th>
+	<td colspan="4">
+		<select class="form-control" id="id_ship_via" name="ship_via">
+		{% for dc in delivery_choices %}
+			<option value="{{dc.id}}">{{dc.delivery_choice}}</option>
+		{% endfor %}
+		</select>
+	</td>
+
+	<th width="150">
+		<label for="id_deliver_internal">Department deliver internal:</label>
+	</th>
+	<td colspan="4">
+		<select class="form-control" id="id_deliver_internal" name="deliver_internal">
+			{% for di in deliver_internals %}
+			<option value="{{di.id}}">
+				{{di.department}}
+			</option>
+			{% endfor %}
+		</select>
+	</td>
+</tr>
+
+<tr class="bg-success">
+	<th width="150">
+		<label for="id_shipping_inst">Shipping inst:</label>
+	</th>
+	<td colspan="9">
+		<textarea class="form-control" cols="40" id="id_shipping_inst" name="shipping_inst" placeholder="Shipping Inst" rows="3"></textarea>
+	</td>
+</tr>
+
+<tr class="bg-info">
+	<th width="150">
+		<label for="id_blanket_po">Blanket po:</label>
+	</th>
+	<td colspan="4">
+		<select class="form-control" id="id_blanket_po" name="blanket_po" placeholder="Blanket PO">
+		<option value="0">NO</option>
+		<option value="1">YES</option>
+		</select>
+	</td>
+
+	<th>
+		<label for="id_terms">Terms:</label>
+	</th>
+	<td colspan="4">
+		<select class="form-control" id="id_terms" name="terms">
+			{% for pt in terms %}
+				<option value="{{pt.id}}" {% if pt.id = 2 %} selected="selected" {% endif %}>{{pt.term}}</option>
+			{% endfor %}
+		</select>
+	</td>
+</tr>
+<tr class="bg-success">
+	<th width="150">
+		<label for="id_purchasing_agent">Purchasing agent:</label>
+	</th>
+	<td colspan="4">
+		<select class="form-control" id="id_purchasing_agent" name="purchasing_agent">
+		{% for user in users %}
+			<option value="{{user.id}}" {% if user.id == request.user.id %}selected='selected' {% endif %}>
+				{{ user.first_name }} {{ user.last_name }}
+			</option>
+		{% endfor %}
+		</select>
+	</td>
+
+	<th width="150">
+		<label for="id_returned_type">Type:</label>
+	</th>
+	<td colspan="4">
+		<select class="form-control" id="id_returned_type" name="returned_type">
+		<option value="0">Purchase Order</option>
+		<option value="1">Return For Credit</option>
+		<option value="2">Returned damaged Goods</option>
+		<option value="3">Return For Repair</option>
+		<option value="4">Return For Replacement</option>
+		<option value="5">Return For RE-WORK</option>
+		<option value="6">Returned Excessive Qty</option>
+		<option value="7">Returned Wrong Material</option>
+		</select>
+	</td>
+</tr>
+<tr>
+	<td colspan="10" align="center" ng-class="{'item_error ng-pristine': !item_added, 'bg-primary': item_added }">
+		<span style="font-size: 14px; font-style: bold;">Add Items here for this purchase order</h4>
+		<a href="/inventory/item/add/" class="btn btn-default" target="_blank">Add New Item To Inventory</a>
+	</td>
+</tr>
+<tr>
+	<td colspan="10" ng-class="{'item_error ng-pristine': !item_added, 'bg-info': item_added }">
+		<div class="item_box">
+						
+			<table class="table item">
+			<thead>
+				<tr>
+					<th width="120">Item Number</th>
+					<th width="180">Description</th>
+					<th width="120">Unit Measure</th>
+					<th width="">Current Cost</th>
+					<th width="100">Order Qty</th>
+					<th width="150">Subtotal</th>
+					<th width="">Job Number</th>
+					<th width="100">Qty Recv To Date</th>
+					<th width="100">Date Last Received</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody id="add_item_list">
+				<tr style="border-top: 2px dotted red;">
+				<td style="position: relative;">
+					<input type="text" class="form-control added_item_number" name="" value="" ng-model="search_item" ng-change="searchItem(search_item)" placeholder="search for item" autocomplete="off">
+
+					<table class="table supplier_contact" id="items_list">
+						<thead>
+							<tr>
+								<th width="110">Item Number</th>
+								<th width="160">Description</th>
+								<th>Unit Measure</th>
+								<th>Wholesale Cost</th>
+								<th>Currency</th>
+								<th>Primary Supplier</th>
+								<th>QTY on hand</th>
+								<th>Qty on Order</th>
+								<th>Last Ordered</th>
+								<th><a href="" class="close" ng-click="hideItemList()">x</a></th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="it in po_items">
+								<td>{[{item.item_number}]}</td>
+								<td colspan="9">{[{item.description}]}</td>
+							</tr>
+							<tr ng-repeat="item in items" ng-click="selectItem(item)">
+								<td>{[{item.item_number}]}</td>
+								<td>{[{item.description}]}</td>
+								<td>{[{item.item_unit_measure}]}</td>
+								<td>{[{item.wholesale_cost}]}</td>
+								<td>{[{item.currency}]}</td>
+								<td>{[{item.primary_supplier.contact_name}]}</td>
+								<td>{[{item.quantity_on_hand}]}</td>
+								<td>{[{item.quantity_on_order}]}</td>
+								<td>{[{item.last_ordered}]}</td>
+								<td></td>
+								
+								
+							</tr>
+
+							<tr ng-show="!items.length">
+								<td colspan="10">No Items</td>
+							</tr>
+						</tbody>
+
+					</table>
+				</td>
+				<td>
+					<textarea rows="1" class="form-control demo_box" readonly=""></textarea>
+				</td>
+				<td>
+					<select class="form-control" disabled="true">
+					{% for unit_measue in item_unit_measures %}
+						<option value="{{unit_measue.id}}">{{unit_measue.unit_name}}</option>
+					{% endfor %}
+					</select>
+				</td>
+				<td>
+					<input type="currency" class="form-control demo_box" placeholder="Cost"readonly="readonly">
+				</td>
+				<td>
+					<input type="number" class="form-control demo_box" placeholder="Qty" readonly="readonly">
+				</td>
+				<td>
+					<input type="currency" step="0.0001" class="form-control demo_box" placeholder="Subtotal" readonly="readonly">
+				</td>
+				<td>
+					
+					<input type="text" class="form-control demo_box" placeholder="job number" autocomplete="off" readonly="readonly">
+				</td>
+				
+				<td>
+					<input type="number" step="0.01" class="form-control" placeholder="Qty Received" readonly="readonly">
+				</td>
+				<td>
+					<input type="text" class="form-control" placeholder="Last Recv Date" readonly="readonly">
+				</td>
+				<td></td>
+				</tr>
+				<tr class="footer"></tr>			
+			</tbody>
+			<tr id='calculated_total_amount'>
+				<td width="150">
+					Items Total Qty:
+				</td>
+				<td colspan="1">
+					<span id='items_total_qty'>0.0</span>
+					<input class="form-control" id="id_items_total" name="items_total" type="hidden">
+				</td>
+				<td colspan="3">Total Amount Without Tax:</td>
+				<td width="120" align="left">{{ currency.get_currency_icon }}<span class="amount">{[{ po_total_before_tax }]}</span></td>
+				<td width="10" colspan="5">
+					<input type="hidden" id="po_total_before_tax" name="po_total_before_tax" value="{[{ po_total_before_tax }]}">
+				</td>
+			</tr>
+				
+			</table>
+				
+		</div>
+	</td>	
+
+</tr>
+
+<tr class="bg-info">
+	<th width="150" colspan="2">
+		<label for="id_hst_taxable">Hst taxable:</label>
+	</th>
+	<td colspan="3">
+		<select class="form-control tax" ng-model="hst_tax" id="id_hst_taxable" name="hst_taxable" ng-change="updateHST(hst_tax)">
+		<option value="0">NO</option>
+		<option value="1">YES</option>
+		</select>
+		
+		<input class="form-control decimal tax" ng-if="hst_tax" ng-model="hst_tax_amount" ng-change="addHstAmount(hst_tax_amount)" id="id_hst_taxable_amount" name="hst_taxable_amount" type="text">
+
+		<input type="hidden" ng-if="!hst_tax" name="hst_taxable_amount" value="0.00">
+		
+		<input type="hidden" id="hst_default_amount" value="{{ sv.default_hst_tax_amount}}">
+	</td>
+	<td colspan="1">
+		<label for="">HST tax Amount:</label>
+	</td>
+	<td colspan="4">
+		<input type="text" name="total_hst_tax" id="hst_tax_amount" class="form-control" value="0.000" readonly="readonly">
+	</td>
+</tr>
+<tr class="bg-success">
+	<th width="150" colspan="2">
+		<label for="id_pst_taxable">Pst taxable:</label>
+	</th>
+	<td colspan="3">
+		<select class="form-control tax" ng-model="pst_tax" id="id_pst_taxable" name="pst_taxable" ng-change="updatePST(pst_tax)">
+		<option value="0">NO</option>
+		<option value="1">YES</option>
+		</select>
+		<input class="form-control decimal tax" ng-if="pst_tax" ng-model="pst_tax_amount" id="id_pst_taxable_amount" name="pst_taxable_amount" ng-change="addPstAmount(pst_tax_amount)" placeholder="PST Taxable Amount" value="0.0" type="text">
+		<input type="hidden" ng-if="!pst_tax" name="pst_taxable_amount" value="0.00">
+
+		<input type="hidden" id="pst_default_amount" value="{{ sv.default_pst_tax_amount}}">
+	</td>
+	<td colspan="1">
+		<label for="">PST tax Amount:</label>
+	</td>
+	<td colspan="4">
+		<input type="text" name="total_pst_tax" id="pst_tax_amount" class="form-control" value="0.000" readonly="readonly">
+	</td>
+</tr>
+<tr class="bg-warning">
+	<th colspan="5">
+	</th>
+	<th colspan="2">
+		<label for="id_po_currency">Total tax amount:</label>
+	</th>
+	<td colspan="3">
+		<input type="text" class="form-control" id="total_tax_amount" style="font-size: 14px;" name="total_tax" value="{[{ total_tax_amount }]}" readonly="readonly">
+	</td>
+</tr>
+<tr class="bg-info">
+	<th width="150">
+		<label for="id_po_currency">Po currency:</label>
+	</th>
+	<td colspan="4">
+		<select class="form-control" id="id_po_currency" name="po_currency">
+		{% for currency in currencies %}
+		<option data-currency-icon="{{ currency.get_currency_icon }}" value="{{currency.id}}" {% if currency.id == 1 %} selected="selected" {% endif %}>
+				{{ currency.currency }} ({{ currency.get_currency_icon }})
+			</option>
+		{% endfor %}
+		</select>
+	</td>
+	<th width="150">
+		<label for="id_total_po_amount">Total po amount:</label>
+	</th>
+	<td colspan="4">
+		<input class="form-control" ng-model="total_amount" id="id_total_po_amount" name="total_po_amount" value="0.00" readonly="readonly" type="text">
+	</td>
+</tr>
+
+<tr>
+
+	<td colspan="6">
+		<label>PDF PO </label> <input type="checkbox" data-toggle="toggle" data-on="Yes" data-off="No" name="pdf_po" style="margin-left: 10px; margin-right: 20px;">
+		<label>Print PO</label><input type="checkbox" data-toggle="toggle" data-on="Yes" data-off="No"  name="print_po" style="margin-left: 10px; margin-right: 20px;">
+		<label>Email PO</label><input type="checkbox" data-toggle="toggle" data-on="Yes" data-off="No" name="email_po" style="margin-left: 10px; margin-right: 20px;">
+		<label>Fax PO</label><input type="checkbox" data-toggle="toggle" data-on="Yes" data-off="No" name="fax_po" style="margin-left: 10px; margin-right: 20px;">
+	</td>
+	<td colspan="4">
+		<button type="submit" ng-show="show_update_button" class="btn btn-primary btn-large form-control" ng-disabled="!(purchase_add_form.$valid && purchase_add_form.$dirty && item_added)">Update PO</button>
+		<button type="submit" ng-show="show_add_button" class="btn btn-primary btn-large form-control" ng-disabled="!(purchase_add_form.$valid && purchase_add_form.$dirty && item_added)">Create PO</button>
+	</td>
+</tr>
+</table>

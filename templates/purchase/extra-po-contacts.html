@@ -1,0 +1,24 @@
+<table class="table table-bordered table-striped" id='extra-con-list' style="margin-top: 10px;">
+	<thead>
+		<tr class="bg-warning">
+			<th>Extra Contact Type</th>
+			<th>Extra Contact</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	<tbody class='extra-contact-row'>
+	{% for pocontact in po_contacts %}
+	<tr >
+		<td>{{pocontact.contact_type}}</td>
+		<td>{{pocontact.contact}}</td>
+		<td><a href='' data-pecid="{{pocontact.id}}" class='delete-extra-contact'>Delete</a></td>
+	</tr>
+
+	{% empty %}
+		<tr>
+			<td colspan='3'>No Extra Contact</td>
+		</tr>
+		
+	{% endfor %}
+	</tbody>
+</table>

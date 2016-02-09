@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+<section class="row"  id="deparment-list">
+	
+
+	<div class="col-md-6 col-md-offset-3">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Department List</h4>
+		  	</div>
+		  	<div class="panel-body" id="department-list">
+		  		<table class="table">
+			  		<tr>
+			  			<td> ID </td>
+			  			<td>Department Name</td>
+			  			<td>Total Use</td>
+			  			{% if perms.scomuser.delete_department %}
+			  			<td>Action</td>
+			  			{% endif %}
+			  			
+			  		</tr>
+			  		{% for department in departments %}
+			  			<tr>
+				  			<td> {{ department.id }} </td>
+				  			<td> {{ department.name }} </td>
+				  			<td> {{ department.payroll_set.all.count }} </td>
+				  			{% if perms.scomuser.delete_department %}
+				  			<td>
+				  				<a class="department-delete" href="/scomuser/department/delete/" data-depid="{{ department.id }}">delete</a>
+				  			</td>
+				  			{% endif %}
+				  			
+				  		</tr>
+				  	{% empty %}
+				  	<tr>
+			  			<td colspan='4'> No rate type found. </td>
+			  		</tr>
+				  	{% endfor %}
+			  	</table>
+		  	
+			</div>
+		</div>
+	</div>
+
+
+</section>
+
+
+<script type="text/javascript">
+(function(){
+	$("#department-list a.department-delete").on("click", function(e){
+		e.preventDefault();
+		department_id = $(this).data("depid");
+		console.log(department_id);
+
+		$.ajax({
+			type: "POST",
+			url: "/scomuser/department/delete/",
+			data: {
+				'department_id': department_id,
+			},
+			success: function(rdata) {
+				console.log(rdata);
+				$("a[data-depid='"+rdata+"']").closest("tr").remove();
+			}
+		})
+	});
+
+})(jQuery)
+
+</script>
+</div>
+
+
+{% endblock content %}
+	

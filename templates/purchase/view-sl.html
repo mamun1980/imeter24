@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style type="text/css">
+.sold-contact span {
+	padding: 5px;
+	background-color: #DDD;
+}
+.sold-contact p {
+	padding: 5px;
+	background-color: #CCC;
+}
+tr.Pending {
+	background-color: #BE9797;
+}
+tr.OnShipping {
+	background-color: #5388CA
+}
+tr.Done {
+	background-color: #DDD;
+}
+tr.thead {
+	background-color: #494949;
+	color: #FFF;
+}
+
+</style>
+<div class="container shadow4 main-body">
+<section class="row ">
+	
+	<div class="col-md-10 col-md-offset-1">
+		
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Shipping List Details</h4>
+		  	</div>
+		  	<div class="panel-body">
+				<table class='table table-bordered table-striped'>
+					
+					<tbody>
+						<tr>
+							<th width="25%">SL Number</th>
+							<td>{{sl.sl_number}}</td>
+						</tr>
+						<tr>
+							<th width="25%">Sold To</th>
+							<td>
+								{% if sl.sold_to %}
+								
+								<p><b>{{ sl.sold_to.attention_to }}</b></p>
+								<p>{{sl.sold_to.address_1}}</p>
+								<p>{{sl.sold_to.address_2}}</p>
+								<p>
+									{{sl.sold_to.city}}
+									{% if sl.sold_to.province %}
+									<span> {{sl.sold_to.province}}</span>
+									{% endif %}
+								</p>
+								
+								<p>{{sl.sold_to.country}}</p>
+								<p>{{ sl.sold_to.postal_code}}</p>
+								{% else %}
+									No contact
+								{% endif %}
+								{% if sl_soldto_contacts %}
+								<table class="table">
+									<thead>
+										<tr class="bg-info">
+											<th>Contact Type</th>
+											<th width="">Contact</th>
+											<th>Contact Name</th>
+											<th>Action</th>
+										</tr>
+									</thead>
+									<tbody>
+										{% for sl_con in sl_soldto_contacts %}
+										<tr>
+											<td>{{sl_con.contact_type}}</td>
+											<td>{{sl_con.contact}}</td>
+											<td>{{sl_con.contact}}</td>
+											<td>
+											<a href="#" class="delete-slsoldtocontact" data-slsoldto-contactid="{{sl_con.id}}">Delete</a>
+											</td>
+										</tr>
+										{% endfor %}
+									</tbody>
+								</table>
+								{% endif %}
+							</td>
+						</tr>
+						<tr>
+							<th width="25%">Ship To</th>
+							<td>
+								{% if sl.ship_to %}
+								
+									<p><b>{{ sl.ship_to.attention_to }}</b></p>
+									<p>{{sl.ship_to.address_1}}</p>
+									<p>{{sl.ship_to.address_2}}</p>
+									<p>
+										{{sl.ship_to.city}}
+										{% if sl.ship_to.province %}
+										<span> {{sl.ship_to.province}}</span>
+										{% endif %}
+									</p>
+									
+									<p>{{sl.ship_to.country}}</p>
+									<p>{{ sl.ship_to.postal_code}}</p>
+								{% else %}
+									<h3>No contact</h3>
+								{% endif %}
+								{% if sl_shipto_contacts %}
+								<table class="table">
+									<thead>
+										<tr class="bg-info">
+											<th>Contact Type</th>
+											<th width="">Contact</th>
+											<th>Contact Name</th>
+											<th>Action</th>
+										</tr>
+									</thead>
+									<tbody>
+										{% for sl_con in sl_shipto_contacts %}
+										<tr>
+											<td>{{sl_con.contact_type}}</td>
+											<td>{{sl_con.contact}}</td>
+											<td>{{sl_con.contact}}</td>
+											<td>
+											<a href="#" class="delete-slshiptocontact" data-slshipto-contactid="{{sl_con.id}}">Delete</a>
+											</td>
+										</tr>
+										{% endfor %}
+									</tbody>
+								</table>
+								{% endif %}
+							</td>
+						</tr>
+						<tr>
+							<th width="25%">Date Ordered</th>
+							<td>{{sl.ordered_date}}</td>
+						</tr>
+						
+						<tr>
+							<th width="25%">Date Required</th>
+							<td>{{sl.date_required}}</td>
+						</tr>
+						<tr>
+							<th width="25%">Ship Via</th>
+							<td>{{sl.ship_via}}</td>
+						</tr>
+						<tr>
+							<th width="25%">Job Number</th>
+							<td>{{sl.job_number}}</td>
+						</tr>
+						<tr>
+							<th width="25%">Customer PO Number</th>
+							<td>{{sl.customer_po_number}}</td>
+						</tr>
+						<tr>
+							<th width="25%">Customer Job Number</th>
+							<td>{{sl.customer_job_number}}</td>
+						</tr>
+						<tr>
+							<th>SL Status</th>
+							<td>{{sl.status_verbose}}</td>
+						</tr>
+						<tr>
+							<th colspan="2"><b>Items for this Shipping List</b></th>
+						</tr>
+						<tr>
+							
+							<td colspan="2">
+								<table class="table sl-items">
+									<thead>
+										<tr class="thead">
+											<th>Item Number</th>
+											<th>Item Description</th>
+											<th>Ordered</th>
+											<th>Shipped</th>
+											<th>Required</th>
+											<th>Filled</th>
+											<th>Status</th>
+										</tr>
+									</thead>
+									<tbody>
+									{% for item in sl_items %}
+										
+									<tr class="{{item.item_ship_status_verbose}}">
+										<td>{{item.item.item_number}}</td>
+										<td>{{item.item.description}}</td>
+										<td>{{item.ordered}}</td>
+										<td>{{item.shipped_total_to_date}}</td>
+										<td>{{item.backordered}}</td>
+										<td>{{item.filled}}</td>
+										<td>{{item.item_ship_status_verbose}}</td>
+										
+									</tr>
+												
+											
+									{% empty %}
+										<tr><td colspan="7">No Item</td></tr>
+									{% endfor %}
+									</tbody>
+								</table>
+							</td>
+						</tr>
+						
+					</tbody>
+
+				</table>
+				
+			</div>
+		</div>
+		
+	</div>
+
+</section>
+</div>
+
+<script type="text/javascript">
+(function(){
+	$(document).on("click", "a.delete-extra-contact", function(e){
+			e.preventDefault();
+			var poecid = $(this).data("pecid");
+			// var url = "/purchase/delete-po-contact/";
+			$.ajax({
+				type: "POST",
+				url: "/purchase/delete-po-contact/",
+				
+				data: {
+					'poecid': poecid,
+				},
+				success: function(rdata) {
+					console.log(rdata);
+					$("a[data-pecid='"+rdata+"']").closest("tr").remove();
+	                
+	                // window.location.reload(false);
+	                // win = window.open("",'_blank');
+	                // win.location.href = "/contacts/edit/" + rdata + "/";
+
+	            }
+			});
+		})
+})(jQuery)
+
+</script>
+{% endblock content %}
+	

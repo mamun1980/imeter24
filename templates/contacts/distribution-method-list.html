@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+<section class="row"  id="distribution-method-list">
+	
+
+	<div class="col-md-6 col-md-offset-3">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Distribution Method List</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  	<table class="table">
+		  		<tr>
+		  			<td> ID </td>
+		  			<td>Distribution Method</td>
+		  			<td>Total Use</td>
+		  			<td>Action</td>
+		  			
+		  		</tr>
+		  		{% for distribution_method in distribution_methods %}
+		  			<tr>
+			  			<td> {{ distribution_method.id }} </td>
+			  			<td> {{ distribution_method.distribution_method }} </td>
+			  			<td> {{ distribution_method.contactprofile_set.all.count }} </td>
+			  			<td>
+			  				<a class="distribution-method-delete" href="#" data-distid="{{ distribution_method.id }}">delete</a>
+			  			</td>
+			  			
+			  		</tr>
+			  	{% empty %}
+				  	<tr>
+			  			<td colspan='4'> No distribution method found. </td>
+			  		</tr>
+			  	{% endfor %}
+		  	</table>
+			</div>
+		</div>
+	</div>
+
+</section>
+
+<script type="text/javascript">
+(function(){
+	$("#distribution-method-list a.distribution-method-delete").on("click", function(e){
+		e.preventDefault();
+		distid = $(this).data("distid");
+		console.log(distid);
+
+		$.ajax({
+			type: "POST",
+			url: "/contacts/distribution-method/delete/",
+			data: {
+				'distid': distid,
+			},
+			success: function(rdata) {
+				console.log(rdata);
+				$("a[data-distid='"+rdata+"']").closest("tr").remove();
+			}
+		})
+	});
+
+})(jQuery)
+
+</script>
+</div>
+
+
+{% endblock content %}

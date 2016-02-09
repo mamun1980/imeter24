@@ -1,0 +1,18 @@
+{{ lookup_form.media.css }}
+{{ lookup_form.media.js }}
+
+<section class="row" id="report-search">
+	<div class="col-md-6">
+		<form name="contact-filter" action="/inventory/item/filter/" method="post">{% csrf_token %}
+			<div class="input-group">
+				{% for field in lookup_form %}
+					{{ field }}
+				{% endfor %}
+				<span class="input-group-btn">
+					<button class="btn btn-default" type="submit">Filter</button>
+		      	</span>
+	      	</div>
+		</form>
+	</div>
+		
+</section>

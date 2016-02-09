@@ -1,0 +1,144 @@
+<div class="row">
+<div class="col-md-12">
+
+
+<div class="panel panel-primary">
+<div class="panel-heading">
+	<h3 class="panel-title">Update User Permissions</h3>
+	</div>
+	<div class="panel-body">
+	<form name='add-permission' action="/scomuser/permission/add/" method="post">{% csrf_token %}
+	<input type="hidden" value="{{ user_obj.id }}" name="user_id">
+	<table class="table">
+	<tr>
+		<td>
+		<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+
+{% for perms in all_permissions %}
+<div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="heading{{ perms.app_label }}">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#{{ perms.app_label }}" aria-expanded="true" aria-controls="{{ perms.app_label }}">
+          {{ perms.app_label }}
+        </a>
+      </h4>
+    </div>
+    <div id="{{ perms.app_label }}" class="panel-collapse collapse {% if forloop.first %} in {% endif %}" role="tabpanel" aria-labelledby="heading{{ perms.app_label }}">
+      <div class="panel-body">
+			
+				{% for content_type in perms.content_type %}
+					<li>{{content_type.name}}</li>
+					{% for permission in content_type.permissions %}
+						<input type="checkbox" class="permissions" name="permissions" value="{{permission.id}}" {% if permission in permissions %} checked="checked"{% endif %} class="form-control"> {{permission.codename}}
+					{% endfor %}
+				{% endfor %}
+
+			
+			</div>
+	    </div>
+	</div>
+{% endfor %}
+						
+</div>
+		</td>
+
+	</tr>
+	<tr>
+		<td style="padding-top: 20px;">
+			<button type="submit" class="btn btn-primary btn-lg">Update Permission</button>
+		</td>
+	</tr>
+		
+	</table>
+	</form>
+	</div>
+</div>
+
+</div>
+</div>
+<script type="text/javascript">
+(function(){
+/*
+	$('#edit-permissions').multiSelect({
+		selectableHeader: "<input type='text' class='search-input form-control' autocomplete='off' placeholder='search permission'>",
+		selectionHeader: "<input type='text' class='search-input form-control' autocomplete='off' placeholder='search permission'>",
+		afterInit: function(ms){
+		var that = this,
+		    $selectableSearch = that.$selectableUl.prev(),
+		    $selectionSearch = that.$selectionUl.prev(),
+		    selectableSearchString = '#'+that.$container.attr('id')+' .ms-elem-selectable:not(.ms-selected)',
+		    selectionSearchString = '#'+that.$container.attr('id')+' .ms-elem-selection.ms-selected';
+
+		that.qs1 = $selectableSearch.quicksearch(selectableSearchString)
+		.on('keydown', function(e){
+		  if (e.which === 40){
+		    that.$selectableUl.focus();
+		    return false;
+		  }
+		});
+
+		that.qs2 = $selectionSearch.quicksearch(selectionSearchString)
+		.on('keydown', function(e){
+		  if (e.which == 40){
+		    that.$selectionUl.focus();
+		    return false;
+		  }
+		});
+		},
+		afterSelect: function(){
+		this.qs1.cache();
+		this.qs2.cache();
+		},
+		afterDeselect: function(){
+		this.qs1.cache();
+		this.qs2.cache();
+		}
+	});
+*/
+	$("form[name='add-permission']").on('submit', function(e){
+		e.preventDefault();
+		var permission_list = [];
+
+		$('input.permissions[type=checkbox]').each(function(){
+			if(this.checked){
+				permission_list.push($(this).val());	
+			}
+			
+		});
+		console.log(permission_list);
+		// console.log(options);
+		
+		// my_perms = [];
+
+		// if (options != null) {
+		// 	for(i=0; i<options.length; i++) {
+		// 		model = $("option[value='"+options[i]+"']").data("model");
+		// 		my_perms.push(model+"-"+options[i]);			
+		// 	}
+		// 	console.log(my_perms);
+		// }
+		
+		
+		user_id = $("input[name='user_id']").val();
+		
+		$.ajax({
+	    	type: "POST",
+	    	url: "/scomuser/permission/add/",
+	    	data: {
+				'selected_permissions': permission_list,
+				'user_id': user_id
+			},
+	    	success: function(data) {
+	    		console.log("Success");
+	    		alert("Permissions updated successfully");
+	    	},
+	    	error: function(errors) {
+	    		console.log("errors");
+	    	}
+	    });
+		
+	});
+
+})(jQuery)
+
+</script>

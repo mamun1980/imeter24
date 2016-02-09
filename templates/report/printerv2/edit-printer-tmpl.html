@@ -1,0 +1,54 @@
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h4 class="modal-title" id="myModalLabel">Edit Printer</h4>
+</div>
+<form name="printer" action="/report/printer/edit/{{ printer_id }}/" method="post">{% csrf_token %}
+<div class="modal-body" style="text-align: center;">
+    
+    <input type="hidden" name="printer_id" value="{{ printer_id }}">
+    <table class="add-user-table">
+        <tr>
+        {% for field in printer_form %}
+            
+            <tr>
+                <td>{{ field.label_tag }}</td>
+                <td>{{ field.errors }}{{ field }}</td>
+            </tr>
+            
+        {% endfor %}
+        
+        </tr>
+    </table>
+    
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default close-modal" data-dismiss="modal">Close</button>
+    <button type="submit" class="btn btn-primary">Save changes</button>
+</div>
+</form>
+<script type="text/javascript">
+(function(){
+    $("form[name='printer']").on("submit", function(e){
+        e.preventDefault();
+        id = $("input[name='printer_id']").val();
+        $("#printer-list span."+id).remove();
+        console.log(id);
+        
+        form_data = $(this).serialize();
+        $.ajax({
+            type: "POST",
+            url: $(this).attr("action"),
+            data: form_data,
+            success: function(rdata) {
+                $( "button.close-modal" ).trigger( "click" );
+
+                window.location.reload()
+
+            }
+        })
+
+    })
+
+})(jQuery)
+    
+</script>

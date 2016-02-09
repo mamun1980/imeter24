@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style type="text/css">
+.item-desc {
+	padding: 5px 0px;
+	margin: 5px 0px;
+	border-top: 1px solid #333;	
+}
+.pr-comment {
+	margin-bottom: 20px;
+}
+tbody th {
+	background-color: #64b8ef !important;
+}
+.comment {
+	background-color: #FFF;
+	margin-top: 10px;
+	padding: 0px;
+}
+.comment p {
+	margin: 2px !important;
+	/*margin-top: 2px;*/
+}
+.comment-text {
+	float: left;
+	padding: 10px;
+
+}
+.avatar {
+	width: 60px;
+	height: 60px;
+	margin-top: 5px;
+}
+.profile {
+	width: 120px;
+	height: 100%;
+	/*min-height: 100px;*/
+	margin: 2px;
+	background-color: #777;
+	float: right;
+	text-align: center;
+
+}
+.cdate, .cname {
+	background-color: #64b8ef;
+}
+</style>
+<div class="container shadow4 main-body">
+	<section class="row"  id="view-pr">
+		<article class="col-md-6">
+			<table class='table table-bordered table-striped'>
+			<thead>
+				<tr class="bg-primary">
+					<th colspan="2">Purchase Request Details</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<th width='30%'>PR ID</th>
+					<td>{{ pr.id }}</td>
+				</tr>
+				<tr>
+					<th width='30%'>Who Requested</th>
+					<td>
+						<p>Name: <b>{{ pr.user_requested }}</b></p>
+						Contact Info:
+						<p class="item-desc">
+						Home phone: {{ pr.user_requested.scomuserprofile.home_phone }} <br>
+						Cell phone: {{ pr.user_requested.scomuserprofile.cell_phone }}
+						</p>
+						
+					</td>
+				</tr>
+				<tr>
+					<th width='30%'>Item</th>
+					<td>
+						<p>Item #: <b>{{ pr.item }}</b></p>
+						Description:
+						<p class="item-desc">{{pr.description}}</p>
+					</td>
+				</tr>
+				<tr>
+					<th width='30%'>Description</th>
+					<td>{{ pr.description }}</td>
+				</tr>
+				<tr>
+					<th width='30%'>Ordered Qty</th>
+					<td>{{ pr.order_qty }}</td>
+				</tr>
+				<tr>
+					<th width='30%'>Requested At</th>
+					<td>{{ pr.requeste_created_at }}</td>
+				</tr>
+				<tr>
+					<th width='30%'>Expected Before</th>
+					<td>{{ pr.item_require_before }}</td>
+				</tr>
+				
+				<tr>
+					<th width='30%'>Aproved Qty</th>
+					<td>{{ pr.approved_qty }}</td>
+				</tr>
+				
+				<tr>
+					<th width='30%'>Approved Date</th>
+					<td>{{ pr.approved_date }}</td>
+				</tr>
+				<tr>
+					<th width='40%'>Status</th>
+					<td>{{ pr.status_verbose }}</td>
+				</tr>
+				
+			</tbody>
+			</table>	
+		</article>
+		<aside class="col-md-6">
+			<form action="/purchase/comment-pr/" name="add-pr-comment">{% csrf_token %}
+				<input type="hidden" name="purchase_request" value="{{pr.id}}">
+				
+				<div class="pr-comment">
+					{% for field in prc_form %}
+						{{ field }}
+					{% endfor %}
+				</div>
+				
+				<input type="submit" class="btn btn-primary" value="Add Comment">
+			</form>	
+
+			<section id="comments">
+			{% for comment in comments %}
+				<aside class="col-md-12 comment">
+					<p class="comment-text">{{ comment.comment }}</p>
+					<div class="profile">
+						<p class="cname">
+							{{ comment.user_commented }}	
+						</p>
+						<p class="cdate">
+							{{ comment.commnet_date }}
+						</p>
+						
+					</div>
+				</aside>
+			{% endfor %}
+				
+			</section>
+			
+			
+		</aside>
+
+	</section>
+</div>
+<script type="text/javascript">
+(function(){
+	$("form[name='add-pr-comment']").on("submit", function(e){
+		e.preventDefault();
+		form_data = $(this).serialize();
+		console.log(form_data);
+		$.ajax({
+			type: "POST",
+			url: "/purchase/comment-pr/",
+			data: form_data,
+			success: function(rdata) {
+				console.log(rdata);
+				$("#comments").prepend(rdata);
+				$("#id_comment").val('');
+                // $( "button.close-modal" ).trigger( "click" );
+                // window.location.reload(false);
+                // win = window.open("",'_blank');
+                // win.location.href = "/contacts/edit/" + rdata + "/";
+
+            }
+		});
+
+	})
+})(jQuery)
+
+</script>
+{% endblock content %}

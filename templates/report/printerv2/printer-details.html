@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+<section class="row"  id="printer">
+	
+
+	<div class="col-md-6 col-md-offset-3">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Printer Details</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  	<table class="table">
+		  		<tr>
+		  			<th>Printer Id</th>
+		  			<td>{{printer.printer_id}}</td>
+		  		</tr>
+		  		<tr>
+		  			<th>Printer Location</th>
+		  			<td>{{printer.printer_location}}</td>
+		  		</tr>
+		  		<tr>
+		  			<th>Printer Type</th>
+		  			<td>{{printer.printer_type}}</td>
+		  		</tr>
+		  		<tr>
+		  			<th>Printer Status</th>
+		  			<td>{{printer.printer_status}}</td>
+		  		</tr>
+		  		<tr>
+		  			<th>Printer Capacity</th>
+		  			<td>{{printer.printer_capacity}}</td>
+		  		</tr>
+
+
+		  	</table>
+			</div>
+		</div>
+	</div>
+
+</section>
+</div>
+
+
+{% endblock content %}
+	

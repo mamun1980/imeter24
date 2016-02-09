@@ -1,0 +1,61 @@
+<form name="PRA" action="/purchase/approve-pr/{{pr.id}}/" method="POST" enctype="multipart/form-data" >{% csrf_token %}
+<input type="hidden" name="max_limit" ng-model="max_limit" value="{{ pr.order_qty }}">
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h4 class="modal-title" id="myModalLabel">Approve</h4>
+</div>
+
+
+<div class="modal-body" ng-controller="ApprovePRFormController">
+	<table class="add-user-table">
+	
+		<tbody>
+			<tr>
+				<td><label for="id_approved_qty">Approved qty:</label></td>
+				<td><input class="form-control decimal" id="id_approved_qty" name="approved_qty" placeholder="qty" type="number" max="{{ pr.order_qty }}" required="true">
+
+					
+				</td>
+			</tr>
+		
+		
+			<tr>
+				<td><label for="id_comment">Comment:</label></td>
+				<td><textarea class="form-control" cols="40" id="id_comment" name="comment" rows="3"></textarea></td>
+			</tr>
+	
+		</tbody>
+	</table>
+</div>
+
+
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-default close-modal" data-dismiss="modal">Close</button>
+    <button type="submit" class="btn btn-primary">Approve</button>
+</div>
+</form>
+<script type="text/javascript">
+(function(){
+	$("form[name='PRA']").on("submit", function(e){
+		e.preventDefault();
+		form_data = $(this).serialize();
+		console.log(form_data);
+		$.ajax({
+			type: "POST",
+			url: $(this).attr('action'),
+			data: form_data,
+			success: function(rdata) {
+                $( "button.close-modal" ).trigger( "click" );
+                window.location.reload(true);
+                // win = window.open("",'_blank');
+                // win.location.href = "/contacts/edit/" + rdata + "/";
+
+            }
+		});
+
+	})
+})(jQuery)
+
+</script>
+    

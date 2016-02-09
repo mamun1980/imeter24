@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style type="text/css">
+#supplier-contact {
+	width: 400px;
+	border: 2px solid black;
+	background-color: #FFF;
+	height: auto;
+}
+.list {
+	margin-top: 10px;
+}
+
+</style>
+<div class="container-fluid shadow4 main-body">
+
+<section class="row list" >
+	<div class="col-md-12">
+		
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Received Purchase Items</h4>
+		  	</div>
+		  	
+				<table class='table table-bordered table-striped'>
+					<thead>
+						<tr class='info'>
+							<th width='120'>PO #</th>
+							<th width="150">Purchased Item</th>
+							<th width="200">Comment</th>
+							<th>Qty Received</th>
+							<th>Received Date</th>
+							<th>Received By</th>
+							<th>Sub Total</th>
+							
+							
+						</tr>
+					</thead>
+					<tbody>
+						{% for item in received_items %}
+						<tr>
+							<td>{{ item.po_number }}</td>
+							<td>{{ item.item_number }}</td>
+							<td>{{ item.comment }}</td>
+							<td>{{ item.qty_received }}</td>
+							<td>{{ item.item_received_date }}</td>
+							<td>{{ item.reveived_by }}</td>
+							<td>{{ item.sub_total }}</td>
+							
+							
+
+
+						</tr>
+						{% empty %}
+							<tr>
+								<td colspan="8">No PR</td>
+							</tr>
+						{% endfor %}
+						
+					</tbody>
+				</table>
+			
+		</div>
+	</div>
+
+
+</section>
+
+{% include "modals/add-modal.html" %}
+
+<script type="text/javascript">
+(function(){
+	$(document).on("click", "a.pr-approve", function(e){
+		e.preventDefault();
+		var pr_id = $(this).data("id");
+
+		e.preventDefault();
+		url = "/purchase/approve-pr/" + pr_id + "/",
+		mdal = $('#addModal');
+		mdal.on("shown.bs.modal", function(){
+			$("#addModal .modal-content").load(url);
+			// console.log(url);
+		}).modal();
+		return false;
+	
+	})
+})(jQuery)
+
+</script>
+
+<script type="text/javascript">
+
+</script>
+{% endblock content %}

@@ -1,0 +1,8 @@
+<tr data-id="{{comment.id}}">
+	<td width="60%">{{ comment.job_comment }}</td>
+	<td width="20%">{{ comment.comment_by }} / {{ comment.datetime }}</td>
+	<td>
+		{% if perms.schedule.change_comment %} <a data-toggle="modal" data-target="#editModal" href="/schedule/comment/edit/{{comment.id}}/" class="edit-comment" data-id="{{comment.id}}">Edit</a> {% endif %}
+		{% if perms.schedule.delete_comment %} / <a href="" class="delete-comment" data-id="{{comment.id}}">Delete</a> {% endif %}
+	</td>
+</tr>

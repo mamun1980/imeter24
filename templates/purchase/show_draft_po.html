@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style type="text/css">
+table#supplier_contact_details, table#ship_to_contact_details {
+	margin-top: 10px;
+}
+table#supplier_contact_details th, table#ship_to_contact_details th{
+	background-color: #83AD9E;
+}
+table.item {
+	margin-top: 10px;
+	background-color: #DDD !important;
+}
+table.item thead {
+	background-color: #333;
+	color: #FF0;
+}
+#calculated_total_amount {
+	background-color: #999;
+}
+#calculated_total_amount td.amount {
+	background-color: #333;
+	color: #FF0;
+	font-size: 16px;
+}
+#add_item_list tr {
+	background-color: #EEE;
+}
+th {
+	background-color: #123122;
+	color: #FF0;
+}
+.add-po-form {
+	-webkit-box-shadow: 0px 0px 10px 0px rgba(50, 50, 50, 0.75);
+	-moz-box-shadow:    0px 0px 10px 0px rgba(50, 50, 50, 0.75);
+	box-shadow:         0px 0px 10px 0px rgba(50, 50, 50, 0.75);
+	margin-top: 20px;
+}
+.container-fluid {
+	margin-bottom: 50px;
+}
+</style>
+<div class="container-fluid">
+<section class="row">
+<form action="/purchase/save-po/" method="POST">{% csrf_token %}
+	<article class="col-md-10 col-md-offset-1">
+	
+	<div class="panel panel-primary">
+		<div class="panel-heading">
+	    	<h4>Save Purchase Order</h4>
+	  	</div>
+		<div class="panel-body">
+			<div class="row">
+				<input type="hidden" name="po_number" value="{{po.po_number}}">
+				<div class="col-md-2">
+					<input type="submit"  class="btn btn-danger form-control" name="action" value="save">		
+				</div>
+				<div class="col-md-2">
+					<input type="submit"  class="btn btn-danger form-control" name="action" value="discard">
+				</div>
+				
+			</div>
+				
+			
+			<table class="table add-po-form">
+				<tr class="bg-info">
+					<th width="150">PO Number</th>
+					<td>{{po.po_number}}</td>
+					<th width="150">Next Number</th>
+					<td>{{po.next_number}}</td>
+				</tr>
+				<tr class="bg-success">
+					<th width="150">Date Issued</th>
+					<td>{{po.date_issued}}</td>
+					<th width="150">Date Expected</th>
+					<td>{{po.date_expected}}</td>
+				</tr>
+				<tr class="bg-info">
+					<th width="150">Supplier</th>
+					<td>
+						<b>{{po.supplier}}</b>
+						<table class="table" id="supplier_contact_details">
+							<tr>
+								<th width="100">Contact Name</th>
+								<td colspan="2">{{ po.supplier.contact_name }}</td>
+							</tr>
+							<tr>
+								<th>City</th>
+								<td colspan="2">{{ po.supplier.city }}</td>
+							</tr>
+							<tr>
+								<th>Province</th>
+								<td colspan="2">{{ po.supplier.province }}</td>
+							</tr>
+							<tr>
+								<th>Country</th>
+								<td colspan="2">{{ po.supplier.country }}</td>
+							</tr>
+							<tr>
+								<th>Emails</th>
+								<td colspan="2">{{ po.supplier.emails }}</td>
+							</tr>
+							
+							<tfoot class="extra-contact">
+							{% if extra_contacts %}
+								<tr>
+									<th style="background-color: #333" colspan="3"  align="center">Extra Contacts</th>
+								</tr>
+								<tr>
+									<th>Contact Type</th>
+									<th>Contact</th>
+									<th>Contact Name</th>
+								</tr>
+							{% endif %}
+							{% for contact in extra_contacts %}
+								<tr>
+									<td>{{contact.contact_type}}</td>
+									<td>{{contact.contact}}</td>
+									<td>{{contact.contact_name}}</td>
+								</tr>
+							{% endfor %}
+							</tfoot>
+							
+							
+						</table>
+					</td>
+					<th width="150">Ship To</th>
+					<td>
+						{{po.ship_to}}
+						<table class="table" id="ship_to_contact_details">
+							<tr>
+								<th width="100">Contact Name</th>
+								<td>{{ po.ship_to.contact_name }}</td>
+							</tr>
+							<tr>
+								<th>Phone</th>
+								<td>{{ po.ship_to.phone }}</td>
+							</tr>
+							<tr>
+								<th>Email</th>
+								<td>{{ po.ship_to.emails }}</td>
+							</tr>
+						</table>
+						
+					</td>
+				</tr>
+				<tr class="bg-success">
+					<th width="150">Ship Via</th>
+					<td>{{po.ship_via}}</td>
+					<th width="150">PO Status</th>
+					<td>{{po.status_verbose}}</td>
+				</tr>
+				<tr class="bg-info">
+					<th width="150">Terms</th>
+					<td>{{po.terms}}</td>
+					<th width="150">FOB</th>
+					<td>{{po.fob}}</td>
+				</tr>
+				<tr class="bg-success">
+					<th width="150">Shipping Inst</th>
+					<td>{{po.shipping_inst}}</td>
+					<th width="150">Deliver Internals</th>
+					<td>{{po.deliver_internal}}</td>
+				</tr>
+				<tr class="bg-info">
+					<th width="150">Date Confirmed</th>
+					<td>{{po.date_confirmed}}</td>
+					<th width="150">Blanket PO</th>
+					<td>{% if po.blanket_po == 0 %} NO {% else %} YES {% endif %}</td>
+				</tr>
+				<tr class="bg-success">
+					<th width="150">Purchaging Agent</th>
+					<td>{{po.get_agent_fullname}}</td>
+					<th width="150">Return Type</th>
+					<td>{{po.get_return_type}}</td>
+				</tr>
+				<tr class="bg-info">
+					<th width="150">Items List</th>
+					<td colspan="3">
+						<table class="table item">
+							<thead>
+								<tr>
+									<th width="120">Item Number</th>
+									<th width="">Item Description</th>
+									<th width="">Item Comment</th>
+									<th width="100">Job Number</th>
+									<th width="120">Qty / cost</th>
+									<th width="100">Subtotal</th>
+								</tr>
+							</thead>
+							<tbody id="add_item_list">
+							{% for item in po_items %}
+							<tr>
+								<td width="120">{{item.item.item_number}}</td>
+								<td width="">{{item.item.description}}</td>
+								<td width="">{{item.comment}}</td>
+								<td width="100">{{item.job_number.job_number}}</td>
+								<td width="120">{{item.qty}} /<br> 
+								{{item.cost}}</td>
+								<td width="100">{{item.sub_total}}</td>
+							</tr>
+							{% empty %}
+								<tr>
+									<td colspan="6">No items added</td>
+								</tr>					
+							{% endfor %}
+							</tbody>
+							<tr id='calculated_total_amount'>
+								<td colspan='5'>Total Amount</td>
+								<td class="amount" width="120">
+								{{po.po_currency.get_currency_icon }} {{po.total_po_amount}}</td>
+								
+							</tr>
+								
+						</table>
+					</td>
+				</tr>
+				<tr class="bg-success">
+					<th width="150">Items Total</th>
+					<td>{{po.items_total}}</td>
+					<th width="150">PO Overwritten By</th>
+					<td>{{po.po_overwridden_by}}</td>
+					
+				</tr>
+				<tr class="bg-info">
+					<th width="150">HST Taxable</th>
+					<td>{% if po.hst_taxable == 0 %} NO {% else %} YES {% endif %}</td>
+					<th width="150"> HST Amount </th>
+					<td>{{po.hst_taxable_amount}}</td>
+				</tr>
+				<tr class="bg-success">
+					<th width="150">PST Taxable</th>
+					<td>{% if po.pst_taxable == 0 %} NO {% else %} YES {% endif %}</td>
+					<th width="150"> PST Amount </th>
+					<td>{{po.pst_taxable_amount}}</td>
+					
+				</tr>
+				<tr class="bg-info">
+					<th width="150">PO Currency</th>
+					<td>{{po.po_currency}} ({{po.po_currency.get_currency_icon }})</td>
+					<th width="150">Total Amount</th>
+					<td>{{po.po_currency.get_currency_icon }} {{po.total_po_amount}}</td>
+					
+				</tr>
+				<tr class="bg-success">
+					<th width="150">Datetime</th>
+					<td>{{po.datetime}}</td>
+					<th width="150">PO Que</th>
+					<td>{{po.que_verbose}}</td>
+				</tr>
+			</table>
+			</div>
+			
+			
+		</div>
+		<div class="row">
+			
+			<div class="col-md-2">
+				<input type="submit"  class="btn btn-danger form-control" name="action" value="save">		
+			</div>
+			<div class="col-md-2">
+				<input type="submit"  class="btn btn-danger form-control" name="action" value="discard">
+			</div>
+			
+		</div>
+	</article>
+	
+</form>
+
+</section>
+</div>
+{% endblock %}

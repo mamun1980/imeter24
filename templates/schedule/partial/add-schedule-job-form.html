@@ -1,0 +1,151 @@
+<table class="add-user-table">
+<tbody>
+	<tr>
+		<td><label for="id_job_number">Job number:</label> </td>
+		<td>
+			<div style="position: relative;">
+				<input class="form-control" id="id_job_number" maxlength="20" ng-model="search_job" type="text" placeholder="Search for job by number" ng-change="searchJob(search_job)" autocomplete="off" name="job_number">
+				
+				<input type="hidden" name="job_id" id="id_job_id">
+
+				<div id="job-list" ng-show="show_job_list">
+					<ul class="search list-group">
+						<li  ng-repeat="job in jobs | filter:search_job">
+							<a href="#" class="list-group-item" ng-click="selectJob(job)"> {[{job.job_number}]}</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+
+		</td>
+	</tr>
+	<tr>
+		<td><label for="id_cab_designation">Cab designation:</label> </td>
+		<td>
+			<input class="form-control" id="id_cab_designation" maxlength="50" name="cab_designation" placeholder="Cab Designation" type="text">
+		</td>
+	</tr>
+	<tr>
+		<td><label for="id_date_opened">Date opened:</label> </td>
+		<td>
+			<input class="form-control datetimepicker" id="id_date_opened" name="date_opened" ng-model="date_opened" placeholder="Opned Date" type="text">
+		</td>
+	</tr>
+	<tr>
+		<td><label for="id_date_required">Date required:</label> </td>
+		<td><input class="form-control datetimepicker" id="id_date_required" name="date_required" ng-model="date_required" placeholder="Date Required" type="text"></td>
+	</tr>
+
+	<tr>
+		<td><label for="id_status">Status:</label> </td>
+		<td>
+			<select class="form-control" id="id_status" name="status">
+			<option value="new">New</option>
+			<option value="issuetoeng">Issued to Eng</option>
+			<option value="drawingsent">Drawings Sent to Customer</option>
+			<option value="drawingapproved">Drawings Approved</option>
+			<option value="issuetoproduction">Issued to Production</option>
+			<option value="issuetoshipping">Issued to Shipping</option>
+			<option value="shipped">Shipped</option>
+			<option value="issuetoinstallers">Issued to Installers</option>
+			<option value="installed">Installation Completed</option>
+			<option value="completed">Completed (Awaiting Invoice)</option>
+			<option value="invoiced">Invoiced</option>
+			<option value="closed">Closed</option>
+			<option value="cancel">Cancelled</option>
+			<option value="onhold">On Hold</option>
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<td><label for="id_job_name">Job name:</label> </td>
+		<td>
+			<input class="form-control" id="id_job_name" maxlength="150" name="job_name" placeholder="Job Name" type="text">
+		</td>
+	</tr>
+
+	<tr>
+		<td><label for="id_address_1">Address 1:</label> </td>
+		<td>
+			<textarea class="form-control no-resize" cols="40" id="id_address_1" name="address_1" placeholder="Address 1" rows="2"></textarea>
+		</td>
+	</tr>
+	<tr>
+		<td><label for="id_customer">Customer:</label> </td>
+		<td>
+			<input class="form-control" id="id_customer" maxlength="100" name="customer" placeholder="customer" type="text">
+		</td>
+	</tr>
+	<tr>
+		<td><label for="id_customer_contact_name">Customer contact name:</label> </td>
+		<td>
+			<input class="form-control" id="id_customer_contact_name" maxlength="100" name="customer_contact_name" placeholder="customer contact name" type="text">
+		</td>
+	</tr>
+	<tr>
+		<td><label for="id_customer_contact_phone_number">Customer contact phone number:</label> </td>
+		<td>
+			<input class="form-control" id="id_customer_contact_phone_number" maxlength="100" name="customer_contact_phone_number" placeholder="customer contact phone number" type="text">
+		</td>
+	</tr>
+	<tr>
+		<td><label for="id_contact_email">Contact Email:</label> </td>
+		<td>
+			<input class="form-control" id="id_contact_email" name="contact_email" placeholder="Contact Email" type="text">
+		</td>
+	</tr>
+	<tr>
+		<td><label for="id_number_of_cabs">Number of cabs:</label> </td>
+		<td>
+			<input class="form-control" id="id_number_of_cabs" max="999" name="number_of_cabs" placeholder="Number of Cabs" type="number">
+		</td>
+	</tr>
+	<tr>
+		<td><label for="id_description">Description:</label> </td>
+		<td>
+			<textarea class="form-control no-resize" cols="40" id="id_description" name="description" placeholder="Description" rows="2"></textarea>
+		</td>
+	</tr>
+	<tr>
+		<td><label for="id_po_number">Po number:</label> </td>
+		<td>
+			<input class="form-control" id="id_po_number" maxlength="40" name="po_number" placeholder="Purchase order number" type="text">
+		</td>
+	</tr>
+	<tr>
+		<td><label for="id_status_notes">Status notes:</label> </td>
+		<td>
+			<textarea class="form-control no-resize" cols="40" id="id_status_notes" name="status_notes" placeholder="Status Notes" rows="2"></textarea>
+		</td>
+	</tr>
+	<tr>
+		<td><label for="id_drawing_req_date">Drawing req date:</label> </td>
+		<td>
+			<input class="form-control datetimepicker" id="id_drawing_req_date" name="drawing_req_date" ng-class="{ 'bg-danger' :jobform.drawing_req_date.$invalid }" ng-model="drawing_req_date" placeholder="Drawing required date" type="text">
+		</td>
+	</tr>
+	<tr>
+		<td><label for="id_drawing_sent_to_customer_date">Drawing sent to customer date:</label> </td>
+		<td>
+			<input class="form-control datetimepicker" id="id_drawing_sent_to_customer_date" name="drawing_sent_to_customer_date" ng-model="drawing_sent_to_customer_date" placeholder="Drawing sent to customer date" type="text">
+		</td>
+	</tr>
+	<tr>
+		<td><label for="id_drawing_approved_date">Drawing approved date:</label> </td>
+		<td>
+			<input class="form-control datetimepicker" id="id_drawing_approved_date" name="drawing_approved_date" ng-model="drawing_approved_date" placeholder="Drawing approved date" type="text">
+		</td>
+	</tr>
+	<tr>
+		<td><label for="id_eng_comment">Eng comment:</label> </td>
+		<td>
+			<textarea class="form-control no-resize" cols="40" id="id_eng_comment" name="eng_comment" placeholder="Engineer Comments" rows="2"></textarea>
+		</td>
+	</tr>
+</tbody>
+</table>
+<script type="text/javascript">
+(function(){
+	$(".datetimepicker").datepicker();
+})(jQuery)
+</script>

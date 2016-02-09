@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+<section class="row"  id="pay-type-list">
+	
+
+	<div class="col-md-6 col-md-offset-3">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Pay Type List</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  		<table class="table">
+			  		<tr>
+			  			<td> ID </td>
+			  			<td>Pay Type</td>
+			  			<td>Total Use</td>
+			  			{% if perms.scomuser.delete_paytype %}
+			  			<td>Action</td>
+			  			{% endif %}
+			  			
+			  		</tr>
+			  		{% for pay_type in pay_types %}
+			  			<tr>
+				  			<td> {{ pay_type.id }} </td>
+				  			<td> {{ pay_type.pay_type }} </td>
+				  			<td> {{ pay_type.payroll_set.all.count }} </td>
+				  			{% if perms.scomuser.delete_paytype %}
+				  			<td>
+				  				<a class="pay-type-delete" href="#" data-paytypeid="{{ pay_type.id }}">delete</a>
+				  			</td>
+				  			{% endif %}
+				  			
+				  		</tr>
+				  	{% empty %}
+				  	<tr>
+			  			<td colspan='4'> No rate type found. </td>
+			  		</tr>
+				  	{% endfor %}
+			  	</table>
+		  	
+			</div>
+		</div>
+	</div>
+
+
+</section>
+
+
+<script type="text/javascript">
+(function(){
+	$("#pay-type-list a.pay-type-delete").on("click", function(e){
+		e.preventDefault();
+		paytypeid = $(this).data("paytypeid");
+		console.log(paytypeid);
+
+		$.ajax({
+			type: "POST",
+			url: "/scomuser/pay-type/delete/",
+			data: {
+				'paytypeid': paytypeid,
+			},
+			success: function(rdata) {
+				console.log(rdata);
+				$("a[data-paytypeid='"+rdata+"']").closest("tr").remove();
+			}
+		})
+	});
+
+})(jQuery)
+
+</script>
+</div>
+
+
+{% endblock content %}
+	

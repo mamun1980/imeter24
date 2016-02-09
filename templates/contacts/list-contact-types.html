@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container shadow4 main-body">
+
+<section class="row"  id="contact-type">
+	
+
+	<div class="col-md-6 col-md-offset-3">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h4>Contact Type List</h4>
+		  	</div>
+		  	<div class="panel-body">
+		  		<table class="table">
+			  		<tr>
+			  			<td> ID </td>
+			  			<td>Contact Type</td>
+			  			<td>Total Contact in use</td>
+			  			<td>Action</td>
+			  			
+			  		</tr>
+			  		{% for contact_type in contact_types %}
+			  			<tr>
+				  			<td> {{ contact_type.id }} </td>
+				  			<td> {{ contact_type.contact_type }} </td>
+				  			<td> {{ contact_type.contactcontacttype_set.all.count }} </td>
+				  			<td>
+				  				<a class="contact-delete" href="#" data-ctid="{{ contact_type.id }}">delete</a>
+				  			</td>
+				  			
+				  		</tr>
+				  	{% empty %}
+				  	<tr>
+			  			<td colspan='4'> No contact type found. </td>
+			  		</tr>
+				  	{% endfor %}
+			  	</table>
+		  	
+			</div>
+		</div>
+	</div>
+
+
+</section>
+
+<script type="text/javascript">
+(function(){
+	$("#contact-type a.contact-delete").on("click", function(e){
+		e.preventDefault();
+		ctid = $(this).data("ctid");
+		console.log(ctid);
+
+		$.ajax({
+			type: "POST",
+			url: "/contacts/contact-type/delete/",
+			data: {
+				'ctid': ctid,
+			},
+			success: function(rdata) {
+				console.log(rdata);
+				$("a[data-ctid='"+rdata+"']").closest("tr").remove();
+			}
+		})
+	});
+
+})(jQuery)
+
+</script>
+</div>
+
+
+{% endblock content %}

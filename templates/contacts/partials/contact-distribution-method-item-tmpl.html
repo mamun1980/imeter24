@@ -1,0 +1,12 @@
+<tr class="{{ contact_distribution_method.id }}">
+	<td>{{ contact_distribution_method.id }}</td>
+	<td>{{ contact_distribution_method.distribution_method }}</td>
+	<td>{{ contact_distribution_method.description }}</td>
+	
+	<td>
+		
+		<a class="contact-distribution-method-edit" href="/contacts/contact-distribution-method/edit/{{ contact_distribution_method.id }}/" 
+		data-id="{{ contact_distribution_method.id }}" data-toggle="modal" data-target="#editModal" >edit</a> / 
+		<a class='contact-distribution-method-delete' href='#' data-id="{{ contact_distribution_method.id }}">delete</a>
+	</td>
+</tr>
