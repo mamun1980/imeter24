@@ -12,6 +12,15 @@ SECRET_KEY = 'zayrkja09!-(v(9o30ex0f)w5wojh@$f(say8j6r#zx@=*5tr+'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+ADMINS = (
+    # ('Your Name', 'your_email@domain.com'),
+    ('paul', 'paul@scom.ca'),
+    ('mamun1980', 'mamun1980@scom.ca'),
+)
+
+MANAGERS = ADMINS
+
+
 TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
