@@ -169,7 +169,7 @@ HAYSTACK_CONNECTIONS = {
         # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
         'ENGINE': 'imeter24.search_backend.ConfigurableElasticSearchEngine',
         # 'ENGINE': 'elasticstack.backends.ConfigurableElasticSearchEngine',
-        'URL': 'http://127.0.0.1:9200/',
+        'URL': 'http://10.221.0.42:9302/',
         'INDEX_NAME': 'contact',
         "INDEX": "not_analyzed",
     },
