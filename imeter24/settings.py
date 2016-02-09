@@ -32,7 +32,23 @@ SITE_NAME = 'IMETER24'
 
 ANONYMOUS_USER_ID = -1
 
-PROJECT_LINK = 'localhost'
+#Project settings base dir (where settings.py is)
+PROJECT_PREFIX = 'imeter24'
+
+#Project name base (for cache etc must be unique to the server)
+PROJECT_NAME = 'imeter24'
+
+#Project base home directory to server (ie /usr/home/www/(project start)/ ) - Needs the trailing slash
+PROJECT_BASE_DIR = '/usr/home/www/www.imeter24.com/'
+
+#Project HTTP (WWW Link include the '/')
+PROJECT_HTTP = 'http://www.imeter24.com/'
+
+#Project Link (without http) - Used for cache setup etc
+PROJECT_LINK = 'www.imeter24.com'
+
+
+
 # Application definition
 
 INSTALLED_APPS = (
@@ -71,7 +87,8 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'imeter24.urls'
 
-WSGI_APPLICATION = 'imeter24.wsgi.application'
+#WSGI_APPLICATION = 'imeter24.wsgi.application'
+WSGI_APPLICATION = '%sdjango.wsgi' %PROJECT_BASE_DIR
 
 
 # Database
@@ -199,7 +216,7 @@ HAYSTACK_CONNECTIONS = {
         # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
         'ENGINE': 'imeter24.search_backend.ConfigurableElasticSearchEngine',
         # 'ENGINE': 'elasticstack.backends.ConfigurableElasticSearchEngine',
-        'URL': 'http://10.221.0.42:9302/',
+        'URL': 'http://10.221.0.42:9202/',
         'INDEX_NAME': 'contact',
         "INDEX": "not_analyzed",
     },
