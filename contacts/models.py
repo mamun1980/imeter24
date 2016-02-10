@@ -213,11 +213,11 @@ class ContactEmailAddress(models.Model):
 
 class ContactDistributionMethod(models.Model):
 	distribution_method = models.ForeignKey(DistributionMethod,  null=False)
-	contact 			= models.ForeignKey(Contact,  null=False)
+	contact 			= models.ForeignKey(Contact,  null=True)
 	description 		= models.TextField(null=True, blank=True)
 
 	def __unicode__(self):
-		return self.contact.contact_name + " " + self.distribution_method.distribution_method
+		return self.distribution_method.distribution_method
 
 	class Meta:
 		verbose_name = "Contact Distribution Method"

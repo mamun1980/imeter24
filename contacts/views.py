@@ -34,11 +34,9 @@ def remove_qout(request):
         contact.save()
     return HttpResponse('Hello')
 
-
 def contact_test(request):
     return render_to_response("contacts/contact-test.html", {},
         context_instance=RequestContext(request))
-
 
 def autocomplete(request):
     # import pdb; pdb.set_trace();
@@ -77,9 +75,6 @@ def autocomplete(request):
         'results': suggestions
     })
     return HttpResponse(the_data, content_type='application/json')
-
-
-
 
 def search_contact(request):
     # import pdb; pdb.set_trace();
@@ -125,6 +120,7 @@ def search_contact(request):
 
                 contact_dict['phones'] = con.phones
                 contact_dict['emails'] = con.emails
+                contact_dict['distribution_methods'] = con.distribution_methods
 
                 contact_list.append(contact_dict)
     try:
@@ -141,8 +137,6 @@ def search_contact(request):
 
     data = json.dumps(results)
     return HttpResponse(data)
-
-
 
 def sc_contact_home(request):
     
@@ -245,11 +239,12 @@ def contact_add_update (request):
 
         if contact_form.is_valid():
             try:
+                
                 contact = contact_form.save()
 
                 phones = request.POST.getlist("contact_phones", "")
                 emails = request.POST.getlist("contact_emails", "")
-                distribution_methods = request.POST.getlist("distribution_methods", "")
+                distribution_methods = request.POST.getlist("contact_dms", "")
                 
                 if phones:
                     for ph in phones:
@@ -262,6 +257,12 @@ def contact_add_update (request):
                         ce = ContactEmailAddress.objects.get(id=em)
                         ce.contact = contact
                         ce.save()
+
+                if distribution_methods:
+                    for dm in distribution_methods:
+                        distribution_method = ContactDistributionMethod.objects.get(id=dm)
+                        distribution_method.contact = contact
+                        distribution_method.save()
 
                 contact.save();
 
@@ -280,9 +281,6 @@ def contact_add_update (request):
             {'page_title': 'Add Contact', 'currencies': currencies, 
             'shipping_methods': shipping_methods, 'payment_terms': payment_terms})
             
-
-
-
 @login_required
 @permission_required('contacts.add_contact')
 @csrf_exempt
@@ -355,8 +353,6 @@ def sc_contact_add_rel_item(request):
         return render(request, "contacts/add-contact-rel-item.html", 
             {'contact_form': contact_form, 'cpf': contact_phone_form, 'cef': contact_email_form})
 
-
-
 @csrf_exempt
 @login_required
 @permission_required('contacts.delete_contact')
@@ -404,7 +400,6 @@ def contact_edit(request, pk):
         'contact_contact_types': contact_contact_types, },
         context_instance=RequestContext(request))
 
-
 def contact_edit_basic(request, pk):
     contact = Contact.objects.get(id=pk)
 
@@ -418,10 +413,6 @@ def contact_edit_basic(request, pk):
         CForm = ContactForm(instance=contact)
 
     return render(request, "contacts/contact-basic-edit.html", {'contact_basic_form': CForm, 'cid': pk})
-
-
-
-
 
 @csrf_protect
 def contact_update(request):
@@ -454,7 +445,6 @@ def profile_update(request):
         else:
             return HttpResponse("error")
 
-
 @login_required
 @csrf_protect
 def sc_profile(request, profile_id=False):
@@ -483,7 +473,6 @@ def sc_profile(request, profile_id=False):
         'contact_phones':contact_phones, 'page_title': page_title, 'pid': profile.id }, 
         context_instance=RequestContext(request))
 
-
 @login_required
 @csrf_exempt
 def sc_phone_list(request):
@@ -497,8 +486,6 @@ def sc_phone_list(request):
     return render_to_response("contacts/phone-list.html",
         {'contact_phones': contact_phones, 'phone_filte_form': phone_filte_form, 'page_title': 'Phone List'},
         context_instance=RequestContext(request))
-
-
 
 @login_required
 @csrf_exempt
@@ -523,6 +510,37 @@ def contact_phone_add(request):
         return render_to_response("contacts/partials/contact-phone-add-form.html",
             {},context_instance=RequestContext(request))
 
+@login_required
+@csrf_exempt
+def add_distributionmethod(request):
+
+    if request.method == 'POST':
+        # import pdb; pdb.set_trace();
+        description = request.POST.get("description")
+        distribution_method = request.POST.get("distribution_method")
+        try:
+            dm = DistributionMethod.objects.get(id=distribution_method)
+        except Exception, e:
+            return HttpResponse('false')
+        
+        cid = request.POST.get("contact_id", "")
+        
+        if cid:
+            profile = Contact.objects.get(id=cid)
+            contact_dm = ContactDistributionMethod(contact=profile,distribution_method=dm, description=description)
+            contact_dm.save()
+            profile.save()
+        else:
+            contact_dm = ContactDistributionMethod(distribution_method=dm, description=description)
+            contact_dm.save()
+        
+        return render_to_response("contacts/partials/contact-dm-row.html",
+            {"contact_dm": contact_dm},context_instance=RequestContext(request))
+    else:
+        DistributionMethods = DistributionMethod.objects.all()
+        cid = request.GET.get("q", "")
+        return render_to_response("contacts/partials/contact-dm-form.html",
+            {'distribution_methods': DistributionMethods, 'cid': cid},context_instance=RequestContext(request))
 
 @login_required
 @csrf_exempt
@@ -555,8 +573,6 @@ def contact_phoneadd(request):
         return render_to_response("contacts/partials/contact-phone-add-form.html",
             {'phone_types': phone_types, 'cid': cid},context_instance=RequestContext(request))
 
-
-
 @login_required
 @csrf_exempt
 @permission_required("contacts.change_contactphone")
@@ -583,7 +599,6 @@ def contact_phone_edit(request, pid):
 
         return render_to_response("contacts/partials/edit-phone-tmpl.html",
             {'cphform':contact_phone_form, 'pid': pid},context_instance=RequestContext(request))
-
 
 @csrf_exempt
 @permission_required("contacts.add_contactcontacttype")
@@ -622,8 +637,6 @@ def contact_contact_type_edit(request, cctid):
         return render_to_response("contacts/partials/edit-contact-contact-type-tmpl.html",
             {'cctform': contact_contact_type_form, 'cctid': cctid},context_instance=RequestContext(request))
 
-
-
 @login_required
 @csrf_exempt
 @permission_required("contacts.delete_contactcontacttype")
@@ -640,7 +653,6 @@ def contact_contact_type_delete(request):
 
     else:
         return HttpResponse("User contact's contact type is added.")
-
 
 @login_required
 @csrf_exempt
@@ -680,7 +692,6 @@ def contact_distribution_method_edit(request, cdmid):
 
         return render_to_response("contacts/partials/edit-contact-distribution-method-tmpl.html",
             {'cmdform': contact_distribution_method_form, 'cdmid': cdmid},context_instance=RequestContext(request))
-
 
 @login_required
 @csrf_exempt
@@ -1364,9 +1375,15 @@ def edit_distribution_method(request, dmid):
 @permission_required("contacts.delete_distributionmethod")
 def delete_distribution_method(request):
     if request.method == "POST":
-        distid = request.POST.get("distid")
-        distribution_method = DistributionMethod.objects.get(id=distid)
+        # import pdb; pdb.set_trace();
+        distid = request.POST.get("id")
+        distribution_method = ContactDistributionMethod.objects.get(id=distid)
+        # dm = distribution_method.distribution_method
+        con = distribution_method.contact
         distribution_method.delete()
+        # dm.delete()
+        con.save()
+
         return HttpResponse(distid)
     else:
         return HttpResponse("Hello World!")

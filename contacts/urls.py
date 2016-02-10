@@ -72,6 +72,7 @@ urlpatterns = patterns('',
     url(r'^delivery-choice/list/$', 'contacts.views.list_delivery_choices', name='delivery-choice-list'),
 
     url(r'^distribution-method/$', 'contacts.views.view_distribution_method', name='distribution-method'),
+    url(r'^dm-add/$', 'contacts.views.add_distributionmethod', name='add-distributionmethod'),
     url(r'^distribution-method/add/$', 'contacts.views.add_distribution_method', name='add-distribution-method'),
     url(r'^distribution-method/edit/(?P<dmid>\d+)/$', 'contacts.views.edit_distribution_method', name='edit-distribution-method'),
     url(r'^distribution-method/delete/$', 'contacts.views.delete_distribution_method', name='delete-distribution-method'),
