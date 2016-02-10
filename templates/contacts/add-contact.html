@@ -17,6 +17,7 @@ table > thead {
 }
 table > tbody {
 	background-color: #FFF;
+	font-size: 14px;
 }
 #contact_list thead, #ship_to_contact_list thead, #customer_broker_contact_list thead {
     background-color: #ed791a;
@@ -82,6 +83,28 @@ table > tbody {
 		  	</div>
 		  	<div class="panel-body">
 			  	<table class="table bordered" id="contact_emails">
+			  		
+			  	</table>
+			</div>
+		</div>
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h2 style="display:inline;font-family: 'Courgette', cursive;">Distribution Methods</h2>
+		    	<a class="btn btn-danger pull-right" ng-click="addDistributionMethod()">+</a>
+		  	</div>
+		  	<div class="panel-body">
+			  	<table class="table bordered" id="distribution_methods">
+			  		
+			  	</table>
+			</div>
+		</div>
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+		    	<h2 style="display:inline;font-family: 'Courgette', cursive;">Contact Type</h2>
+		    	<a class="btn btn-danger pull-right" ng-click="addContactType()">+</a>
+		  	</div>
+		  	<div class="panel-body">
+			  	<table class="table bordered" id="contact_types">
 			  		
 			  	</table>
 			</div>
@@ -164,44 +187,92 @@ table > tbody {
 	    	$("#id_bv_ap_account").val(contact.bv_ap_account);
 	    	$("#id_bv_ar_account").val(contact.bv_ar_account);
 
-	    	if(contact.phones.length > 0) {
-	    		var header = "<tr class='bg-primary'><td>Phone Type</td><td>Phone Number</td><td>Phone Ext.</td><td>Action</td></tr>";
-	    		
-	    		$("#contact_phones").html(header);
+	    	if(contact.phones){
+	    		if(contact.phones.length > 0) {
+		    		var header = "<tr class='bg-primary'><td>Phone Type</td><td>Phone Number</td><td>Phone Ext.</td><td>Action</td></tr>";
+		    		
+		    		$("#contact_phones").html(header);
 
-	    		for(var i=0; i<contact.phones.length; i++){
-	    			var tr = '<tr class="bg-info">';
-	    			tr += "<td>"+contact.phones[i].type+"</td>";
-	    			tr += "<td>"+contact.phones[i].number+"</td>";
-	    			tr += "<td>"+contact.phones[i].ext+"</td>";
-	    			tr += "<td>";
-	    			tr += "<a class='contact-phone-delete' href='#' data-id='"+contact.phones[i].id+"'>delete</a>";
-	    			tr += '<input type="hidden" name="contact_phones" value="'+contact.phones[i].id+'">';
-	    			tr += "</td>";
-	    			tr += "</tr>";
-	    			$("#contact_phones").append(tr);
-	    		}
-	    		
+		    		for(var i=0; i<contact.phones.length; i++){
+		    			var tr = '<tr class="bg-info">';
+		    			tr += "<td>"+contact.phones[i].type+"</td>";
+		    			tr += "<td>"+contact.phones[i].number+"</td>";
+		    			tr += "<td>"+contact.phones[i].ext+"</td>";
+		    			tr += "<td>";
+		    			tr += "<a class='contact-phone-delete' href='#' data-id='"+contact.phones[i].id+"'>delete</a>";
+		    			tr += '<input type="hidden" name="contact_phones" value="'+contact.phones[i].id+'">';
+		    			tr += "</td>";
+		    			tr += "</tr>";
+		    			$("#contact_phones").append(tr);
+		    		}
+		    		
+		    	}
+	    	}
+	    	
+
+	    	if(contact.emails) {
+	    		if(contact.emails.length > 0) {
+		    		var header = "<tr class='bg-primary'><td>Email Type</td><td>Email Address</td><td>Action</td></tr>";
+		    		
+		    		$("#contact_emails").html(header);
+
+		    		for(var i=0; i<contact.emails.length; i++){
+		    			var tr = '<tr class="bg-info">';
+		    			tr += "<td>"+contact.emails[i].email_type+"</td>";
+		    			tr += "<td>"+contact.emails[i].email_address+"</td>";
+		    			tr += "<td>";
+		    			tr += "<a class='contact-email-delete' href='#' data-id='"+contact.emails[i].id+"'>delete</a>";
+		    			tr += '<input type="hidden" name="contact_emails" value="'+contact.emails[i].id+'">';
+		    			tr += "</td>";
+		    			tr += "</tr>";
+		    			$("#contact_emails").append(tr);
+		    		}
+		    		
+		    	}
+	    	}
+	    	
+	    	if(contact.distribution_methods) {
+	    		if(contact.distribution_methods.length > 0) {
+		    		var header = "<tr class='bg-primary'><td>Email Type</td><td>Email Address</td><td>Action</td></tr>";
+		    		
+		    		$("#distribution_methods").html(header);
+
+		    		for(var i=0; i<contact.distribution_methods.length; i++){
+		    			var tr = '<tr class="bg-info">';
+		    			tr += "<td>"+contact.distribution_methods[i].distribution_method+"</td>";
+		    			tr += "<td>"+contact.distribution_methods[i].description+"</td>";
+		    			tr += "<td>";
+		    			tr += "<a class='contact-dm-delete' href='#' data-id='"+contact.distribution_methods[i].id+"'>delete</a>";
+		    			tr += '<input type="hidden" name="contact_dms" value="'+contact.distribution_methods[i].id+'">';
+		    			tr += "</td>";
+		    			tr += "</tr>";
+		    			$("#distribution_methods").append(tr);
+		    		}
+		    		
+		    	}
 	    	}
 
-	    	if(contact.emails.length > 0) {
-	    		var header = "<tr class='bg-primary'><td>Email Type</td><td>Email Address</td><td>Action</td></tr>";
-	    		
-	    		$("#contact_emails").html(header);
+	    	if(contact.contact_types) {
+	    		if(contact.contact_types.length > 0) {
+		    		var header = "<tr class='bg-primary'><td>Contact Type</td><td>Description</td><td>Action</td></tr>";
+		    		
+		    		$("#contact_types").html(header);
 
-	    		for(var i=0; i<contact.emails.length; i++){
-	    			var tr = '<tr class="bg-info">';
-	    			tr += "<td>"+contact.emails[i].email_type+"</td>";
-	    			tr += "<td>"+contact.emails[i].email_address+"</td>";
-	    			tr += "<td>";
-	    			tr += "<a class='contact-email-delete' href='#' data-id='"+contact.emails[i].id+"'>delete</a>";
-	    			tr += '<input type="hidden" name="contact_emails" value="'+contact.emails[i].id+'">';
-	    			tr += "</td>";
-	    			tr += "</tr>";
-	    			$("#contact_emails").append(tr);
-	    		}
-	    		
+		    		for(var i=0; i<contact.contact_types.length; i++){
+		    			var tr = '<tr class="bg-info">';
+		    			tr += "<td>"+contact.contact_types[i].contact_type+"</td>";
+		    			tr += "<td>"+contact.contact_types[i].description+"</td>";
+		    			tr += "<td>";
+		    			tr += "<a class='contact-contacttype-delete' href='#' data-id='"+contact.contact_types[i].id+"'>delete</a>";
+		    			tr += '<input type="hidden" name="contact_types" value="'+contact.contact_types[i].id+'">';
+		    			tr += "</td>";
+		    			tr += "</tr>";
+		    			$("#contact_types").append(tr);
+		    		}
+		    		
+		    	}
 	    	}
+	    	
 
 	    };
 
@@ -262,7 +333,21 @@ table > tbody {
 			mdal = $('#addModal');
 			var cid = $("#contact_id").val();
 			console.log(cid);
-			url = "/contacts/phone-add/?q="+cid;;
+			url = "/contacts/dm-add/?q="+cid;;
+			mdal.on("shown.bs.modal", function(e){
+				$("#addModal .modal-content").load(url);
+				// $(e.currentTarget).find('#contact_id').val(cid);
+				// console.log(url);
+			}).modal();
+			return false;
+	    };
+
+	    $scope.addContactType = function() {
+			console.log("testing..");
+			mdal = $('#addModal');
+			var cid = $("#contact_id").val();
+			console.log(cid);
+			url = "/contacts/contact-type-add/?q="+cid;;
 			mdal.on("shown.bs.modal", function(e){
 				$("#addModal .modal-content").load(url);
 				// $(e.currentTarget).find('#contact_id').val(cid);
@@ -274,6 +359,32 @@ table > tbody {
 
 
 	}]);
+	
+	$(document).on("click", "a.contact-contacttype-delete", function(e){
+        e.preventDefault();
+        
+        var row = $(this).closest("tr");
+        row.remove();
+        var cpid = $(this).data("id");
+        if(cpid != ""){
+            var url = "/contacts/contacttype/delete/";
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                
+                data: {
+                    'cpid': cpid,
+                },
+                success: function(rdata) {
+
+                }
+            });    
+        }
+
+        return false;
+        
+    });
 
 	$(document).on("click", "a.contact-phone-delete", function(e){
         e.preventDefault();
@@ -290,6 +401,32 @@ table > tbody {
                 
                 data: {
                     'cpid': cpid,
+                },
+                success: function(rdata) {
+
+                }
+            });    
+        }
+
+        return false;
+        
+    });
+
+    $(document).on("click", "a.contact-dm-delete", function(e){
+        e.preventDefault();
+        
+        var row = $(this).closest("tr");
+        row.remove();
+        var cpid = $(this).data("id");
+        if(cpid != ""){
+            var url = "/contacts/distribution-method/delete/";
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                
+                data: {
+                    'id': cpid,
                 },
                 success: function(rdata) {
 

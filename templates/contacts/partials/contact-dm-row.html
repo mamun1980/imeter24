@@ -1,0 +1,8 @@
+<tr class="bg-info">
+	<td>{{ contact_dm.distribution_method }}</td>
+	<td>{{ contact_dm.description }}</td>
+	<td>
+		<a class='contact-dm-delete' href='#' data-id="{{ contact_dm.id }}">delete</a>
+		<input type="hidden" name="contact_dms" value="{{ contact_dm.id }}">
+	</td>
+</tr>

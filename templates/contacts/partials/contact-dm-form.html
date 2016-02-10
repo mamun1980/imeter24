@@ -1,0 +1,78 @@
+<form name="pocontact" action="/contacts/dm-add/" method="POST" enctype="multipart/form-data">{% csrf_token %}
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h4 class="modal-title" id="myModalLabel">Add Distribution Method</h4>
+</div>
+
+
+<div class="modal-body">
+	<table class="table add-user-table">
+		<tr>
+			<td>Distribution Method</td>
+			<td>
+				<select class="form-control" name="distribution_method">
+				{% for dm in distribution_methods %}
+					<option value="{{dm.id}}">{{dm.distribution_method}}</option>
+				{% endfor %}
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>Description</td>
+			<td>
+				<textarea class="form-control" name="description"></textarea> 
+				<input type="hidden" name="contact_id" id="contact_id" value="{{cid}}">
+			</td>
+		</tr>
+		
+	</table>
+</div>
+
+
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-default close-modal" data-dismiss="modal">Close</button>
+    <button type="submit" class="btn btn-primary">Add Distribution Method</button>
+</div>
+</form>
+<script type="text/javascript">
+	(function(){
+
+		$("form[name='pocontact']").on("submit", function(e){
+			e.preventDefault();
+			form_data = $(this).serialize();
+			// console.log($(this).attr('action'));
+			$.ajax({
+				type: "POST",
+				url: $(this).attr('action'),
+				data: form_data,
+				success: function(rdata) {
+					console.log(rdata);
+	                $( "button.close-modal" ).trigger( "click" );
+	                
+	                if(rdata != 'false') {
+	                	var extraContactPlaceHolder = $("#distribution_methods");
+		                var contacts = extraContactPlaceHolder.find("tr");
+		                var header = "<tr class='bg-primary'><td>Distribution Method</td><td>Description</td><td>Action</td></tr>";
+		                
+		                
+		                if (contacts.length > 0) {
+		                	extraContactPlaceHolder.append(rdata);
+						} else {
+							extraContactPlaceHolder.html(header);
+							extraContactPlaceHolder.append(rdata);
+						}
+	                } else {
+	                	alert("No valid distribution method selected.");
+	                }
+	                
+	            }
+			});
+
+		});
+
+		
+
+	})(jQuery)
+
+</script>
