@@ -1,0 +1,123 @@
+<table class="table bordered">
+	<tbody>
+		<tr>
+			<td>Controller ID</td>
+			<td colspan="3">
+				<input type="text" class="form-control" name="controller_id">
+			</td>
+		</tr>
+		<tr>
+			<td>Sold To</td>
+			<td colspan="3">
+				<div class="contact_box">	
+					<input type="text" ng-model="search_sold_to" name="search_sold_to" placeholder="start typing to search sold to contact" class="form-control" ng-change="searchSoldTo(search_sold_to)" ng-required="true" style="width: 95%; display: inline;">
+					
+					
+					<table class="table sold_to_contact" id="sold_to_contact_list">
+						<thead>
+							<tr>
+								<th>Contact Name</th><th>Address</th><th> Primary Cont No.</th>
+								<th><a href="" class="close" ng-click="hideSupplierContact()">x</a></th>
+							</tr>
+						</thead>
+						<tbody>
+							
+
+							<tr class="ui-menu-item" ng-repeat="contact in soldto" ng-click="selectSoldTo(contact)">
+								
+								
+								<td class="contact_name">{[{contact.contact_name}]}</td>
+								<td class="address_1">
+									<p ng-if="contact.address_1 != ''">{[{contact.address_1}]}</p>
+									<p ng-if="contact.city != ''">{[{contact.city}]}<span ng-if="contact.province != ''">, {[{contact.province}]}</span></p>
+									<p>
+									<span ng-if="contact.country != ''">{[{contact.country}]}</span>
+									</p>
+									<p ng-if="contact.postal_code != ''">{[{ contact.postal_code }]}</p>
+									
+									
+								</td>
+								
+								<td class="city">
+									<div class='phone' ng-repeat="phon in contact.phones" ng-if="$first">
+										{[{phon.number}]} <span ng-if="phon.ext !=''"> (ext: {[{phon.ext}]})</span>
+									</div>
+								</td>
+								
+								<td>
+									
+								</td>
+							</tr>
+						</tbody>
+					</table>
+
+					<input type="hidden" id="id_sold_to" name="sold_to">
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="4">
+				<table class="table table-bordered" id="sold_to_contact_details">
+				
+					<tr>
+						<th width="150">Contact Name</th>
+						<td colspan="2">
+							<span ng-if="sold_to_contact.attention_to != ''">
+								{[{ sold_to_contact.attention_to }]}, 
+							</span>
+							<span ng-if="sold_to_contact.contact_name != ''">
+								{[{ sold_to_contact.contact_name }]}
+							</span>
+							
+						</td>
+					</tr>
+					<tr>
+						<th>Address</th>
+						<td colspan="2">
+							<p ng-if="sold_to_contact.address_1 != ''">
+								{[{sold_to_contact.address_1}]}
+							</p>
+							<p ng-if="sold_to_contact.address_2 != ''">
+								{[{sold_to_contact.address_2}]}
+							</p>
+							<p>{[{sold_to_contact.city}]}<span ng-if="sold_to_contact.province != ''">, {[{sold_to_contact.province}]}</span></p>
+							
+							<p>{[{sold_to_contact.country}]}</p>
+							<p><span ng-if="sold_to_contact.postal_code != ''">{[{ sold_to_contact.postal_code }]}
+							</span></p>
+						</td>
+					</tr>
+					
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td>Localtion</td>
+			<td colspan="3">
+				<input type="text" class="form-control" name="location">
+			</td>
+		</tr>
+		<tr>
+			<td>Controller Type</td>
+			<td>
+				<input type="text" class="form-control" name="controller_type">
+			</td>
+			<td>Number of contacts for this controller</td>
+			<td width="200">
+				<div class="input-group">
+					<span class="input-group-addon" id="basic-addon1">#</span>
+					<input type="number" width="50" class="form-control" ng-model="no_of_contacts" name="no_of_contacts">
+					<span class="input-group-btn">
+				        <button class="btn btn-danger" type="button" ng-click="generateContacts()">Add!</button>
+				    </span>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="4">
+				<button type="submit" class="btn btn-primary">Add Controller</button>
+			</td>
+		</tr>
+	</tbody>
+	
+</table>

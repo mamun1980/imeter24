@@ -6,4 +6,3 @@ class ControllerForm(forms.ModelForm):
 	
     class Meta:
         model = Controller
-        exclude = ['oid',]

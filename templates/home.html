@@ -8,16 +8,36 @@
 	    <div class="col-md-6 col-md-offset-3">
 	    <section class="home">
 	    	
-	    	<div class="jumbotron shadow4" id="login-jumbo">
-			<form action="/scomuser/login/" method="POST">{% csrf_token %}
-				{% for field in lform %}
-					{{ field.label }}
-					{{ field }}
+	    	<div class="jumbotron" id="login-jumbo">
+				<form action="/scomuser/login/" method="POST">{% csrf_token %}
+					<table class="table">
+						<tr>
+							<th><label>Email address</label></th>
+						</tr>
+						<tr>
+							<td>
+								<input autofocus="autofocus" class="form-control" id="id_username" maxlength="50" name="username" placeholder="Enter user id" type="text">
+							</td>
+						</tr>
+						<tr>
+							<th>
+								<label>Password</label>
+							</th>
+						</tr>
+						<tr>
+							
+							<td>
+								<input class="form-control" id="id_password" maxlength="25" name="password" placeholder="Password" type="password">
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<button type="submit" class="btn btn-primary btn-lg form-control login-btn">Login</button>
+							</td>
+						</tr>
+					</table>
 					
-				{% endfor %}
-				
-				<button type="submit" class="btn btn-primary btn-lg form-control login-btn">Login</button>
-			</form>
+				</form>
 			</div>
 	    </section>
 			

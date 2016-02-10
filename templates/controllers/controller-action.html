@@ -2,51 +2,198 @@
 {% block title %}{{site_name}}{% endblock title %}
 
 {% block content %}
-<div class="container main-body shadow4">
-	
-	<div class="row">
-	    <div class="col-md-6 col-md-offset-3">
-	    <div class="panel panel-primary">
-			<div class="panel-heading">
-		    	<h2 style="display:inline;font-family: 'Courgette', cursive;">Controller</h2>
-		    	
-		  	</div>
-		  	<div class="panel-body">
-			  	<table class="table bordered">
-			    	<tbody>
-			    		<tr>
-			    			<td>Controller ID</td>
-			    			<td>
-			    				<input type="text" class="form-control" name="controllerid">
-			    			</td>
-			    		</tr>
-			    		<tr>
-			    			<td>Relay ID</td>
-			    			<td>
-			    				<input type="text" class="form-control" name="relayid">
-			    			</td>
-			    		</tr>
-			    		<tr>
-			    			<td>Status</td>
-			    			<td>
-			    				<input type="text" class="form-control" name="status">
-			    			</td>
-			    		</tr>
-			    		<tr>
-			    			<td colspan="2">
-			    				<button class="btn btn-primary">Add Controller</button>
-			    			</td>
-			    		</tr>
-			    	</tbody>
-			    	
-			    </table>
-			</div>
-		</div>
-		    
-		</div>
+<style type="text/css">
+	th.action, td.action {
+		width: 55px;
+	}
+	.sold_to_contact tbody tr:hover{
+		background-color: #616183;
+	}
+	#sold_to_contact_list tbody {
+    color: #FFF;
+    background-color: #333;
+    font-size: 14px;
+}
+#sold_to_contact_list thead {
+    color: #FFF;
+    background-color: #ed791a;
+    font-size: 16px;
+}
+#sold_to_contact_list, #ship_to_contact_list {
+    width: 980px !important;
+    position: absolute;
+    top: 34px;
+    z-index: 1000;
+}
+table#sold_to_contact_details th{
+	background-color: #83AD9E;
+}
+.contact_box{
+	position: relative;
+}
+table#sold_to_contact_details {
+	margin-top: 10px;
+}
+</style>
+<div class="container-fluid main-body shadow4" ng-app="controllerApp">
+	<form name="controller_form" action="/controllers/add/" method="post">{% csrf_token %}
+		<div class="row" ng-controller="ControllerController">
+		    <div class="col-md-6">
+			    <div class="panel panel-primary">
+					<div class="panel-heading">
+				    	<h2 style="display:inline;font-family: 'Courgette', cursive;">Controller</h2>
+				    	
+				  	</div>
+				  	<div class="panel-body">
+					  	
+					  	{% include "controllers/controller-action-form.html" %}
 
-	</div>
+					</div>
+				</div>
+			    
+			</div>
+
+			<div class="col-md-6">
+			    <div class="panel panel-primary">
+					<div class="panel-heading">
+				    	<h2 style="display:inline;font-family: 'Courgette', cursive;">List of contacts</h2>
+				    	
+				  	</div>
+				  	<div class="panel-body">
+
+					</div>
+					<table class="table table-hover" id="controller_contacts" ng-hide="contact_list">
+						
+					</table>
+				</div>
+			    
+			</div>
+
+		</div>
+	</form>
 		
 </div>
+{% include "modals/add-modal.html" %}
 
+<link href="/statics/css/bootstrap-toggle.min.css" rel="stylesheet">
+<script src="/statics/js/bootstrap-toggle.min.js"></script>
+<script type="text/javascript">
+(function(){
+
+
+	var controllerApp = angular.module("controllerApp", [], function ($interpolateProvider) {
+	        $interpolateProvider.startSymbol("{[{");
+	        $interpolateProvider.endSymbol("}]}");
+	});
+	controllerApp.controller('ControllerController',['$scope', '$http', function ($scope, $http) {
+		$scope.init = function(){
+	        console.log("Hello world!");
+	        $scope.contact_list = false;
+	        
+	        $("#sold_to_contact_list").hide();
+        	$("#sold_to_contact_details").hide();
+	        
+	        // $scope.gst_tax_exempt = true;
+	    }
+	    $scope.init();
+
+	    $scope.generateContacts = function() {
+	    	var contacts_container = $("#controller_contacts");
+	    	// alert($scope.no_of_contacts);
+	    	var head = contacts_container.find("thead");
+	    	console.log(head.length);
+
+	    	if(head.length == 0){
+
+	    		var hd = "<thead class='bg-info'><tr>";
+	    		hd += "<th>";
+	    		hd += "Contact ID";
+	    		hd += "</th>";
+	    		hd += "<th>";
+	    		hd += "Contact Description";
+	    		hd += "</th>";
+	    		hd += "<th>";
+	    		hd += "Status";
+	    		hd += "</th>";
+	    		hd += "<th class='pull-right action'>";
+	    		hd += "Action";
+	    		hd += "</th>";
+	    		hd += "</tr></thead>";
+	    		contacts_container.append(hd);
+	    	}
+
+	    	for(var i=1; i<=$scope.no_of_contacts; i++) {
+	    		var str = "<tr>";
+	    		str += "<td>";
+	    		str += "["+i+"]";
+	    		str += "<input type=hidden class='form-control' name='con_id' value='"+i+"'>";
+	    		str += "</td>";
+	    		str += "<td>";
+	    		str += "<input type=text class='form-control' name='con_description'>";
+	    		str += "</td>";
+	    		str += "<td>";
+	    		str += "<input type='checkbox' data-toggle='toggle' data-onstyle='success' data-offstyle='danger' data-on='Contact On' data-off='Contact Off' class='form-control con_status' name='controler_status_"+i+"'>";
+	    		
+	    		str += "</td>";
+	    		str += "<td class='action'>";
+	    		str += "<a href='#' class='btn btn-danger pull-right remove-contact'>X</a>";
+	    		str += "</td>";
+	    		str += "</tr>";
+
+	    		contacts_container.append(str);
+	    	}
+
+	    	$('input.con_status').bootstrapToggle();
+	    }
+
+	    $scope.searchSoldTo  = function(q) {
+	        if(q.length > 1) {
+	            url = "/contacts/search/?q=" + q
+	            $http({method: 'GET', url: url}).
+	                success(function(data, status, headers, config) {
+	                	console.log(data);
+	                    $scope.soldto = data;
+	                });
+	            $("#sold_to_contact_list").show();
+	            
+	            
+	        } else {
+	            $("#sold_to_contact_list").hide();
+	        }
+	    }
+
+	    $scope.selectSoldTo = function(con) {
+	    	console.log(con);
+			$("#sold_to_contact_list").hide();
+			$scope.search_sold_to = con.contact_name;
+			$scope.sold_to_contact = con;
+			$("#id_sold_to").val(con.id);
+			$("#sold_to_contact_details").show();
+
+
+		};
+
+	    
+
+
+
+	}]);
+
+	$(document).on("click", "a.remove-contact", function(e){
+        e.preventDefault();
+        
+        var row = $(this).closest("tr");
+        row.remove();
+        
+        return false;
+        
+    });
+
+    
+
+    // $('input.con_status').bootstrapToggle();
+
+
+})(jQuery)
+</script>
 {% endblock content %}
