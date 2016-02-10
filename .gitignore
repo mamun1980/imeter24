@@ -1,4 +1,4 @@
-imeter24/settings.py
+.cache/*
 .python-eggs/*
 */*.pyc
 *.pyc
