@@ -253,3 +253,4 @@ HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 HAYSTACK_ROUTERS = [
                 'contacts.routers.ContactRouter',
                 'haystack.routers.DefaultRouter',]
+
