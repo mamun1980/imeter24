@@ -17,6 +17,7 @@ table > thead {
 }
 table > tbody {
 	background-color: #FFF;
+	font-size: 14px;
 }
 #contact_list thead, #ship_to_contact_list thead, #customer_broker_contact_list thead {
     background-color: #ed791a;
@@ -250,6 +251,27 @@ table > tbody {
 		    		
 		    	}
 	    	}
+
+	    	if(contact.contact_types) {
+	    		if(contact.contact_types.length > 0) {
+		    		var header = "<tr class='bg-primary'><td>Contact Type</td><td>Description</td><td>Action</td></tr>";
+		    		
+		    		$("#contact_types").html(header);
+
+		    		for(var i=0; i<contact.contact_types.length; i++){
+		    			var tr = '<tr class="bg-info">';
+		    			tr += "<td>"+contact.contact_types[i].contact_type+"</td>";
+		    			tr += "<td>"+contact.contact_types[i].description+"</td>";
+		    			tr += "<td>";
+		    			tr += "<a class='contact-contacttype-delete' href='#' data-id='"+contact.contact_types[i].id+"'>delete</a>";
+		    			tr += '<input type="hidden" name="contact_types" value="'+contact.contact_types[i].id+'">';
+		    			tr += "</td>";
+		    			tr += "</tr>";
+		    			$("#contact_types").append(tr);
+		    		}
+		    		
+		    	}
+	    	}
 	    	
 
 	    };
@@ -320,9 +342,49 @@ table > tbody {
 			return false;
 	    };
 
+	    $scope.addContactType = function() {
+			console.log("testing..");
+			mdal = $('#addModal');
+			var cid = $("#contact_id").val();
+			console.log(cid);
+			url = "/contacts/contact-type-add/?q="+cid;;
+			mdal.on("shown.bs.modal", function(e){
+				$("#addModal .modal-content").load(url);
+				// $(e.currentTarget).find('#contact_id').val(cid);
+				// console.log(url);
+			}).modal();
+			return false;
+	    };
+
 
 
 	}]);
+	
+	$(document).on("click", "a.contact-contacttype-delete", function(e){
+        e.preventDefault();
+        
+        var row = $(this).closest("tr");
+        row.remove();
+        var cpid = $(this).data("id");
+        if(cpid != ""){
+            var url = "/contacts/contacttype/delete/";
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                
+                data: {
+                    'cpid': cpid,
+                },
+                success: function(rdata) {
+
+                }
+            });    
+        }
+
+        return false;
+        
+    });
 
 	$(document).on("click", "a.contact-phone-delete", function(e){
         e.preventDefault();

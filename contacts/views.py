@@ -121,6 +121,7 @@ def search_contact(request):
                 contact_dict['phones'] = con.phones
                 contact_dict['emails'] = con.emails
                 contact_dict['distribution_methods'] = con.distribution_methods
+                contact_dict['contact_types'] = con.contact_types
 
                 contact_list.append(contact_dict)
     try:
@@ -228,7 +229,7 @@ def contact_add_update (request):
     currencies = Currency.objects.all()
 
     if request.method == 'POST':
-        # import pdb; pdb.set_trace();
+        import pdb; pdb.set_trace();
         cid = request.POST.get("contact_id", "")
         if cid:
             con = Contact.objects.get(id=cid)
@@ -245,6 +246,7 @@ def contact_add_update (request):
                 phones = request.POST.getlist("contact_phones", "")
                 emails = request.POST.getlist("contact_emails", "")
                 distribution_methods = request.POST.getlist("contact_dms", "")
+                contact_types = request.POST.getlist("contact_types", "")
                 
                 if phones:
                     for ph in phones:
@@ -264,7 +266,17 @@ def contact_add_update (request):
                         distribution_method.contact = contact
                         distribution_method.save()
 
-                contact.save();
+                if contact_types:
+                    for dm in contact_types:
+                        contact_type = ContactContactType.objects.get(id=dm)
+                        contact_type.contact = contact
+                        contact_type.save()
+
+                try:
+                    contact.save();
+                except Exception, e:
+                    raise e
+                
 
                 messages.info(request, "Contact added successfully.")
                 return HttpResponseRedirect("/contacts/")    
@@ -510,6 +522,7 @@ def contact_phone_add(request):
         return render_to_response("contacts/partials/contact-phone-add-form.html",
             {},context_instance=RequestContext(request))
 
+
 @login_required
 @csrf_exempt
 def add_distributionmethod(request):
@@ -572,6 +585,44 @@ def contact_phoneadd(request):
         cid = request.GET.get("q", "")
         return render_to_response("contacts/partials/contact-phone-add-form.html",
             {'phone_types': phone_types, 'cid': cid},context_instance=RequestContext(request))
+
+
+
+@login_required
+@csrf_exempt
+def contact_typeadd(request):
+
+    if request.method == 'POST':
+        # import pdb; pdb.set_trace();
+        contact_type_id = request.POST.get("contact_type")
+        
+        description = request.POST.get("description")
+
+        try:
+            contact_type = ContactType.objects.get(id=contact_type_id)
+        except Exception, e:
+            return HttpResponse('false')
+        
+        cid = request.POST.get("contact_id", "")
+        
+        if cid:
+            profile = Contact.objects.get(id=cid)
+            ct = ContactContactType(contact=profile,contact_type=contact_type, description=description)
+            ct.save()
+            profile.save()
+        else:
+            ct = ContactContactType(contact_type=contact_type, description=description)
+            ct.save()
+        
+        return render_to_response("contacts/partials/contact-contact-type-row.html",
+            {"contact_type": ct},context_instance=RequestContext(request))
+    else:
+        ContactTypes = ContactType.objects.all()
+        cid = request.GET.get("q", "")
+        return render_to_response("contacts/partials/contact-contact-type-add-form.html",
+            {'contact_types': ContactTypes, 'cid': cid},context_instance=RequestContext(request))
+
+
 
 @login_required
 @csrf_exempt
@@ -644,8 +695,10 @@ def contact_contact_type_delete(request):
     if request.method == 'POST':
         cctid = request.POST.get("cctid")
         contact_contact_type = ContactContactType.objects.get(id=cctid)
+        con = contact_contact_type.contact
         try:
             contact_contact_type.delete()
+            con.save()
             return HttpResponse(cctid)
         except:
             messages.errors(request, "Contact's contact type is not deleted.")
@@ -653,6 +706,7 @@ def contact_contact_type_delete(request):
 
     else:
         return HttpResponse("User contact's contact type is added.")
+
 
 @login_required
 @csrf_exempt

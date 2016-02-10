@@ -56,6 +56,7 @@ urlpatterns = patterns('',
     url(r'^email-type/delete/$', 'contacts.views.email_type_delete', name='sc-email-type-delete'),
 
     url(r'^contact-type/$', 'contacts.views.view_contact_types', name='sc-contact-type-add-ajax'),
+    url(r'^contact-type-add/$', 'contacts.views.contact_typeadd', name='sc-contact-typeadd-ajax'),
     url(r'^contact-type/add/$', 'contacts.views.contact_type_add', name='sc-contact-type-add-ajax'),
     url(r'^contact-type/edit/(?P<ctid>\d+)/$', 'contacts.views.contact_type_edit', name='sc-contact-type-edit'),
     url(r'^contact-type/delete/$', 'contacts.views.contact_type_delete', name='sc-contact-type-delete'),

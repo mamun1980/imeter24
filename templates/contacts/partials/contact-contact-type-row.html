@@ -1,0 +1,8 @@
+<tr class="bg-info">
+	<td>{{ contact_type.contact_type }}</td>
+	<td>{{ contact_type.description }}</td>
+	<td>
+		<a class='contact-contacttype-delete' href='#' data-id="{{ contact_type.id }}">delete</a>
+		<input type="hidden" name="contact_types" value="{{ contact_type.id }}">
+	</td>
+</tr>

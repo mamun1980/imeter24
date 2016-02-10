@@ -1,6 +1,6 @@
 import datetime
 from haystack import indexes
-from contacts.models import Contact, ContactPhone, ContactEmailAddress, ContactDistributionMethod
+from contacts.models import Contact, ContactContactType, ContactPhone, ContactEmailAddress, ContactDistributionMethod
 
 
 class ContactIndex(indexes.SearchIndex, indexes.Indexable):
@@ -66,6 +66,17 @@ class ContactIndex(indexes.SearchIndex, indexes.Indexable):
             dmlist.append(dm)
 
         self.prepared_data['distribution_methods'] = dmlist
+
+        contact_types = ContactContactType.objects.filter(contact=obj)
+        ctlist = []
+        for ct in contact_types:
+            ct = {}
+            ct['contact_type'] = ct.contact_type.contact_type
+            ct['description'] = ct.description
+            ct['id'] = ct.id
+            ctlist.append(ct)
+
+        self.prepared_data['contact_types'] = ctlist
 
         
         if obj.terms:
