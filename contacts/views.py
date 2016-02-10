@@ -229,7 +229,7 @@ def contact_add_update (request):
     currencies = Currency.objects.all()
 
     if request.method == 'POST':
-        import pdb; pdb.set_trace();
+        # import pdb; pdb.set_trace();
         cid = request.POST.get("contact_id", "")
         if cid:
             con = Contact.objects.get(id=cid)
