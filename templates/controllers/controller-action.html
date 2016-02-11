@@ -198,9 +198,9 @@ table#sold_to_contact_details, table#location_contact_details {
 	    		str += "<td>";
 	    		
 	    		if(status == 'off') {
-	    			str += "<input type='checkbox' data-toggle='toggle' data-onstyle='success' data-offstyle='danger' data-on='Contact On' data-off='Contact Off' class='form-control con_status' name='controler_status_"+i+"' >";	
+	    			str += "<input type='checkbox' data-toggle='toggle' data-onstyle='success' data-offstyle='danger' data-on='Contact On' data-off='Contact Off' class='form-control con_status' name='controler_status_"+i+"' data-id='"+con_cons[i-1].id+"'>";	
 	    		} else if(status == 'on') {
-	    			str += "<input type='checkbox' data-toggle='toggle' data-onstyle='success' data-offstyle='danger' data-on='Contact On' data-off='Contact Off' class='form-control con_status' name='controler_status_"+i+"' checked >";
+	    			str += "<input type='checkbox' data-toggle='toggle' data-onstyle='success' data-offstyle='danger' data-on='Contact On' data-off='Contact Off' class='form-control con_status' name='controler_status_"+i+"' checked data-id='"+con_cons[i-1].id+"' ng-click>";
 	    		}
 	    		
 	    		
@@ -293,7 +293,7 @@ table#sold_to_contact_details, table#location_contact_details {
 	    		
 	    		str += "</td>";
 	    		str += "<td class='action'>";
-	    		str += "<a href='#' class='btn btn-danger pull-right remove-contact'>X</a>";
+	    		str += "<a href='#' class='btn btn-danger pull-right remove-contact' data-id=''>X</a>";
 	    		str += "</td>";
 	    		str += "</tr>";
 
@@ -387,6 +387,37 @@ table#sold_to_contact_details, table#location_contact_details {
         
     });
 
+    $(document).on("change", "input.con_status", function(e){
+        e.preventDefault();
+        var con_id = $(this).data("id");
+        console.log(con_id);
+        
+        var con_status = $(this).prop('checked');
+        if(con_id != undefined) {
+        	var url = "/controllers/contact/status/update/";
+
+	        $.ajax({
+	            type: "POST",
+	            url: url,
+	            
+	            data: {
+	                'id': con_id,
+	                'status': con_status
+	            },
+	            success: function(rdata) {
+
+	            }
+	        });	
+        } else {
+        	console.log($(this).prop('checked'));	
+        }
+
+        // console.log(con_id);
+        
+
+        return false;
+        
+    });
     
 
     // $('input.con_status').bootstrapToggle();

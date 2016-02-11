@@ -103,3 +103,21 @@ def contact_delete(request):
     except Exception, e:
         return HttpResponse("false")
     
+
+
+class ContactStatusUpdate(TemplateView):
+
+    def post(self, request):
+        # import pdb; pdb.set_trace();
+        con_con_id = request.POST.get("id","")
+        con_status = request.POST.get("status")
+        con_con = ControllerContact.objects.get(id=con_con_id)
+        if con_status == 'true':
+            con_con.status = 'on'
+        else:
+            con_con.status = 'off'
+
+        con_con.save()
+        con_con.controller.save()
+        
+        return HttpResponse('true')
