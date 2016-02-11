@@ -13,291 +13,226 @@
 		<div class="navbar-collapse collapse">
 			<ul class="nav navbar-nav">
 				<li class="active"><a href="/">Home</a></li>
-				
-				<li class="dropdown">
-					<a href="/contacts/add/" class="dropdown-toggle" data-toggle="dropdown">Contact <b class="caret"></b></a>
-					<ul class="dropdown-menu">
-						
-						<li><a href="/contacts/add/">Add Contact</a></li>
-						
-						
 
-						<li class="divider"></li>
-						<li class="dropdown-submenu">
-							<a href="/contacts/contact-type/">Contact Type</a>
-							<ul class="dropdown-menu">
-								
-								<li>
-									<a href="/contacts/contact-type/add/">
-										Add Contact Type
-									</a>
-								</li>
-								
-								<li>
-									<a href="/contacts/contact-type/">
-										Contact Type List
-									</a>
-								</li>
-								
-							</ul>
-						</li>
-						
-						<li class="divider"></li>
-						<li class="dropdown-submenu">
-							<a href="/contacts/terms/">Payment Terms</a>
-							<ul class="dropdown-menu">
-								
-								<li><a href="/contacts/term/add/">Add Terms</a></li>
-								
-								<li><a href="/contacts/terms/">Term List</a></li>
-								
-							</ul>
-						</li>
-						
-
-						
-						<li class="divider"></li>
-						<li class="dropdown-submenu">
-							<a href="/contacts/email-type/">Email Types</a>
-							<ul class="dropdown-menu">
-								
-								<li><a href="/contacts/email-type/add/">Add Email Type</a></li>
-								
-								<li><a href="/contacts/email-type/">Email Type List</a></li>
-								
-							</ul>
-						</li>
-						
-
-					
-						<li class="divider"></li>
-						<li class="dropdown-submenu">
-							<a href="/contacts/delivery-choice/">Shippling Method</a>
-							<ul class="dropdown-menu">
-								
-								<li><a href="/contacts/delivery-choice/">Shippling Method List</a></li>
-								
-							</ul>
-						</li>
-					
-
-					
-						<li class="divider"></li>
-						<li class="dropdown-submenu">
-							<a href="/contacts/distribution-method/">Distribution Method</a>
-							<ul class="dropdown-menu">
-								
-								<li>
-									<a href="/contacts/distribution-method/add/">
-										Add Distribution Method
-									</a>
-								</li>
-								
-								<li>
-									<a href="/contacts/distribution-method/">
-										Distribution Method List
-									</a>
-								</li>
-								
-							</ul>
-						</li>
-					
-
-
-						
-						<li class="divider"></li>
-						<li class="dropdown-submenu">
-							<a href="/contacts/currency/">Currency</a>
-							<ul class="dropdown-menu">
-								
-								<li><a href="/contacts/currency/add/">Add Currency</a></li>
-							
-								<li><a href="/contacts/currency/">Currency List</a></li>
-								
-							</ul>
-						</li>
-						
-
-						
-						<li class="divider"></li>
-						<li class="dropdown-submenu">
-						<a href="/contacts/phone-type/">Phone Type</a>
-							<ul class="dropdown-menu">
-								
-								<li><a href="/contacts/phone-type/add/">Add Phone Type</a></li>
-								
-								<li><a href="/contacts/phone-type/">Phone Type List</a></li>
-								
-							</ul>
-						</li>
-						
-						
-						</ul>
-				</li>
-				<li class="dropdown">
-					<a href="/controllers/" class="dropdown-toggle" data-toggle="dropdown">Controllers <b class="caret"></b></a>
-					<ul class="dropdown-menu">
-						<li>
-							<li><a href="/controllers/add/">Add Controller</a></li>
-						</li>
-					</ul>
-					
-				</li>
-				
-
-					{% if perms.inventory.view_item %}
-						<li class="dropdown">
-							<a href="#" class="dropdown-toggle" data-toggle="dropdown">Inventory <b class="caret"></b></a>
-							<ul class="dropdown-menu">
-								{% if perms.inventory.add_item %}
-								<li>
-									<a href="/inventory/item/add/">
-										Add Inventory Item
-									</a>
-								</li>
-								{% endif %}
-								<li>
-									<a href="/inventory/list/">
-										Inventory Item List
-									</a>
-								</li>
-								
-								{% if perms.inventory.view_itemunitmeasure %}
-								<li class="divider"></li>
-
-								<li class="dropdown-submenu">
-									<a href="/inventory/unit-measure-list/">Item Unit Mesure</a>
-									<ul class="dropdown-menu">
-										{% if perms.inventory.add_itemunitmeasure %}
-										<li><a href="/inventory/unit-measure/add/">Add Unit Measure</a></li>
-										{% endif %}
-										<li><a href="/inventory/unit-measure-list/">Unit Measure List</a></li>
-										
-									</ul>
-								</li>
-								{% endif %}
-
-								{% if perms.inventory.view_productiontype %}
-								<li class="divider"></li>
-
-								<li class="dropdown-submenu">
-									<a href="/inventory/production-type-list/">Production Type</a>
-									<ul class="dropdown-menu">
-										{% if perms.inventory.add_productiontype %}
-										<li><a href="/inventory/production-type/add/">Add Production Type</a></li>
-										{% endif %}
-										<li><a href="/inventory/production-type-list/">Production Type List</a></li>
-										
-									</ul>
-								</li>
-								{% endif %}
-
-								{% if perms.inventory.view_customsdesignation %}
-								<li class="divider"></li>
-
-								<li class="dropdown-submenu">
-									<a href="/inventory/custom-designation-list/">Custom Designation</a>
-									<ul class="dropdown-menu">
-										{% if perms.inventory.add_customsdesignation %}
-										<li><a href="/inventory/custom-designation/add/">Add Custom Designation</a></li>
-										{% endif %}
-										<li><a href="/inventory/custom-designation-list/">Custom Designation List</a></li>
-										
-									</ul>
-								</li>
-								{% endif %}
-								
-								{% if perms.purchase.view_deliverinternal %}
-								<li class="divider"></li>
-
-								<li class="dropdown-submenu">
-									<a href="/inventory/deliverinternal-list/">Deliver Internal</a>
-									<ul class="dropdown-menu">
-										
-										<li><a href="/inventory/deliverinternal/add/">Add Deliver Internal</a></li>
-										
-										<li><a href="/inventory/deliverinternal-list/">Deliver Internal List</a></li>
-										
-									</ul>
-								</li>
-								{% endif %}
-
-								<li class="divider"></li>
-								<li class="dropdown-submenu">
-								<a href="/inventory/deliverinternal-list/">Department</a>
+				{% if user.is_authenticated %}
+					<li class="dropdown">
+						<a href="/contacts/add/" class="dropdown-toggle" data-toggle="dropdown">
+							Contact <b class="caret"></b>
+						</a>
+						<ul class="dropdown-menu">					
+							<li><a href="/contacts/add/">Add Contact</a></li>
+							<li class="divider"></li>
+							<li class="dropdown-submenu">
+								<a href="/contacts/contact-type/">Contact Type</a>
 								<ul class="dropdown-menu">
+									<li>
+										<a href="/contacts/contact-type/add/">
+											Add Contact Type
+										</a>
+									</li>
 									
-										<li><a href="/scomuser/department/add/">Add Department</a></li>
-									
-
-									<li><a href="/scomuser/departments/">Department List</a></li>
+									<li>
+										<a href="/contacts/contact-type/">
+											Contact Type List
+										</a>
+									</li>
 									
 								</ul>
+							</li>
+							<li class="divider"></li>
+							<li class="dropdown-submenu">
+								<a href="/contacts/terms/">Payment Terms</a>
+								<ul class="dropdown-menu">
+									
+									<li><a href="/contacts/term/add/">Add Terms</a></li>
+									
+									<li><a href="/contacts/terms/">Term List</a></li>
+									
+								</ul>
+							</li>
+							<li class="divider"></li>
+							<li class="dropdown-submenu">
+								<a href="/contacts/email-type/">Email Types</a>
+								<ul class="dropdown-menu">
+									
+									<li><a href="/contacts/email-type/add/">Add Email Type</a></li>
+									
+									<li><a href="/contacts/email-type/">Email Type List</a></li>
+									
+								</ul>
+							</li>
+
+							<li class="divider"></li>
+							<li class="dropdown-submenu">
+								<a href="/contacts/delivery-choice/">Shippling Method</a>
+								<ul class="dropdown-menu">
+									<li><a href="/contacts/delivery-choice/">Shippling Method List</a></li>
+								</ul>
+							</li>
+
+							<li class="divider"></li>
+							<li class="dropdown-submenu">
+								<a href="/contacts/distribution-method/">Distribution Method</a>
+								<ul class="dropdown-menu">
+									<li>
+										<a href="/contacts/distribution-method/add/">
+											Add Distribution Method
+										</a>
+									</li>
+									<li>
+										<a href="/contacts/distribution-method/">
+											Distribution Method List
+										</a>
+									</li>
+								</ul>
+							</li>
+							<li class="divider"></li>
+							<li class="dropdown-submenu">
+								<a href="/contacts/currency/">Currency</a>
+								<ul class="dropdown-menu">
+									
+									<li><a href="/contacts/currency/add/">Add Currency</a></li>
 								
+									<li><a href="/contacts/currency/">Currency List</a></li>
+									
+								</ul>
+							</li>
 
-								
-							</ul>
-						</li>
-					{% endif %}
+							<li class="divider"></li>
+							<li class="dropdown-submenu">
+							<a href="/contacts/phone-type/">Phone Type</a>
+								<ul class="dropdown-menu">
+									
+									<li><a href="/contacts/phone-type/add/">Add Phone Type</a></li>
+									
+									<li><a href="/contacts/phone-type/">Phone Type List</a></li>
+									
+								</ul>
+							</li>
+						</ul>
+					</li>
+					
+					<li class="dropdown">
+						<a href="/controllers/" class="dropdown-toggle" data-toggle="dropdown">Controllers <b class="caret"></b></a>
+						<ul class="dropdown-menu">
+							<li>
+								<li><a href="/controllers/add/">Add Controller</a></li>
+							</li>
+						</ul>
+					</li>
 
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Inventory <b class="caret"></b></a>
+						<ul class="dropdown-menu">
+							<li>
+								<a href="/inventory/item/add/">
+									Add Inventory Item
+								</a>
+							</li>
+							<li>
+								<a href="/inventory/list/">
+									Inventory Item List
+								</a>
+							</li>
+							
+							<li class="divider"></li>
 
+							<li class="dropdown-submenu">
+								<a href="/inventory/unit-measure-list/">Item Unit Mesure</a>
+								<ul class="dropdown-menu">
+									<li><a href="/inventory/unit-measure/add/">Add Unit Measure</a></li>
+									<li><a href="/inventory/unit-measure-list/">Unit Measure List</a></li>
+								</ul>
+							</li>
 
-					<!--  Start of Order Control menu -->
-					{% if perms.purchase.view_shipping_list %}
-						<li class="dropdown">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Order Control<b class="caret"></b></a>
+							<li class="divider"></li>
+
+							<li class="dropdown-submenu">
+								<a href="/inventory/production-type-list/">Production Type</a>
+								<ul class="dropdown-menu">
+									<li><a href="/inventory/production-type/add/">Add Production Type</a></li>
+									<li><a href="/inventory/production-type-list/">Production Type List</a></li>
+									
+								</ul>
+							</li>
+
+							<li class="divider"></li>
+
+							<li class="dropdown-submenu">
+								<a href="/inventory/custom-designation-list/">Custom Designation</a>
+								<ul class="dropdown-menu">
+									<li><a href="/inventory/custom-designation/add/">Add Custom Designation</a></li>
+									<li><a href="/inventory/custom-designation-list/">Custom Designation List</a></li>
+									
+								</ul>
+							</li>
+							
+							<li class="divider"></li>
+
+							<li class="dropdown-submenu">
+								<a href="/inventory/deliverinternal-list/">Deliver Internal</a>
+								<ul class="dropdown-menu">
+									
+									<li><a href="/inventory/deliverinternal/add/">Add Deliver Internal</a></li>
+									
+									<li><a href="/inventory/deliverinternal-list/">Deliver Internal List</a></li>
+									
+								</ul>
+							</li>
+
+							<li class="divider"></li>
+							<li class="dropdown-submenu">
+							<a href="/inventory/deliverinternal-list/">Department</a>
 							<ul class="dropdown-menu">
 								
+									<li><a href="/scomuser/department/add/">Add Department</a></li>
+								
 
-
-								{% if perms.purchase.view_invoice %}
-								<li class="divider"></li>
-								<li class="dropdown-submenu">
-									<a href="/purchase/invoice-list/">Invoice</a>
-									<ul class="dropdown-menu">
-										<li>
-											<a href="/purchase/add-invoice/">
-												Add / Update Invoice
-											</a>
-										</li>
-										<li>
-											<a href="/purchase/invoice-list/">
-												View Invoice List 
-											</a>
-										</li>
-									</ul>
-								</li>
-								{% endif %}
-
+								<li><a href="/scomuser/departments/">Department List</a></li>
+								
 							</ul>
-						</li>
+							
+						</ul>
+					</li>
 
-					{% endif %}
-					
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Order Control<b class="caret"></b></a>
+						<ul class="dropdown-menu">
+							<li class="divider"></li>
+							<li class="dropdown-submenu">
+								<a href="/purchase/invoice-list/">Invoice</a>
+								<ul class="dropdown-menu">
+									<li>
+										<a href="/purchase/add-invoice/">
+											Add / Update Invoice
+										</a>
+									</li>
+									<li>
+										<a href="/purchase/invoice-list/">
+											View Invoice List 
+										</a>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</li>
 
-					
-
-					{% if perms.report.view_recuringreport or perms.report.view_singlereport or perms.report.view_report %}
-						<li class="dropdown">
+					<li class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Report Que<b class="caret"></b></a>
 						<ul class="dropdown-menu">
-							
-							{% if perms.report.view_singlereport %}
+						
 							<li>
 								<a href="/report/lists/#/report/single-job-list">
 									Current Jobs
 								</a>
 							</li>
-							{% endif %}
-							{% if perms.report.add_singlereport %}
+							
 							<li>
 								<a href="/report/singlejob/add/">
 									Add Single Report job
 								</a>
 							</li>
-							{% endif %}
-							
-							{% if perms.report.add_recuringreport or perms.report.add_singlereport %}
+						
 							<li class="divider"></li>
 							<li class="dropdown-submenu">
 								<a href="/report/report-types/">Recurring Jobs</a>
@@ -307,33 +242,27 @@
 											List Recurring Jobs
 										</a>
 									</li>
-										{% if perms.report.add_recuringreport %}
 							
 										<li>
 											<a href="/report/recuring/add/">
 												Add Recuring Report job
 											</a>
 										</li>
-										{% endif %}
-										
 									
 								</ul>
 							</li>
-							{% endif %}
-							
-							{% if perms.report.view_report %}
+						
 							<li class="divider"></li>
 							<li class="dropdown-submenu">
 								<a href="/report/report-types/">Reports</a>
 								<ul class="dropdown-menu">
 									
-									{% if perms.report.add_report %}
 									<li>
 										<a href="/report/add/">
 											Add Report
 										</a>
 									</li>
-									{% endif %}
+									
 									<li>
 										<a href="/report/list/">
 											Report List
@@ -341,20 +270,16 @@
 									</li>
 								</ul>
 							</li>
-							{% endif %}
-
-							{% if perms.report.view_printer %}
+						
 							<li class="divider"></li>
 							<li class="dropdown-submenu">
 								<a href="/report/printer/">Printer setup</a>
 								<ul class="dropdown-menu">
-									{% if perms.report.add_printer %}
 									<li>
 										<a href="/report/printer/add/">
 											Add printer
 										</a>
 									</li>
-									{% endif %}
 									<li>
 										<a href="/report/printer/list/">
 											printer List
@@ -363,37 +288,31 @@
 									
 								</ul>
 							</li>
-							{% endif %}
-
+						
 						</ul>
 					</li>
-					{% endif %}
-
-					<!-- Start of Events menu -->
-
-					{% if perms.events.view_events or perms.events.view_controllers %}
-						<li class="dropdown">
+						
+					<li class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Events <b class="caret"></b></a>
 						<ul class="dropdown-menu">
-							{% if perms.events.view_events %}
+							
 							<li>
 								<a href="/events/#/events/list/">
 									Current Events
 								</a>
 							</li>
-							{% endif %}
-							{% if perms.events.view_controllers %}
+							
 							<li class="divider"></li>
 							<li class="dropdown-submenu">
 								<a href="/events/controllers/">Controllers</a>
 								<ul class="dropdown-menu">
-									{% if perms.events.add_controllers %}
+							
 									<li>
 										<a href="/events/controllers/add/">
 											Add Controller
 										</a>
 									</li>
-									{% endif %}
+							
 									<li>
 										<a href="/events/controllers/#/events/controller-list">
 											Controllers List
@@ -402,20 +321,17 @@
 									
 								</ul>
 							</li>
-							{% endif %}
-
-							{% if perms.events.view_evententry %}
+							
 							<li class="divider"></li>
 							<li class="dropdown-submenu">
 								<a href="/events/controllers/">Payroll Event </a>
 								<ul class="dropdown-menu">
-									{% if perms.events.add_evententry %}
 									<li>
 										<a href="/events/evententry/add/">
 											Add Event Entry
 										</a>
 									</li>
-									{% endif %}
+									
 									<li>
 										<a href="/events/entry/list/#/events/event-entry-list">
 											Event Entry List
@@ -423,13 +339,12 @@
 									</li>
 									<li class="divider"></li>
 
-									{% if perms.events.add_evententry %}
 									<li>
 										<a href="/events/eventpayroll/add/">
 											Add Event Payroll
 										</a>
 									</li>
-									{% endif %}
+
 									<li>
 										<a href="/events/payroll/list/">
 											List Event Payroll
@@ -438,78 +353,65 @@
 									
 								</ul>
 							</li>
-							{% endif %}
-
-
 						</ul>
 					</li>
-					{% endif %}
-					<!-- End of Events menu -->
 
-
-					<!-- Unitility menu -->
-					{% if perms.auth.view_utility %}
-						<li class="dropdown">
+					<li class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Utility <b class="caret"></b></a>
-							<ul class="dropdown-menu">
-								{% if perms.scomuser.send_massmail %}
-								<li>
-									<a href="/send-mass-mail/">
-										Send mass email
-									</a>
-								</li>
-								{% endif %}
-
-								{% if perms.scomuser.view_massmail %}
-
-								<li>
-									<a href="/mass-mail-status/#/get-mass-mails">
-										Mass email status
-									</a>
-								</li>
-								{% endif %}
-								<li class="divider"></li>
-								<li>
-									<a href="/system-variable/">
-										System variables
-									</a>
-								</li>
-								<li class="divider"></li>
-								<li class="dropdown-submenu">
-								<a href="/events/controllers/">Reindex Database</a>
-									<ul  class="dropdown-menu">
-										<li>
-											<a href="/contacts/contact/reindex/">
-												Contact reindex
-											</a>
-										</li>
-										<li>
-											<a href="/inventory/item/reindex/">
-												Inventory Iten reindex
-											</a>
-										</li>
-										<li>
-											<a href="/purchase/po/reindex/">
-												PO reindex
-											</a>
-										</li>
-										<li>
-											<a href="/purchase/sl/reindex/">
-												SL reindex
-											</a>
-										</li>
-										
-										<li>
-											<a href="/schedule/sjob/reindex/">
-												Schedule job reindex
-											</a>
-										</li>	
-									</ul>
-								</li>
-
-							</ul>
-						</li>
-					{% endif %}
+						<ul class="dropdown-menu">
+							<li>
+								<a href="/send-mass-mail/">
+									Send mass email
+								</a>
+							</li>
+							
+							<li>
+								<a href="/mass-mail-status/#/get-mass-mails">
+									Mass email status
+								</a>
+							</li>
+							
+							<li class="divider"></li>
+							<li>
+								<a href="/system-variable/">
+									System variables
+								</a>
+							</li>
+							<li class="divider"></li>
+							<li class="dropdown-submenu">
+							<a href="/events/controllers/">Reindex Database</a>
+								<ul  class="dropdown-menu">
+									<li>
+										<a href="/contacts/contact/reindex/">
+											Contact reindex
+										</a>
+									</li>
+									<li>
+										<a href="/inventory/item/reindex/">
+											Inventory Iten reindex
+										</a>
+									</li>
+									<li>
+										<a href="/purchase/po/reindex/">
+											PO reindex
+										</a>
+									</li>
+									<li>
+										<a href="/purchase/sl/reindex/">
+											SL reindex
+										</a>
+									</li>
+									
+									<li>
+										<a href="/schedule/sjob/reindex/">
+											Schedule job reindex
+										</a>
+									</li>	
+								</ul>
+							</li>
+						</ul>
+					</li>
+				{% endif %}
 			</ul>
 
 		</div><!--/.nav-collapse -->
