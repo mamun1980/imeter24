@@ -251,7 +251,7 @@ table#sold_to_contact_details, table#location_contact_details {
 	    	// alert($scope.no_of_contacts);
 	    	var head = contacts_container.find("thead");
 	    	var contacts = contacts_container.find("tr.concon");
-
+	    	console.log(contacts.length);
 	    	if(head.length == 0){
 
 	    		var hd = "<thead class='bg-info'><tr>";
@@ -271,8 +271,15 @@ table#sold_to_contact_details, table#location_contact_details {
 	    		contacts_container.append(hd);
 	    	}
 
-	    	// if(cont)
-	    	for(var i=1; i<=$scope.no_of_contacts; i++) {
+	    	if(contacts.length > 0) {
+	    		var totalcontacts = contacts.length+1;
+	    		var lastloop = $scope.no_of_contacts + totalcontacts;
+	    	} else {
+	    		var totalcontacts = 1;
+	    		var lastloop = $scope.no_of_contacts;
+	    	}
+
+	    	for(var i=totalcontacts; i<=lastloop; i++) {
 	    		var str = "<tr class='concon'>";
 	    		str += "<td>";
 	    		str += "["+i+"]";
