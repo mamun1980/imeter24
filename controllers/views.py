@@ -80,6 +80,17 @@ class ControllerList(ListView):
         return HttpResponse(data, content_type='application/json')
 
 @csrf_exempt
+def controller_delete(request, id):
+    # import pdb; pdb.set_trace();
+    try:
+        controller = Controller.objects.get(controller_id=id)
+        contacts = ControllerContact.objects.filter(controller=controller)
+        controller.delete()
+        return HttpResponse("true")
+    except Exception, e:
+        return HttpResponse("false")
+
+@csrf_exempt
 def contact_delete(request):
     # import pdb; pdb.set_trace();
     con_id = request.POST.get("id")

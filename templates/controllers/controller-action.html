@@ -62,7 +62,7 @@ table#sold_to_contact_details, table#location_contact_details {
 			<div class="col-md-6">
 			    <div class="panel panel-primary">
 					<div class="panel-heading">
-				    	<h2 style="display:inline;font-family: 'Courgette', cursive;">List of contacts</h2>
+				    	<h2 style="display:inline;font-family: 'Courgette', cursive;">List of Relay Contacts</h2>
 				    	
 				  	</div>
 				  	<div class="panel-body">
@@ -93,8 +93,9 @@ table#sold_to_contact_details, table#location_contact_details {
 	});
 	controllerApp.controller('ControllerController',['$scope', '$http', function ($scope, $http) {
 		$scope.init = function(){
-	        console.log("Hello world!");
+
 	        $scope.contact_list = false;
+	        $scope.new_controller = true;
 
 	        $("#sold_to_details_row").hide();
 	        $("#sold_to_contact_list").hide();
@@ -119,10 +120,11 @@ table#sold_to_contact_details, table#location_contact_details {
 	            $http({method: 'GET', url: url}).
 	                success(function(data, status, headers, config) {
 	                    $scope.controllers = data.results;
+	                    if(data.results.length > 0) {
+	                    	$("#controller_list").show();	
+	                    }
+	                    
 	                });
-	            $("#controller_list").show();
-	            
-	            
 	        } else {
 	            $("#controller_list").hide();
 	        }
@@ -130,6 +132,7 @@ table#sold_to_contact_details, table#location_contact_details {
 
 	    $scope.selectController = function(controller) {
 	    	console.log(controller);
+	    	$scope.new_controller = false;
 	    	$("#controller_list").hide();
 	    	$scope.search_controller = controller.controller_id;
 	    	$("#id_controller_id").val(controller.controller_id);
@@ -184,7 +187,7 @@ table#sold_to_contact_details, table#location_contact_details {
 
 	    	for(var i=1; i <= con_cons.length; i++) {
 	    		var status = con_cons[i-1].status;
-	    		var str = "<tr>";
+	    		var str = "<tr class='concon'>";
 	    		str += "<td>";
 	    		str += "["+con_cons[i-1].contact_id+"]";
 	    		str += "<input type=hidden class='form-control' name='con_id' value='"+con_cons[i-1].contact_id+"'>";
@@ -214,10 +217,40 @@ table#sold_to_contact_details, table#location_contact_details {
 
 	    }
 
+	    $scope.deleteController = function() {
+	    	var status = confirm("Are you sure want to delete this controller?");
+	    	if(status == true) {
+	    		var cont_id = $("#id_controller_id").val();
+	    		var url = "/controllers/delete/"+cont_id+"/";
+
+	    		$.ajax({
+	                type: "POST",
+	                url: url,
+	                
+	                data: {
+	                    'id': cont_id,
+	                },
+	                success: function(rdata) {
+	                	if(rdata == "true") {
+	                		window.location.reload();
+	                		alert("Controller deleted");
+	                	} else {
+	                		alert("Controller not deleted");
+	                	}
+	                }
+	            });
+
+	    	} else {
+	    		console.log("false");
+	    	}
+	    	return false;
+	    }
+
 	    $scope.generateContacts = function() {
 	    	var contacts_container = $("#controller_contacts");
 	    	// alert($scope.no_of_contacts);
 	    	var head = contacts_container.find("thead");
+	    	var contacts = contacts_container.find("tr.concon");
 
 	    	if(head.length == 0){
 
@@ -238,8 +271,9 @@ table#sold_to_contact_details, table#location_contact_details {
 	    		contacts_container.append(hd);
 	    	}
 
+	    	// if(cont)
 	    	for(var i=1; i<=$scope.no_of_contacts; i++) {
-	    		var str = "<tr>";
+	    		var str = "<tr class='concon'>";
 	    		str += "<td>";
 	    		str += "["+i+"]";
 	    		str += "<input type=hidden class='form-control' name='con_id' value='"+i+"'>";
