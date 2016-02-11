@@ -3,35 +3,41 @@
 
 {% block content %}
 <style type="text/css">
-	th.action, td.action {
-		width: 55px;
-	}
-	.sold_to_contact tbody tr:hover{
-		background-color: #616183;
-	}
-	#sold_to_contact_list tbody {
-    color: #FFF;
-    background-color: #333;
-    font-size: 14px;
+th.action, td.action {
+	width: 55px;
 }
-#sold_to_contact_list thead {
+.sold_to_contact tbody tr:hover, .location_contact tbody tr:hover{
+	background-color: #616183;
+}
+#sold_to_contact_list tbody, #location_contact_list tbody, #controller_list tbody {
+color: #FFF;
+background-color: #333;
+font-size: 14px;
+}
+#sold_to_contact_list thead, #location_contact_list thead, #controller_list thead  {
     color: #FFF;
     background-color: #ed791a;
     font-size: 16px;
 }
-#sold_to_contact_list, #ship_to_contact_list {
+#sold_to_contact_list, #location_contact_list, #controller_list {
     width: 980px !important;
     position: absolute;
     top: 34px;
     z-index: 1000;
 }
-table#sold_to_contact_details th{
+#controller_list {
+	width: 760px !important;
+}
+#controller_list tbody tr:hover{
+	background-color: #444;
+}
+table#sold_to_contact_details th, table#location_contact_details th{
 	background-color: #83AD9E;
 }
 .contact_box{
 	position: relative;
 }
-table#sold_to_contact_details {
+table#sold_to_contact_details, table#location_contact_details {
 	margin-top: 10px;
 }
 </style>
@@ -89,19 +95,129 @@ table#sold_to_contact_details {
 		$scope.init = function(){
 	        console.log("Hello world!");
 	        $scope.contact_list = false;
-	        
+
+	        $("#sold_to_details_row").hide();
 	        $("#sold_to_contact_list").hide();
         	$("#sold_to_contact_details").hide();
+
+        	$("#location_details_row").hide();
+        	$("#location_contact_list").hide();
+        	$("#location_contact_details").hide();
 	        
+	        $("#controller_list").hide();
 	        // $scope.gst_tax_exempt = true;
 	    }
 	    $scope.init();
+	    
+	    $scope.hideControllerList = function() {
+	    	$("#controller_list").hide();
+	    };
+
+	    $scope.searchController  = function(q) {
+	        if(q.length > 1) {
+	            url = "/controllers/list-json/?q=" + q
+	            $http({method: 'GET', url: url}).
+	                success(function(data, status, headers, config) {
+	                    $scope.controllers = data.results;
+	                });
+	            $("#controller_list").show();
+	            
+	            
+	        } else {
+	            $("#controller_list").hide();
+	        }
+	    };
+
+	    $scope.selectController = function(controller) {
+	    	console.log(controller);
+	    	$("#controller_list").hide();
+	    	$scope.search_controller = controller.controller_id;
+	    	$("#id_controller_id").val(controller.controller_id);
+
+	    	// set sold_to ====
+	    	if(controller.sold_to){
+	    		$("#id_sold_to").val(controller.sold_to.id);
+		    	$scope.search_sold_to = controller.sold_to.contact_name;
+		    	$scope.sold_to_contact = controller.sold_to;
+		    	$("#sold_to_details_row").show();
+				$("#sold_to_contact_details").show();	
+	    	}
+	    	
+
+			// set location ====
+			if(controller.location){
+				$scope.search_location = controller.location.contact_name;
+				$scope.location_contact = controller.location;
+				$("#id_location").val(controller.location.id);
+				$("#location_details_row").show();
+				$("#location_contact_details").show();
+			}
+			
+			$("#id_controller_type").val(controller.controller_type);
+
+			var con_cons = controller.controller_contacts;
+			$scope.no_of_contacts = con_cons.length;
+
+			// Setting up contacts ==========
+			var contacts_container = $("#controller_contacts");
+	    	// alert($scope.no_of_contacts);
+	    	var head = contacts_container.find("thead");
+
+	    	if(head.length == 0){
+
+	    		var hd = "<thead class='bg-info'><tr>";
+	    		hd += "<th>";
+	    		hd += "Contact ID";
+	    		hd += "</th>";
+	    		hd += "<th>";
+	    		hd += "Contact Description";
+	    		hd += "</th>";
+	    		hd += "<th>";
+	    		hd += "Status";
+	    		hd += "</th>";
+	    		hd += "<th class='pull-right action'>";
+	    		hd += "Action";
+	    		hd += "</th>";
+	    		hd += "</tr></thead>";
+	    		contacts_container.append(hd);
+	    	}
+
+	    	for(var i=1; i <= con_cons.length; i++) {
+	    		var status = con_cons[i-1].status;
+	    		var str = "<tr>";
+	    		str += "<td>";
+	    		str += "["+con_cons[i-1].contact_id+"]";
+	    		str += "<input type=hidden class='form-control' name='con_id' value='"+con_cons[i-1].contact_id+"'>";
+	    		str += "</td>";
+	    		str += "<td>";
+	    		str += "<input type=text class='form-control' name='con_description' value='"+con_cons[i-1].description+"'>";
+	    		str += "</td>";
+	    		str += "<td>";
+	    		
+	    		if(status == 'off') {
+	    			str += "<input type='checkbox' data-toggle='toggle' data-onstyle='success' data-offstyle='danger' data-on='Contact On' data-off='Contact Off' class='form-control con_status' name='controler_status_"+i+"' >";	
+	    		} else if(status == 'on') {
+	    			str += "<input type='checkbox' data-toggle='toggle' data-onstyle='success' data-offstyle='danger' data-on='Contact On' data-off='Contact Off' class='form-control con_status' name='controler_status_"+i+"' checked >";
+	    		}
+	    		
+	    		
+	    		str += "</td>";
+	    		str += "<td class='action'>";
+	    		str += "<a href='#' class='btn btn-danger pull-right remove-contact' data-id='"+con_cons[i-1].id+"'>X</a>";
+	    		str += "</td>";
+	    		str += "</tr>";
+
+	    		contacts_container.append(str);
+	    	}
+
+	    	$('input.con_status').bootstrapToggle();
+
+	    }
 
 	    $scope.generateContacts = function() {
 	    	var contacts_container = $("#controller_contacts");
 	    	// alert($scope.no_of_contacts);
 	    	var head = contacts_container.find("thead");
-	    	console.log(head.length);
 
 	    	if(head.length == 0){
 
@@ -160,7 +276,7 @@ table#sold_to_contact_details {
 	        } else {
 	            $("#sold_to_contact_list").hide();
 	        }
-	    }
+	    };
 
 	    $scope.selectSoldTo = function(con) {
 	    	console.log(con);
@@ -168,12 +284,36 @@ table#sold_to_contact_details {
 			$scope.search_sold_to = con.contact_name;
 			$scope.sold_to_contact = con;
 			$("#id_sold_to").val(con.id);
+			$("#sold_to_details_row").show();
 			$("#sold_to_contact_details").show();
-
-
 		};
 
-	    
+		$scope.searchLocation  = function(q) {
+	        if(q.length > 1) {
+	            url = "/contacts/search/?q=" + q
+	            $http({method: 'GET', url: url}).
+	                success(function(data, status, headers, config) {
+	                	console.log(data);
+	                    $scope.location_contact = data;
+	                });
+	            $("#location_contact_list").show();
+
+	        } else {
+	            $("#location_contact_list").hide();
+	        }
+	    }
+
+	    $scope.selectLocation = function(con) {
+	    	// console.log(con);
+			$("#location_contact_list").hide();
+			$scope.search_location = con.contact_name;
+			$scope.location_contact = con;
+			$("#id_location").val(con.id);
+			$("#location_details_row").show();
+			$("#location_contact_details").show();
+		};
+
+			    
 
 
 
@@ -184,7 +324,24 @@ table#sold_to_contact_details {
         
         var row = $(this).closest("tr");
         row.remove();
-        
+        var cpid = $(this).data("id");
+        console.log(cpid);	
+        if(cpid != ""){
+            var url = "/controllers/contact/delete/";
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                
+                data: {
+                    'id': cpid,
+                },
+                success: function(rdata) {
+
+                }
+            });    
+        }
+
         return false;
         
     });

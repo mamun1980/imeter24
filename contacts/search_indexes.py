@@ -70,11 +70,11 @@ class ContactIndex(indexes.SearchIndex, indexes.Indexable):
         contact_types = ContactContactType.objects.filter(contact=obj)
         ctlist = []
         for ct in contact_types:
-            ct = {}
-            ct['contact_type'] = ct.contact_type.contact_type
-            ct['description'] = ct.description
-            ct['id'] = ct.id
-            ctlist.append(ct)
+            ctd = {}
+            ctd['contact_type'] = ct.contact_type.contact_type
+            ctd['description'] = ct.description
+            ctd['id'] = ct.id
+            ctlist.append(ctd)
 
         self.prepared_data['contact_types'] = ctlist
 

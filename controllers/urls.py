@@ -5,5 +5,6 @@ from controllers.views import *
 urlpatterns = patterns('',
     # Examples:
     url(r'^add/$', ControllerFormAction.as_view()),
-    url(r'^list/$', ControllerList.as_view()),
+    url(r'^list-json/$', ControllerList.as_view()),
+    url(r'^contact/delete/$', "controllers.views.contact_delete"),
 )

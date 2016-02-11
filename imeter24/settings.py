@@ -224,6 +224,16 @@ HAYSTACK_CONNECTIONS = {
         'URL': 'http://10.221.0.42:9202/',
         'INDEX_NAME': 'contact',
         "INDEX": "not_analyzed",
+        'EXCLUDED_INDEXES': ['controller.search_indexes.ControllerIndex','scomuser.search_indexes.UserIndex',],
+    },
+    'controller': {
+        # 'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+        'ENGINE': 'imeter24.search_backend.ConfigurableElasticSearchEngine',
+        # 'ENGINE': 'elasticstack.backends.ConfigurableElasticSearchEngine',
+        'URL': 'http://10.221.0.42:9202/',
+        'INDEX_NAME': 'controller',
+        "INDEX": "not_analyzed",
+        'EXCLUDED_INDEXES': ['contacts.search_indexes.ContactIndex','scomuser.search_indexes.UserIndex',],
     },
     
 }
@@ -246,4 +256,5 @@ HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 
 HAYSTACK_ROUTERS = [
                 'contacts.routers.ContactRouter',
+                'controllers.routers.ControllerRouter',
                 'haystack.routers.DefaultRouter',]

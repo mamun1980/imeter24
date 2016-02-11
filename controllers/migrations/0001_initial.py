@@ -12,7 +12,7 @@ class Migration(SchemaMigration):
         db.create_table(u'controllers_controller', (
             ('controller_id', self.gf('django.db.models.fields.CharField')(max_length=20, primary_key=True)),
             ('sold_to', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='controller_sold_to', null=True, to=orm['contacts.Contact'])),
-            ('location', self.gf('django.db.models.fields.CharField')(max_length=200, null=True, blank=True)),
+            ('location', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='controller_location', null=True, to=orm['contacts.Contact'])),
             ('controller_type', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
         ))
         db.send_create_signal(u'controllers', ['Controller'])
@@ -90,7 +90,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Controller'},
             'controller_id': ('django.db.models.fields.CharField', [], {'max_length': '20', 'primary_key': 'True'}),
             'controller_type': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'location': ('django.db.models.fields.CharField', [], {'max_length': '200', 'null': 'True', 'blank': 'True'}),
+            'location': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'controller_location'", 'null': 'True', 'to': u"orm['contacts.Contact']"}),
             'sold_to': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'controller_sold_to'", 'null': 'True', 'to': u"orm['contacts.Contact']"})
         },
         u'controllers.controllercontact': {

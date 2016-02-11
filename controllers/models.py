@@ -6,7 +6,7 @@ from contacts.models import Contact
 class Controller(models.Model):
 	controller_id = models.CharField(max_length=20, primary_key=True)
 	sold_to = models.ForeignKey(Contact, blank=True, null=True, related_name='controller_sold_to')
-	location = models.CharField(max_length=200, blank=True, null=True)
+	location = models.ForeignKey(Contact, blank=True, null=True, related_name='controller_location')
 	controller_type = models.CharField(max_length=100, blank=True, null=True)
 	
 	class Meta:
