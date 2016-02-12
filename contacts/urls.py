@@ -60,6 +60,7 @@ urlpatterns = patterns('',
     url(r'^contact-type/add/$', 'contacts.views.contact_type_add', name='sc-contact-type-add-ajax'),
     url(r'^contact-type/edit/(?P<ctid>\d+)/$', 'contacts.views.contact_type_edit', name='sc-contact-type-edit'),
     url(r'^contact-type/delete/$', 'contacts.views.contact_type_delete', name='sc-contact-type-delete'),
+    # url(r'^contacttype/delete/$', 'contacts.views.contacttype_delete', name='sc-contact-type-delete'),
 
     url(r'^contact-contact-type/add/$', 'contacts.views.contact_contact_type_add', name='contact-contact-type-add-ajax'),
     url(r'^contact-contact-type/edit/(?P<cctid>\d+)/$', 'contacts.views.contact_contact_type_edit', name='contact-contact-type-edit'),

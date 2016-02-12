@@ -370,12 +370,11 @@ def sc_contact_add_rel_item(request):
 @permission_required('contacts.delete_contact')
 def contact_delete(request):
     if request.method == "POST":
+        # import pdb; pdb.set_trace();
         cid = request.POST.get("cid")
-        if cid:
-            contact = Contact.objects.get(id=cid)
-            contact_profile = ContactProfile.objects.get(contact=contact)
         try:
             # contact_profile.delete()
+            contact = Contact.objects.get(id=cid)
             contact.delete()
             return HttpResponse(cid)
         except:
@@ -693,7 +692,8 @@ def contact_contact_type_edit(request, cctid):
 @permission_required("contacts.delete_contactcontacttype")
 def contact_contact_type_delete(request):
     if request.method == 'POST':
-        cctid = request.POST.get("cctid")
+        # import pdb; pdb.set_trace();
+        cctid = request.POST.get("cpid")
         contact_contact_type = ContactContactType.objects.get(id=cctid)
         con = contact_contact_type.contact
         try:

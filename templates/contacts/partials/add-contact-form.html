@@ -93,7 +93,7 @@
 	
 		<tr>
 			<td><label for="id_address_1">Address 1:</label></td>
-			<td colspan="3"><input class="form-control" id="id_address_1" maxlength="64" name="address_1" placeholder="Address 1" type="text" value="1400 Phillip Murray Avenue"></td>
+			<td colspan="3"><input class="form-control" id="id_address_1" maxlength="64" name="address_1" placeholder="Address 1" type="text" value=""></td>
 		</tr>
 	
 		<tr>
@@ -103,22 +103,22 @@
 	
 		<tr>
 			<td><label for="id_city">City:</label></td>
-			<td colspan="3"><input class="form-control" id="id_city" maxlength="64" name="city" placeholder="City" type="text" value="Oshawa"></td>
+			<td colspan="3"><input class="form-control" id="id_city" maxlength="64" name="city" placeholder="City" type="text" value=""></td>
 		</tr>
 	
 		<tr>
 			<td><label for="id_province">Province:</label></td>
-			<td colspan="3"><input class="form-control" id="id_province" maxlength="64" name="province" placeholder="Province" type="text" value="Ontario"></td>
+			<td colspan="3"><input class="form-control" id="id_province" maxlength="64" name="province" placeholder="Province" type="text" value=""></td>
 		</tr>
 	
 		<tr>
 			<td><label for="id_country">Country:</label></td>
-			<td colspan="3"><input class="form-control" id="id_country" maxlength="40" name="country" placeholder="Country" type="text" value="Canada"></td>
+			<td colspan="3"><input class="form-control" id="id_country" maxlength="40" name="country" placeholder="Country" type="text" value=""></td>
 		</tr>
 	
 		<tr>
 			<td><label for="id_postal_code">Postal code:</label></td>
-			<td colspan="3"><input class="form-control" id="id_postal_code" maxlength="15" name="postal_code" placeholder="Postal Code" type="text" value="L1J 7E8"></td>
+			<td colspan="3"><input class="form-control" id="id_postal_code" maxlength="15" name="postal_code" placeholder="Postal Code" type="text" value=""></td>
 		</tr>
 	
 		<tr>
@@ -131,7 +131,8 @@
 			<td><label for="id_gst_tax_exempt">Gst tax exempt:</label></td>
 			<td>
 				<input id="id_gst_tax_exempt" ng-model="gst_tax_exempt" name="gst_tax_exempt" type="checkbox">
-
+			</td>
+			<td>
 				<label class="pull-right" ng-show="gst_tax_exempt" for="id_gst_number">Gst number:</label>
 			</td>
 			<td><input class="form-control" id="id_gst_number" maxlength="17" name="gst_number" placeholder="gst number" ng-show="gst_tax_exempt" type="text"></td>
@@ -143,6 +144,9 @@
 			<td><label for="id_hst_tax_exempt">Hst tax exempt:</label></td>
 			<td>
 				<input id="id_hst_tax_exempt" ng-model="hst_tax_exempt" name="hst_tax_exempt" type="checkbox">
+				
+			</td>
+			<td>
 				<label class="pull-right" ng-show="hst_tax_exempt" for="id_hst_number">Hst number:</label>
 			</td>
 			<td><input class="form-control" id="id_hst_number" maxlength="17" name="hst_number" placeholder="hst number" ng-show="hst_tax_exempt" type="text"></td>
@@ -155,9 +159,9 @@
 			<td><label for="id_pst_tax_exempt">Pst tax exempt:</label></td>
 			<td>
 				<input id="id_pst_tax_exempt" ng-model="pst_tax_exempt" name="pst_tax_exempt" type="checkbox">
-
-				<label class="pull-right" ng-show="pst_tax_exempt" for="id_pst_number">Pst number:</label>
 			</td>
+			<td>
+				<label class="pull-right" ng-show="pst_tax_exempt" for="id_pst_number">Pst number:</label></td>
 			<td>
 				<input class="form-control" id="id_pst_number" maxlength="11" name="pst_number" placeholder="pst number" ng-show="pst_tax_exempt" type="text">
 			</td>
@@ -215,7 +219,7 @@
 		  		
 		<tr>
 			<td><label for="id_fob">Fob:</label></td>
-			<td colspan="3"><input class="form-control" id="id_fob" maxlength="50" name="fob" placeholder="FOB" type="text" value="Oshawa, Ontario, Canada"></td>
+			<td colspan="3"><input class="form-control" id="id_fob" maxlength="50" name="fob" placeholder="FOB" type="text" value=""></td>
 		</tr>
 	
 		<tr>
@@ -235,15 +239,21 @@
 		  		
 		  		
 		<tr>
-			<td colspan="4" class="submit">
-				<button type="submit" class="btn btn-primary btn-lg form-control login-btn">
+			<td>
+				<button type="submit" ng-hide="new_contact_form" class="btn btn-primary btn-lg form-control login-btn">
+					Update Contact
+				</button>
+			</td>
+			<td colspan="2" class="submit">
+				<button type="submit" ng-show="new_contact_form" class="btn btn-primary btn-lg form-control login-btn">
 					Add Contact
 				</button>
 
-				<button type="submit" class="ng-hide btn btn-primary btn-lg form-control login-btn">
-					Update Contact
-				</button>
-
+			</td>
+			<td>
+				<a ng-hide="new_contact_form" ng-click="deleteContact()" class="btn btn-danger btn-lg form-control login-btn">
+					Delete Contact
+				</a>
 			</td>
 		</tr>
 	
