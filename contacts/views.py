@@ -376,7 +376,7 @@ def contact_delete(request):
             # contact_profile.delete()
             contact = Contact.objects.get(id=cid)
             contact.delete()
-            return HttpResponse(cid)
+            return HttpResponse("true")
         except:
             return HttpResponse("not deleted")
     else:

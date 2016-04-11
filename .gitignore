@@ -16,10 +16,7 @@ data/*
 .rhosts
 .shrc
 .ssh/*
-imeter24/local_settings.py
 
 .git/*
 .ssh/*
 .psql_history
-
-manage.py

@@ -295,7 +295,9 @@ table > tbody {
 	                    'cid': con_id,
 	                },
 	                success: function(rdata) {
-
+	                	if(rdata == 'true') {
+	                		window.location.reload();
+	                	}
 	                }
 	            });
 	        }
