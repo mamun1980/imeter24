@@ -16,7 +16,7 @@ data/*
 .rhosts
 .shrc
 .ssh/*
-
+imeter24/.DS_Store
 .git/*
 .ssh/*
 .psql_history
